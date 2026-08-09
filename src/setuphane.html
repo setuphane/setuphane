@@ -1152,16 +1152,20 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
               </p>
             ) : null;
           })()}
-          <ul className="space-y-2 max-h-[560px] overflow-y-auto pr-1">
+          {/* Mobilde iç kaydırma yok: sayfa içinde ikinci bir kaydırma alanı
+              dokunmatikte can sıkıcı ve kaydırma çubuğu yazıdan yer çalıyordu. */}
+          <ul className="space-y-2 sm:max-h-[560px] sm:overflow-y-auto sm:pr-1">
             {list.slice(0,10).map(l=>{
               const on=cur && cur.name===l.name;
               const ad=laptopAd(l);
               return (
                 <li key={l.name}>
                   <button onClick={()=>setSel(l)} aria-pressed={!!on}
-                    className={'w-full text-left flex items-start gap-3 sm:gap-4 p-3 border transition-all duration-300 '+
+                    className={'w-full text-left flex items-start gap-2.5 sm:gap-4 p-2.5 sm:p-3 border transition-all duration-300 '+
                       (on?'border-cy bg-cy/[.06]':'border-line hover:border-ink/25')}>
-                    <span className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-[#0b0b12] grid place-items-center overflow-hidden">
+                    {/* Telefonda 64px görsel yazıya 187px bırakıyordu ve özellik
+                        satırı sıkışıp okunmuyordu. 48px'e indirildi. */}
+                    <span className="w-12 h-12 sm:w-20 sm:h-20 shrink-0 bg-[#0b0b12] grid place-items-center overflow-hidden">
                       <img src={l.image} alt="" loading="lazy" decoding="async"
                            className="w-full h-full object-contain"
                            style={{filter:'grayscale(.55) brightness(.92)'}}
@@ -1174,8 +1178,10 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
                         {ad.model}
                       </span>
                       {ad.seri && <span className="num block text-[.7rem] text-dim/70 mt-1">{ad.seri}</span>}
-                      <span className="block text-[.74rem] text-dim mt-1.5 leading-snug">
-                        {l.ram?l.ram+' GB RAM · ':''}{l.ssd?(l.ssd>=1000?(l.ssd/1000)+' TB':l.ssd+' GB')+' SSD · ':''}{l.inch?l.inch+' inç · ':''}{l.offers} satıcı
+                      <span className="block text-[.8rem] text-dim mt-1.5 leading-relaxed">
+                        {l.ram?l.ram+' GB RAM':''}{l.ssd?' · '+(l.ssd>=1000?(l.ssd/1000)+' TB':l.ssd+' GB')+' SSD':''}
+                        {l.inch?' · '+l.inch+'"':''}
+                        <span className="block sm:inline text-dim/70">{l.offers} satıcı</span>
                       </span>
                       {/* telefonda fiyat kendi satırında — yan yana sıkışınca başlık 4 satıra yayılıyordu */}
                       <span className="num sm:hidden block mt-2 text-[1.05rem] text-ink">{fmt(l.price)}</span>
@@ -3291,12 +3297,15 @@ function FpsTesti(){
   return (
     <div>
       <div className="grid sm:grid-cols-2 gap-6 mb-7">
+        {/* Eşit genişlikli ızgara: 'flex flex-wrap' düğmeleri metin uzunluğuna
+            göre boyutlandırdığı için mobilde 3+2 kırılıyor ve satırlar hizasız
+            görünüyordu. Izgarada 3+2 kırılma da düzenli duruyor. */}
         <div>
           <div className="lbl text-dim mb-3">TEST SÜRESİ</div>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {[15,30,60].map(s=>(
               <button key={s} onClick={()=>{setSure(s);setKalan(s);}} disabled={calisiyor} aria-pressed={sure===s}
-                className={'lbl px-4 py-2.5 border transition-colors disabled:opacity-40 '+(sure===s?'border-cy text-cy bg-cy/[.07]':'border-line text-dim hover:text-ink')}>
+                className={'lbl text-center px-2 py-2.5 border transition-colors disabled:opacity-40 '+(sure===s?'border-cy text-cy bg-cy/[.07]':'border-line text-dim hover:text-ink')}>
                 {s} SN
               </button>
             ))}
@@ -3304,10 +3313,10 @@ function FpsTesti(){
         </div>
         <div>
           <div className="lbl text-dim mb-3">YÜK YOĞUNLUĞU</div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {FPS_YOGUNLUK.map(y=>(
               <button key={y.id} onClick={()=>setYog(y.id)} disabled={calisiyor} aria-pressed={yog===y.id}
-                className={'lbl px-3.5 py-2.5 border transition-colors disabled:opacity-40 '+(yog===y.id?'border-cy text-cy bg-cy/[.07]':'border-line text-dim hover:text-ink')}>
+                className={'lbl text-center px-2 py-2.5 border transition-colors disabled:opacity-40 '+(yog===y.id?'border-cy text-cy bg-cy/[.07]':'border-line text-dim hover:text-ink')}>
                 {y.n}
               </button>
             ))}
@@ -3315,14 +3324,16 @@ function FpsTesti(){
         </div>
       </div>
 
+      {/* Etiket kutuları sabit yükseklikte: "—" ile "180 Hz" farklı yükseklik
+          verdiği için satırlar birbirine göre kayık duruyordu. */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-5 pb-6 mb-6 border-b border-line">
         {[['ANLIK FPS',calisiyor?anlik:(son?son.ort:'—')],
           ['YENİLEME HIZI',hz?hz+' Hz':'—'],
           ['ORTALAMA',son?son.ort:'—'],
           ['KALAN',kalan+' sn']].map(([k,v])=>(
           <div key={k}>
-            <div className="lbl text-dim mb-1.5">{k}</div>
-            <div className="num text-[1.5rem] font-light text-cy">{v}</div>
+            <div className="lbl text-dim mb-1.5 h-[13px] leading-[13px]">{k}</div>
+            <div className="num text-[1.5rem] font-light text-cy leading-[1.7rem] h-[1.7rem]">{v}</div>
           </div>
         ))}
       </div>
