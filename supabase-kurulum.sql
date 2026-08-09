@@ -1,3 +1,11 @@
+-- SETUP HANE — forum tablolari
+-- Bu betik BASTAN KURAR: varsa siler, yeniden olusturur.
+-- Icinde gercek kullanici gonderisi varsa ONCE YEDEK AL (Table Editor -> Export).
+
+drop table if exists begeniler cascade;
+drop table if exists cevaplar  cascade;
+drop table if exists konular   cascade;
+
 create extension if not exists pgcrypto;
 
 create table konular (
@@ -28,6 +36,10 @@ create table begeniler (
   primary key (konu_id, cihaz)
 );
 
+-- Listeleme hizi icin
+create index konular_tarih_idx  on konular (olusturma desc);
+create index cevaplar_konu_idx  on cevaplar (konu_id);
+
 alter table konular   enable row level security;
 alter table cevaplar  enable row level security;
 alter table begeniler enable row level security;
@@ -37,12 +49,12 @@ create policy oku_k on konular   for select using (true);
 create policy oku_c on cevaplar  for select using (true);
 create policy oku_b on begeniler for select using (true);
 
--- Herkes yazar (uzunluk/biçim kısıtları yukarıdaki CHECK'lerde)
+-- Herkes yazar (uzunluk/bicim kisitlari yukaridaki CHECK'lerde)
 create policy yaz_k on konular   for insert with check (not sabit);
 create policy yaz_c on cevaplar  for insert with check (true);
 create policy yaz_b on begeniler for insert with check (true);
 
--- Beğeni geri alınabilir; konu/cevap SİLİNEMEZ.
--- Sunucu tarafında sahiplik doğrulanamadığı için silme yetkisi verilmiyor;
--- moderasyon Supabase panelinden yapılır.
+-- Begeni geri alinabilir; konu/cevap SILINEMEZ.
+-- Sunucu tarafinda sahiplik dogrulanamadigi icin silme yetkisi verilmiyor;
+-- moderasyon Supabase panelinden yapilir.
 create policy sil_b on begeniler for delete using (true);

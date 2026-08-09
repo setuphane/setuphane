@@ -2446,7 +2446,7 @@ function GirisKarti({user,setUser}){
 
   return (
     <div>
-      <Label className="mb-4">FORUMA KATIL</Label>
+      <Label className="mb-4">OTURUM AÇ</Label>
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="fad" className="lbl text-dim block mb-2">KULLANICI ADIN</label>
@@ -2475,7 +2475,7 @@ function GirisKarti({user,setUser}){
       {hata && <p className="mt-4 text-[.85rem]" style={{color:'#FF2D95'}}>{hata}</p>}
       <button onClick={katil}
         className="mt-6 border border-cy text-cy px-6 py-3 lbl hover:bg-cy hover:text-bg transition-colors duration-300">
-        KATIL
+        OTURUM AÇ
       </button>
       <p className="mt-4 text-[.78rem] text-dim leading-relaxed max-w-[52ch]">
         E-posta istemiyoruz, doğrulama yok, hiçbir şey sunucuya gitmiyor. PIN sadece aynı
@@ -2558,7 +2558,7 @@ function YeniKonu({user,sys,prof,onEkle}){
   );
 }
 
-function Konu({k,user,ben,onGuncelle,onSil}){
+function Konu({k,user,ben,onGuncelle,onSil,onOturumAc}){
   const [ac,setAc]=useState(false);
   const [cevap,setCevap]=useState('');
   const kat=KATEGORILER.find(x=>x.id===k.kat)||KATEGORILER[4];
@@ -2652,7 +2652,12 @@ function Konu({k,user,ben,onGuncelle,onSil}){
                 </button>
               </div>
             ) : (
-              <p className="mt-7 text-[.88rem] text-dim">Cevap yazmak için yukarıdan bir kullanıcı adı seç.</p>
+              /* Aynı akışa bağlı: paneli açar ve sayfayı ona kaydırır.
+                 Önceden "yukarıdan bir ad seç" diyen ölü bir metindi. */
+              <button onClick={onOturumAc}
+                className="mt-7 lbl px-5 py-3 border border-cy/40 text-cy hover:bg-cy/[.07] hover:border-cy transition-colors duration-300">
+                CEVAP YAZMAK İÇİN OTURUM AÇ
+              </button>
             )}
           </div>
         </div>
@@ -2669,6 +2674,16 @@ function Forum({sys,prof}){
   const [yukleniyor,setYukleniyor]=useState(uzakVar());
   const [uzakHata,setUzakHata]=useState(null);
   const [kimlikAcik,setKimlikAcik]=useState(false);
+  const kimlikRef=useRef(null);
+  /* Tek giriş noktası: nerede "oturum aç" yazsa buraya bağlanıyor —
+     paneli açar ve sayfayı ona kaydırır. */
+  const oturumAc=useCallback(()=>{
+    setKimlikAcik(true);
+    setTimeout(()=>{
+      const el=kimlikRef.current;
+      if(el) el.scrollIntoView({behavior:reduced()?'auto':'smooth', block:'center'});
+    },60);
+  },[]);
   const dosyaRef=useRef(null);
   const ben=cihazId();
 
@@ -2780,7 +2795,7 @@ function Forum({sys,prof}){
           içerik kayıt formunun altında gömülüydü. Artık form yalnızca
           gerektiğinde açılıyor. */}
       <Reveal delay={110}>
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-3 py-3 border-y border-line">
+        <div ref={kimlikRef} className="mt-10 flex flex-wrap items-center justify-between gap-3 py-3 border-y border-line scroll-mt-[140px]">
           {user ? (
             <>
               <span className="flex items-center gap-3 min-w-0">
@@ -2792,10 +2807,10 @@ function Forum({sys,prof}){
             </>
           ) : (
             <>
-              <span className="text-[.88rem] text-dim">Okumak serbest — yazmak için bir ad seç.</span>
-              <button onClick={()=>setKimlikAcik(a=>!a)}
+              <span className="text-[.88rem] text-dim">Okumak serbest — yazmak için oturum aç.</span>
+              <button onClick={()=>kimlikAcik?setKimlikAcik(false):oturumAc()}
                 className={'lbl px-4 py-2 border transition-colors '+(kimlikAcik?'border-cy text-cy':'border-line text-dim hover:text-ink')}>
-                {kimlikAcik?'KAPAT':'KATIL'}
+                {kimlikAcik?'KAPAT':'OTURUM AÇ'}
               </button>
             </>
           )}
@@ -2843,7 +2858,7 @@ function Forum({sys,prof}){
       <Reveal delay={190}>
         <div className="mt-6">{user
           ? <YeniKonu user={user} sys={sys} prof={prof} onEkle={ekle}/>
-          : <button onClick={()=>setKimlikAcik(true)}
+          : <button onClick={oturumAc}
               className="w-full border border-cy/40 text-cy px-6 py-4 lbl hover:bg-cy/[.07] hover:border-cy transition-colors duration-300">
               + YENİ KONU AÇ
             </button>}
@@ -2871,7 +2886,8 @@ function Forum({sys,prof}){
             ? <p className="py-10 text-[.9rem] text-dim">Konular yükleniyor…</p>
             : liste.length===0
               ? <p className="py-10 text-[.9rem] text-dim">Bu kategoride henüz konu yok. İlk açan sen ol.</p>
-              : liste.map(k=><Konu key={k.id} k={k} user={user} ben={ben} onGuncelle={guncelle} onSil={sil}/>)}
+              : liste.map(k=><Konu key={k.id} k={k} user={user} ben={ben}
+                              onGuncelle={guncelle} onSil={sil} onOturumAc={oturumAc}/>)}
         </div>
       </Reveal>
 

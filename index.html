@@ -261,7 +261,7 @@ img, video { max-width: 100%; height: auto; }
 .mt-7 { margin-top: 1.75rem; }
 .mt-8 { margin-top: 2rem; }
 .mt-9 { margin-top: 2.25rem; }
-.line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.ml-1 { margin-left: 0.25rem; }
 .block { display: block; }
 .flex { display: flex; }
 .inline-flex { display: inline-flex; }
@@ -280,8 +280,7 @@ img, video { max-width: 100%; height: auto; }
 .h-\[3px\] { height: 3px; }
 .h-\[60px\] { height: 60px; }
 .h-full { height: 100%; }
-.h-\[1\.7rem\] { height: 1.7rem; }
-.h-\[260px\] { height: 260px; }
+.h-px { height: 1px; }
 .w-1\.5 { width: 0.375rem; }
 .w-12 { width: 3rem; }
 .w-2 { width: 0.5rem; }
@@ -309,16 +308,15 @@ img, video { max-width: 100%; height: auto; }
 .max-w-\[56ch\] { max-width: 56ch; }
 .max-w-\[58ch\] { max-width: 58ch; }
 .max-w-\[1100px\] { max-width: 1100px; }
-.max-w-\[18ch\] { max-width: 18ch; }
+.max-w-\[17ch\] { max-width: 17ch; }
 .flex-1 { flex: 1 1 0%; }
 .shrink-0 { flex-shrink: 0; }
 .-translate-x-1\/2 { --tw-translate-x: -50%; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
 .-translate-y-1\/2 { --tw-translate-y: -50%; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
 .rotate-45 { --tw-rotate: 45deg; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
 .scroll-mt-24 { scroll-margin-top: 6rem; }
+.scroll-mt-\[140px\] { scroll-margin-top: 140px; }
 .grid-cols-1 { grid-template-columns: repeat(1, minmax(0px, 1fr)); }
-.grid-cols-2 { grid-template-columns: repeat(2, minmax(0px, 1fr)); }
-.grid-cols-3 { grid-template-columns: repeat(3, minmax(0px, 1fr)); }
 .flex-col { flex-direction: column; }
 .flex-wrap { flex-wrap: wrap; }
 .place-items-center { place-items: center; }
@@ -337,7 +335,6 @@ img, video { max-width: 100%; height: auto; }
 .gap-5 { gap: 1.25rem; }
 .gap-7 { gap: 1.75rem; }
 .gap-8 { gap: 2rem; }
-.gap-6 { gap: 1.5rem; }
 .gap-x-10 { column-gap: 2.5rem; }
 .gap-x-14 { column-gap: 3.5rem; }
 .gap-x-8 { column-gap: 2rem; }
@@ -346,18 +343,14 @@ img, video { max-width: 100%; height: auto; }
 .gap-y-3 { row-gap: 0.75rem; }
 .gap-y-4 { row-gap: 1rem; }
 .gap-y-6 { row-gap: 1.5rem; }
-.gap-x-6 { column-gap: 1.5rem; }
-.gap-y-1 { row-gap: 0.25rem; }
-.gap-y-5 { row-gap: 1.25rem; }
 .space-y-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(0.5rem * var(--tw-space-y-reverse)); }
 .space-y-3 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(0.75rem * var(--tw-space-y-reverse)); }
 .space-y-3\.5 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(0.875rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(0.875rem * var(--tw-space-y-reverse)); }
-.space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(0.625rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(0.625rem * var(--tw-space-y-reverse)); }
 .divide-y > :not([hidden]) ~ :not([hidden]) { --tw-divide-y-reverse: 0; border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(1px * var(--tw-divide-y-reverse)); }
 .divide-line > :not([hidden]) ~ :not([hidden]) { border-color: rgba(236, 235, 242, 0.1); }
-.overflow-hidden { overflow: hidden; }
 .whitespace-nowrap { white-space: nowrap; }
 .border { border-width: 1px; }
+.border-y { border-top-width: 1px; border-bottom-width: 1px; }
 .border-b { border-bottom-width: 1px; }
 .border-l { border-left-width: 1px; }
 .border-t { border-top-width: 1px; }
@@ -371,16 +364,14 @@ img, video { max-width: 100%; height: auto; }
 .bg-cy\/\[\.07\] { background-color: rgba(45, 226, 230, 0.07); }
 .bg-ink\/10 { background-color: rgba(236, 235, 242, 0.1); }
 .bg-ink\/30 { background-color: rgba(236, 235, 242, 0.3); }
-.bg-\[\#0b0b12\] { --tw-bg-opacity: 1; background-color: rgb(11 11 18 / var(--tw-bg-opacity, 1)); }
-.bg-cy\/\[\.06\] { background-color: rgba(45, 226, 230, 0.06); }
-.object-contain { object-fit: contain; }
+.bg-transparent { background-color: transparent; }
+.bg-line { background-color: rgba(236, 235, 242, 0.1); }
 .p-4 { padding: 1rem; }
 .p-5 { padding: 1.25rem; }
 .p-6 { padding: 1.5rem; }
 .p-7 { padding: 1.75rem; }
 .p-\[7\%\] { padding: 7%; }
 .p-\[9\%\] { padding: 9%; }
-.p-2\.5 { padding: 0.625rem; }
 .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
 .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
 .px-4 { padding-left: 1rem; padding-right: 1rem; }
@@ -396,6 +387,7 @@ img, video { max-width: 100%; height: auto; }
 .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
 .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
 .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
 .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
 .pb-2\.5 { padding-bottom: 0.625rem; }
 .pb-3 { padding-bottom: 0.75rem; }
@@ -410,8 +402,6 @@ img, video { max-width: 100%; height: auto; }
 .pt-6 { padding-top: 1.5rem; }
 .pt-8 { padding-top: 2rem; }
 .pt-\[128px\] { padding-top: 128px; }
-.pb-6 { padding-bottom: 1.5rem; }
-.pt-7 { padding-top: 1.75rem; }
 .text-left { text-align: left; }
 .text-center { text-align: center; }
 .text-right { text-align: right; }
@@ -445,8 +435,8 @@ img, video { max-width: 100%; height: auto; }
 .text-\[clamp\(2rem\,7\.4vw\,3\.4rem\)\] { font-size: clamp(2rem, 7.4vw, 3.4rem); }
 .text-\[clamp\(3\.4rem\,17vw\,7\.5rem\)\] { font-size: clamp(3.4rem, 17vw, 7.5rem); }
 .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-.text-\[1rem\] { font-size: 1rem; }
-.text-\[clamp\(2rem\,6vw\,3\.6rem\)\] { font-size: clamp(2rem, 6vw, 3.6rem); }
+.text-\[1\.12rem\] { font-size: 1.12rem; }
+.text-\[clamp\(2rem\,6\.4vw\,4\.2rem\)\] { font-size: clamp(2rem, 6.4vw, 4.2rem); }
 .font-light { font-weight: 300; }
 .font-normal { font-weight: 400; }
 .italic { font-style: italic; }
@@ -458,8 +448,6 @@ img, video { max-width: 100%; height: auto; }
 .leading-relaxed { line-height: 1.625; }
 .leading-snug { line-height: 1.375; }
 .leading-tight { line-height: 1.25; }
-.leading-\[1\.7rem\] { line-height: 1.7rem; }
-.leading-\[13px\] { line-height: 13px; }
 .text-cy { --tw-text-opacity: 1; color: rgb(45 226 230 / var(--tw-text-opacity, 1)); }
 .text-dim { --tw-text-opacity: 1; color: rgb(139 136 160 / var(--tw-text-opacity, 1)); }
 .text-dim\/50 { color: rgba(139, 136, 160, 0.5); }
@@ -472,23 +460,26 @@ img, video { max-width: 100%; height: auto; }
 .text-mg { --tw-text-opacity: 1; color: rgb(255 45 149 / var(--tw-text-opacity, 1)); }
 .underline-offset-4 { text-underline-offset: 4px; }
 .opacity-\[\.06\] { opacity: 0.06; }
+.opacity-60 { opacity: 0.6; }
 .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
 .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
 .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
 .duration-300 { transition-duration: 300ms; }
 .duration-500 { transition-duration: 500ms; }
+.placeholder\:text-dim\/50::placeholder { color: rgba(139, 136, 160, 0.5); }
 .hover\:border-ink\/25:hover { border-color: rgba(236, 235, 242, 0.25); }
+.hover\:border-cy:hover { --tw-border-opacity: 1; border-color: rgb(45 226 230 / var(--tw-border-opacity, 1)); }
+.hover\:border-ink\/30:hover { border-color: rgba(236, 235, 242, 0.3); }
 .hover\:bg-cy:hover { --tw-bg-opacity: 1; background-color: rgb(45 226 230 / var(--tw-bg-opacity, 1)); }
+.hover\:bg-cy\/\[\.07\]:hover { background-color: rgba(45, 226, 230, 0.07); }
 .hover\:text-bg:hover { --tw-text-opacity: 1; color: rgb(7 7 11 / var(--tw-text-opacity, 1)); }
 .hover\:text-ink:hover { --tw-text-opacity: 1; color: rgb(236 235 242 / var(--tw-text-opacity, 1)); }
-.hover\:text-cy:hover { --tw-text-opacity: 1; color: rgb(45 226 230 / var(--tw-text-opacity, 1)); }
 .hover\:underline:hover { text-decoration-line: underline; }
+.focus\:border-cy:focus { --tw-border-opacity: 1; border-color: rgb(45 226 230 / var(--tw-border-opacity, 1)); }
 .active\:bg-cy:active { --tw-bg-opacity: 1; background-color: rgb(45 226 230 / var(--tw-bg-opacity, 1)); }
 .active\:text-bg:active { --tw-text-opacity: 1; color: rgb(7 7 11 / var(--tw-text-opacity, 1)); }
-.disabled\:opacity-40:disabled { opacity: 0.4; }
-.disabled\:hover\:bg-transparent:hover:disabled { background-color: transparent; }
-.disabled\:hover\:text-cy:hover:disabled { --tw-text-opacity: 1; color: rgb(45 226 230 / var(--tw-text-opacity, 1)); }
 .group:hover .group-hover\:translate-x-1\.5 { --tw-translate-x: 0.375rem; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
+.group:hover .group-hover\:translate-x-1 { --tw-translate-x: 0.25rem; transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y)); }
 .group:hover .group-hover\:border-cy\/45 { border-color: rgba(45, 226, 230, 0.45); }
 .group:hover .group-hover\:border-ink\/30 { border-color: rgba(236, 235, 242, 0.3); }
 .group:hover .group-hover\:text-cy { --tw-text-opacity: 1; color: rgb(45 226 230 / var(--tw-text-opacity, 1)); }
@@ -497,30 +488,20 @@ img, video { max-width: 100%; height: auto; }
   .sm\:mb-14 { margin-bottom: 3.5rem; }
   .sm\:block { display: block; }
   .sm\:inline { display: inline; }
-  .sm\:hidden { display: none; }
   .sm\:h-16 { height: 4rem; }
-  .sm\:h-20 { height: 5rem; }
-  .sm\:h-\[340px\] { height: 340px; }
-  .sm\:max-h-\[560px\] { max-height: 560px; }
   .sm\:w-16 { width: 4rem; }
   .sm\:w-7 { width: 1.75rem; }
   .sm\:w-\[240px\] { width: 240px; }
-  .sm\:w-20 { width: 5rem; }
   .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0px, 1fr)); }
   .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0px, 1fr)); }
-  .sm\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0px, 1fr)); }
   .sm\:flex-row { flex-direction: row; }
   .sm\:items-end { align-items: flex-end; }
   .sm\:gap-5 { gap: 1.25rem; }
-  .sm\:gap-4 { gap: 1rem; }
-  .sm\:overflow-y-auto { overflow-y: auto; }
   .sm\:p-7 { padding: 1.75rem; }
   .sm\:p-9 { padding: 2.25rem; }
-  .sm\:p-3 { padding: 0.75rem; }
   .sm\:px-8 { padding-left: 2rem; padding-right: 2rem; }
   .sm\:py-7 { padding-top: 1.75rem; padding-bottom: 1.75rem; }
   .sm\:pt-\[136px\] { padding-top: 136px; }
-  .sm\:pr-1 { padding-right: 0.25rem; }
   .sm\:text-\[\.95rem\] { font-size: 0.95rem; }
   .sm\:text-\[\.98rem\] { font-size: 0.98rem; }
   .sm\:text-\[1\.22rem\] { font-size: 1.22rem; }
@@ -544,6 +525,7 @@ img, video { max-width: 100%; height: auto; }
   .lg\:grid-cols-\[1fr_auto\] { grid-template-columns: 1fr auto; }
   .lg\:grid-cols-\[300px_1fr\] { grid-template-columns: 300px 1fr; }
   .lg\:grid-cols-\[minmax\(0\,1fr\)_330px\] { grid-template-columns: minmax(0px, 1fr) 330px; }
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0px, 1fr)); }
   .lg\:gap-12 { gap: 3rem; }
   .lg\:px-12 { padding-left: 3rem; padding-right: 3rem; }
   .lg\:py-24 { padding-top: 6rem; padding-bottom: 6rem; }
@@ -4387,7 +4369,7 @@ function GirisKarti({
   };
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "FORUMA KATIL"), /*#__PURE__*/React.createElement("div", {
+  }, "OTURUM A\xC7"), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 gap-4"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "fad",
@@ -4436,7 +4418,7 @@ function GirisKarti({
   }, hata), /*#__PURE__*/React.createElement("button", {
     onClick: katil,
     className: "mt-6 border border-cy text-cy px-6 py-3 lbl hover:bg-cy hover:text-bg transition-colors duration-300"
-  }, "KATIL"), /*#__PURE__*/React.createElement("p", {
+  }, "OTURUM A\xC7"), /*#__PURE__*/React.createElement("p", {
     className: "mt-4 text-[.78rem] text-dim leading-relaxed max-w-[52ch]"
   }, "E-posta istemiyoruz, do\u011Frulama yok, hi\xE7bir \u015Fey sunucuya gitmiyor. PIN sadece ayn\u0131 bilgisayar\u0131 payla\u015F\u0131yorsan ba\u015Fkas\u0131 senin ad\u0131nla yazmas\u0131n diye \u2014 ger\xE7ek bir \u015Fifre de\u011Fil."));
 }
@@ -4558,7 +4540,8 @@ function Konu({
   user,
   ben,
   onGuncelle,
-  onSil
+  onSil,
+  onOturumAc
 }) {
   const [ac, setAc] = useState(false);
   const [cevap, setCevap] = useState('');
@@ -4681,9 +4664,14 @@ function Konu({
     onClick: cevapla,
     disabled: cevap.trim().length < 2,
     className: "mt-3 border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300 disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-cy"
-  }, "CEVAP YAZ")) : /*#__PURE__*/React.createElement("p", {
-    className: "mt-7 text-[.88rem] text-dim"
-  }, "Cevap yazmak i\xE7in yukar\u0131dan bir kullan\u0131c\u0131 ad\u0131 se\xE7.")))));
+  }, "CEVAP YAZ")) :
+  /*#__PURE__*/
+  /* Aynı akışa bağlı: paneli açar ve sayfayı ona kaydırır.
+     Önceden "yukarıdan bir ad seç" diyen ölü bir metindi. */
+  React.createElement("button", {
+    onClick: onOturumAc,
+    className: "mt-7 lbl px-5 py-3 border border-cy/40 text-cy hover:bg-cy/[.07] hover:border-cy transition-colors duration-300"
+  }, "CEVAP YAZMAK \u0130\xC7\u0130N OTURUM A\xC7")))));
 }
 function Forum({
   sys,
@@ -4698,6 +4686,19 @@ function Forum({
   const [yukleniyor, setYukleniyor] = useState(uzakVar());
   const [uzakHata, setUzakHata] = useState(null);
   const [kimlikAcik, setKimlikAcik] = useState(false);
+  const kimlikRef = useRef(null);
+  /* Tek giriş noktası: nerede "oturum aç" yazsa buraya bağlanıyor —
+     paneli açar ve sayfayı ona kaydırır. */
+  const oturumAc = useCallback(() => {
+    setKimlikAcik(true);
+    setTimeout(() => {
+      const el = kimlikRef.current;
+      if (el) el.scrollIntoView({
+        behavior: reduced() ? 'auto' : 'smooth',
+        block: 'center'
+      });
+    }, 60);
+  }, []);
   const dosyaRef = useRef(null);
   const ben = cihazId();
 
@@ -4876,7 +4877,8 @@ function Forum({
   }, "Kurucu sana bir sistem verir ama her sorunun cevab\u0131 form\xFClde yoktur. Bir kullan\u0131c\u0131 ad\u0131 se\xE7, konu a\xE7, kurdu\u011Fun sistemi tek tu\u015Fla g\xF6nderine ekle.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 110
   }, /*#__PURE__*/React.createElement("div", {
-    className: "mt-10 flex flex-wrap items-center justify-between gap-3 py-3 border-y border-line"
+    ref: kimlikRef,
+    className: "mt-10 flex flex-wrap items-center justify-between gap-3 py-3 border-y border-line scroll-mt-[140px]"
   }, user ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
     className: "flex items-center gap-3 min-w-0"
   }, /*#__PURE__*/React.createElement(Avatar, {
@@ -4897,10 +4899,10 @@ function Forum({
     className: "lbl text-dim hover:text-ink transition-colors"
   }, "\xC7IKI\u015E")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
     className: "text-[.88rem] text-dim"
-  }, "Okumak serbest \u2014 yazmak i\xE7in bir ad se\xE7."), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setKimlikAcik(a => !a),
+  }, "Okumak serbest \u2014 yazmak i\xE7in oturum a\xE7."), /*#__PURE__*/React.createElement("button", {
+    onClick: () => kimlikAcik ? setKimlikAcik(false) : oturumAc(),
     className: 'lbl px-4 py-2 border transition-colors ' + (kimlikAcik ? 'border-cy text-cy' : 'border-line text-dim hover:text-ink')
-  }, kimlikAcik ? 'KAPAT' : 'KATIL')))), !user && /*#__PURE__*/React.createElement("div", {
+  }, kimlikAcik ? 'KAPAT' : 'OTURUM AÇ')))), !user && /*#__PURE__*/React.createElement("div", {
     className: 'acc ' + (kimlikAcik ? 'open' : '')
   }, /*#__PURE__*/React.createElement("div", {
     className: "accIn"
@@ -4953,7 +4955,7 @@ function Forum({
     prof: prof,
     onEkle: ekle
   }) : /*#__PURE__*/React.createElement("button", {
-    onClick: () => setKimlikAcik(true),
+    onClick: oturumAc,
     className: "w-full border border-cy/40 text-cy px-6 py-4 lbl hover:bg-cy/[.07] hover:border-cy transition-colors duration-300"
   }, "+ YEN\u0130 KONU A\xC7"))), /*#__PURE__*/React.createElement(Reveal, {
     delay: 220
@@ -4987,7 +4989,8 @@ function Forum({
     user: user,
     ben: ben,
     onGuncelle: guncelle,
-    onSil: sil
+    onSil: sil,
+    onOturumAc: oturumAc
   })))), /*#__PURE__*/React.createElement(Reveal, {
     delay: 280
   }, /*#__PURE__*/React.createElement("div", {
