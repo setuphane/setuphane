@@ -230,7 +230,6 @@ img, video { max-width: 100%; height: auto; }
 .top-\[6\%\] { top: 6%; }
 .z-10 { z-index: 10; }
 .z-50 { z-index: 50; }
-.-mx-5 { margin-left: -1.25rem; margin-right: -1.25rem; }
 .mx-auto { margin-left: auto; margin-right: auto; }
 .-mt-1 { margin-top: -0.25rem; }
 .-mt-\[4px\] { margin-top: -4px; }
@@ -349,11 +348,11 @@ img, video { max-width: 100%; height: auto; }
 .space-y-5 > :not([hidden]) ~ :not([hidden]) { --tw-space-y-reverse: 0; margin-top: calc(1.25rem * calc(1 - var(--tw-space-y-reverse))); margin-bottom: calc(1.25rem * var(--tw-space-y-reverse)); }
 .divide-y > :not([hidden]) ~ :not([hidden]) { --tw-divide-y-reverse: 0; border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse))); border-bottom-width: calc(1px * var(--tw-divide-y-reverse)); }
 .divide-line > :not([hidden]) ~ :not([hidden]) { border-color: rgba(236, 235, 242, 0.1); }
-.overflow-x-auto { overflow-x: auto; }
 .whitespace-nowrap { white-space: nowrap; }
 .whitespace-pre-wrap { white-space: pre-wrap; }
 .break-words { overflow-wrap: break-word; }
 .border { border-width: 1px; }
+.border-y { border-top-width: 1px; border-bottom-width: 1px; }
 .border-b { border-bottom-width: 1px; }
 .border-l { border-left-width: 1px; }
 .border-t { border-top-width: 1px; }
@@ -363,13 +362,10 @@ img, video { max-width: 100%; height: auto; }
 .border-line { border-color: rgba(236, 235, 242, 0.1); }
 .border-line\/60 { border-color: rgba(236, 235, 242, 0.6); }
 .border-transparent { border-color: transparent; }
-.border-cy\/25 { border-color: rgba(45, 226, 230, 0.25); }
 .bg-cy\/40 { background-color: rgba(45, 226, 230, 0.4); }
 .bg-cy\/\[\.07\] { background-color: rgba(45, 226, 230, 0.07); }
 .bg-ink\/10 { background-color: rgba(236, 235, 242, 0.1); }
 .bg-ink\/30 { background-color: rgba(236, 235, 242, 0.3); }
-.bg-cy { --tw-bg-opacity: 1; background-color: rgb(45 226 230 / var(--tw-bg-opacity, 1)); }
-.bg-cy\/\[\.05\] { background-color: rgba(45, 226, 230, 0.05); }
 .bg-transparent { background-color: transparent; }
 .p-4 { padding: 1rem; }
 .p-5 { padding: 1.25rem; }
@@ -377,13 +373,14 @@ img, video { max-width: 100%; height: auto; }
 .p-7 { padding: 1.75rem; }
 .p-\[7\%\] { padding: 7%; }
 .p-\[9\%\] { padding: 9%; }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
 .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-.px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
 .px-4 { padding-left: 1rem; padding-right: 1rem; }
 .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
 .px-7 { padding-left: 1.75rem; padding-right: 1.75rem; }
 .py-16 { padding-top: 4rem; padding-bottom: 4rem; }
 .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
 .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
 .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
 .py-3\.5 { padding-top: 0.875rem; padding-bottom: 0.875rem; }
@@ -392,8 +389,6 @@ img, video { max-width: 100%; height: auto; }
 .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
 .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
 .py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
-.py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
-.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
 .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
 .pb-2\.5 { padding-bottom: 0.625rem; }
 .pb-3 { padding-bottom: 0.75rem; }
@@ -411,6 +406,7 @@ img, video { max-width: 100%; height: auto; }
 .pb-7 { padding-bottom: 1.75rem; }
 .pl-0 { padding-left: 0px; }
 .text-left { text-align: left; }
+.text-center { text-align: center; }
 .text-right { text-align: right; }
 .font-serif { font-family: Newsreader, Georgia, serif; }
 .font-display { font-family: "Space Grotesk", system-ui, sans-serif; }
@@ -474,8 +470,10 @@ img, video { max-width: 100%; height: auto; }
 .duration-500 { transition-duration: 500ms; }
 .placeholder\:text-dim\/50::placeholder { color: rgba(139, 136, 160, 0.5); }
 .hover\:border-ink\/25:hover { border-color: rgba(236, 235, 242, 0.25); }
+.hover\:border-cy:hover { --tw-border-opacity: 1; border-color: rgb(45 226 230 / var(--tw-border-opacity, 1)); }
 .hover\:border-ink\/30:hover { border-color: rgba(236, 235, 242, 0.3); }
 .hover\:bg-cy:hover { --tw-bg-opacity: 1; background-color: rgb(45 226 230 / var(--tw-bg-opacity, 1)); }
+.hover\:bg-cy\/\[\.07\]:hover { background-color: rgba(45, 226, 230, 0.07); }
 .hover\:text-bg:hover { --tw-text-opacity: 1; color: rgb(7 7 11 / var(--tw-text-opacity, 1)); }
 .hover\:text-ink:hover { --tw-text-opacity: 1; color: rgb(236 235 242 / var(--tw-text-opacity, 1)); }
 .hover\:underline:hover { text-decoration-line: underline; }
@@ -489,7 +487,6 @@ img, video { max-width: 100%; height: auto; }
 .group:hover .group-hover\:text-cy { --tw-text-opacity: 1; color: rgb(45 226 230 / var(--tw-text-opacity, 1)); }
 .group:hover .group-hover\:text-ink { --tw-text-opacity: 1; color: rgb(236 235 242 / var(--tw-text-opacity, 1)); }
 @media (min-width: 640px) {
-  .sm\:-mx-8 { margin-left: -2rem; margin-right: -2rem; }
   .sm\:mb-14 { margin-bottom: 3.5rem; }
   .sm\:block { display: block; }
   .sm\:inline { display: inline; }
@@ -1551,6 +1548,28 @@ const LAPTOPS = [{
 /* LAPTOPS:END */
 const laptopFps = (l, game, res) => Math.max(12, Math.round(l.idx * res.mul * game.k));
 
+/* Cimri'nin ürün adı her şeyi tek satıra sıkıştırıyor:
+   "Lenovo LOQ 15IRX10 83JE00EQTR i5-13450HX 12GB RAM 512GB SSD RTX 5060 FreeDOS 15.6 inç Oyun Bilgisayarı"
+   Bunu ham basınca kart iki satıra taşıp ortadan kesiliyordu — üstelik
+   işlemci/RAM/disk zaten alt satırda ayrıca yazıyor. Marka ve işlemciden
+   sonrasını atıp model + seri kodunu ayırıyoruz. */
+function laptopAd(l) {
+  let s = (l.name || '').replace(new RegExp('^\\s*' + (l.brand || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*', 'i'), '');
+  const kes = s.match(/\s(i[3579][\s-]?\d{4,5}|Ryzen|Ultra\s|Core\s|Snapdragon)/i);
+  if (kes) s = s.slice(0, kes.index);
+  s = s.replace(/\s+/g, ' ').trim();
+  const par = s.split(' ');
+  let seri = null;
+  const son = par[par.length - 1] || '';
+  if (par.length > 1 && son.length >= 6 && /\d/.test(son) && /^[A-Z0-9._\-]+$/i.test(son) && son === son.toUpperCase()) {
+    seri = par.pop();
+  }
+  return {
+    model: par.join(' ') || s || l.name,
+    seri
+  };
+}
+
 /* ═══════════════════ para birimi ═══════════════════ */
 const NNBSP = ' ';
 const Cur = createContext(null);
@@ -1823,41 +1842,20 @@ function Wordmark({
   }, "HANE"));
 }
 /* Nav için sadeleştirilmiş işaret — küçük boyutta okunur kalsın diye */
+/* Sadeleştirilmiş işaret KALDIRILDI: kasa/klavye/mouse atılınca monitör
+   kemerin içinde sola-yukarı kayıyordu (denge kasadan geliyormuş) ve site
+   iki farklı logo kullanır hale gelmişti. Artık her yerde tek sahne var;
+   küçük boyutta okunsun diye sadece tüp kalınlığı artırılıyor. */
 function MarkSmall({
-  size = 34
+  size = 52
 }) {
-  /* Küçük işarette masa/klavye yok, o yüzden tam sahnenin viewBox'ı (0 0 300 196)
-     KULLANILMAZ: altta 52 birim boşluk kalıp işaret yukarı kayıyor ve sıkışık
-     duruyordu. Çerçeve içeriğe göre hesaplandı ve tam ortalandı:
-       içerik x 49.5–250.5 (orta 150)  ·  y 7.5–134.5 (orta 71)
-       viewBox 46,4 208×134            → orta 150,71  ✔
-     Tüp 9 birim: 11'de monitörün içi kapanıp leke gibi görünüyordu. */
-  const H = Math.round(size * 134 / 208);
-  return /*#__PURE__*/React.createElement("svg", {
-    width: size,
-    height: H,
-    viewBox: "46 4 208 134",
-    className: "neonSvg shrink-0",
-    fill: "none",
-    "aria-hidden": "true"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M59.8 140.8A96 96 0 1 1 240.2 140.8",
-    stroke: "#FF2D95",
-    strokeWidth: "9",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("rect", {
-    x: "96",
-    y: "56",
-    width: "78",
-    height: "50",
-    rx: "6",
-    stroke: "#2DE2E6",
-    strokeWidth: "9"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: "M135 106v16M116 130h38",
-    stroke: "#2DE2E6",
-    strokeWidth: "9",
-    strokeLinecap: "round"
+  return /*#__PURE__*/React.createElement("span", {
+    className: "shrink-0 block",
+    style: {
+      width: size
+    }
+  }, /*#__PURE__*/React.createElement(NeonScene, {
+    w: 2.3
   }));
 }
 function LogoLockup({
@@ -2238,7 +2236,7 @@ function Nav({
       "aria-current": on ? 'page' : undefined,
       className: 'lbl px-4 py-2 border transition-colors duration-300 whitespace-nowrap ' + (on ? 'border-cy text-cy bg-cy/[.07]' : 'border-transparent text-dim hover:text-ink')
     }, s.t);
-  })), /*#__PURE__*/React.createElement("div", {
+  })), route === 'ana' ? /*#__PURE__*/React.createElement("div", {
     className: "flex items-center gap-2 shrink-0",
     role: "group",
     "aria-label": "Para birimi"
@@ -2251,19 +2249,18 @@ function Nav({
     "aria-pressed": mode === 'USD',
     title: '1 $ = ' + rate.toFixed(2).replace('.', ',') + ' ₺ · ' + live,
     className: 'lbl px-3 py-2 border transition-colors ' + (mode === 'USD' ? 'border-cy text-cy' : 'border-line text-dim hover:text-ink')
-  }, "$ USD"))), /*#__PURE__*/React.createElement("nav", {
+  }, "$ USD")) : /*#__PURE__*/React.createElement("span", {
+    className: "w-px"
+  })), /*#__PURE__*/React.createElement("nav", {
     "aria-label": "B\xF6l\xFCmler",
-    className: "lg:hidden -mx-5 sm:-mx-8 px-5 sm:px-8 pb-2.5 flex gap-2 overflow-x-auto",
-    style: {
-      scrollbarWidth: 'none'
-    }
+    className: "lg:hidden pb-2.5 flex gap-2"
   }, SEKMELER.map(s => {
     const on = route === s.id;
     return /*#__PURE__*/React.createElement("a", {
       key: s.id,
       href: s.href,
       "aria-current": on ? 'page' : undefined,
-      className: 'lbl px-3.5 py-2 border transition-colors duration-300 whitespace-nowrap shrink-0 ' + (on ? 'border-cy text-cy bg-cy/[.07]' : 'border-line/60 text-dim')
+      className: 'lbl flex-1 text-center px-2 py-2.5 border transition-colors duration-300 whitespace-nowrap ' + (on ? 'border-cy text-cy bg-cy/[.07]' : 'border-line/60 text-dim')
     }, s.kisa);
   }))));
 }
@@ -2713,6 +2710,7 @@ function LaptopPicker({
     className: "space-y-2 max-h-[560px] overflow-y-auto pr-1"
   }, list.slice(0, 10).map(l => {
     const on = cur && cur.name === l.name;
+    const ad = laptopAd(l);
     return /*#__PURE__*/React.createElement("li", {
       key: l.name
     }, /*#__PURE__*/React.createElement("button", {
@@ -2736,10 +2734,12 @@ function LaptopPicker({
     })), /*#__PURE__*/React.createElement("span", {
       className: "min-w-0 flex-1"
     }, /*#__PURE__*/React.createElement("span", {
-      className: "lbl text-dim/80 block mb-1"
+      className: "lbl text-dim/80 block mb-1.5"
     }, l.brand.toUpperCase(), " \xB7 ", l.gpu.toUpperCase()), /*#__PURE__*/React.createElement("span", {
-      className: 'text-[.86rem] sm:text-[.95rem] leading-snug line-clamp-2 ' + (on ? 'text-cy' : 'text-ink')
-    }, l.name.replace(/\s*(FreeDOS|Windows \d+[^ ]*)\s*/ig, ' ').replace(/\s+inç.*$/, '').replace(/\s+/g, ' ')), /*#__PURE__*/React.createElement("span", {
+      className: 'text-[.95rem] sm:text-[1rem] leading-snug line-clamp-1 ' + (on ? 'text-cy' : 'text-ink')
+    }, ad.model), ad.seri && /*#__PURE__*/React.createElement("span", {
+      className: "num block text-[.7rem] text-dim/70 mt-1"
+    }, ad.seri), /*#__PURE__*/React.createElement("span", {
       className: "block text-[.74rem] text-dim mt-1.5 leading-snug"
     }, l.ram ? l.ram + ' GB RAM · ' : '', l.ssd ? (l.ssd >= 1000 ? l.ssd / 1000 + ' TB' : l.ssd + ' GB') + ' SSD · ' : '', l.inch ? l.inch + ' inç · ' : '', l.offers, " sat\u0131c\u0131"), /*#__PURE__*/React.createElement("span", {
       className: "num sm:hidden block mt-2 text-[1.05rem] text-ink"
@@ -3417,7 +3417,7 @@ function Panel({
     className: "lbl text-dim mt-3"
   }, isLap ? 'EN UCUZ SATICI FİYATI' : 'TOPLAM PARÇA TUTARI'), /*#__PURE__*/React.createElement("div", {
     className: "mt-7 pt-6 border-t border-line space-y-3.5"
-  }, (isLap ? [['Marka', act.lap.brand], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '—') + ' GB']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Bellek', sys.r.n], ['Disk', sys.s.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
+  }, (isLap ? [['Model', laptopAd(act.lap).model], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '—') + ' GB']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Bellek', sys.r.n], ['Disk', sys.s.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
     key: a,
     className: "flex justify-between gap-4 text-[.83rem]"
   }, /*#__PURE__*/React.createElement("span", {
@@ -3520,7 +3520,7 @@ function MobileDock({
     className: "accIn"
   }, /*#__PURE__*/React.createElement("div", {
     className: "px-5 pt-5 space-y-3"
-  }, (isLap ? [['Marka', act.lap.brand], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '—') + ' GB'], ['Disk', act.lap.ssd ? act.lap.ssd >= 1000 ? act.lap.ssd / 1000 + ' TB' : act.lap.ssd + ' GB' : '—'], ['Ekran', (act.lap.inch || '—') + ' inç'], ['Satıcı', act.lap.offers + ' mağaza']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Anakart', sys.mb.n], ['Bellek', sys.r.n], ['Disk', sys.s.n], ['Güç kaynağı', sys.psu.n], ['Soğutucu', sys.cl.n], ['Kasa', sys.cs.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
+  }, (isLap ? [['Model', laptopAd(act.lap).model], ['Seri', laptopAd(act.lap).seri || '—'], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '—') + ' GB'], ['Disk', act.lap.ssd ? act.lap.ssd >= 1000 ? act.lap.ssd / 1000 + ' TB' : act.lap.ssd + ' GB' : '—'], ['Ekran', (act.lap.inch || '—') + ' inç'], ['Satıcı', act.lap.offers + ' mağaza']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Anakart', sys.mb.n], ['Bellek', sys.r.n], ['Disk', sys.s.n], ['Güç kaynağı', sys.psu.n], ['Soğutucu', sys.cl.n], ['Kasa', sys.cs.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
     key: a,
     className: "flex justify-between gap-4 text-[.8rem]"
   }, /*#__PURE__*/React.createElement("span", {
@@ -4679,6 +4679,7 @@ function Forum({
   const [bildirim, setBildirim] = useState('');
   const [yukleniyor, setYukleniyor] = useState(uzakVar());
   const [uzakHata, setUzakHata] = useState(null);
+  const [kimlikAcik, setKimlikAcik] = useState(false);
   const dosyaRef = useRef(null);
   const ben = cihazId();
 
@@ -4856,12 +4857,44 @@ function Forum({
     className: "mt-6 text-dim max-w-[56ch] leading-relaxed text-[.95rem]"
   }, "Kurucu sana bir sistem verir ama her sorunun cevab\u0131 form\xFClde yoktur. Bir kullan\u0131c\u0131 ad\u0131 se\xE7, konu a\xE7, kurdu\u011Fun sistemi tek tu\u015Fla g\xF6nderine ekle.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 110
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mt-10 flex flex-wrap items-center justify-between gap-3 py-3 border-y border-line"
+  }, user ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "flex items-center gap-3 min-w-0"
+  }, /*#__PURE__*/React.createElement(Avatar, {
+    ad: user.ad,
+    renk: user.renk,
+    size: 30
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "text-[.92rem] truncate",
+    style: {
+      color: user.renk
+    }
+  }, user.ad)), /*#__PURE__*/React.createElement("button", {
+    onClick: () => {
+      setUser(null);
+      userSave(null);
+      setKimlikAcik(false);
+    },
+    className: "lbl text-dim hover:text-ink transition-colors"
+  }, "\xC7IKI\u015E")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "text-[.88rem] text-dim"
+  }, "Okumak serbest \u2014 yazmak i\xE7in bir ad se\xE7."), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setKimlikAcik(a => !a),
+    className: 'lbl px-4 py-2 border transition-colors ' + (kimlikAcik ? 'border-cy text-cy' : 'border-line text-dim hover:text-ink')
+  }, kimlikAcik ? 'KAPAT' : 'KATIL')))), !user && /*#__PURE__*/React.createElement("div", {
+    className: 'acc ' + (kimlikAcik ? 'open' : '')
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "accIn"
   }, /*#__PURE__*/React.createElement(Card, {
-    className: "mt-12 p-5 sm:p-7"
+    className: "mt-4 p-5 sm:p-7"
   }, /*#__PURE__*/React.createElement(GirisKarti, {
     user: user,
-    setUser: setUser
-  }))), /*#__PURE__*/React.createElement(Reveal, {
+    setUser: u => {
+      setUser(u);
+      setKimlikAcik(false);
+    }
+  })))), /*#__PURE__*/React.createElement(Reveal, {
     delay: 150
   }, uzakHata ? /*#__PURE__*/React.createElement("div", {
     className: "mt-5 p-4 border flex items-start gap-3",
@@ -4880,15 +4913,11 @@ function Forum({
     className: "text-mg"
   }, "Sunucuya ula\u015F\u0131lamad\u0131."), " G\xF6nderiler ge\xE7ici olarak g\xF6r\xFCnt\xFClenemiyor. Ba\u011Flant\u0131n\u0131 kontrol edip sayfay\u0131 yenile.", /*#__PURE__*/React.createElement("span", {
     className: "block text-[.75rem] text-dim mt-1.5 break-words"
-  }, uzakHata))) : uzakVar() ? /*#__PURE__*/React.createElement("div", {
-    className: "mt-5 p-4 border border-cy/25 bg-cy/[.05] flex items-start gap-3"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "w-2 h-2 rotate-45 shrink-0 mt-1.5 bg-cy"
-  }), /*#__PURE__*/React.createElement("p", {
-    className: "text-[.85rem] text-ink/80 leading-relaxed"
+  }, uzakHata))) : uzakVar() ? /*#__PURE__*/React.createElement("p", {
+    className: "mt-4 text-[.82rem] text-dim leading-relaxed"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
-  }, "Buras\u0131 ortak alan."), ' ', "Yazd\u0131klar\u0131n\u0131 herkes g\xF6r\xFCr ve silinmez \u2014 g\xF6ndermeden \xF6nce bir kez daha oku. Ki\u015Fisel bilgilerini (telefon, adres, sipari\u015F numaras\u0131) yazma.")) : /*#__PURE__*/React.createElement("div", {
+  }, "Buras\u0131 ortak alan"), " \u2014 yazd\u0131klar\u0131n\u0131 herkes g\xF6r\xFCr ve silinmez. Telefon, adres, sipari\u015F numaras\u0131 gibi ki\u015Fisel bilgi yazma.") : /*#__PURE__*/React.createElement("div", {
     className: "mt-5 p-4 border border-cy/25 bg-cy/[.05] flex items-start gap-3"
   }, /*#__PURE__*/React.createElement("span", {
     className: "w-2 h-2 rotate-45 shrink-0 mt-1.5 bg-cy"
@@ -4899,18 +4928,19 @@ function Forum({
   }, "Bu forum senin cihaz\u0131nda \xE7al\u0131\u015F\u0131yor."), ' ', "Yazd\u0131klar\u0131n taray\u0131c\u0131nda kal\u0131r, internete gitmez, ba\u015Fkas\u0131 g\xF6remez. Payla\u015Fmak istersen a\u015Fa\u011F\u0131dan dosya olarak d\u0131\u015Fa aktarabilirsin."))), /*#__PURE__*/React.createElement(Reveal, {
     delay: 190
   }, /*#__PURE__*/React.createElement("div", {
-    className: "mt-8"
+    className: "mt-6"
   }, user ? /*#__PURE__*/React.createElement(YeniKonu, {
     user: user,
     sys: sys,
     prof: prof,
     onEkle: ekle
-  }) : /*#__PURE__*/React.createElement("p", {
-    className: "text-[.9rem] text-dim"
-  }, "Konu a\xE7mak i\xE7in yukar\u0131dan bir kullan\u0131c\u0131 ad\u0131 se\xE7."))), /*#__PURE__*/React.createElement(Reveal, {
+  }) : /*#__PURE__*/React.createElement("button", {
+    onClick: () => setKimlikAcik(true),
+    className: "w-full border border-cy/40 text-cy px-6 py-4 lbl hover:bg-cy/[.07] hover:border-cy transition-colors duration-300"
+  }, "+ YEN\u0130 KONU A\xC7"))), /*#__PURE__*/React.createElement(Reveal, {
     delay: 220
   }, /*#__PURE__*/React.createElement("div", {
-    className: "mt-9 flex flex-wrap gap-2"
+    className: "mt-8 flex flex-wrap gap-2"
   }, [{
     id: 'hepsi',
     n: 'Hepsi'
