@@ -1,0 +1,12 @@
+# Sirlar buraya asla girmemeli — depo zaten proje kokunun disinda,
+# .env ve API anahtarlari yapisal olarak burada degil. Yine de guvence:
+.env
+.env.*
+*.key
+*.pem
+
+# Yerel
+node_modules/
+.vercel/
+.DS_Store
+Thumbs.db
