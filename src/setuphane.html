@@ -441,6 +441,17 @@ function balance(c,g){
 const bnColor = b => b.sev==='real' ? '#FF2D95' : b.sev==='minor' ? '#ECEBF2' : '#2DE2E6';
 const PREBUILT_MARGIN=.22, ASSEMBLY=3500;
 
+/* Fiyatların çekildiği tarih. scripts/prices.ps1 her tazelemede güncellenmeli.
+   Sayfada görünür olması şart: "gerçek fiyat" iddiası olan bir sitede verinin
+   ne kadar taze olduğunu saklamak güveni baltalar. */
+const FIYAT_TARIHI='2026-08-09';
+function fiyatYasi(){
+  const g=Math.floor((Date.now()-new Date(FIYAT_TARIHI+'T12:00:00').getTime())/86400000);
+  const m=new Date(FIYAT_TARIHI+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  return {gun:Math.max(0,g), metin:m,
+          bayat:g>30, uyari:g>30?'Bir aydan eski — alım öncesi kendin de kontrol et.':null};
+}
+
 /* Laptop ekran kartları masaüstü eşdeğerinden zayıftır; idx aynı ölçekte
    (masaüstü RTX 5070 = 100). */
 /* LAPTOPS:BEGIN — scripts/laptops.ps1 üretir, elle düzenleme */
@@ -1719,7 +1730,9 @@ function Panel({sys,act,prof,game,res}){
             </a>
           )}
           <p className="mt-3 text-[.72rem] text-dim leading-relaxed">
-            Fiyatlar Cimri.com'dan çekilmiştir; alım anında değişebilir.
+            Fiyatlar <span className="text-ink/80">{fiyatYasi().metin}</span> tarihinde
+            Cimri.com'dan çekildi.
+            {fiyatYasi().bayat && <span className="block mt-1 text-mg">{fiyatYasi().uyari}</span>}
           </p>
         </Card>
         )}
@@ -2289,7 +2302,13 @@ function DeviceTest({sys}){
    Supabase tarafındaki RLS kurallarıyla sağlanır. Buraya asla service_role
    anahtarı yazma.  Kurulum SQL'i README.md içinde.
    ───────────────────────────────────────────────────────────────────── */
-const SUPABASE={ url:'', anon:'' };
+const SUPABASE={
+  url:'https://qxnsdpjyxcfmhanjxtgs.supabase.co',
+  /* sb_publishable_… Supabase'in yeni biçimi; eski 'anon public' anahtarının
+     karşılığı ve tarayıcıya çıkması tasarım gereği güvenli. Gizli olan
+     sb_secret_… ile karıştırma — o asla koda girmemeli. */
+  anon:'sb_publishable_skYOMRrisxDHTtnSJ-bprw_oovja6ss'
+};
 const uzakVar = () => !!(SUPABASE.url && SUPABASE.anon);
 
 async function sb(yol,opts){
@@ -3982,7 +4001,7 @@ function Footer(){
           </p>
         </div>
         <div className="lbl text-dim/70 leading-loose">
-          <div>FİYATLAR YAKLAŞIK · TÜRKİYE PİYASASI</div>
+          <div>FİYATLAR: CİMRİ · {fiyatYasi().metin.toLocaleUpperCase('tr')}</div>
           <div>FPS DEĞERLERİ TAHMİNDİR</div>
           <div className="mt-3 text-dim/50">© {new Date().getFullYear()} SETUP HANE</div>
         </div>
