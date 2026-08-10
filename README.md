@@ -132,8 +132,15 @@ engellerse görseller kaybolur — kart yine çalışır, `onError` gizler.
 
 ---
 
-## Ne toplanmıyor
+## Veri
 
-Çerez yok, izleme yok, analitik yok. Kullanıcı adı, forum gönderileri ve test
-rekorları tarayıcının `localStorage`'ında durur. Supabase bağlıysa yalnızca forum
-gönderileri sunucuya gider; kullanıcı adı takma addır, e-posta istenmez.
+**Çerez yok.** Kullanıcı adı, forum taslakları ve test rekorları tarayıcının
+`localStorage`'ında durur — sunucuya gitmez.
+
+**Sunucuya giden tek şey forum gönderileri** (Supabase). Kullanıcı adı takma addır,
+e-posta istenmez.
+
+**Ziyaret sayılır.** Vercel Analytics ile sayfa görüntüleme, geldiği kaynak, ülke ve
+cihaz tipi ölçülür — reklam/işbirliği görüşmelerinde trafik göstermek için. Çerez
+kullanmaz, kişi kimliği tutmaz, siteler arası takip yapmaz. Test sonuçları ve forum
+içeriği bu ölçüme dahil değildir. Sayfanın altında da yazar.

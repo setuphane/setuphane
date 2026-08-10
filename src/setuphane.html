@@ -215,6 +215,11 @@ select option{background:#0E0E15;color:#ECEBF2}
 
 <div id="root"></div>
 
+<!-- Vercel Analytics: çerez kullanmaz, kişi takip etmez, siteler arası izleme yapmaz.
+     Yalnızca sayfa görüntüleme / kaynak / ülke / cihaz sayar. Yolu Vercel sunar;
+     yerel geliştirmede 404 döner, zararsızdır. -->
+<script defer src="/_vercel/insights/script.js"></script>
+
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone@7.24.10/babel.min.js"></script>
@@ -3979,7 +3984,8 @@ function TestlerHub({sub,sys}){
           Donanımını <span className="em">gerçekten</span> ölç.
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
-          Hepsi tarayıcıda çalışır, kurulum istemez, hiçbir veri göndermez.
+          Hepsi tarayıcıda çalışır, kurulum istemez — <span className="text-ink/80">ölçüm
+          sonuçların hiçbir yere gönderilmez</span>, cihazında kalır.
           İkinci el alırken, yeni ürünü kutudan çıkarınca ya da bir şeyin bozulduğunu
           düşündüğünde buraya bak.
         </p>
@@ -4083,6 +4089,9 @@ function Footer(){
         <div className="lbl text-dim/70 leading-loose">
           <div>FİYATLAR: CİMRİ · {fiyatYasi().metin.toLocaleUpperCase('tr')}</div>
           <div>FPS DEĞERLERİ TAHMİNDİR</div>
+          {/* Analitik eklendiği için bu satır şart: site "izleme yok" diyordu,
+              artık ziyaret sayılıyor. Ne sayıldığını saklamak dürüst olmaz. */}
+          <div>ÇEREZ YOK · ZİYARET SAYILIR, KİŞİ TAKİP EDİLMEZ</div>
           <div className="mt-3 text-dim/50">© {new Date().getFullYear()} SETUP HANE</div>
         </div>
       </div>
