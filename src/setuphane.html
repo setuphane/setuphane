@@ -10,6 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="SETUP HANE — Bütçene göre doğru bilgisayar">
 <meta property="og:description" content="Bütçeni yaz, ne alman gerektiğini saniyesinde gör. Parça isimlerini bilmene gerek yok.">
+<link rel="canonical" href="https://www.setuphane.com/">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
 <meta property="og:url" content="https://www.setuphane.com/">
@@ -778,11 +779,33 @@ function Shot({kind,ratio='4/3',sm=false,className=''}){
 }
 
 /* ═══════════════════ ÜST BAR ═══════════════════ */
+/* Gerçek adresler (çapa değil). Önceden #/testler kullanılıyordu; arama
+   motorları çapayı ayrı sayfa saymadığı için sitenin TEK sayfası
+   indeksleniyordu ve analitik oturum başına tek görüntüleme sayıyordu. */
 const SEKMELER=[
-  {id:'ana',     href:'#/',        t:'SİSTEM KUR', kisa:'SİSTEM'},
-  {id:'testler', href:'#/testler', t:'TESTLER',    kisa:'TESTLER'},
-  {id:'forum',   href:'#/forum',   t:'FORUM',      kisa:'FORUM'},
+  {id:'ana',     href:'/',        t:'SİSTEM KUR', kisa:'SİSTEM'},
+  {id:'testler', href:'/testler', t:'TESTLER',    kisa:'TESTLER'},
+  {id:'forum',   href:'/forum',   t:'FORUM',      kisa:'FORUM'},
 ];
+
+/* Her rotanın kendi başlığı ve açıklaması — arama sonucunda ve paylaşımda
+   doğru görünmesi için. */
+const ROTA_META={
+  ana:     {t:'SETUP HANE — Bütçene göre doğru bilgisayarı kuralım',
+            d:'Ne kadar paran varsa yaz, o paraya alınabilecek en iyi bilgisayarı parça parça göster. Bilgisayardan hiç anlamayanlar için.'},
+  testler: {t:'Donanım Testleri — FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
+            d:'12 ücretsiz araç: FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri. Kurulum gerekmez.'},
+  forum:   {t:'Forum — Sistem tavsiyesi ve bilgisayar sorunları | SETUP HANE',
+            d:'Bütçene uygun sistem sor, kurulumunu paylaş, arızanı çöz. Kayıt için e-posta istenmez.'},
+};
+
+function rotaCoz(){
+  const p=(location.pathname||'/').replace(/\/+$/,'')||'/';
+  const m=p.match(/^\/testler(?:\/([\w-]+))?$/);
+  if(m) return {route:'testler', sub:m[1]||null};
+  if(p==='/forum') return {route:'forum', sub:null};
+  return {route:'ana', sub:null};
+}
 
 function Nav({route}){
   const {mode,setMode,live,rate}=useCur();
@@ -805,7 +828,7 @@ function Nav({route}){
           kesiliyordu. Mobilde iki satır, masaüstünde tek satır. */}
       <div className="max-w-[1500px] mx-auto px-5 sm:px-8 lg:px-12">
         <div className="h-[60px] lg:h-[68px] flex items-center justify-between gap-4">
-          <a href={route==='ana'?'#top':'#/'} className="flex items-center gap-3" aria-label="SETUP HANE — ana sayfa">
+          <a href={route==='ana'?'#top':'/'} className="flex items-center gap-3" aria-label="SETUP HANE — ana sayfa">
             <MarkSmall size={38}/>
             <span className="hidden sm:block"><Wordmark size={15} flicker={false}/></span>
           </a>
@@ -1302,7 +1325,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick}){
               {PROFILES.map(p=>{
                 const on=p.id===prof.id;
                 return (
-                  <button key={p.id} onClick={()=>setProf(p)} aria-pressed={on}
+                  <button key={p.id} onClick={()=>{ setProf(p); olay('sistem_amaci',{amac:p.id}); }} aria-pressed={on}
                     className={'text-left px-4 py-4 border transition-all duration-300 '+(on?'border-cy bg-cy/[.07]':'border-line hover:border-ink/25')}>
                     <div className={'text-[.95rem] leading-snug '+(on?'text-cy':'text-ink')}>{p.n}</div>
                     <div className="text-[.78rem] text-dim mt-1.5 leading-snug">{p.sub}</div>
@@ -1677,6 +1700,7 @@ function useCopy(sys,prof,plain){
       try{document.execCommand('copy')}catch(_){}
       document.body.removeChild(ta);
     }
+    olay('liste_kopyalandi');
     setCopied(true); setTimeout(()=>setCopied(false),2200);
   },[sys,prof,plain]);
   return [copied,copy];
@@ -2335,6 +2359,77 @@ function DeviceTest({sys}){
    Supabase tarafındaki RLS kurallarıyla sağlanır. Buraya asla service_role
    anahtarı yazma.  Kurulum SQL'i README.md içinde.
    ───────────────────────────────────────────────────────────────────── */
+/* ─────────────── ÖLÇÜM ───────────────
+   İki katman:
+   1) Vercel Analytics — çerezsiz, kişi tanımlamaz. KVKK'ya göre açık rıza
+      gerektirmez, her ziyaretçide çalışır. pushState'i kendisi izlediği için
+      rota değişimlerini otomatik sayar.
+   2) GA4 — çerez kullanır, bu yüzden SADECE açık rıza verilirse yüklenir.
+      Rıza yoksa hiçbir Google script'i sayfaya girmez.                      */
+const GA4_ID='G-YF8LW43PF7';     /* GA4 Ölçüm Kimliği — gizli değil, herkese açıktır */
+const RIZA_KEY='sh_riza_v1';
+const rizaOku = () => { try{ return localStorage.getItem(RIZA_KEY); }catch(e){ return null; } };
+const rizaYaz = v => { try{ localStorage.setItem(RIZA_KEY,v); }catch(e){} };
+
+function ga4Yukle(){
+  if(!GA4_ID || window.__ga4Yuklendi) return;
+  window.__ga4Yuklendi=true;
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){ window.dataLayer.push(arguments); };
+  window.gtag('js',new Date());
+  /* send_page_view:false — sayfa görüntülemeyi rota değişiminde biz bildiriyoruz */
+  window.gtag('config',GA4_ID,{send_page_view:false, anonymize_ip:true});
+  const s=document.createElement('script');
+  s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+GA4_ID;
+  document.head.appendChild(s);
+  window.gtag('event','page_view',{page_path:location.pathname, page_title:document.title});
+}
+
+function sayfaGoruntuleme(yol){
+  /* Vercel pushState'i kendi izliyor; burada yalnızca GA4'e bildiriyoruz. */
+  if(window.gtag) window.gtag('event','page_view',{page_path:yol, page_title:document.title});
+}
+
+/* Etkileşim olayları — sponsora "kaliteli trafik" kanıtı.
+   Kişisel veri taşımaz, yalnızca hangi aracın kullanıldığını sayar. */
+function olay(ad,veri){
+  try{
+    if(window.va) window.va('event',{name:ad, data:veri||{}});
+    if(window.gtag) window.gtag('event',ad,veri||{});
+  }catch(e){}
+}
+
+function CerezBandi(){
+  const [durum,setDurum]=useState(()=>rizaOku());
+  useEffect(()=>{ if(durum==='kabul') ga4Yukle(); },[durum]);
+  if(!GA4_ID || durum) return null;   /* GA4 yoksa band da yok */
+  const sec=v=>{ rizaYaz(v); setDurum(v); };
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-[92] border-t border-cy/30"
+         style={{background:'rgba(9,9,14,.96)',backdropFilter:'blur(20px)',paddingBottom:'env(safe-area-inset-bottom)'}}
+         role="dialog" aria-label="Çerez tercihi">
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+        <p className="text-[.85rem] text-ink/85 leading-relaxed flex-1">
+          <span className="text-cy">Ölçüm çerezi kullanalım mı?</span>{' '}
+          Ziyaret sayısını zaten çerezsiz sayıyoruz. Ek olarak Google Analytics açarsan
+          hangi sayfada ne kadar kaldığını da ölçebiliriz — bu çerez gerektiriyor.
+          Reddedersen site aynen çalışır, hiçbir şey kaybetmezsin.
+        </p>
+        <div className="flex gap-2 shrink-0">
+          <button onClick={()=>sec('ret')}
+            className="lbl px-4 py-2.5 border border-line text-dim hover:text-ink transition-colors">
+            SADECE GEREKLİ
+          </button>
+          <button onClick={()=>sec('kabul')}
+            className="lbl px-4 py-2.5 border border-cy text-cy hover:bg-cy hover:text-bg transition-colors">
+            KABUL EDİYORUM
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const SUPABASE={
   url:'https://qxnsdpjyxcfmhanjxtgs.supabase.co',
   /* sb_publishable_… Supabase'in yeni biçimi; eski 'anon public' anahtarının
@@ -2506,6 +2601,7 @@ function YeniKonu({user,sys,prof,onEkle}){
     if(ekle && sys){
       g += '\n\n--- SİSTEMİM ---\n'+summaryText(sys,prof,plain);
     }
+    olay('forum_konu_acildi',{kategori:kat, sistem_ekli:!!(ekle&&sys)});
     onEkle({id:'k'+Date.now(), kat, baslik:baslik.trim(), govde:g,
             yazar:user.ad, renk:user.renk, ts:Date.now(), cevaplar:[], begeni:0});
     setBaslik(''); setGovde(''); setHata(''); setAc(false); setEkle(false);
@@ -3012,7 +3108,7 @@ function EkranTesti(){
               <div key={t.id} className="p-5 border border-line">
                 <h3 className="text-[1.15rem] font-light mb-2.5">{t.n}</h3>
                 <p className="text-[.86rem] text-dim leading-relaxed mb-5">{t.d}</p>
-                <button onClick={()=>{ setRenkIdx(0); setAktif(t.id); }}
+                <button onClick={()=>{ setRenkIdx(0); setAktif(t.id); olay('ekran_testi',{tur:t.id}); }}
                   className="lbl px-5 py-2.5 border border-cy text-cy hover:bg-cy hover:text-bg transition-colors duration-300">
                   BAŞLAT
                 </button>
@@ -3952,7 +4048,7 @@ function TestlerHub({sub,sys}){
     const C=t.C;
     return (
       <div className="py-8 lg:py-12">
-        <a href="#/testler"
+        <a href="/testler"
            className="lbl text-dim hover:text-cy transition-colors inline-flex items-center gap-2.5 mb-8">
           <svg width="18" height="8" viewBox="0 0 18 8" fill="none" aria-hidden="true">
             <path d="M18 4H1M4 1L1 4l3 3" stroke="currentColor" strokeWidth="1.1"/>
@@ -4000,7 +4096,7 @@ function TestlerHub({sub,sys}){
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {TESTLER.filter(x=>x.kat===kat).map(x=>(
-                <a key={x.id} href={'#/testler/'+x.id} className="group block h-full">
+                <a key={x.id} href={'/testler/'+x.id} className="group block h-full">
                   <Card className="h-full p-5 transition-colors duration-300 group-hover:border-cy/45">
                     <div className="flex items-start justify-between gap-3 mb-2.5">
                       <h2 className="text-[1.12rem] font-light leading-snug text-ink group-hover:text-cy transition-colors">{x.n}</h2>
@@ -4024,8 +4120,8 @@ function TestlerHub({sub,sys}){
 /* ═══════════════════ KEŞFET — diğer sekmelere köprü ═══════════════════ */
 function Kesfet(){
   const kartlar=[
-    {href:'#/testler', t:'Testler', d:'FPS, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu, refleks… On iki test, hepsi tarayıcıda çalışır.', e:'12 ARAÇ'},
-    {href:'#/forum', t:'Forum', d:'Kafana takılanı sor, kurduğun sistemi paylaş, başkalarının kurulumlarına bak. Kullanıcı adı seçmen yeterli.', e:'TOPLULUK'},
+    {href:'/testler', t:'Testler', d:'FPS, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu, refleks… On iki test, hepsi tarayıcıda çalışır.', e:'12 ARAÇ'},
+    {href:'/forum', t:'Forum', d:'Kafana takılanı sor, kurduğun sistemi paylaş, başkalarının kurulumlarına bak. Kullanıcı adı seçmen yeterli.', e:'TOPLULUK'},
   ];
   return (
     <section className="py-16 lg:py-24">
@@ -4114,26 +4210,43 @@ function App(){
 
   /* Sekme yönlendirmesi. Sayfa bağlantıları '#/...' ile, bölüm çıpaları
      düz '#id' ile ayrılıyor; böylece ikisi çakışmıyor. */
-  const [route,setRoute]=useState('ana');
-  const [sub,setSub]=useState(null);
+  const ilk=useRef(true);
+  const [{route,sub},setRota]=useState(()=>rotaCoz());
   useEffect(()=>{
     const uygula=()=>{
-      const h=location.hash;
-      const tm=h.match(/^#\/testler(?:\/([\w-]+))?$/);
-      const s=SEKMELER.find(x=>x.href===h && x.id!=='ana');
-      const r = tm ? 'testler' : (s ? s.id : 'ana');
-      setSub(tm ? (tm[1]||null) : null);
-      setRoute(r);
-      if(r==='ana' && h && h.length>1 && h.charAt(1)!=='/'){
-        /* Ana sayfaya dönüp bölüme kaydır — bölüm henüz basılmamış olabilir */
-        setTimeout(()=>{ const el=document.getElementById(h.slice(1)); if(el) el.scrollIntoView(); },70);
-      } else {
-        window.scrollTo(0,0);
-      }
+      const r=rotaCoz();
+      setRota(r);
+      /* Başlık ve açıklamayı rotaya göre güncelle — hem arama sonucu hem
+         analitik sayfa adı için gerekli. */
+      const meta=ROTA_META[r.route]||ROTA_META.ana;
+      document.title=meta.t;
+      const md=document.querySelector('meta[name="description"]');
+      if(md) md.setAttribute('content',meta.d);
+      const can=document.querySelector('link[rel="canonical"]');
+      if(can) can.setAttribute('href','https://www.setuphane.com'+location.pathname);
+      /* Analitiğe sayfa görüntülemesi bildir. Tek sayfa uygulamasında rota
+         değişimi kendiliğinden sayılmıyor; sayılmazsa hemen çıkma oranı
+         yapay olarak %100 görünüyor. */
+      sayfaGoruntuleme(location.pathname);
+      const cp=location.hash&&location.hash.length>1?location.hash.slice(1):null;
+      if(cp){ setTimeout(()=>{ const el=document.getElementById(cp); if(el) el.scrollIntoView(); },70); }
+      else if(!ilk.current){ window.scrollTo(0,0); }
+      ilk.current=false;
     };
-    window.addEventListener('hashchange',uygula);
+    /* Site içi bağlantıları yakala: tam sayfa yenilemeden gez. */
+    const tik=e=>{
+      if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+      const a=e.target.closest&&e.target.closest('a[href^="/"]');
+      if(!a||a.target==='_blank'||a.hasAttribute('download')) return;
+      e.preventDefault();
+      const yol=a.getAttribute('href');
+      if(location.pathname!==yol) history.pushState({},'',yol);
+      uygula();
+    };
+    document.addEventListener('click',tik);
+    window.addEventListener('popstate',uygula);
     uygula();
-    return()=>window.removeEventListener('hashchange',uygula);
+    return()=>{ document.removeEventListener('click',tik); window.removeEventListener('popstate',uygula); };
   },[]);
 
   useEffect(()=>{
@@ -4206,6 +4319,7 @@ function App(){
       )}
 
       {route==='ana' && <MobileDock sys={sys} act={act} prof={prof} game={game} res={res}/>}
+      <CerezBandi/>
     </div>
   );
 }
