@@ -1859,9 +1859,14 @@ const ROTA_META = {
     t: 'SETUP HANE — Bütçene göre doğru bilgisayarı kuralım',
     d: 'Ne kadar paran varsa yaz, o paraya alınabilecek en iyi bilgisayarı parça parça göster. Bilgisayardan hiç anlamayanlar için.'
   },
+  /* noindex: ürünler boş — Google bunu "içeriksiz sayfa" görüp genel SEO'ya
+     zarar vermesin diye ürünler eklenene kadar arama sonuçlarından gizli.
+     Sayfa çalışmaya devam ediyor; Instagram/iş birliği linkleriyle gelenler
+     etkilenmez, sadece Google'da görünmüyor. */
   aksesuarlar: {
     t: 'Setup Aksesuarları — Kategorilere göre keşfet | SETUP HANE',
-    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.'
+    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.',
+    noindex: true
   },
   testler: {
     t: 'Donanım Testleri — FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
@@ -6494,6 +6499,20 @@ function App() {
       if (md) md.setAttribute('content', meta.d);
       const can = document.querySelector('link[rel="canonical"]');
       if (can) can.setAttribute('href', 'https://www.setuphane.com' + location.pathname);
+      /* Ürünsüz sayfalar (ör. aksesuarlar) Google'a girmesin diye rota
+         değişince robots meta'sı eklenip kaldırılıyor. Google JS ile eklenen
+         robots meta'yı destekliyor (render aşamasında okunuyor). */
+      let rb = document.querySelector('meta[name="robots"]');
+      if (meta.noindex) {
+        if (!rb) {
+          rb = document.createElement('meta');
+          rb.setAttribute('name', 'robots');
+          document.head.appendChild(rb);
+        }
+        rb.setAttribute('content', 'noindex,follow');
+      } else if (rb) {
+        rb.remove();
+      }
       /* Analitiğe sayfa görüntülemesi bildir. Tek sayfa uygulamasında rota
          değişimi kendiliğinden sayılmıyor; sayılmazsa hemen çıkma oranı
          yapay olarak %100 görünüyor. */
