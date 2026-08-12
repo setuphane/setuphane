@@ -784,9 +784,10 @@ function Shot({kind,ratio='4/3',sm=false,className=''}){
    motorları çapayı ayrı sayfa saymadığı için sitenin TEK sayfası
    indeksleniyordu ve analitik oturum başına tek görüntüleme sayıyordu. */
 const SEKMELER=[
-  {id:'ana',     href:'/',        t:'SİSTEM KUR', kisa:'SİSTEM'},
-  {id:'testler', href:'/testler', t:'TESTLER',    kisa:'TESTLER'},
-  {id:'forum',   href:'/forum',   t:'FORUM',      kisa:'FORUM'},
+  {id:'ana',        href:'/',           t:'SİSTEM KUR',   kisa:'SİSTEM'},
+  {id:'aksesuarlar',href:'/aksesuarlar',t:'AKSESUARLAR',  kisa:'AKSESUAR'},
+  {id:'testler',    href:'/testler',    t:'TESTLER',      kisa:'TESTLER'},
+  {id:'forum',      href:'/forum',      t:'FORUM',        kisa:'FORUM'},
 ];
 
 /* Her rotanın kendi başlığı ve açıklaması — arama sonucunda ve paylaşımda
@@ -794,6 +795,8 @@ const SEKMELER=[
 const ROTA_META={
   ana:     {t:'SETUP HANE — Bütçene göre doğru bilgisayarı kuralım',
             d:'Ne kadar paran varsa yaz, o paraya alınabilecek en iyi bilgisayarı parça parça göster. Bilgisayardan hiç anlamayanlar için.'},
+  aksesuarlar: {t:'Setup Aksesuarları — Kategorilere göre keşfet | SETUP HANE',
+            d:'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.'},
   testler: {t:'Donanım Testleri — FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
             d:'12 ücretsiz araç: FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri. Kurulum gerekmez.'},
   forum:   {t:'Forum — Sistem tavsiyesi ve bilgisayar sorunları | SETUP HANE',
@@ -805,6 +808,7 @@ function rotaCoz(){
   const m=p.match(/^\/testler(?:\/([\w-]+))?$/);
   if(m) return {route:'testler', sub:m[1]||null};
   if(p==='/forum') return {route:'forum', sub:null};
+  if(p==='/aksesuarlar') return {route:'aksesuarlar', sub:null};
   return {route:'ana', sub:null};
 }
 
@@ -4118,16 +4122,132 @@ function TestlerHub({sub,sys}){
   );
 }
 
+/* ═══════════════════ AKSESUARLAR ═══════════════════
+   Kategoriler Ulugames ve Wraith Esports'un ürün ağacı incelenerek
+   çıkarıldı (mousepad çeşitleri, kablo/skate/sleeve/switch/keycap/USB hub/
+   bilek desteği, klavye modları, joystick aksesuarları). Ürünler bilinçli
+   olarak boş — iş birliği anlaşmaları netleşince kart içine ürün eklenecek.
+   Tek sayfa + net kategori ayrımı: "derya deniz" çeşitlilik karışık
+   görünmesin diye foto yok, sade tipografik kart kullanıldı. */
+const AKSESUAR_KATEGORILERI=[
+  {id:'mousepad', ad:'Mouse Pad & Deskpad',
+   d:'Kumaş, cam ve poron yüzeyler; masayı uçtan uca kaplayan XL altlıklar.'},
+  {id:'kablo', ad:'Kablo Yönetimi',
+   d:'Kablo örgüsü, klipsler ve USB hub’lar — masayı sadeleştir.'},
+  {id:'bilek', ad:'Bilek & Kol Destekleri',
+   d:'Klavye ve mouse için uzun oturumlarda konfor sağlayan destekler.'},
+  {id:'tustakimi', ad:'Tuş Takımı & Anahtarlar',
+   d:'Keycap setleri, switch’ler, o-ring ve stabilizatörler.'},
+  {id:'mouseaksesuar', ad:'Mouse Aksesuarları',
+   d:'Skate/paten, grip bandı ve kablo bungee’leri.'},
+  {id:'rgb', ad:'RGB & Aydınlatma',
+   d:'LED şeritler, ambiyans lambaları, senkronize masa ışıklandırması.'},
+  {id:'sesgoruntu', ad:'Ses & Görüntü',
+   d:'Mikrofon kolu, kulaklık standı, webcam ve stream deck.'},
+  {id:'standlar', ad:'Masaüstü Standlar',
+   d:'Monitör ayağı, laptop standı, telefon ve kulaklık askısı.'},
+  {id:'kontrolcu', ad:'Kumanda Aksesuarları',
+   d:'Joystick grip’leri, şarj istasyonları ve koruma kılıfları.'},
+  {id:'dekor', ad:'Dekor & Kişiselleştirme',
+   d:'Figürler, sticker’lar, neon yazılar ve masa dekorları.'},
+];
+const AKSESUAR_BOS_SAYISI=3;
+
+function AksesuarBosKart(){
+  return (
+    <div className="aspect-[4/3] border border-dashed border-line/70 grid place-items-center gap-2.5
+                     text-dim/70 transition-colors duration-300 hover:border-cy/40 hover:text-cy/70">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M10 2v16M2 10h16" stroke="currentColor" strokeWidth="1.1"/>
+      </svg>
+      <span className="lbl text-[.62rem] tracking-[.16em]">YAKINDA</span>
+    </div>
+  );
+}
+
+function AksesuarlarHub(){
+  /* Kategoriler açık/kapalı akordeon — hepsi aynı anda açık gelirse
+     10 kategori × 3 boş kart üst üste yığılıp kafa karıştırıyordu.
+     Tek seferde en çok bir kategori açık, geri kalanı tek satır başlık. */
+  const [acik,setAcik]=useState(null);
+  return (
+    <div className="py-8 lg:py-12">
+      <Reveal>
+        <Label className="mb-4">AKSESUARLAR</Label>
+        <div className="rule mb-8"/>
+        <h1 className="h-xl text-[clamp(2rem,6.4vw,4.2rem)] max-w-[17ch]">
+          Setup’ını <span className="em">parça parça</span> tamamla.
+        </h1>
+        <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
+          Mouse pad’den kablo düzenine, RGB’den masa dekoruna kadar — iş birliği
+          yaptığımız markaların ürünleri kategori kategori burada olacak.
+          <span className="text-ink/80"> Şu an vitrin taslak</span>, ürünler
+          anlaşmalar netleşince eklenecek. Bir kategoriye tıkla, ürünlerini gör.
+        </p>
+      </Reveal>
+
+      <div className="mt-12 border-t border-line">
+        {AKSESUAR_KATEGORILERI.map((kat,ki)=>{
+          const on=acik===kat.id, bid='akat-btn-'+kat.id, pid='akat-pnl-'+kat.id;
+          return (
+            <Reveal key={kat.id} delay={Math.min(ki*45,300)}>
+              <div className="border-b border-line">
+                <h2>
+                  <button id={bid} onClick={()=>setAcik(on?null:kat.id)} aria-expanded={on} aria-controls={pid}
+                    className="w-full text-left py-5 sm:py-6 flex items-center gap-4 sm:gap-5 group">
+                    <span className="lbl text-cy/70 w-6 sm:w-7 shrink-0">{String(ki+1).padStart(2,'0')}</span>
+                    <span className="flex-1 min-w-0">
+                      <span className={'block text-[1.05rem] sm:text-[1.2rem] font-light transition-colors duration-300 '+(on?'text-cy':'text-ink group-hover:text-cy')}>{kat.ad}</span>
+                      <span className="block text-[.8rem] sm:text-[.84rem] text-dim mt-1 leading-snug">{kat.d}</span>
+                    </span>
+                    <span className={'shrink-0 w-8 h-8 grid place-items-center border transition-all duration-500 '+(on?'border-cy rotate-45':'border-line group-hover:border-ink/30')}>
+                      <svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true">
+                        <path d="M6 0v12M0 6h12" stroke={on?'#2DE2E6':'#8B88A0'} strokeWidth="1.1"/>
+                      </svg>
+                    </span>
+                  </button>
+                </h2>
+                <div id={pid} role="region" aria-labelledby={bid} className={'acc '+(on?'open':'')}>
+                  <div className="accIn">
+                    <div className="pb-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {Array.from({length:AKSESUAR_BOS_SAYISI}).map((_,pi)=>
+                        <AksesuarBosKart key={pi}/>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          );
+        })}
+      </div>
+
+      <Reveal delay={200}>
+        <div className="mt-16">
+          <Card className="p-6 sm:p-8">
+            <p className="text-[.9rem] text-dim leading-relaxed max-w-[62ch]">
+              Setup aksesuarı üreten ya da satan bir marka mısın?
+              <span className="text-ink/80"> İş birliği için bize ulaş</span> —
+              ürünlerin doğru kategoride, sade bir vitrinde yer alsın.
+            </p>
+          </Card>
+        </div>
+      </Reveal>
+    </div>
+  );
+}
+
 /* ═══════════════════ KEŞFET — diğer sekmelere köprü ═══════════════════ */
 function Kesfet(){
   const kartlar=[
+    {href:'/aksesuarlar', t:'Aksesuarlar', d:'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası — kategori kategori, iş birliği yaptığımız markalardan.', e:'VİTRİN'},
     {href:'/testler', t:'Testler', d:'FPS, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu, refleks… On iki test, hepsi tarayıcıda çalışır.', e:'12 ARAÇ'},
     {href:'/forum', t:'Forum', d:'Kafana takılanı sor, kurduğun sistemi paylaş, başkalarının kurulumlarına bak. Kullanıcı adı seçmen yeterli.', e:'TOPLULUK'},
   ];
   return (
     <section className="py-16 lg:py-24">
       <Reveal><Label className="mb-4">BUNLARI DA DENE</Label><div className="rule mb-10"/></Reveal>
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {kartlar.map((k,i)=>(
           <Reveal key={k.href} delay={i*110}>
             <a href={k.href} className="group block h-full">
@@ -4258,6 +4378,13 @@ function App(){
   return (
     <div className="relative z-10">
       <Nav route={route}/>
+
+      {route==='aksesuarlar' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <AksesuarlarHub/>
+          <Footer/>
+        </main>
+      )}
 
       {route==='testler' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">

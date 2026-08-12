@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "setuphane-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/devserver.mjs"],
+      "port": 5180
+    }
+  ]
+}
