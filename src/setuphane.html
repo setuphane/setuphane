@@ -3359,11 +3359,18 @@ function NisanOyunu(){
 /* ═══════════════════ FPS TESTİ — canvas parçacık yükü ═══════════════════
    GPU gücü testinden farkı: bu, tarayıcının SAYFA ÇİZME hızını ölçer (rAF,
    yani vsync'e bağlı). Oyundaki FPS hissinin karşılığı budur; %1 düşük ve
-   tutarlılık takılma hissini ortalamadan daha iyi anlatır. */
+   tutarlılık takılma hissini ortalamadan daha iyi anlatır.
+   Eski sürüm sadece küçük daireler çiziyordu — 9000 tanesi bile Skia'nın
+   2D hızlandırmasıyla hemen hiçbir kartı zorlamıyordu. Şimdi sayı çok daha
+   yüksek VE üst seviyelerde ctx.shadowBlur açık: Canvas 2D'nin en pahalı
+   işlemlerinden biri, her parçacığı gerçek bir glow render'ına çeviriyor.
+   Zayıf/entegre ekran kartları "yüksek/ekstrem"de artık gerçekten düşüyor. */
 const FPS_YOGUNLUK=[
-  {id:'dusuk', n:'Düşük',   p:300},  {id:'hafif',n:'Hafif',  p:900},
-  {id:'orta',  n:'Orta',    p:2200}, {id:'yuksek',n:'Yüksek',p:4500},
-  {id:'ekstrem',n:'Ekstrem',p:9000},
+  {id:'dusuk',  n:'Düşük',   p:1500, r:2,   blur:0},
+  {id:'hafif',  n:'Hafif',   p:5000, r:2.6, blur:0},
+  {id:'orta',   n:'Orta',    p:11000,r:3.2, blur:6},
+  {id:'yuksek', n:'Yüksek',  p:20000,r:4,   blur:12},
+  {id:'ekstrem',n:'Ekstrem', p:34000,r:5,   blur:20},
 ];
 const FPS_GECMIS_KEY='sh_fpstest_v1';
 
@@ -3384,17 +3391,19 @@ function FpsTesti(){
   const basla=()=>{
     const cv=cvRef.current; if(!cv) return;
     const ctx=cv.getContext('2d');
-    const dpr=Math.min(2,window.devicePixelRatio||1);
+    /* Eskiden 2'de kesiliyordu; yüksek DPR ekranlarda (telefon/4K dizüstü)
+       gerçek zorluk çözünürlükle orantılı olmalı — 3'e kadar izin veriyoruz. */
+    const dpr=Math.min(3,window.devicePixelRatio||1);
     const W=cv.clientWidth, H=cv.clientHeight;
     cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
     ctx.scale(dpr,dpr);
 
-    const adet=FPS_YOGUNLUK.find(y=>y.id===yog).p;
+    const cfg=FPS_YOGUNLUK.find(y=>y.id===yog);
     const par=[];
-    for(let i=0;i<adet;i++) par.push({
+    for(let i=0;i<cfg.p;i++) par.push({
       x:Math.random()*W, y:Math.random()*H,
       vx:(Math.random()-.5)*90, vy:(Math.random()-.5)*90,
-      r:1.5+Math.random()*2.5, h:Math.random()
+      r:cfg.r*(0.75+Math.random()*0.5), h:Math.random()
     });
 
     setCalisiyor(true); setSon(null); setKalan(sure);
@@ -3410,14 +3419,21 @@ function FpsTesti(){
       setKalan(Math.max(0,Math.ceil(sure-gecen)));
       if(kareler.length%10===0 && dt>0) setAnlik(Math.round(1000/dt));
 
+      ctx.shadowBlur=0;
       ctx.fillStyle='#07070B'; ctx.fillRect(0,0,W,H);
+      /* shadowBlur, Canvas 2D'nin en pahalı işlemlerinden biri — her
+         parçacığı gerçek bir bulanık glow'a çeviriyor, gerçek GPU/CPU
+         kompozisyon yükü demek. 0 iken (düşük/hafif) neredeyse bedava. */
+      ctx.shadowBlur=cfg.blur;
       const s=Math.min(dt,50)/1000;
       for(let i=0;i<par.length;i++){
         const p=par[i];
         p.x+=p.vx*s; p.y+=p.vy*s;
         if(p.x<0||p.x>W) p.vx*=-1;
         if(p.y<0||p.y>H) p.vy*=-1;
-        ctx.fillStyle = p.h<.5 ? 'rgba(45,226,230,.75)' : 'rgba(255,45,149,.7)';
+        const cy=p.h<.5;
+        ctx.fillStyle = cy ? 'rgba(45,226,230,.75)' : 'rgba(255,45,149,.7)';
+        if(cfg.blur) ctx.shadowColor = cy ? '#2DE2E6' : '#FF2D95';
         ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.283); ctx.fill();
       }
 
