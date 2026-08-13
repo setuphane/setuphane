@@ -4328,10 +4328,10 @@ function AksesuarlarHub(){
 const ONERI_URUNLER=[
   {id:'op1', kat:'mousepad', ad:'XL Kumaş Mouse Pad (Örnek)',
    aciklama:'Masayı uçtan uca kaplayan, kaymaz tabanlı kumaş yüzey.',
-   minTL:0, maxTL:1000, anahtar:['mousepad','mouse pad','altlık','masa','xl','kumaş']},
+   minTL:0, maxTL:1000, anahtar:['mousepad','mouse pad','mouse','fare','fare pedi','altlık','masa','xl','kumaş']},
   {id:'op2', kat:'mousepad', ad:'Cam Yüzey Mouse Pad (Örnek)',
    aciklama:'Düşük sürtünme isteyen rekabetçi oyuncular için sert cam yüzey.',
-   minTL:500, maxTL:2000, anahtar:['mousepad','cam','hassas','rekabetçi','fps','nişan']},
+   minTL:500, maxTL:2000, anahtar:['mousepad','mouse','fare','cam','hassas','rekabetçi','fps','nişan']},
   {id:'op3', kat:'kablo', ad:'Kablo Örgüsü + Klips Seti (Örnek)',
    aciklama:'Masa altını toparlayan örgü ve klips seti.',
    minTL:0, maxTL:800, anahtar:['kablo','düzen','toparla','karmaşa','klips']},
@@ -4355,6 +4355,34 @@ const ONERI_URUNLER=[
    minTL:200, maxTL:1200, anahtar:['dekor','figür','kişisel','estetik','görünüm']},
 ];
 
+/* İki kelime arasındaki düzenleme mesafesi (Levenshtein) — "mause"/"mouse"
+   gibi yazım hatalarını yakalamak için. Kelimeler kısa (site içi anahtar
+   kelimeler), O(n*m) burada sorun değil. */
+function duzenlemeMesafesi(a,b){
+  const m=a.length,n=b.length;
+  if(!m) return n; if(!n) return m;
+  let onceki=Array.from({length:n+1},(_,j)=>j);
+  for(let i=1;i<=m;i++){
+    const simdi=[i];
+    for(let j=1;j<=n;j++){
+      simdi[j]=a[i-1]===b[j-1] ? onceki[j-1]
+        : 1+Math.min(onceki[j], simdi[j-1], onceki[j-1]);
+    }
+    onceki=simdi;
+  }
+  return onceki[n];
+}
+/* Kısa kelimede 1, orta kelimede 2, uzun kelimede 3 harflik hataya izin
+   ver — "mause"→"mouse" (mesafe 1), "klavie"→"klavye" (mesafe 2) gibi
+   tipik yazım hatalarını yakalar; alakasız kelimeleri eşleştirmeyecek
+   kadar da sıkı (rastgele 3-4 harflik kelimeler eşleşmez). */
+function benzerKelime(a,b){
+  if(a===b) return true;
+  if(a.length>=3 && b.length>=3 && (a.includes(b)||b.includes(a))) return true;
+  const tol = b.length<=4?1 : b.length<=7?2 : 3;
+  return duzenlemeMesafesi(a,b)<=tol;
+}
+
 function oneriUret(butce, istek){
   /* Bütçe eşleşmesi TEK BAŞINA ürün göstermeye yetiyordu: "mouse pad" yazan
      biri, bütçesi RGB/mikrofon aralığına da denk geldiği için alakasız
@@ -4363,16 +4391,28 @@ function oneriUret(butce, istek){
      ek puan. Sadece bütçe girilip metin boşsa, bütçeye göre filtrelenir. */
   /* Boşluk/tire farkı eşleşmeyi kaçırıyordu: "mouse pad" (boşluklu) yazan
      kullanıcı, anahtar listesinde sadece "mousepad" (boşluksuz) olan bir
-     ürünü bulamıyordu. Karşılaştırmayı boşluk/tire yok sayarak yapıyoruz. */
+     ürünü bulamıyordu. Karşılaştırmayı boşluk/tire yok sayarak yapıyoruz.
+     Ayrıca insanlar yazım hatası yapar ("mause") veya farklı kelime
+     kullanır ("fare") — tam eşleşme yoksa kelime bazlı, hataya toleranslı
+     bir ikinci tur devreye giriyor. */
   const sadelestir=s=>s.toLocaleLowerCase('tr').replace(/[\s-]+/g,'');
-  const metin=sadelestir((istek||'').trim());
+  const kelimelere=s=>s.toLocaleLowerCase('tr').split(/[^a-zçğıöşü0-9]+/i).filter(k=>k.length>1);
+  const ham=(istek||'').trim();
+  const metin=sadelestir(ham);
   const metinVar=metin.length>0;
+  const kullaniciKelimeleri=kelimelere(ham);
+
   return ONERI_URUNLER
     .map(u=>{
-      const eslesen=u.anahtar.filter(k=>metin.includes(sadelestir(k)));
-      let skor=eslesen.length*3;
+      let skor=0, eslesenVar=false;
+      for(const k of u.anahtar){
+        if(metin.includes(sadelestir(k))){ skor+=3; eslesenVar=true; continue; }
+        for(const kt of kelimelere(k)){
+          if(kullaniciKelimeleri.some(uk=>benzerKelime(uk,kt))){ skor+=2; eslesenVar=true; }
+        }
+      }
       if(butce>0 && butce>=u.minTL && butce<=u.maxTL) skor+=1;
-      return {...u, skor, eslesti:eslesen.length>0, butceUyumlu:butce>0&&butce>=u.minTL&&butce<=u.maxTL};
+      return {...u, skor, eslesti:eslesenVar, butceUyumlu:butce>0&&butce>=u.minTL&&butce<=u.maxTL};
     })
     .filter(u=> metinVar ? u.eslesti : u.butceUyumlu)
     .sort((a,b)=>b.skor-a.skor)

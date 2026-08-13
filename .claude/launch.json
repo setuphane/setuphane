@@ -5,7 +5,8 @@
       "name": "setuphane-dev",
       "runtimeExecutable": "node",
       "runtimeArgs": ["scripts/devserver.mjs"],
-      "port": 5180
+      "port": 5180,
+      "autoPort": true
     }
   ]
 }

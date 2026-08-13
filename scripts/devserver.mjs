@@ -9,7 +9,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const port = 5180;
+// Harness bir öncekini kapatamazsa 5180 elde kalabiliyor; autoPort:true ile
+// PORT env değişkeninden farklı bir port atanabiliyor, burada onu dinliyoruz.
+const port = Number(process.env.PORT) || 5180;
 
 const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css',
   '.jpg':'image/jpeg', '.png':'image/png', '.svg':'image/svg+xml',
