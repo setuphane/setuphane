@@ -25,6 +25,12 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"SETUP HANE","url":"https://www.setuphane.com/","logo":"https://www.setuphane.com/icon-192.png","sameAs":["https://instagram.com/setuphane"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"SETUP HANE","url":"https://www.setuphane.com/"}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -823,6 +829,12 @@ const ROTA_META={
             d:'12 ücretsiz araç: FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri. Kurulum gerekmez.'},
   forum:   {t:'Forum — Sistem tavsiyesi ve bilgisayar sorunları | SETUP HANE',
             d:'Bütçene uygun sistem sor, kurulumunu paylaş, arızanı çöz. Kayıt için e-posta istenmez.'},
+  hakkimizda: {t:'Hakkımızda | SETUP HANE',
+            d:'SETUP HANE nedir, kim yapıyor, hangi ilkelerle çalışıyor — kısaca.'},
+  isbirlikleri: {t:'İş Birlikleri | SETUP HANE',
+            d:'Markalar ve iş birliği yapmak isteyenler için SETUP HANE hakkında bilgi ve iletişim.'},
+  gizlilik: {t:'Gizlilik ve Çerez Politikası | SETUP HANE',
+            d:'Hangi veri tutulur, hangi çerezler kullanılır, kayıt gerekip gerekmediği — açıkça.'},
 };
 
 function rotaCoz(){
@@ -831,6 +843,9 @@ function rotaCoz(){
   if(m) return {route:'testler', sub:m[1]||null};
   if(p==='/forum') return {route:'forum', sub:null};
   if(p==='/aksesuarlar') return {route:'aksesuarlar', sub:null};
+  if(p==='/hakkimizda') return {route:'hakkimizda', sub:null};
+  if(p==='/isbirlikleri') return {route:'isbirlikleri', sub:null};
+  if(p==='/gizlilik') return {route:'gizlilik', sub:null};
   return {route:'ana', sub:null};
 }
 
@@ -4341,10 +4356,132 @@ function Trust(){
     </section>
   );
 }
+/* ═══════════════════ HAKKIMIZDA / İŞ BİRLİKLERİ / GİZLİLİK ═══════════════════
+   Üçü de gerçek bilgiye dayanıyor — sahte ekip, sahte rakam veya sahte
+   hizmet listesi yok. SETUP HANE tek kişilik bir araç+topluluk projesi;
+   bunu gizlemek yerine sade ve profesyonel şekilde söylüyoruz. */
+function BasitSayfa({etiket,baslik,children}){
+  return (
+    <div className="py-8 lg:py-12 max-w-[68ch]">
+      <Reveal>
+        <Label className="mb-4">{etiket}</Label>
+        <div className="rule mb-8"/>
+        <h1 className="h-xl text-[clamp(2rem,6vw,3.6rem)] max-w-[18ch] mb-10">{baslik}</h1>
+      </Reveal>
+      <Reveal delay={90}>
+        <div className="space-y-6 text-[.95rem] leading-relaxed text-ink/85">
+          {children}
+        </div>
+      </Reveal>
+    </div>
+  );
+}
+
+function HakkimizdaSayfa(){
+  return (
+    <BasitSayfa etiket="HAKKIMIZDA" baslik="Bir kişinin kurduğu, ciddiye alınan bir araç.">
+      <p>
+        SETUP HANE, bütçesine göre bilgisayar toplamak isteyenler için ücretsiz bir
+        hesaplayıcı olarak başladı; şimdi donanım testleri, bir forum ve setup
+        aksesuarları vitrinini de içeren bir <span className="text-ink">araç ve topluluk</span> platformu.
+      </p>
+      <p>
+        Site tek kişi tarafından geliştiriliyor — arkasında bir ajans veya "editör
+        kadrosu" yok. Bunu gizlemenin bir anlamı yok: küçük olmak, özensiz olmak
+        demek değil. Her hesaplama mantığı ekranda açık, kimseye komisyonla
+        yönlendirme yapılmıyor.
+      </p>
+      <p>
+        Topluluk tarafı Instagram'da <a href="https://instagram.com/setuphane" target="_blank"
+        rel="noopener noreferrer" className="text-cy hover:underline underline-offset-4">@setuphane</a>{' '}
+        üzerinden büyüyor; sitedeki forum da kayıt istemeden, aynı ruhla çalışıyor.
+      </p>
+      <p>
+        Veri ve gizlilik yaklaşımının detayları{' '}
+        <a href="/gizlilik" className="text-cy hover:underline underline-offset-4">Gizlilik ve Çerez Politikası</a>{' '}
+        sayfasında; markalarla iş birliği için{' '}
+        <a href="/isbirlikleri" className="text-cy hover:underline underline-offset-4">İş Birlikleri</a>{' '}
+        sayfasına bakabilirsin.
+      </p>
+    </BasitSayfa>
+  );
+}
+
+function IsBirlikleriSayfa(){
+  const hizmetler=[
+    {t:'İçerik & tanıtım',d:'Instagram\'da düzenli, organik paylaşılan setup/PC içeriği içinde ürün veya marka tanıtımı.'},
+    {t:'Site içi vitrin',d:'setuphane.com/aksesuarlar üzerindeki kategori vitrininde ürün gösterimi.'},
+    {t:'Ürün odaklı içerik',d:'Kurulum/inceleme tarzı paylaşımlarla ürünün gerçek kullanımının gösterilmesi.'},
+  ];
+  return (
+    <BasitSayfa etiket="İŞ BİRLİKLERİ" baslik="Markalarla iş birliği.">
+      <p>
+        SETUP HANE, PC/setup ekosistemindeki markalarla iş birliğine açık.
+        Aşağıdakiler şu an gerçekten sunabildiğim kanallar — burada olmayan bir
+        şeyi vaat etmiyorum.
+      </p>
+      <div className="grid sm:grid-cols-3 gap-4 not-prose py-2">
+        {hizmetler.map(h=>(
+          <Card key={h.t} className="p-5">
+            <h3 className="text-[1.02rem] text-ink mb-2">{h.t}</h3>
+            <p className="text-[.84rem] text-dim leading-relaxed">{h.d}</p>
+          </Card>
+        ))}
+      </div>
+      <p>
+        Takipçi/erişim rakamları, kampanya bazında ayrıca paylaşılıyor — burada
+        genel bir sayı iddia etmiyorum; istersen doğrudan sorabilirsin.
+      </p>
+      <p>
+        <a href="mailto:setuphane@gmail.com"
+           className="inline-block mt-2 border border-cy text-cy px-6 py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300">
+          İŞ BİRLİĞİ İÇİN YAZ
+        </a>
+      </p>
+    </BasitSayfa>
+  );
+}
+
+function GizlilikSayfa(){
+  return (
+    <BasitSayfa etiket="GİZLİLİK VE ÇEREZ POLİTİKASI" baslik="Ne tutuyoruz, ne tutmuyoruz.">
+      <p><span className="text-ink">Kayıt yok.</span> Siteyi kullanmak için hesap açman, e-posta vermen gerekmiyor.</p>
+      <p>
+        <span className="text-ink">Ziyaret ölçümü:</span> Vercel Analytics çerez kullanmadan,
+        kişiyi tanımlamadan sadece sayfa görüntüleme sayar. Ek olarak Google Analytics
+        yalnızca sen bandodaki "Kabul Ediyorum" düğmesine basarsan yüklenir; reddedersen
+        site aynen çalışmaya devam eder, hiçbir şey kaybetmezsin.
+      </p>
+      <p>
+        <span className="text-ink">Cihazında kalan veriler:</span> Para birimi/dil tercihin,
+        test geçmişin ve forumdaki takma adın tarayıcının <code className="text-cy">localStorage</code>'ında
+        durur — sunucuya gönderilmez, cihazlar arası senkron olmaz.
+      </p>
+      <p>
+        <span className="text-ink">Forum:</span> Paylaştığın konu/cevaplar Supabase üzerindeki
+        veritabanında tutulur; kimliğini değil, tarayıcı bazlı anonim bir cihaz kimliğini
+        taşır. E-posta veya isim istenmez.
+      </p>
+      <p>
+        <span className="text-ink">Üçüncü taraflara satış yok.</span> Hiçbir veri reklam
+        ağlarına satılmaz veya paylaşılmaz.
+      </p>
+      <p>
+        Sorun varsa: <a href="mailto:setuphane@gmail.com" className="text-cy hover:underline underline-offset-4">setuphane@gmail.com</a>
+      </p>
+    </BasitSayfa>
+  );
+}
+
+const FOOTER_LINKLER=[
+  {href:'/hakkimizda',   t:'Hakkımızda'},
+  {href:'/isbirlikleri', t:'İş Birlikleri'},
+  {href:'/gizlilik',     t:'Gizlilik ve Çerez Politikası'},
+];
 function Footer(){
   return (
     <footer className="pt-16 pb-36 lg:pb-16 border-t border-line">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-10">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10">
         <div>
           <div className="w-[168px]"><LogoLockup wordSize={24}/></div>
           <p className="mt-6 text-sm text-dim max-w-[38ch] leading-relaxed">
@@ -4353,13 +4490,20 @@ function Footer(){
                className="text-cy hover:underline underline-offset-4">@setuphane</a>.
           </p>
         </div>
-        <div className="lbl text-dim/70 leading-loose">
-          <div>FİYATLAR: CİMRİ · {fiyatYasi().metin.toLocaleUpperCase('tr')}</div>
-          <div>FPS DEĞERLERİ TAHMİNDİR</div>
-          {/* Analitik eklendiği için bu satır şart: site "izleme yok" diyordu,
-              artık ziyaret sayılıyor. Ne sayıldığını saklamak dürüst olmaz. */}
-          <div>ÇEREZ YOK · ZİYARET SAYILIR, KİŞİ TAKİP EDİLMEZ</div>
-          <div className="mt-3 text-dim/50">© {new Date().getFullYear()} SETUP HANE</div>
+        <div className="flex flex-col sm:items-end gap-8">
+          <nav aria-label="Kurumsal" className="flex flex-col sm:items-end gap-2.5">
+            {FOOTER_LINKLER.map(l=>(
+              <a key={l.href} href={l.href} className="lbl text-dim hover:text-cy transition-colors">{l.t}</a>
+            ))}
+          </nav>
+          <div className="lbl text-dim/70 leading-loose sm:text-right">
+            <div>FİYATLAR: CİMRİ · {fiyatYasi().metin.toLocaleUpperCase('tr')}</div>
+            <div>FPS DEĞERLERİ TAHMİNDİR</div>
+            {/* Analitik eklendiği için bu satır şart: site "izleme yok" diyordu,
+                artık ziyaret sayılıyor. Ne sayıldığını saklamak dürüst olmaz. */}
+            <div>ÇEREZ YOK · ZİYARET SAYILIR, KİŞİ TAKİP EDİLMEZ</div>
+            <div className="mt-3 text-dim/50">© {new Date().getFullYear()} SETUP HANE</div>
+          </div>
         </div>
       </div>
     </footer>
@@ -4461,6 +4605,27 @@ function App(){
       {route==='forum' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
           <Forum sys={sys} prof={prof}/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='hakkimizda' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <HakkimizdaSayfa/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='isbirlikleri' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <IsBirlikleriSayfa/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='gizlilik' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <GizlilikSayfa/>
           <Footer/>
         </main>
       )}
