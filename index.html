@@ -6492,8 +6492,16 @@ function App() {
       const r = rotaCoz();
       setRota(r);
       /* Başlık ve açıklamayı rotaya göre güncelle — hem arama sonucu hem
-         analitik sayfa adı için gerekli. */
-      const meta = ROTA_META[r.route] || ROTA_META.ana;
+         analitik sayfa adı için gerekli. /testler/xxx alt sayfaları önceden
+         hepsi aynı genel "Donanım Testleri" başlığını paylaşıyordu — Google
+         Search Console'da yinelenen başlık uyarısına yol açıyordu ve her
+         testin kendi arama sorgusunda (ör. "mouse dpi testi") ayrı
+         görünmesini engelliyordu. Şimdi TESTLER'daki isim/açıklama kullanılıyor. */
+      const testSub = r.route === 'testler' && r.sub ? TESTLER.find(x => x.id === r.sub) : null;
+      const meta = testSub ? {
+        t: testSub.n + ' — Ücretsiz Online Araç | SETUP HANE',
+        d: testSub.d
+      } : ROTA_META[r.route] || ROTA_META.ana;
       document.title = meta.t;
       const md = document.querySelector('meta[name="description"]');
       if (md) md.setAttribute('content', meta.d);
