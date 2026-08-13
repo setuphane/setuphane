@@ -207,11 +207,17 @@ select option{background:#0E0E15;color:#ECEBF2}
 
 <div id="boot">
   <div style="text-align:center">
-    <svg width="62" height="40" viewBox="46 4 208 134" fill="none" aria-hidden="true" style="margin:0 auto 16px;filter:drop-shadow(0 0 6px rgba(45,226,230,.6))">
+    <!-- viewBox eskiden 46 4 208 134'tü: kemerin alt uçları (y≈140.8, 9px
+         kalınlık) taşıp kırpılıyordu — "bozuk/orantısız" görünümün sebebi
+         buydu. Yükseklik büyütülüp genişlik oranla ayarlandı. -->
+    <svg width="64" height="43" viewBox="40 0 220 148" fill="none" aria-hidden="true" style="margin:0 auto 14px;filter:drop-shadow(0 0 6px rgba(45,226,230,.6))">
       <path d="M59.8 140.8A96 96 0 1 1 240.2 140.8" stroke="#FF2D95" stroke-width="9" stroke-linecap="round"/>
       <rect x="96" y="56" width="78" height="50" rx="6" stroke="#2DE2E6" stroke-width="9"/>
       <path d="M135 106v16M116 130h38" stroke="#2DE2E6" stroke-width="9" stroke-linecap="round"/>
     </svg>
+    <!-- .neonWord/.hn: Wordmark bileşeniyle aynı CSS sınıfları — JS henüz
+         yüklenmediği için burada React değil, aynı görünümü veren düz HTML. -->
+    <div class="neonWord" style="font-size:20px;margin-bottom:10px">SETUP<span class="hn">HANE</span></div>
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;color:#8B88A0">YÜKLENİYOR</div>
   </div>
 </div>
@@ -809,6 +815,7 @@ function Shot({kind,ratio='4/3',sm=false,className=''}){
 const SEKMELER=[
   {id:'ana',        href:'/',           t:'SİSTEM KUR',   kisa:'SİSTEM'},
   {id:'aksesuarlar',href:'/aksesuarlar',t:'AKSESUARLAR',  kisa:'AKSESUAR'},
+  {id:'oner',       href:'/oner',       t:'ÖNER',         kisa:'ÖNER'},
   {id:'testler',    href:'/testler',    t:'TESTLER',      kisa:'TESTLER'},
   {id:'forum',      href:'/forum',      t:'FORUM',        kisa:'FORUM'},
 ];
@@ -824,6 +831,11 @@ const ROTA_META={
      etkilenmez, sadece Google'da görünmüyor. */
   aksesuarlar: {t:'Setup Aksesuarları — Kategorilere göre keşfet | SETUP HANE',
             d:'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.',
+            noindex:true},
+  /* Deneme aşaması: eşleştirme mantığı gerçek ama ürün verisi örnek/placeholder.
+     Aksesuarlar'daki gibi gerçek ürünler gelene kadar Google'dan gizli. */
+  oner: {t:'Sana Göre Öner (Deneme) | SETUP HANE',
+            d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim. Şu an örnek verilerle çalışan bir deneme.',
             noindex:true},
   testler: {t:'Donanım Testleri — FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
             d:'12 ücretsiz araç: FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri. Kurulum gerekmez.'},
@@ -843,6 +855,7 @@ function rotaCoz(){
   if(m) return {route:'testler', sub:m[1]||null};
   if(p==='/forum') return {route:'forum', sub:null};
   if(p==='/aksesuarlar') return {route:'aksesuarlar', sub:null};
+  if(p==='/oner') return {route:'oner', sub:null};
   if(p==='/hakkimizda') return {route:'hakkimizda', sub:null};
   if(p==='/isbirlikleri') return {route:'isbirlikleri', sub:null};
   if(p==='/gizlilik') return {route:'gizlilik', sub:null};
@@ -913,15 +926,19 @@ function Nav({route}){
           </div>
         </div>
 
-        {/* Mobil sekmeler: üçü de eşit genişlikte, tam yan yana.
+        {/* Mobil sekmeler: hepsi eşit genişlikte, tam yan yana.
             Önceki sürüm yatay kaydırmalıydı ve genişlikler farklıydı,
-            hizasız görünüyordu. */}
-        <nav aria-label="Bölümler" className="lg:hidden pb-2.5 flex gap-2">
+            hizasız görünüyordu. 5. sekme (ÖNER) eklenince satır 375px'te
+            taşıyordu; overflow-x:clip bunu SESSİZCE kırpıyordu (FORUM
+            görünmez oluyordu) — .lbl'nin geniş letter-spacing'i (.3em) en
+            büyük suçlu, burada daraltıyoruz. */}
+        <nav aria-label="Bölümler" className="lg:hidden pb-2.5 flex gap-1.5">
           {SEKMELER.map(s=>{
             const on=route===s.id;
             return (
               <a key={s.id} href={s.href} aria-current={on?'page':undefined}
-                className={'lbl flex-1 text-center px-2 py-2.5 border transition-colors duration-300 whitespace-nowrap '+
+                style={{letterSpacing:'.1em'}}
+                className={'lbl flex-1 text-center px-1 py-2.5 border transition-colors duration-300 whitespace-nowrap text-[9px] '+
                   (on?'border-cy text-cy bg-cy/[.07]':'border-line/60 text-dim')}>
                 {s.kisa}
               </a>
@@ -4302,17 +4319,160 @@ function AksesuarlarHub(){
   );
 }
 
+/* ═══════════════════ ÖNER — kural tabanlı ürün eşleştirme (deneme) ═══════════════════
+   Gerçek yapay zeka değil: bütçe aralığı + anahtar kelime örtüşmesiyle
+   puanlayan basit bir motor. Sunucu/API anahtarı gerektirmiyor, tamamen
+   tarayıcıda çalışıyor — sitenin "bağımsızlık" prensibiyle uyumlu.
+   ÜRÜNLER şu an örnek/placeholder — gerçek iş birlikleri geldikçe burası
+   güncellenecek, motorun kendisi (oneriUret) aynı kalabilir. */
+const ONERI_URUNLER=[
+  {id:'op1', kat:'mousepad', ad:'XL Kumaş Mouse Pad (Örnek)',
+   aciklama:'Masayı uçtan uca kaplayan, kaymaz tabanlı kumaş yüzey.',
+   minTL:0, maxTL:1000, anahtar:['mousepad','mouse pad','altlık','masa','xl','kumaş']},
+  {id:'op2', kat:'mousepad', ad:'Cam Yüzey Mouse Pad (Örnek)',
+   aciklama:'Düşük sürtünme isteyen rekabetçi oyuncular için sert cam yüzey.',
+   minTL:500, maxTL:2000, anahtar:['mousepad','cam','hassas','rekabetçi','fps','nişan']},
+  {id:'op3', kat:'kablo', ad:'Kablo Örgüsü + Klips Seti (Örnek)',
+   aciklama:'Masa altını toparlayan örgü ve klips seti.',
+   minTL:0, maxTL:800, anahtar:['kablo','düzen','toparla','karmaşa','klips']},
+  {id:'op4', kat:'rgb', ad:'Senkronize LED Şerit (Örnek)',
+   aciklama:'Masa/kasa arkasına ambiyans ışığı, uygulamadan renk kontrolü.',
+   minTL:400, maxTL:2500, anahtar:['rgb','led','ışık','ambiyans','aydınlatma','neon']},
+  {id:'op5', kat:'bilek', ad:'Jel Bilek Desteği (Örnek)',
+   aciklama:'Uzun oturumlarda bilek ağrısını azaltan jel destek.',
+   minTL:0, maxTL:600, anahtar:['bilek','ağrı','konfor','destek','uzun oturum']},
+  {id:'op6', kat:'standlar', ad:'Ayarlanabilir Monitör Standı (Örnek)',
+   aciklama:'Yükseklik/açı ayarlı, masada yer açan monitör ayağı.',
+   minTL:800, maxTL:4000, anahtar:['monitör','stand','ayak','yükseklik','boyun','ergonomi']},
+  {id:'op7', kat:'sesgoruntu', ad:'Esnek Mikrofon Kolu (Örnek)',
+   aciklama:'Yayın/toplantı için masaya sabitlenen mikrofon kolu.',
+   minTL:500, maxTL:2500, anahtar:['mikrofon','yayın','stream','podcast','kayıt','ses']},
+  {id:'op8', kat:'tustakimi', ad:'PBT Keycap Seti (Örnek)',
+   aciklama:'Solmayan PBT malzemeli, Türkçe baskılı tuş takımı.',
+   minTL:600, maxTL:3000, anahtar:['klavye','keycap','tuş takımı','mekanik','özelleştir']},
+  {id:'op9', kat:'dekor', ad:'Masaüstü LED Figür (Örnek)',
+   aciklama:'Masanı kişiselleştiren küçük ışıklı dekor objesi.',
+   minTL:200, maxTL:1200, anahtar:['dekor','figür','kişisel','estetik','görünüm']},
+];
+
+function oneriUret(butce, istek){
+  /* Bütçe eşleşmesi TEK BAŞINA ürün göstermeye yetiyordu: "mouse pad" yazan
+     biri, bütçesi RGB/mikrofon aralığına da denk geldiği için alakasız
+     kategoriler görüyordu. Kural artık net: kullanıcı bir şey yazdıysa,
+     anahtar kelime eşleşmesi ZORUNLU — bütçe sadece sıralamada küçük bir
+     ek puan. Sadece bütçe girilip metin boşsa, bütçeye göre filtrelenir. */
+  /* Boşluk/tire farkı eşleşmeyi kaçırıyordu: "mouse pad" (boşluklu) yazan
+     kullanıcı, anahtar listesinde sadece "mousepad" (boşluksuz) olan bir
+     ürünü bulamıyordu. Karşılaştırmayı boşluk/tire yok sayarak yapıyoruz. */
+  const sadelestir=s=>s.toLocaleLowerCase('tr').replace(/[\s-]+/g,'');
+  const metin=sadelestir((istek||'').trim());
+  const metinVar=metin.length>0;
+  return ONERI_URUNLER
+    .map(u=>{
+      const eslesen=u.anahtar.filter(k=>metin.includes(sadelestir(k)));
+      let skor=eslesen.length*3;
+      if(butce>0 && butce>=u.minTL && butce<=u.maxTL) skor+=1;
+      return {...u, skor, eslesti:eslesen.length>0, butceUyumlu:butce>0&&butce>=u.minTL&&butce<=u.maxTL};
+    })
+    .filter(u=> metinVar ? u.eslesti : u.butceUyumlu)
+    .sort((a,b)=>b.skor-a.skor)
+    .slice(0,5);
+}
+
+function OnerHub(){
+  const [butce,setButce]=useState('');
+  const [istek,setIstek]=useState('');
+  const [sonuc,setSonuc]=useState(null);
+
+  const ara=e=>{
+    e.preventDefault();
+    setSonuc(oneriUret(Number(butce)||0, istek));
+  };
+
+  return (
+    <div className="py-8 lg:py-12">
+      <Reveal>
+        <Label className="mb-4">SANA GÖRE ÖNER</Label>
+        <div className="rule mb-8"/>
+        <h1 className="h-xl text-[clamp(2rem,6.4vw,4.2rem)] max-w-[17ch]">
+          Bütçeni ve ne istediğini yaz, <span className="em">biz eşleştirelim</span>.
+        </h1>
+        <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
+          Yapay zeka değil — bütçe aralığı ve yazdığın kelimelere göre çalışan basit
+          bir eşleştirme. <span className="text-ink/80">Şu an örnek ürünlerle deneme
+          aşamasında</span>; gerçek iş birlikleri geldikçe ürünler gerçek olacak.
+        </p>
+      </Reveal>
+
+      <Reveal delay={90}>
+        <form onSubmit={ara} className="mt-10 grid sm:grid-cols-[220px_1fr] gap-4 items-end">
+          <div>
+            <label htmlFor="oner-butce" className="lbl text-dim mb-3 block">BÜTÇEN (₺)</label>
+            <input id="oner-butce" type="number" min="0" step="50" inputMode="numeric"
+              value={butce} onChange={e=>setButce(e.target.value)} placeholder="ör. 1500"
+              className="w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50
+                         focus:border-cy transition-colors"/>
+          </div>
+          <div>
+            <label htmlFor="oner-istek" className="lbl text-dim mb-3 block">NE ARIYORSUN?</label>
+            <input id="oner-istek" type="text" value={istek} onChange={e=>setIstek(e.target.value)}
+              placeholder="ör. masam dağınık, kablo toparlamak istiyorum"
+              className="w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50
+                         focus:border-cy transition-colors"/>
+          </div>
+          <button type="submit"
+            className="sm:col-span-2 border border-cy text-cy px-6 py-3.5 lbl hover:bg-cy hover:text-bg
+                       transition-colors duration-300 w-fit">
+            ÖNERİ AL
+          </button>
+        </form>
+      </Reveal>
+
+      {sonuc && (
+        <Reveal delay={120}>
+          <div className="mt-12 pt-8 border-t border-line">
+            {sonuc.length===0 ? (
+              <p className="text-dim text-[.9rem]">
+                Eşleşme bulunamadı — bütçeni artırıp farklı kelimelerle tekrar dene.
+              </p>
+            ) : (
+              <>
+                <Label className="mb-5">ÖNERİLER</Label>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {sonuc.map(u=>(
+                    <Card key={u.id} className="p-5">
+                      <div className="lbl text-cy/70 mb-2">
+                        {(AKSESUAR_KATEGORILERI.find(k=>k.id===u.kat)||{ad:u.kat}).ad}
+                      </div>
+                      <h3 className="text-[1.02rem] text-ink mb-2">{u.ad}</h3>
+                      <p className="text-[.84rem] text-dim leading-relaxed mb-4">{u.aciklama}</p>
+                      <span className="lbl text-[.62rem] text-dim/60 border border-dashed border-line/70 px-3 py-1.5 inline-block">
+                        ÖRNEK ÜRÜN · BAĞLANTI YAKINDA
+                      </span>
+                    </Card>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </Reveal>
+      )}
+    </div>
+  );
+}
+
 /* ═══════════════════ KEŞFET — diğer sekmelere köprü ═══════════════════ */
 function Kesfet(){
   const kartlar=[
     {href:'/aksesuarlar', t:'Aksesuarlar', d:'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası — kategori kategori, iş birliği yaptığımız markalardan.', e:'VİTRİN'},
+    {href:'/oner', t:'Sana Göre Öner', d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim.', e:'DENEME'},
     {href:'/testler', t:'Testler', d:'FPS, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu, refleks… On iki test, hepsi tarayıcıda çalışır.', e:'12 ARAÇ'},
     {href:'/forum', t:'Forum', d:'Kafana takılanı sor, kurduğun sistemi paylaş, başkalarının kurulumlarına bak. Kullanıcı adı seçmen yeterli.', e:'TOPLULUK'},
   ];
   return (
     <section className="py-16 lg:py-24">
       <Reveal><Label className="mb-4">BUNLARI DA DENE</Label><div className="rule mb-10"/></Reveal>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kartlar.map((k,i)=>(
           <Reveal key={k.href} delay={i*110}>
             <a href={k.href} className="group block h-full">
@@ -4591,6 +4751,13 @@ function App(){
       {route==='aksesuarlar' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
           <AksesuarlarHub/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='oner' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <OnerHub/>
           <Footer/>
         </main>
       )}
