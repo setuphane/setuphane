@@ -264,18 +264,18 @@ const GPUS=[
     çıkmıyordu. Üç kart eklendi (Cimri/Akakçe, Ağustos 2026, en ucuz liste
     fiyatı): RX 6600, RX 7600, RTX 4060. */
  {id:'6600',   n:'Radeon RX 6600 8 GB',           b:'AMD',    idx:40,  vram:8,  tdp:132, p:13949},
- {id:'b580',   n:'Intel Arc B580 12 GB',          b:'Intel',  idx:55,  vram:12, tdp:190, p:13110},
+ {id:'b580',   n:'Intel Arc B580 12 GB',          b:'Intel',  idx:55,  vram:12, tdp:190, p:13230},
  {id:'7600',   n:'Radeon RX 7600 8 GB',           b:'AMD',    idx:48,  vram:8,  tdp:165, p:16780},
  {id:'4060',   n:'GeForce RTX 4060 8 GB',         b:'NVIDIA', idx:54,  vram:8,  tdp:115, p:18880},
- {id:'5060',   n:'GeForce RTX 5060 8 GB',         b:'NVIDIA', idx:58,  vram:8,  tdp:145, p:17880},
- {id:'9060xt', n:'Radeon RX 9060 XT 16 GB',       b:'AMD',    idx:64,  vram:16, tdp:180, p:24599},
- {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB',     b:'NVIDIA', idx:74,  vram:16, tdp:180, p:33119},
- {id:'9070',   n:'Radeon RX 9070 16 GB',          b:'AMD',    idx:92,  vram:16, tdp:220, p:37000},
- {id:'5070',   n:'GeForce RTX 5070 12 GB',        b:'NVIDIA', idx:100, vram:12, tdp:250, p:35279},
- {id:'9070xt', n:'Radeon RX 9070 XT 16 GB',       b:'AMD',    idx:112, vram:16, tdp:304, p:36549},
- {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB',     b:'NVIDIA', idx:126, vram:16, tdp:300, p:57035},
- {id:'5080',   n:'GeForce RTX 5080 16 GB',        b:'NVIDIA', idx:152, vram:16, tdp:360, p:74887},
- {id:'5090',   n:'GeForce RTX 5090 32 GB',        b:'NVIDIA', idx:205, vram:32, tdp:575, p:150000},
+ {id:'5060',   n:'GeForce RTX 5060 8 GB',         b:'NVIDIA', idx:58,  vram:8,  tdp:145, p:16969},
+ {id:'9060xt', n:'Radeon RX 9060 XT 16 GB',       b:'AMD',    idx:64,  vram:16, tdp:180, p:18599},
+ {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB',     b:'NVIDIA', idx:74,  vram:16, tdp:180, p:33200},
+ {id:'9070',   n:'Radeon RX 9070 16 GB',          b:'AMD',    idx:92,  vram:16, tdp:220, p:42902},
+ {id:'5070',   n:'GeForce RTX 5070 12 GB',        b:'NVIDIA', idx:100, vram:12, tdp:250, p:34062},
+ {id:'9070xt', n:'Radeon RX 9070 XT 16 GB',       b:'AMD',    idx:112, vram:16, tdp:304, p:38699},
+ {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB',     b:'NVIDIA', idx:126, vram:16, tdp:300, p:62399},
+ {id:'5080',   n:'GeForce RTX 5080 16 GB',        b:'NVIDIA', idx:152, vram:16, tdp:360, p:90790},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB',        b:'NVIDIA', idx:205, vram:32, tdp:575, p:175207},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -292,35 +292,43 @@ const CPUS=[
     — 7500F ile 9600X arasında hiç seçenek yoktu, bütçe orta segmentte
     gereğinden pahalı işlemciye zıplıyordu. */
  {id:'7400f',  n:'Ryzen 5 7400F',     plat:'AM5',     g:68,  m:62,  tdp:65,  p:5546,  ig:false},
- {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:55,  m:52,  tdp:65,  p:7653,  ig:true},
+ {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:55,  m:52,  tdp:65,  p:7383,  ig:true},
  {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:74,  m:68,  tdp:65,  p:6999,  ig:false},
- {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:78,  m:71,  tdp:65,  p:7199,  ig:true},
- {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:88,  m:96,  tdp:125, p:10949, ig:true},
- {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:92,  m:80,  tdp:65,  p:9387, ig:true},
+ {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:78,  m:71,  tdp:65,  p:7253,  ig:true},
+ {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:88,  m:96,  tdp:125, p:10400, ig:true},
+ {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:92,  m:80,  tdp:65,  p:9475, ig:true},
  {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:94,  m:104, tdp:65,  p:12300, ig:true},
- {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:95,  m:124, tdp:125, p:17000, ig:true},
- {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:108, m:88,  tdp:120, p:15804, ig:true},
- {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:22132, ig:true},
- {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:96,  m:150, tdp:125, p:25000, ig:true},
- {id:'9950x3d',n:'Ryzen 9 9950X3D',  plat:'AM5',     g:128, m:165, tdp:170, p:40000, ig:true},
+ {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:95,  m:124, tdp:125, p:16900, ig:true},
+ {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:108, m:88,  tdp:120, p:14697, ig:true},
+ {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:21808, ig:true},
+ {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:96,  m:150, tdp:125, p:27094, ig:true},
+ {id:'9950x3d',n:'Ryzen 9 9950X3D',  plat:'AM5',     g:128, m:165, tdp:170, p:33564, ig:true},
 ];
+/* RAM fiyatları: 2026'da yapay zeka veri merkezlerinin (HBM) bellek talebi
+   yüzünden küresel bir DDR5 arz krizi var — üreticiler üretimi yüksek
+   marjlı HBM'e kaydırdı, tüketici DDR5 fiyatları son aylarda %250'ye varan
+   artış gösterdi. Bu geçici bir dalgalanma değil: SK Hynix arz sıkıntısının
+   2028'e kadar süreceğini öngörüyor. Eski fiyatlar (16/32/64 GB için
+   2.400/4.300/8.600₺) bu krizden önceydi ve artık gerçekçi değil. */
 const RAMS=[
- {id:'16',n:'16 GB DDR5-6000 (2×8)',       gb:16,p:2400},
- {id:'32',n:'32 GB DDR5-6000 CL30 (2×16)', gb:32,p:4300},
- {id:'64',n:'64 GB DDR5-6000 (2×32)',      gb:64,p:8600},
+ {id:'16',n:'16 GB DDR5-6000 (2×8)',       gb:16,p:13649},
+ {id:'32',n:'32 GB DDR5-6000 CL30 (2×16)', gb:32,p:26496},
+ {id:'64',n:'64 GB DDR5-6000 (2×32)',      gb:64,p:56668},
 ];
 const SSDS=[
- {id:'500',n:'500 GB NVMe Gen4',gb:500, p:1400},
- {id:'1t', n:'1 TB NVMe Gen4',  gb:1000,p:2500},
- {id:'2t', n:'2 TB NVMe Gen4',  gb:2000,p:4600},
+ {id:'500',n:'500 GB NVMe Gen4',gb:500, p:4999},
+ {id:'1t', n:'1 TB NVMe Gen4',  gb:1000,p:7999},
+ {id:'2t', n:'2 TB NVMe Gen4',  gb:2000,p:12849},
 ];
 const PSUS=[
- {id:'500', n:'500 W 80+ Bronze',w:500, p:1600},
- {id:'650', n:'650 W 80+ Bronze',w:650, p:2400},
- {id:'750', n:'750 W 80+ Gold',  w:750, p:3400},
- {id:'850', n:'850 W 80+ Gold',  w:850, p:4500},
- {id:'1000',n:'1000 W 80+ Gold', w:1000,p:6500},
- {id:'1200',n:'1200 W 80+ Platinum', w:1200,p:11000},   /* RTX 5090 sınıfı için */
+ {id:'500', n:'500 W 80+ Bronze',w:500, p:1700},
+ {id:'650', n:'650 W 80+ Bronze',w:650, p:2260},
+ {id:'750', n:'750 W 80+ Gold',  w:750, p:5299},
+ {id:'850', n:'850 W 80+ Gold',  w:850, p:5649},
+ {id:'1000',n:'1000 W 80+ Gold', w:1000,p:8781},
+ /* 1200 W Platinum için güvenilir tekil bir liste fiyatı bulunamadı;
+    1000 W kademesindeki artış oranıyla (~1.69×) orantılı tahmin edildi. */
+ {id:'1200',n:'1200 W 80+ Platinum', w:1200,p:14850},   /* RTX 5090 sınıfı için */
 ];
 const BOARDS={
  AM5:[{n:'A620 anakart',p:2900,t:1},{n:'B650 anakart',p:4500,t:2},{n:'B650E anakart',p:6500,t:3}],
@@ -476,8 +484,11 @@ const PREBUILT_MARGIN=.22, ASSEMBLY=3500;
 
 /* Fiyatların çekildiği tarih. scripts/prices.ps1 her tazelemede güncellenmeli.
    Sayfada görünür olması şart: "gerçek fiyat" iddiası olan bir sitede verinin
-   ne kadar taze olduğunu saklamak güveni baltalar. */
-const FIYAT_TARIHI='2026-08-09';
+   ne kadar taze olduğunu saklamak güveni baltalar.
+   Not: GPU/CPU/RAM/SSD/PSU bu tarihte tek tek doğrulandı (Cimri/Akakçe).
+   BOARDS/COOLERS/CASES henüz bu geçişte doğrulanmadı, hâlâ eski veri —
+   bunlar bütçenin küçük bir kısmı olduğu için öncelik GPU/CPU/RAM/SSD'ydi. */
+const FIYAT_TARIHI='2026-08-13';
 function fiyatYasi(){
   const g=Math.floor((Date.now()-new Date(FIYAT_TARIHI+'T12:00:00').getTime())/86400000);
   const m=new Date(FIYAT_TARIHI+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
