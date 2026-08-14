@@ -464,9 +464,14 @@ const MAX_CPU_G = Math.max.apply(null, CPUS.map(x=>x.g));
    kullanılmayan işlemci kapasitesidir ve ileride kart yükseltince işine yarar.
    Gerçek problem işlemcinin yetişememesidir. İkisini aynı dille anlatmak
    ("%13 kayıp, paran boşa gidiyor") sağlam bir bütçe sistemini kötü gösteriyordu. */
+const posForRatio = ratio => Math.max(4,Math.min(96, 50+(ratio-1.25)*55));
+/* "Darboğaz yok" aralığının çubuk üzerindeki konumu — grafikte bu bandı
+   vurgulamak için (aksi halde tek başına bir elmas işareti çizgide gezinir,
+   ziyaretçi "iyi" konumun neresi olduğunu bilemez). */
+const BN_SAFE_LO=posForRatio(.98), BN_SAFE_HI=posForRatio(1.55);
 function balance(c,g){
   const ratio=(c.g*1.32)/g.idx;
-  const pos=Math.max(4,Math.min(96, 50+(ratio-1.25)*55));
+  const pos=posForRatio(ratio);
 
   if(ratio>=.98 && ratio<=1.55)
     return {k:'ok',sev:'none',loss:0,pos,unit:'',t:'Darboğaz yok',
@@ -1647,16 +1652,27 @@ function BalanceTest({sys}){
           </div>
 
           <div className="mt-11">
+            {/* Uçlar "kötü" değil, sadece kimin beklediğini gösteriyor — bu yüzden
+               ok işaretiyle yön belirtiliyor. Asıl anlaşılır olması gereken şey
+               "dengeli aralık" bandı, o yüzden ayrı ve her ekran boyutunda görünür. */}
             <div className="flex justify-between lbl text-dim mb-3 gap-3">
-              <span>İŞLEMCİ DARBOĞAZI</span><span className="hidden sm:inline text-cy">DARBOĞAZ YOK</span><span>EKRAN KARTI DARBOĞAZI</span>
+              <span>◂ İŞLEMCİ BEKLETİYOR</span><span>EKRAN KARTI BEKLETİYOR ▸</span>
             </div>
             <div className="relative h-11">
               <div className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 tick"/>
+              {/* Dengeli aralık bandı: elmas işareti burada bir yerdeyse
+                  "darboğaz yok" demektir — grafiğin en önemli parçası. */}
+              <div className="absolute top-1 bottom-1 rounded-[2px]"
+                   style={{left:BN_SAFE_LO+'%', width:(BN_SAFE_HI-BN_SAFE_LO)+'%',
+                           background:'rgba(45,226,230,.10)', border:'1px solid rgba(45,226,230,.35)'}}/>
               <div className="absolute top-1 bottom-1 left-1/2 w-px bg-cy/40"/>
-              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2"
+              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-[left] duration-500"
                    style={{left:posA+'%'}}>
                 <div className="w-[13px] h-[13px] rotate-45" style={{background:col,boxShadow:`0 0 26px ${col}`}}/>
               </div>
+            </div>
+            <div className="lbl text-center mt-2" style={{color:'rgba(45,226,230,.75)'}}>
+              ▴ İŞARET BU BANDIN İÇİNDEYSE DARBOĞAZ YOK
             </div>
 
             <div className="mt-8 grid lg:grid-cols-[1fr_auto] gap-8 items-start">
