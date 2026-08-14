@@ -259,23 +259,24 @@ const PHOTOS = { gpu:'', cpu:'', ram:'', ssd:'', psu:'', mb:'', case:'', cooler:
 /* Fiyatlar: Cimri.com'dan 2026-08-09 tarihinde cekildi (scripts/prices.ps1). Guncellemek icin tek yer burasi. */
 const GPUS=[
  {id:'igpu',   n:'Dahili grafik (ayrı kart yok)', b:'—',      idx:12,  vram:0,  tdp:0,   p:0},
- /* Bütçe segmenti eskiden B580'in altında tamamen boştu — 18-20 bin TL gibi
-    düşük bütçelerde "ekran kartı gerekiyor" seçilince genelde hiç sonuç
-    çıkmıyordu. Üç kart eklendi (Cimri/Akakçe, Ağustos 2026, en ucuz liste
-    fiyatı): RX 6600, RX 7600, RTX 4060. */
- {id:'6600',   n:'Radeon RX 6600 8 GB',           b:'AMD',    idx:40,  vram:8,  tdp:132, p:13949},
- {id:'b580',   n:'Intel Arc B580 12 GB',          b:'Intel',  idx:55,  vram:12, tdp:190, p:13230},
- {id:'7600',   n:'Radeon RX 7600 8 GB',           b:'AMD',    idx:48,  vram:8,  tdp:165, p:16780},
- {id:'4060',   n:'GeForce RTX 4060 8 GB',         b:'NVIDIA', idx:54,  vram:8,  tdp:115, p:18880},
- {id:'5060',   n:'GeForce RTX 5060 8 GB',         b:'NVIDIA', idx:58,  vram:8,  tdp:145, p:16969},
- {id:'9060xt', n:'Radeon RX 9060 XT 16 GB',       b:'AMD',    idx:64,  vram:16, tdp:180, p:18599},
- {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB',     b:'NVIDIA', idx:74,  vram:16, tdp:180, p:33200},
- {id:'9070',   n:'Radeon RX 9070 16 GB',          b:'AMD',    idx:92,  vram:16, tdp:220, p:42902},
- {id:'5070',   n:'GeForce RTX 5070 12 GB',        b:'NVIDIA', idx:100, vram:12, tdp:250, p:34062},
- {id:'9070xt', n:'Radeon RX 9070 XT 16 GB',       b:'AMD',    idx:112, vram:16, tdp:304, p:38699},
- {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB',     b:'NVIDIA', idx:126, vram:16, tdp:300, p:62399},
- {id:'5080',   n:'GeForce RTX 5080 16 GB',        b:'NVIDIA', idx:152, vram:16, tdp:360, p:90790},
- {id:'5090',   n:'GeForce RTX 5090 32 GB',        b:'NVIDIA', idx:205, vram:32, tdp:575, p:245336},
+ /* Parantez içindeki isim: bu fiyatın hangi gerçek karttan geldiği (Akakçe,
+    Ağustos 2026, en ucuz liste fiyatı). Kullanıcı sonucu kopyaladığında
+    hangi modeli aratacağını bilsin diye — genel "RTX 5090 32 GB" değil,
+    "RTX 5090 32 GB (Asus TUF Gaming)". RX 9070 (XT değil) için Türkiye'de
+    tek başına satılan güvenilir bir model bulunamadı, o yüzden markasız. */
+ {id:'6600',   n:'Radeon RX 6600 8 GB (Asus Dual)',              b:'AMD',    idx:40,  vram:8,  tdp:132, p:13949},
+ {id:'b580',   n:'Intel Arc B580 12 GB (Sparkle Titan OC)',      b:'Intel',  idx:55,  vram:12, tdp:190, p:12725},
+ {id:'7600',   n:'Radeon RX 7600 8 GB (Asus Dual Evo OC)',       b:'AMD',    idx:48,  vram:8,  tdp:165, p:10800},
+ {id:'4060',   n:'GeForce RTX 4060 8 GB (Asus Dual OC)',         b:'NVIDIA', idx:54,  vram:8,  tdp:115, p:16648},
+ {id:'5060',   n:'GeForce RTX 5060 8 GB (Asus Dual OC)',         b:'NVIDIA', idx:58,  vram:8,  tdp:145, p:16969},
+ {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Gigabyte Gaming OC)', b:'AMD',    idx:64,  vram:16, tdp:180, p:18599},
+ {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',     b:'NVIDIA', idx:74,  vram:16, tdp:180, p:33200},
+ {id:'9070',   n:'Radeon RX 9070 16 GB',                         b:'AMD',    idx:92,  vram:16, tdp:220, p:42902},
+ {id:'5070',   n:'GeForce RTX 5070 12 GB (MSI Ventus 2X OC)',    b:'NVIDIA', idx:100, vram:12, tdp:250, p:36599},
+ {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Gaming OC)',b:'AMD',    idx:112, vram:16, tdp:304, p:34493},
+ {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (Asus Prime OC)',    b:'NVIDIA', idx:126, vram:16, tdp:300, p:62399},
+ {id:'5080',   n:'GeForce RTX 5080 16 GB (PNY OC)',              b:'NVIDIA', idx:152, vram:16, tdp:360, p:59999},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB (Asus TUF Gaming)',     b:'NVIDIA', idx:205, vram:32, tdp:575, p:245336},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -311,24 +312,25 @@ const CPUS=[
    2028'e kadar süreceğini öngörüyor. Eski fiyatlar (16/32/64 GB için
    2.400/4.300/8.600₺) bu krizden önceydi ve artık gerçekçi değil. */
 const RAMS=[
- {id:'16',n:'16 GB DDR5-6000 (2×8)',       gb:16,p:13649},
- {id:'32',n:'32 GB DDR5-6000 CL30 (2×16)', gb:32,p:26496},
- {id:'64',n:'64 GB DDR5-6000 (2×32)',      gb:64,p:56668},
+ {id:'16',n:'16 GB DDR5-6000 (2×8) (Kingston Fury Beast)',        gb:16,p:12999},
+ {id:'32',n:'32 GB DDR5-6000 CL30 (2×16) (G.Skill Trident Z5 RGB)',gb:32,p:22199},
+ {id:'64',n:'64 GB DDR5-6000 (2×32) (Kingston Fury Beast)',       gb:64,p:51206},
 ];
 const SSDS=[
- {id:'500',n:'500 GB NVMe Gen4',gb:500, p:4999},
- {id:'1t', n:'1 TB NVMe Gen4',  gb:1000,p:7999},
- {id:'2t', n:'2 TB NVMe Gen4',  gb:2000,p:12849},
+ {id:'500',n:'500 GB NVMe Gen4 (SanDisk Extreme)',gb:500, p:3143},
+ {id:'1t', n:'1 TB NVMe Gen4 (Kingston KC3000)',  gb:1000,p:3275},
+ {id:'2t', n:'2 TB NVMe Gen4 (Kingston NV2)',     gb:2000,p:12141},
 ];
 const PSUS=[
- {id:'500', n:'500 W 80+ Bronze',w:500, p:1700},
- {id:'650', n:'650 W 80+ Bronze',w:650, p:2260},
- {id:'750', n:'750 W 80+ Gold',  w:750, p:5299},
- {id:'850', n:'850 W 80+ Gold',  w:850, p:5649},
- {id:'1000',n:'1000 W 80+ Gold', w:1000,p:8781},
+ {id:'550', n:'550 W 80+ Bronze (Strong ST550)',       w:550, p:1059},
+ {id:'650', n:'650 W 80+ Bronze (Rampage RMP-650-80PB)',w:650, p:2308},
+ {id:'750', n:'750 W 80+ Gold (MSI MAG A750GL)',       w:750, p:5299},
+ {id:'850', n:'850 W 80+ Gold (Rampage P850)',         w:850, p:4000},
+ {id:'1000',n:'1000 W 80+ Gold (MSI MPG A1000GS)',     w:1000,p:10259},
  /* 1200 W Platinum için güvenilir tekil bir liste fiyatı bulunamadı;
-    1000 W kademesindeki artış oranıyla (~1.69×) orantılı tahmin edildi. */
- {id:'1200',n:'1200 W 80+ Platinum', w:1200,p:14850},   /* RTX 5090 sınıfı için */
+    1000 W kademesindeki fiyattan orantılı tahmin edildi — gerçek model adı
+    doğrulanamadı, o yüzden markasız bırakıldı. */
+ {id:'1200',n:'1200 W 80+ Platinum', w:1200,p:17300},   /* RTX 5090 sınıfı için */
 ];
 /* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
    modeller (Akakçe, Ağustos 2026, en ucuz liste fiyatı) — her yonga
@@ -347,15 +349,16 @@ const BOARDS={
  ]
 };
 const COOLERS=[
- {id:'stock',n:'Kutudan çıkan soğutucu',  cap:65, p:0},
- {id:'air',  n:'Kule tipi hava soğutucu', cap:105,p:1400},
- {id:'tower',n:'Çift fanlı büyük kule',   cap:180,p:2600},
- {id:'aio',  n:'240 mm sıvı soğutma',     cap:260,p:4200},
+ {id:'stock',n:'Kutudan çıkan soğutucu',                    cap:65, p:0},
+ {id:'air',  n:'Kule tipi hava soğutucu (Segotep Wind Clear T2)',cap:105,p:1889},
+ /* "tower" bu geçişte doğrulanmadı, eski fiyat duruyor. */
+ {id:'tower',n:'Çift fanlı büyük kule',                     cap:180,p:2600},
+ {id:'aio',  n:'240 mm sıvı soğutma (DeepCool LE520 ARGB)', cap:260,p:2290},
 ];
 const CASES=[
- {n:'Hava akışlı standart kasa',      p:1500,upTo:35000},
- {n:'Mesh ön panelli kasa',           p:2600,upTo:70000},
- {n:'Camlı, yüksek hava akışlı kasa', p:4200,upTo:Infinity},
+ {n:'Hava akışlı standart kasa (MSI)',                    p:2169,upTo:35000},
+ {n:'Mesh ön panelli kasa (MSI Mag Forge 320R Airflow)',  p:3219,upTo:70000},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D)',p:5041,upTo:Infinity},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -497,9 +500,11 @@ const PREBUILT_MARGIN=.22, ASSEMBLY=3500;
 /* Fiyatların çekildiği tarih. scripts/prices.ps1 her tazelemede güncellenmeli.
    Sayfada görünür olması şart: "gerçek fiyat" iddiası olan bir sitede verinin
    ne kadar taze olduğunu saklamak güveni baltalar.
-   Not: GPU/CPU/RAM/SSD/PSU bu tarihte tek tek doğrulandı (Cimri/Akakçe).
-   BOARDS/COOLERS/CASES henüz bu geçişte doğrulanmadı, hâlâ eski veri —
-   bunlar bütçenin küçük bir kısmı olduğu için öncelik GPU/CPU/RAM/SSD'ydi. */
+   Not: GPU/CPU/RAM/SSD/PSU/BOARDS/CASES ve çoğu COOLERS bu tarihte gerçek,
+   isimli modellerle tek tek doğrulandı (Akakçe) — her parçanın adında artık
+   hangi gerçek üründen fiyat alındığı yazıyor, kopyala-yapıştırda kullanıcı
+   ne aratacağını bilsin diye. Tek istisna: COOLERS içindeki "tower" kademesi
+   bu geçişte doğrulanmadı, eski tahmini fiyatta kaldı. */
 const FIYAT_TARIHI='2026-08-13';
 function fiyatYasi(){
   const g=Math.floor((Date.now()-new Date(FIYAT_TARIHI+'T12:00:00').getTime())/86400000);
