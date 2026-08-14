@@ -4299,17 +4299,24 @@ const AKSESUAR_BOS_SAYISI=3;
    link kuralına uygun): editoryal değil, komisyonlu bağlantı olduğu belli olsun.
    Fiyat kasıtlı olarak gösterilmiyor — Ulugames'te değişebilir, burada elle
    senkron tutmak yeni bir "bayat veri" riski yaratır. */
+/* kaynak: kart etiketinde ve /oner'de dinamik gösteriliyor — birden fazla
+   ortak eklenince (İncehesap, İtopya vb.) her ürün kendi mağazasını göstersin.
+   anahtar: /oner'in bu gerçek ürünleri de önerebilmesi için — kural motoru
+   ONERI_URUNLER'daki örnek verilerle aynı mantıkla burayı da tarıyor. */
 const AKSESUAR_URUNLERI={
   mousepad:[
-    {ad:'Axgamingpunk Nex Poron Mousepad',
+    {ad:'Axgamingpunk Nex Poron Mousepad', kaynak:'Ulugames',
      gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/axgamin-nex-turuncu_350x.png?v=1774465152',
-     link:'https://ulugames.com.tr/products/axgamingpunk-nex-poron-mousepad?bg_ref=CsmfVOpQxV'},
-    {ad:'Ulugames Drift Speed Mousepad',
+     link:'https://ulugames.com.tr/products/axgamingpunk-nex-poron-mousepad?bg_ref=CsmfVOpQxV',
+     anahtar:['mousepad','mouse pad','mouse','fare','fare pedi','poron','turuncu']},
+    {ad:'Ulugames Drift Speed Mousepad', kaynak:'Ulugames',
      gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Drift-Kanashii-N_1_350x.png?v=1772215598',
-     link:'https://ulugames.com.tr/products/ulugames-drift-speed-mousepad?bg_ref=CsmfVOpQxV'},
-    {ad:'UluGames Aruw Hybrid Mousepad',
+     link:'https://ulugames.com.tr/products/ulugames-drift-speed-mousepad?bg_ref=CsmfVOpQxV',
+     anahtar:['mousepad','mouse pad','mouse','fare','speed','hızlı','illüstrasyon','tasarım']},
+    {ad:'UluGames Aruw Hybrid Mousepad', kaynak:'Ulugames',
      gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Kitsune_350x.png?v=1772215666',
-     link:'https://ulugames.com.tr/products/ulugames-aruw-hybrid-mousepad?bg_ref=CsmfVOpQxV'},
+     link:'https://ulugames.com.tr/products/ulugames-aruw-hybrid-mousepad?bg_ref=CsmfVOpQxV',
+     anahtar:['mousepad','mouse pad','mouse','fare','tilki','anime','illüstrasyon','tasarım']},
   ],
 };
 
@@ -4334,7 +4341,7 @@ function AksesuarUrunKart({u}){
            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
       <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-bg/95 via-bg/70 to-transparent">
         <div className="text-[.74rem] text-ink/90 leading-snug line-clamp-2">{u.ad}</div>
-        <div className="lbl text-[.6rem] text-cy/80 mt-1">ULUGAMES · İNCELE →</div>
+        <div className="lbl text-[.6rem] text-cy/80 mt-1">{u.kaynak.toLocaleUpperCase('tr')} · İNCELE →</div>
       </div>
     </a>
   );
@@ -4479,6 +4486,19 @@ function benzerKelime(a,b){
   return duzenlemeMesafesi(a,b)<=tol;
 }
 
+/* Öner artık iki kaynağı birleştirip tarıyor: gerçek iş birliği ürünleri
+   (AKSESUAR_URUNLERI) VE hâlâ boş kategoriler için örnek veri (ONERI_URUNLER).
+   Bir kategoride gerçek ürün varsa (şu an: mousepad) o kategorinin örnek
+   verisi otomatik devre dışı kalır — kullanıcı gerçek ürünle örnek ürünü
+   aynı anda görmesin. Kategori dolunca burada elle bir şey değiştirmeye
+   gerek yok, liste kendiliğinden gerçek ürüne geçiyor. */
+function oneriKaynaklari(){
+  const gercekKatlar=Object.keys(AKSESUAR_URUNLERI).filter(k=>AKSESUAR_URUNLERI[k].length>0);
+  const gercek=gercekKatlar.flatMap(kat=>AKSESUAR_URUNLERI[kat].map(u=>({...u, kat, gercek:true})));
+  const ornek=ONERI_URUNLER.filter(u=>!gercekKatlar.includes(u.kat));
+  return [...gercek, ...ornek];
+}
+
 function oneriUret(butce, istek){
   /* Bütçe eşleşmesi TEK BAŞINA ürün göstermeye yetiyordu: "mouse pad" yazan
      biri, bütçesi RGB/mikrofon aralığına da denk geldiği için alakasız
@@ -4498,17 +4518,22 @@ function oneriUret(butce, istek){
   const metinVar=metin.length>0;
   const kullaniciKelimeleri=kelimelere(ham);
 
-  return ONERI_URUNLER
+  /* Gerçek ürünlerde fiyat aralığı yok (Ulugames'te değişebilir diye elle
+     girilmiyor) — bütçe filtresi onları elemiyor, sadece kelime eşleşmesi
+     belirleyici. Skor sıralamasında da gerçek ürünler küçük bir öncelik alır
+     (bunlar gösterildiğinde asıl önerilmesi gereken şey onlar). */
+  return oneriKaynaklari()
     .map(u=>{
-      let skor=0, eslesenVar=false;
+      let skor=u.gercek?1:0, eslesenVar=false;
       for(const k of u.anahtar){
         if(metin.includes(sadelestir(k))){ skor+=3; eslesenVar=true; continue; }
         for(const kt of kelimelere(k)){
           if(kullaniciKelimeleri.some(uk=>benzerKelime(uk,kt))){ skor+=2; eslesenVar=true; }
         }
       }
-      if(butce>0 && butce>=u.minTL && butce<=u.maxTL) skor+=1;
-      return {...u, skor, eslesti:eslesenVar, butceUyumlu:butce>0&&butce>=u.minTL&&butce<=u.maxTL};
+      const butceUyumlu = u.gercek ? true : (butce>0 && butce>=u.minTL && butce<=u.maxTL);
+      if(butceUyumlu) skor+=1;
+      return {...u, skor, eslesti:eslesenVar, butceUyumlu};
     })
     .filter(u=> metinVar ? u.eslesti : u.butceUyumlu)
     .sort((a,b)=>b.skor-a.skor)
@@ -4535,8 +4560,8 @@ function OnerHub(){
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
           Yapay zeka değil — bütçe aralığı ve yazdığın kelimelere göre çalışan basit
-          bir eşleştirme. <span className="text-ink/80">Şu an örnek ürünlerle deneme
-          aşamasında</span>; gerçek iş birlikleri geldikçe ürünler gerçek olacak.
+          bir eşleştirme. <span className="text-ink/80">Bazı kategorilerde gerçek iş
+          birliği ürünleri var</span>, geri kalanı iş birlikleri geldikçe gerçek olacak.
         </p>
       </Reveal>
 
@@ -4575,7 +4600,9 @@ function OnerHub(){
               <>
                 <Label className="mb-5">ÖNERİLER</Label>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {sonuc.map(u=>(
+                  {sonuc.map(u=> u.gercek ? (
+                    <AksesuarUrunKart key={u.link} u={u}/>
+                  ) : (
                     <Card key={u.id} className="p-5">
                       <div className="lbl text-cy/70 mb-2">
                         {(AKSESUAR_KATEGORILERI.find(k=>k.id===u.kat)||{ad:u.kat}).ad}

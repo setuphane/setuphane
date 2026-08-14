@@ -6429,19 +6429,29 @@ const AKSESUAR_BOS_SAYISI = 3;
    link kuralına uygun): editoryal değil, komisyonlu bağlantı olduğu belli olsun.
    Fiyat kasıtlı olarak gösterilmiyor — Ulugames'te değişebilir, burada elle
    senkron tutmak yeni bir "bayat veri" riski yaratır. */
+/* kaynak: kart etiketinde ve /oner'de dinamik gösteriliyor — birden fazla
+   ortak eklenince (İncehesap, İtopya vb.) her ürün kendi mağazasını göstersin.
+   anahtar: /oner'in bu gerçek ürünleri de önerebilmesi için — kural motoru
+   ONERI_URUNLER'daki örnek verilerle aynı mantıkla burayı da tarıyor. */
 const AKSESUAR_URUNLERI = {
   mousepad: [{
     ad: 'Axgamingpunk Nex Poron Mousepad',
+    kaynak: 'Ulugames',
     gorsel: 'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/axgamin-nex-turuncu_350x.png?v=1774465152',
-    link: 'https://ulugames.com.tr/products/axgamingpunk-nex-poron-mousepad?bg_ref=CsmfVOpQxV'
+    link: 'https://ulugames.com.tr/products/axgamingpunk-nex-poron-mousepad?bg_ref=CsmfVOpQxV',
+    anahtar: ['mousepad', 'mouse pad', 'mouse', 'fare', 'fare pedi', 'poron', 'turuncu']
   }, {
     ad: 'Ulugames Drift Speed Mousepad',
+    kaynak: 'Ulugames',
     gorsel: 'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Drift-Kanashii-N_1_350x.png?v=1772215598',
-    link: 'https://ulugames.com.tr/products/ulugames-drift-speed-mousepad?bg_ref=CsmfVOpQxV'
+    link: 'https://ulugames.com.tr/products/ulugames-drift-speed-mousepad?bg_ref=CsmfVOpQxV',
+    anahtar: ['mousepad', 'mouse pad', 'mouse', 'fare', 'speed', 'hızlı', 'illüstrasyon', 'tasarım']
   }, {
     ad: 'UluGames Aruw Hybrid Mousepad',
+    kaynak: 'Ulugames',
     gorsel: 'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Kitsune_350x.png?v=1772215666',
-    link: 'https://ulugames.com.tr/products/ulugames-aruw-hybrid-mousepad?bg_ref=CsmfVOpQxV'
+    link: 'https://ulugames.com.tr/products/ulugames-aruw-hybrid-mousepad?bg_ref=CsmfVOpQxV',
+    anahtar: ['mousepad', 'mouse pad', 'mouse', 'fare', 'tilki', 'anime', 'illüstrasyon', 'tasarım']
   }]
 };
 function AksesuarBosKart() {
@@ -6480,7 +6490,7 @@ function AksesuarUrunKart({
     className: "text-[.74rem] text-ink/90 leading-snug line-clamp-2"
   }, u.ad), /*#__PURE__*/React.createElement("div", {
     className: "lbl text-[.6rem] text-cy/80 mt-1"
-  }, "ULUGAMES \xB7 \u0130NCELE \u2192")));
+  }, u.kaynak.toLocaleUpperCase('tr'), " \xB7 \u0130NCELE \u2192")));
 }
 function AksesuarlarHub() {
   /* Kategoriler açık/kapalı akordeon — hepsi aynı anda açık gelirse
@@ -6677,6 +6687,23 @@ function benzerKelime(a, b) {
   const tol = b.length <= 4 ? 1 : b.length <= 7 ? 2 : 3;
   return duzenlemeMesafesi(a, b) <= tol;
 }
+
+/* Öner artık iki kaynağı birleştirip tarıyor: gerçek iş birliği ürünleri
+   (AKSESUAR_URUNLERI) VE hâlâ boş kategoriler için örnek veri (ONERI_URUNLER).
+   Bir kategoride gerçek ürün varsa (şu an: mousepad) o kategorinin örnek
+   verisi otomatik devre dışı kalır — kullanıcı gerçek ürünle örnek ürünü
+   aynı anda görmesin. Kategori dolunca burada elle bir şey değiştirmeye
+   gerek yok, liste kendiliğinden gerçek ürüne geçiyor. */
+function oneriKaynaklari() {
+  const gercekKatlar = Object.keys(AKSESUAR_URUNLERI).filter(k => AKSESUAR_URUNLERI[k].length > 0);
+  const gercek = gercekKatlar.flatMap(kat => AKSESUAR_URUNLERI[kat].map(u => ({
+    ...u,
+    kat,
+    gercek: true
+  })));
+  const ornek = ONERI_URUNLER.filter(u => !gercekKatlar.includes(u.kat));
+  return [...gercek, ...ornek];
+}
 function oneriUret(butce, istek) {
   /* Bütçe eşleşmesi TEK BAŞINA ürün göstermeye yetiyordu: "mouse pad" yazan
      biri, bütçesi RGB/mikrofon aralığına da denk geldiği için alakasız
@@ -6695,8 +6722,13 @@ function oneriUret(butce, istek) {
   const metin = sadelestir(ham);
   const metinVar = metin.length > 0;
   const kullaniciKelimeleri = kelimelere(ham);
-  return ONERI_URUNLER.map(u => {
-    let skor = 0,
+
+  /* Gerçek ürünlerde fiyat aralığı yok (Ulugames'te değişebilir diye elle
+     girilmiyor) — bütçe filtresi onları elemiyor, sadece kelime eşleşmesi
+     belirleyici. Skor sıralamasında da gerçek ürünler küçük bir öncelik alır
+     (bunlar gösterildiğinde asıl önerilmesi gereken şey onlar). */
+  return oneriKaynaklari().map(u => {
+    let skor = u.gercek ? 1 : 0,
       eslesenVar = false;
     for (const k of u.anahtar) {
       if (metin.includes(sadelestir(k))) {
@@ -6711,12 +6743,13 @@ function oneriUret(butce, istek) {
         }
       }
     }
-    if (butce > 0 && butce >= u.minTL && butce <= u.maxTL) skor += 1;
+    const butceUyumlu = u.gercek ? true : butce > 0 && butce >= u.minTL && butce <= u.maxTL;
+    if (butceUyumlu) skor += 1;
     return {
       ...u,
       skor,
       eslesti: eslesenVar,
-      butceUyumlu: butce > 0 && butce >= u.minTL && butce <= u.maxTL
+      butceUyumlu
     };
   }).filter(u => metinVar ? u.eslesti : u.butceUyumlu).sort((a, b) => b.skor - a.skor).slice(0, 5);
 }
@@ -6742,7 +6775,7 @@ function OnerHub() {
     className: "mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]"
   }, "Yapay zeka de\u011Fil \u2014 b\xFCt\xE7e aral\u0131\u011F\u0131 ve yazd\u0131\u011F\u0131n kelimelere g\xF6re \xE7al\u0131\u015Fan basit bir e\u015Fle\u015Ftirme. ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink/80"
-  }, "\u015Eu an \xF6rnek \xFCr\xFCnlerle deneme a\u015Famas\u0131nda"), "; ger\xE7ek i\u015F birlikleri geldik\xE7e \xFCr\xFCnler ger\xE7ek olacak.")), /*#__PURE__*/React.createElement(Reveal, {
+  }, "Baz\u0131 kategorilerde ger\xE7ek i\u015F birli\u011Fi \xFCr\xFCnleri var"), ", geri kalan\u0131 i\u015F birlikleri geldik\xE7e ger\xE7ek olacak.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 90
   }, /*#__PURE__*/React.createElement("form", {
     onSubmit: ara,
@@ -6783,7 +6816,10 @@ function OnerHub() {
     className: "mb-5"
   }, "\xD6NER\u0130LER"), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
-  }, sonuc.map(u => /*#__PURE__*/React.createElement(Card, {
+  }, sonuc.map(u => u.gercek ? /*#__PURE__*/React.createElement(AksesuarUrunKart, {
+    key: u.link,
+    u: u
+  }) : /*#__PURE__*/React.createElement(Card, {
     key: u.id,
     className: "p-5"
   }, /*#__PURE__*/React.createElement("div", {
