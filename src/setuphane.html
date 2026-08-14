@@ -4293,6 +4293,26 @@ const AKSESUAR_KATEGORILERI=[
 ];
 const AKSESUAR_BOS_SAYISI=3;
 
+/* İlk gerçek iş birliği: Ulugames affiliate ürün linkleri (business.ulugames.com.tr).
+   Görsel Ulugames'in kendi Shopify CDN'inden — hotlink değil, affiliate
+   panelinin resmi ürün görseli. Link "sponsored" işaretli (Google'ın affiliate
+   link kuralına uygun): editoryal değil, komisyonlu bağlantı olduğu belli olsun.
+   Fiyat kasıtlı olarak gösterilmiyor — Ulugames'te değişebilir, burada elle
+   senkron tutmak yeni bir "bayat veri" riski yaratır. */
+const AKSESUAR_URUNLERI={
+  mousepad:[
+    {ad:'Axgamingpunk Nex Poron Mousepad',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/axgamin-nex-turuncu_350x.png?v=1774465152',
+     link:'https://ulugames.com.tr/products/axgamingpunk-nex-poron-mousepad?bg_ref=CsmfVOpQxV'},
+    {ad:'Ulugames Drift Speed Mousepad',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Drift-Kanashii-N_1_350x.png?v=1772215598',
+     link:'https://ulugames.com.tr/products/ulugames-drift-speed-mousepad?bg_ref=CsmfVOpQxV'},
+    {ad:'UluGames Aruw Hybrid Mousepad',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Kitsune_350x.png?v=1772215666',
+     link:'https://ulugames.com.tr/products/ulugames-aruw-hybrid-mousepad?bg_ref=CsmfVOpQxV'},
+  ],
+};
+
 function AksesuarBosKart(){
   return (
     <div className="aspect-[4/3] border border-dashed border-line/70 grid place-items-center gap-2.5
@@ -4302,6 +4322,21 @@ function AksesuarBosKart(){
       </svg>
       <span className="lbl text-[.62rem] tracking-[.16em]">YAKINDA</span>
     </div>
+  );
+}
+
+function AksesuarUrunKart({u}){
+  return (
+    <a href={u.link} target="_blank" rel="sponsored noopener noreferrer"
+       className="group block aspect-[4/3] border border-line/70 relative overflow-hidden
+                  transition-colors duration-300 hover:border-cy/50">
+      <img src={u.gorsel} alt={u.ad} loading="lazy"
+           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+      <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-bg/95 via-bg/70 to-transparent">
+        <div className="text-[.74rem] text-ink/90 leading-snug line-clamp-2">{u.ad}</div>
+        <div className="lbl text-[.6rem] text-cy/80 mt-1">ULUGAMES · İNCELE →</div>
+      </div>
+    </a>
   );
 }
 
@@ -4350,7 +4385,10 @@ function AksesuarlarHub(){
                 <div id={pid} role="region" aria-labelledby={bid} className={'acc '+(on?'open':'')}>
                   <div className="accIn">
                     <div className="pb-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {Array.from({length:AKSESUAR_BOS_SAYISI}).map((_,pi)=>
+                      {(AKSESUAR_URUNLERI[kat.id]||[]).map(u=>
+                        <AksesuarUrunKart key={u.link} u={u}/>
+                      )}
+                      {Array.from({length:Math.max(0,AKSESUAR_BOS_SAYISI-(AKSESUAR_URUNLERI[kat.id]||[]).length)}).map((_,pi)=>
                         <AksesuarBosKart key={pi}/>
                       )}
                     </div>
