@@ -3034,6 +3034,21 @@ function Forum({sys,prof}){
         </p>
       </Reveal>
 
+      {/* Aylık Instagram öne çıkarma duyurusu — "Kurulum gösterisi" kategorisini
+          canlı tutmak için. Kod tarafında yeni bir şey gerekmiyordu, kategori
+          zaten vardı; burası sadece onu görünür kılıyor. */}
+      <Reveal delay={90}>
+        <div className="mt-8 p-5 sm:p-6 border border-mg/30 bg-mg/[.05] flex flex-col sm:flex-row sm:items-center gap-4">
+          <span className="w-2 h-2 rotate-45 shrink-0 hidden sm:block mt-1" style={{background:'#FF2D95'}}/>
+          <p className="text-[.88rem] text-ink/85 leading-relaxed">
+            <span className="text-mg">Setup'ını / masa düzenini paylaş</span> — "Kurulum gösterisi"
+            kategorisine ekle. Her ay en iyi 3 kurulumu Instagram'da
+            (<a href="https://instagram.com/setuphane" target="_blank" rel="noopener noreferrer"
+                className="text-cy hover:underline underline-offset-4">@setuphane</a>) videoyla öne çıkarıyoruz.
+          </p>
+        </div>
+      </Reveal>
+
       {/* Kimlik: tek satırlık şerit. Eskiden kocaman bir kayıt formu en üstteydi
           ve mobilde tek konu görmeden 1400 piksel scroll gerekiyordu —
           içerik kayıt formunun altında gömülüydü. Artık form yalnızca
