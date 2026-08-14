@@ -275,7 +275,7 @@ const GPUS=[
  {id:'9070xt', n:'Radeon RX 9070 XT 16 GB',       b:'AMD',    idx:112, vram:16, tdp:304, p:38699},
  {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB',     b:'NVIDIA', idx:126, vram:16, tdp:300, p:62399},
  {id:'5080',   n:'GeForce RTX 5080 16 GB',        b:'NVIDIA', idx:152, vram:16, tdp:360, p:90790},
- {id:'5090',   n:'GeForce RTX 5090 32 GB',        b:'NVIDIA', idx:205, vram:32, tdp:575, p:175207},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB',        b:'NVIDIA', idx:205, vram:32, tdp:575, p:245336},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -1356,13 +1356,15 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
 }
 
 /* ═══════════════════ MODÜL 01 — SİSTEM KURUCU ═══════════════════ */
-/* Tavan RTX 5090'lı sistemi (~230 bin) kaldırmalı. Ama düz bir 18 bin–500 bin
+/* Tavan RTX 5090'lı sistemi kaldırmalı. Ama düz bir 18 bin–500 bin
    çubuğunda topluluğun asıl aralığı (25-80 bin) şeridin %13'üne sıkışıyor.
-   Bu yüzden çubuk LOGARİTMİK: her adım oransal olarak eşit, orta nokta ~95 bin. */
-/* Tavan: en pahalı sistem (5090 + 9950X3D + üst seviye her şey) ~232 bin.
-   300 bin, fiyat artışına pay bırakır ama çubuğun üst yarısını ölü bölgeye
-   çevirmez. Logaritmik orta nokta ~73 bin — topluluğun tam ortası. */
-const BUD_MIN=18000, BUD_MAX=300000, SLIDER_STEPS=1000;
+   Bu yüzden çubuk LOGARİTMİK: her adım oransal olarak eşit. */
+/* Tavan: en pahalı sistem (5090 + 9950X3D + üst seviye her şey) RAM krizi
+   ve RTX 5090 fiyat düzeltmesinden sonra ~330 bin'e çıktı (önceden ~232
+   bindi). Kullanıcı isteğiyle tavan 1.000.000₺'ye çıkarıldı — birden fazla
+   sistem/işlik bütçesi, çoklu GPU hayali vb. üst uçtaki meraklıları da
+   kapsasın diye bilinçli olarak flagship sistemin çok üzerinde tutuldu. */
+const BUD_MIN=18000, BUD_MAX=1000000, SLIDER_STEPS=1000;
 const posToBudget = t => {
   const v = BUD_MIN*Math.pow(BUD_MAX/BUD_MIN, t/SLIDER_STEPS);
   return v<100000 ? Math.round(v/500)*500 : Math.round(v/2500)*2500;

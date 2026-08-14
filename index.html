@@ -373,7 +373,7 @@ const GPUS = [{
   idx: 205,
   vram: 32,
   tdp: 575,
-  p: 175207
+  p: 245336
 }];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat === 'AM5' ? 'AMD' : 'Intel';
@@ -2636,14 +2636,16 @@ function LaptopPicker({
 }
 
 /* ═══════════════════ MODÜL 01 — SİSTEM KURUCU ═══════════════════ */
-/* Tavan RTX 5090'lı sistemi (~230 bin) kaldırmalı. Ama düz bir 18 bin–500 bin
+/* Tavan RTX 5090'lı sistemi kaldırmalı. Ama düz bir 18 bin–500 bin
    çubuğunda topluluğun asıl aralığı (25-80 bin) şeridin %13'üne sıkışıyor.
-   Bu yüzden çubuk LOGARİTMİK: her adım oransal olarak eşit, orta nokta ~95 bin. */
-/* Tavan: en pahalı sistem (5090 + 9950X3D + üst seviye her şey) ~232 bin.
-   300 bin, fiyat artışına pay bırakır ama çubuğun üst yarısını ölü bölgeye
-   çevirmez. Logaritmik orta nokta ~73 bin — topluluğun tam ortası. */
+   Bu yüzden çubuk LOGARİTMİK: her adım oransal olarak eşit. */
+/* Tavan: en pahalı sistem (5090 + 9950X3D + üst seviye her şey) RAM krizi
+   ve RTX 5090 fiyat düzeltmesinden sonra ~330 bin'e çıktı (önceden ~232
+   bindi). Kullanıcı isteğiyle tavan 1.000.000₺'ye çıkarıldı — birden fazla
+   sistem/işlik bütçesi, çoklu GPU hayali vb. üst uçtaki meraklıları da
+   kapsasın diye bilinçli olarak flagship sistemin çok üzerinde tutuldu. */
 const BUD_MIN = 18000,
-  BUD_MAX = 300000,
+  BUD_MAX = 1000000,
   SLIDER_STEPS = 1000;
 const posToBudget = t => {
   const v = BUD_MIN * Math.pow(BUD_MAX / BUD_MIN, t / SLIDER_STEPS);
