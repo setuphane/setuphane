@@ -330,9 +330,21 @@ const PSUS=[
     1000 W kademesindeki artış oranıyla (~1.69×) orantılı tahmin edildi. */
  {id:'1200',n:'1200 W 80+ Platinum', w:1200,p:14850},   /* RTX 5090 sınıfı için */
 ];
+/* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
+   modeller (Akakçe, Ağustos 2026, en ucuz liste fiyatı) — her yonga
+   setinde onlarca model var, burada her kademenin en ucuz gerçek örneği
+   seçildi. pickBoard() hâlâ tek bir board döndürür (t eşiğine göre),
+   sadece isim/fiyat artık soyut değil. */
 const BOARDS={
- AM5:[{n:'A620 anakart',p:2900,t:1},{n:'B650 anakart',p:4500,t:2},{n:'B650E anakart',p:6500,t:3}],
- LGA1851:[{n:'B860 anakart',p:5500,t:2},{n:'Z890 anakart',p:9800,t:3}]
+ AM5:[
+  {n:'Gigabyte A620M H (A620)',            p:3689,t:1},
+  {n:'Biostar B650MP-E Pro (B650)',        p:4069,t:2},
+  {n:'Asus B650E Max Gaming Wi-Fi (B650E)',p:9799,t:3},
+ ],
+ LGA1851:[
+  {n:'Gigabyte B860 DS3H WIFI6E (B860)',      p:7006,t:2},
+  {n:'Asus TUF Gaming Z890-PLUS Wi-Fi (Z890)',p:14432,t:3},
+ ]
 };
 const COOLERS=[
  {id:'stock',n:'Kutudan çıkan soğutucu',  cap:65, p:0},
