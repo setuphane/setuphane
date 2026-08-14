@@ -259,7 +259,14 @@ const PHOTOS = { gpu:'', cpu:'', ram:'', ssd:'', psu:'', mb:'', case:'', cooler:
 /* Fiyatlar: Cimri.com'dan 2026-08-09 tarihinde cekildi (scripts/prices.ps1). Guncellemek icin tek yer burasi. */
 const GPUS=[
  {id:'igpu',   n:'Dahili grafik (ayrı kart yok)', b:'—',      idx:12,  vram:0,  tdp:0,   p:0},
+ /* Bütçe segmenti eskiden B580'in altında tamamen boştu — 18-20 bin TL gibi
+    düşük bütçelerde "ekran kartı gerekiyor" seçilince genelde hiç sonuç
+    çıkmıyordu. Üç kart eklendi (Cimri/Akakçe, Ağustos 2026, en ucuz liste
+    fiyatı): RX 6600, RX 7600, RTX 4060. */
+ {id:'6600',   n:'Radeon RX 6600 8 GB',           b:'AMD',    idx:40,  vram:8,  tdp:132, p:13949},
  {id:'b580',   n:'Intel Arc B580 12 GB',          b:'Intel',  idx:55,  vram:12, tdp:190, p:13110},
+ {id:'7600',   n:'Radeon RX 7600 8 GB',           b:'AMD',    idx:48,  vram:8,  tdp:165, p:16780},
+ {id:'4060',   n:'GeForce RTX 4060 8 GB',         b:'NVIDIA', idx:54,  vram:8,  tdp:115, p:18880},
  {id:'5060',   n:'GeForce RTX 5060 8 GB',         b:'NVIDIA', idx:58,  vram:8,  tdp:145, p:17880},
  {id:'9060xt', n:'Radeon RX 9060 XT 16 GB',       b:'AMD',    idx:64,  vram:16, tdp:180, p:24599},
  {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB',     b:'NVIDIA', idx:74,  vram:16, tdp:180, p:33119},
@@ -281,11 +288,16 @@ const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
 const BRAND={ AMD:'#FF3D45', Intel:'#3BA9F0', NVIDIA:'#76B900' };
 const brandDot = b => BRAND[b] || null;
 const CPUS=[
+ /* 7400F ve 9700X eklendi (Cimri/Akakçe, Ağustos 2026, en ucuz liste fiyatı)
+    — 7500F ile 9600X arasında hiç seçenek yoktu, bütçe orta segmentte
+    gereğinden pahalı işlemciye zıplıyordu. */
+ {id:'7400f',  n:'Ryzen 5 7400F',     plat:'AM5',     g:68,  m:62,  tdp:65,  p:5546,  ig:false},
  {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:55,  m:52,  tdp:65,  p:7653,  ig:true},
  {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:74,  m:68,  tdp:65,  p:6999,  ig:false},
  {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:78,  m:71,  tdp:65,  p:7199,  ig:true},
  {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:88,  m:96,  tdp:125, p:10949, ig:true},
  {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:92,  m:80,  tdp:65,  p:9387, ig:true},
+ {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:94,  m:104, tdp:65,  p:12300, ig:true},
  {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:95,  m:124, tdp:125, p:17000, ig:true},
  {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:108, m:88,  tdp:120, p:15804, ig:true},
  {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:22132, ig:true},

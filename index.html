@@ -265,6 +265,19 @@ const GPUS = [{
   vram: 0,
   tdp: 0,
   p: 0
+},
+/* Bütçe segmenti eskiden B580'in altında tamamen boştu — 18-20 bin TL gibi
+   düşük bütçelerde "ekran kartı gerekiyor" seçilince genelde hiç sonuç
+   çıkmıyordu. Üç kart eklendi (Cimri/Akakçe, Ağustos 2026, en ucuz liste
+   fiyatı): RX 6600, RX 7600, RTX 4060. */
+{
+  id: '6600',
+  n: 'Radeon RX 6600 8 GB',
+  b: 'AMD',
+  idx: 40,
+  vram: 8,
+  tdp: 132,
+  p: 13949
 }, {
   id: 'b580',
   n: 'Intel Arc B580 12 GB',
@@ -273,6 +286,22 @@ const GPUS = [{
   vram: 12,
   tdp: 190,
   p: 13110
+}, {
+  id: '7600',
+  n: 'Radeon RX 7600 8 GB',
+  b: 'AMD',
+  idx: 48,
+  vram: 8,
+  tdp: 165,
+  p: 16780
+}, {
+  id: '4060',
+  n: 'GeForce RTX 4060 8 GB',
+  b: 'NVIDIA',
+  idx: 54,
+  vram: 8,
+  tdp: 115,
+  p: 18880
 }, {
   id: '5060',
   n: 'GeForce RTX 5060 8 GB',
@@ -360,7 +389,20 @@ const BRAND = {
   NVIDIA: '#76B900'
 };
 const brandDot = b => BRAND[b] || null;
-const CPUS = [{
+const CPUS = [
+/* 7400F ve 9700X eklendi (Cimri/Akakçe, Ağustos 2026, en ucuz liste fiyatı)
+   — 7500F ile 9600X arasında hiç seçenek yoktu, bütçe orta segmentte
+   gereğinden pahalı işlemciye zıplıyordu. */
+{
+  id: '7400f',
+  n: 'Ryzen 5 7400F',
+  plat: 'AM5',
+  g: 68,
+  m: 62,
+  tdp: 65,
+  p: 5546,
+  ig: false
+}, {
   id: '8500g',
   n: 'Ryzen 5 8500G',
   plat: 'AM5',
@@ -404,6 +446,15 @@ const CPUS = [{
   m: 80,
   tdp: 65,
   p: 9387,
+  ig: true
+}, {
+  id: '9700x',
+  n: 'Ryzen 7 9700X',
+  plat: 'AM5',
+  g: 94,
+  m: 104,
+  tdp: 65,
+  p: 12300,
   ig: true
 }, {
   id: '265k',
