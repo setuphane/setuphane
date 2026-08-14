@@ -2671,8 +2671,11 @@ const BUD_MIN = 18000,
 function butceUrldenAl() {
   const m = (location.pathname || '').match(/^\/fiyat:(\d+)$/);
   if (!m) return null;
-  const v = Number(m[1]);
-  return v >= BUD_MIN && v <= BUD_MAX ? v : null;
+  /* Reddetmek yerine sınıra sabitliyoruz: 1 milyonun üstü 1 milyona, en
+     ucuz sistemin altındaki bir değer kaydırıcının tabanı olan 18 bine
+     çekiliyor — kişi hangi yöne taşarsa taşsın en yakın gerçek sisteme
+     düşsün, alakasız bir varsayılana (55 bin) sıçramasın. */
+  return Math.min(BUD_MAX, Math.max(BUD_MIN, Number(m[1])));
 }
 const posToBudget = t => {
   const v = BUD_MIN * Math.pow(BUD_MAX / BUD_MIN, t / SLIDER_STEPS);
