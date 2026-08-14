@@ -2663,6 +2663,17 @@ function LaptopPicker({
 const BUD_MIN = 18000,
   BUD_MAX = 1000000,
   SLIDER_STEPS = 1000;
+/* Instagram/Story'lerden bütçe önceden dolu gelsin diye derin link:
+   setuphane.com/fiyat:55000 → hesaplayıcı 55.000₺ ile açılır. rotaCoz bunu
+   zaten 'ana' rotaya düşürüyor (eşleşmeyen her yol öyle), burada sadece
+   sayıyı okuyoruz. Canonical hep '/' kalıyor (App() içinde) — arama
+   motorunda binlerce "aynı sayfa farklı bütçe" URL'si dolaşmasın diye. */
+function butceUrldenAl() {
+  const m = (location.pathname || '').match(/^\/fiyat:(\d+)$/);
+  if (!m) return null;
+  const v = Number(m[1]);
+  return v >= BUD_MIN && v <= BUD_MAX ? v : null;
+}
 const posToBudget = t => {
   const v = BUD_MIN * Math.pow(BUD_MAX / BUD_MIN, t / SLIDER_STEPS);
   return v < 100000 ? Math.round(v / 500) * 500 : Math.round(v / 2500) * 2500;
@@ -7061,7 +7072,7 @@ function Footer() {
 /* ═══════════════════ UYGULAMA ═══════════════════ */
 function App() {
   const [mode, setMode] = useState('topla'); // 'topla' | 'laptop'
-  const [budget, setBudget] = useState(55000);
+  const [budget, setBudget] = useState(() => butceUrldenAl() || 55000);
   const [prof, setProf] = useState(PROFILES[0]);
   const [pick, setPick] = useState({
     cpu: '',
@@ -7100,8 +7111,11 @@ function App() {
       document.title = meta.t;
       const md = document.querySelector('meta[name="description"]');
       if (md) md.setAttribute('content', meta.d);
+      /* /fiyat:55000 gibi derin linkler hep '/' olarak kanonikleşiyor —
+         yoksa her paylaşılan bütçe değeri Google'a ayrı bir sayfa gibi
+         görünür ve aynı içerik binlerce URL'e bölünür. */
       const can = document.querySelector('link[rel="canonical"]');
-      if (can) can.setAttribute('href', 'https://www.setuphane.com' + location.pathname);
+      if (can) can.setAttribute('href', 'https://www.setuphane.com' + (r.route === 'ana' ? '/' : location.pathname));
       /* Ürünsüz sayfalar (ör. aksesuarlar) Google'a girmesin diye rota
          değişince robots meta'sı eklenip kaldırılıyor. Google JS ile eklenen
          robots meta'yı destekliyor (render aşamasında okunuyor). */
