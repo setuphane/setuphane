@@ -1,0 +1,18 @@
+# SETUP HANE
+
+> Bütçeye göre bilgisayar toplayan, ücretsiz ve kayıt gerektirmeyen bir araç ve topluluk sitesi. Kullanıcı bütçesini ve amacını girer, o bütçeyle alınabilecek en iyi PC parça parça hesaplanır; ayrıca 12 ücretsiz donanım testi ve kayıt gerektirmeyen bir forum sunar. Hiçbir ürün satılmaz, komisyon alınmaz.
+
+## Sayfalar
+
+- [Sistem Kur](https://www.setuphane.com/): Bütçe ve kullanım amacına göre canlı PC parça hesaplayıcı (AMD/Intel, NVIDIA/AMD karşılaştırması dahil), hazır laptop karşılaştırması.
+- [Testler](https://www.setuphane.com/testler): FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri — 12 tarayıcı içi araç.
+- [Forum](https://www.setuphane.com/forum): Sistem tavsiyesi ve bilgisayar sorunları için kayıt gerektirmeyen topluluk forumu.
+- [Hakkımızda](https://www.setuphane.com/hakkimizda): SETUP HANE'nin ne olduğu, kim tarafından yapıldığı ve çalışma ilkeleri.
+- [İş Birlikleri](https://www.setuphane.com/isbirlikleri): Markalarla iş birliği için sunulan gerçek kanallar ve iletişim.
+- [Gizlilik ve Çerez Politikası](https://www.setuphane.com/gizlilik): Hangi verinin tutulduğu, hangi çerezlerin kullanıldığı.
+
+## Notlar
+
+- Fiyatlar Cimri kaynaklıdır ve periyodik olarak güncellenir; sitede gösterilen tarihten eskiyse doğrulamadan alıntılamayın.
+- Site tek geliştirici tarafından yürütülür, sahte istatistik veya kurumsal iddia içermez.
+- /aksesuarlar ve /oner sayfaları şu an geliştirme aşamasında (örnek/placeholder içerik) — özetlerken bunu belirtin.
