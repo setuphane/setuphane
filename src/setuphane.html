@@ -22,6 +22,12 @@
 <meta property="og:image:alt" content="SETUP HANE — Bütçeni yaz, doğru bilgisayarı biz kuralım">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.setuphane.com/og.jpg">
+<!-- vercel.json'daki yakala-hepsini yönlendirmesi, tanımsız /favicon.ico isteğini
+     index.html'e (text/html, 200) çeviriyordu — Google'ın kök dizinde aradığı
+     klasik dosya. Gerçek .ico eklendi, aynı favicon.svg tasarımından üretildi. -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -4346,6 +4352,12 @@ const AKSESUAR_URUNLERI={
      gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Kitsune_350x.png?v=1772215666',
      link:'https://ulugames.com.tr/products/ulugames-aruw-hybrid-mousepad?bg_ref=CsmfVOpQxV',
      anahtar:['mousepad','mouse pad','mouse','fare','tilki','anime','illüstrasyon','tasarım']},
+  ],
+  kablo:[
+    {ad:'Wraith Çift Başlıklı Kablo', kaynak:'Wraith Esports',
+     gorsel:'https://wraithesports.com/cdn/shop/files/Siyah_79a34e20-32ba-43ea-bee6-46f4b453683e_350x.png?v=1759217239',
+     link:'https://wraithesports.com/products/wraith-cift-baslikli-kablo',
+     anahtar:['kablo','kablo yönetimi','kablo düzeni','kablo karmaşası','klavye','mouse','fare','usb','type-c','çift çıkış','8000hz','toparla']},
   ],
 };
 
