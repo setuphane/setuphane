@@ -472,6 +472,57 @@ function fpsVerdict(f){
   if(f<170)return {t:'144 Hz ekranı doldurur',   c:'#2DE2E6'};
   return    {t:'Rekabetçi e-spor seviyesi',      c:'#2DE2E6'};
 }
+/* ── Ekran önerisi ───────────────────────────────────────────────────────
+   Sistem FPS üretir; ekran onu gösteremezse aradaki fark çöpe gider.
+   165 FPS veren bir sistem 60 Hz panelde 60 FPS görünür. Kitlenin en pahalı
+   ve en sık yaptığı hata bu: parayı kasaya gömüp ekrana hiç bakmamak.
+
+   Bilerek MODEL ve FİYAT önerilmiyor. Ekran fiyatları FIYAT_TARIHI akışında
+   doğrulanmadı; doğrulanmamış bir fiyatı gerçekmiş gibi göstermek sitenin
+   "kendin kontrol et, haklı çıkacaksın" iddiasını çürütür. Onun yerine
+   ziyaretçiye ne arayacağı veriliyor — fiyatı kendisi doğruluyor. */
+/* Hz merdiveni çözünürlüğe göre ayrı: 4K'da 360 Hz panel üretilmiyor, 1080p'de
+   üretiliyor. Tek bir liste kullanınca "4K 360 Hz monitör" gibi aratıldığında
+   hiç sonuç vermeyen bir öneri çıkıyordu. Buradaki değerler gerçekten
+   satılan panel kademeleri. */
+const HZ_KADEME={
+  '1080':[60,75,100,120,144,165,180,240,360],
+  '1440':[60,75,100,120,144,165,180,240,360],
+  '2160':[60,120,144,160,240],
+};
+function ekranOneri(f,res){
+  /* Ekran, sistemin ürettiğini KARŞILAMALI: altında kalırsa aradaki kareler
+     kalıcı olarak kaybolur. Bu yüzden f'i karşılayan en küçük kademe seçilir —
+     daha yükseği para israfı, daha düşüğü performans israfı.
+     %5 tolerans: 150 FPS için 144 Hz'i 165'e tercih ederiz, 6 kare uğruna
+     bir üst segment ekran aldırmak doğru olmaz. */
+  const merdiven = HZ_KADEME[res.id] || HZ_KADEME['1080'];
+  const hz = merdiven.find(h=>h*1.05>=f) || merdiven[merdiven.length-1];
+  /* 60 Hz almanın bedeli — önerinin neden önemli olduğunu somutlaştırır. */
+  const kayip60 = f>60 ? Math.round((f-60)/f*100) : 0;
+
+  /* Çözünürlük: kullanıcının seçtiğini esas al, ama uçlarda uyar.
+     1080p zaten en alt kademe — orada "bir kademe düşür" demek anlamsız,
+     onun yerine ayar/parça tarafına yönlendiriyoruz. */
+  const cozNot =
+      f<45 && res.id!=='1080'
+        ? `Bu sistem ${res.n} için zorlanıyor. 1080p ekran alırsan hem belirgin şekilde daha akıcı olur hem ekrana daha az para verirsin.`
+    : f<45
+        ? 'Bu sistem oyunda zorlanıyor. Daha hızlı bir ekran almak bunu düzeltmez — önce oyun ayarlarını düşür, bütçen artarsa ekran kartını yükselt.'
+    : res.id==='1080' && f>200 ? '1440p ekrana çıkabilirsin — sistem fazlasıyla yetiyor, görüntü belirgin şekilde netleşir.'
+    : null;
+
+  return {
+    hz, kayip60, cozNot,
+    coz: res.n,
+    arama: `${res.n} ${hz} Hz IPS monitör`,
+    /* Hz'i sayı olarak değil, hissedilen şey olarak anlat. */
+    kiyas: hz>=240 ? 'Rekabetçi oyunda fark yaratan seviye. Gözün ekranda hareketi bulanık değil, net takip eder.'
+         : hz>=144 ? 'Fareyi oynattığında imleç kayarak değil, yapışık gibi hareket eder. 60 Hz’den sonra en çok hissedilen fark budur.'
+         : hz>=100 ? '60 Hz’e göre gözle görülür daha yumuşak. Masaüstünde pencere sürüklerken bile fark edilir.'
+         : 'Standart ekran hızı. İzlemeye ve günlük kullanıma yeter.'
+  };
+}
 const MAX_CPU_G = Math.max.apply(null, CPUS.map(x=>x.g));
 
 /* Darboğaz modeli.
@@ -1536,6 +1587,90 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick}){
   );
 }
 
+/* Ekran önerisi kartı — FPS sonucunun hemen altında durur, çünkü cümle ancak
+   orada kurulabiliyor: "bu sistem şu kadar FPS veriyor, o hâlde şu ekran".
+   Ayrı bir sekmede kullanıcının sistemi olmadığı için aynı şey söylenemez. */
+function EkranOnerisi({f,res}){
+  const e=ekranOneri(f,res);
+  const hzA=useCount(e.hz,900);
+  return (
+    <div className="mt-10 pt-8 border-t border-line">
+      <Label className="mb-5">SANA LAZIM OLAN EKRAN</Label>
+
+      <div className="grid lg:grid-cols-[auto_1fr] gap-7 lg:gap-12 items-start">
+        <div className="flex items-end gap-3">
+          <div className="num text-[clamp(2.6rem,11vw,4.6rem)] font-light leading-[.82] text-cy">
+            {Math.round(hzA)}
+          </div>
+          <div className="pb-2">
+            <div className="text-[1.05rem] leading-none text-cy">Hz</div>
+            {/* lbl kullanılmadı: büyük harfe çevirince "1080p" -> "1080P" oluyor. */}
+            <div className="text-[.8rem] tracking-[.14em] text-dim mt-2">{e.coz}</div>
+          </div>
+        </div>
+
+        <div className="max-w-[56ch]">
+          {e.kayip60>0 ? (
+            <p className="text-[.95rem] leading-relaxed text-ink/85">
+              Bu sistem <span className="num text-ink">{f}</span> FPS üretiyor.
+              {' '}<strong className="text-mg font-normal">60 Hz bir ekran alırsan bunun sadece 60'ını görürsün</strong> —
+              {' '}üstündeki her kare ekrana hiç çıkmaz. Yani ekran kartına verdiğin paranın
+              {/* "kadarı" bilerek: Türkçe iyelik eki sayının okunuşuna göre değişiyor
+                  (%60'ı, %72'si, %5'i) — bu kalıp her sayıyla doğru çalışır. */}
+              {' '}yaklaşık <span className="num text-mg">%{e.kayip60}</span> kadarı görüntüye yansımaz.
+            </p>
+          ) : (
+            <p className="text-[.95rem] leading-relaxed text-ink/85">
+              Bu sistem <span className="num text-ink">{f}</span> FPS üretiyor. 60 Hz bir ekran
+              {' '}bu sistemi karşılar — daha hızlı ekran alman şu an bir şey kazandırmaz.
+            </p>
+          )}
+          <p className="text-[.9rem] leading-relaxed text-dim mt-3">{e.kiyas}</p>
+          {e.cozNot && <p className="text-[.9rem] leading-relaxed text-dim mt-3">{e.cozNot}</p>}
+        </div>
+      </div>
+
+      <dl className="mt-9 grid sm:grid-cols-3 gap-x-8 gap-y-6">
+        <div>
+          <dt className="lbl text-dim mb-2">PANEL TİPİ</dt>
+          <dd className="text-[.92rem] leading-relaxed text-ink/85">
+            <span className="text-ink">IPS</span> ara — renkler canlı olur ve yandan bakınca solmaz.
+            {' '}<span className="text-ink">VA</span> karanlık sahnelerde daha derin siyah verir ama hızlı
+            {' '}sahnelerde iz bırakabilir. <span className="text-dim">TN</span> ucuzdur, rengi soluktur.
+          </dd>
+        </div>
+        <div>
+          <dt className="lbl text-dim mb-2">ÖZELLİKLERDE ŞU YAZMALI</dt>
+          <dd className="text-[.92rem] leading-relaxed text-ink/85">
+            <span className="text-cy">FreeSync</span> veya <span className="text-cy">G-Sync</span> —
+            {' '}ekranla kartın adımını eşler, görüntünün ortadan yırtılmasını önler. Neredeyse
+            {' '}her oyuncu ekranında var, olmayanı alma.
+          </dd>
+        </div>
+        <div>
+          <dt className="lbl text-dim mb-2">ALDIKTAN SONRA</dt>
+          <dd className="text-[.92rem] leading-relaxed text-ink/85">
+            Ekran kutudan <span className="text-ink">60 Hz</span> olarak çıkar; Windows'tan elle
+            {' '}yükseltmen gerekir. <a href="/testler" className="text-cy hover:underline">Testler</a> bölümünden
+            {' '}gerçekten kaç Hz çalıştığını ölçebilirsin.
+          </dd>
+        </div>
+      </dl>
+
+      <div className="mt-8 p-4 border border-line/70 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="lbl text-dim">FİYAT KARŞILAŞTIRMADA ARAT</span>
+        <span className="num text-[.95rem] text-cy">{e.arama}</span>
+      </div>
+      {/* Fiyat vermiyoruz: ekran fiyatları doğrulanmış veri akışımızda yok.
+          Uydurmak yerine ne aratacağını veriyoruz — kendisi doğruluyor. */}
+      <p className="text-[.82rem] text-dim mt-3 leading-relaxed">
+        Ekran fiyatlarını burada göstermiyoruz, çünkü parça fiyatlarımız gibi doğrulayamıyoruz.
+        {' '}Yukarıdaki yazıyı fiyat karşılaştırma sitesinde aratman en doğru sonucu verir.
+      </p>
+    </div>
+  );
+}
+
 /* ═══════════════════ MODÜL 02 — OYUN TESTİ ═══════════════════ */
 function GameTest({act,gid,setGid,rid,setRid}){
   const {fmt}=useCur();
@@ -1626,6 +1761,8 @@ function GameTest({act,gid,setGid,rid,setRid}){
                   <dd className="num text-[.92rem] text-ink/85">{fmt(act.total/Math.max(1,f))}</dd>
                 </div>
               </dl>
+
+              <EkranOnerisi f={f} res={res}/>
             </div>
           ) : <p className="mt-10 text-dim text-sm">Önce yukarıdan bir sistem seç.</p>}
         </Card>
