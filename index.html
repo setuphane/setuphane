@@ -199,16 +199,34 @@ select option{background:#0E0E15;color:#ECEBF2}
 
 <div id="boot">
   <div style="text-align:center">
-    <!-- viewBox eskiden 46 4 208 134'tü: kemerin alt uçları (y≈140.8, 9px
-         kalınlık) taşıp kırpılıyordu — "bozuk/orantısız" görünümün sebebi
-         buydu. Yükseklik büyütülüp genişlik oranla ayarlandı. -->
-    <svg width="64" height="43" viewBox="40 0 220 148" fill="none" aria-hidden="true" style="margin:0 auto 14px;filter:drop-shadow(0 0 6px rgba(45,226,230,.6))">
-      <path d="M59.8 140.8A96 96 0 1 1 240.2 140.8" stroke="#FF2D95" stroke-width="9" stroke-linecap="round"/>
-      <!-- Ekran grubu kemerle ortak merkezde olmalı: kemer x=150 merkezli
-           (59.8↔240.2), ekran ise x=135'te duruyordu — 15px sola kaymış
-           görünüyordu. Rect ve ayak +15 kaydırıldı. -->
-      <rect x="111" y="56" width="78" height="50" rx="6" stroke="#2DE2E6" stroke-width="9"/>
-      <path d="M150 106v16M131 130h38" stroke="#2DE2E6" stroke-width="9" stroke-linecap="round"/>
+    <!-- NeonScene'in BİREBİR aynısı (kemer, monitör, kasa, masa, klavye,
+         mouse). Burada React yok — JS henüz yüklenmediği için düz SVG.
+         Önceki sürüm yalnızca kemer ve monitör çiziyordu; açılışta farklı,
+         siteye girince farklı bir logo görünüyordu. Tek marka işareti olmalı.
+         Çizgi kalınlıkları MarkSmall ile aynı (w=2.3): küçük boyutta
+         klavye ve mouse kaybolmasın diye. -->
+    <svg width="84" height="55" viewBox="0 0 300 196" fill="none" aria-hidden="true" style="margin:0 auto 14px;filter:drop-shadow(0 0 6px rgba(45,226,230,.6))">
+      <defs>
+        <linearGradient id="bootArcG" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#FF2D95"/><stop offset=".45" stop-color="#B14BE8"/><stop offset="1" stop-color="#2DE2E6"/>
+        </linearGradient>
+      </defs>
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M59.8 140.8A96 96 0 1 1 240.2 140.8" stroke="url(#bootArcG)" stroke-width="8.28"/>
+        <rect x="88" y="46" width="94" height="66" rx="5" stroke="#2DE2E6" stroke-width="7.82"/>
+        <path d="M103 102 129 62M118 102 143 62M140 98 161 68" stroke="#FF2D95" stroke-width="4.83" opacity=".85"/>
+        <path d="M110 86 116 78" stroke="#2DE2E6" stroke-width="4.37" opacity=".8"/>
+        <path d="M135 112v14M118 134l6-8h22l6 8z" stroke="#2DE2E6" stroke-width="7.82"/>
+        <rect x="194" y="60" width="30" height="66" rx="4" stroke="#FF2D95" stroke-width="7.82"/>
+        <path d="M200 71h18M200 78h18M200 85h18" stroke="#FF2D95" stroke-width="4.37" opacity=".85"/>
+        <circle cx="209" cy="106" r="5" stroke="#FF2D95" stroke-width="5.06"/>
+        <path d="M58 182 96 146h108l38 36z" stroke="url(#bootArcG)" stroke-width="5.75" opacity=".9"/>
+        <path d="M86 176 112 154h66l24 22z" stroke="#2DE2E6" stroke-width="7.82"/>
+        <path d="M97 169h94M105 162h78" stroke="#2DE2E6" stroke-width="3.68" opacity=".8"/>
+        <path d="M124 176h40" stroke="#2DE2E6" stroke-width="3.68" opacity=".8"/>
+        <rect x="210" y="164" width="12" height="14" rx="6" stroke="#FF2D95" stroke-width="5.06"/>
+        <path d="M216 164v4" stroke="#FF2D95" stroke-width="3.91"/>
+      </g>
     </svg>
     <!-- .neonWord/.hn: Wordmark bileşeniyle aynı CSS sınıfları — JS henüz
          yüklenmediği için burada React değil, aynı görünümü veren düz HTML. -->
@@ -2703,6 +2721,40 @@ function butceUrldenAl() {
      düşsün, alakasız bir varsayılana (55 bin) sıçramasın. */
   return Math.min(BUD_MAX, Math.max(BUD_MIN, Number(m[1])));
 }
+/* Paylaşılabilir sistem linki: /sistem:55000-oyun-x-nvidia-cs2-1440
+   '/fiyat:' derin linkiyle aynı dil; rotaCoz ikisini de 'ana'ya düşürüyor ve
+   canonical '/' kalıyor (App içinde) — paylaşılan her sistem Google'a ayrı
+   sayfa gibi görünmesin diye.
+
+   Parça listesi DEĞİL, sadece girdiler taşınıyor (bütçe, amaç, marka tercihi,
+   oyun, çözünürlük). buildSystem() aynı girdiyle hep aynı sonucu ürettiği
+   için link hem kısa kalıyor hem de fiyatlar güncellenince paylaşılan link
+   eski parçaları değil, o bütçenin bugünkü en iyisini gösteriyor. */
+function sistemKodla(butce, profId, pick, gid, rid) {
+  return [butce, profId, pick.cpu || 'x', pick.gpu || 'x', gid, rid].join('-');
+}
+function sistemUrldenAl() {
+  const m = (location.pathname || '').match(/^\/sistem:([\w.-]+)$/);
+  if (!m) return null;
+  const p = m[1].split('-');
+  if (p.length !== 6) return null;
+  const butce = Number(p[0]);
+  if (!isFinite(butce) || butce <= 0) return null;
+  /* Her alan tek tek doğrulanıyor: elle kurcalanmış ya da eski biçimli bir
+     link sayfayı kırmasın, bilinmeyen değer varsayılana düşsün. */
+  const prof = PROFILES.find(x => x.id === p[1]);
+  const marka = (v, liste) => v !== 'x' && liste.indexOf(v) >= 0 ? v : '';
+  return {
+    butce: Math.min(BUD_MAX, Math.max(BUD_MIN, butce)),
+    prof: prof || PROFILES[0],
+    pick: {
+      cpu: marka(p[2], ['AMD', 'Intel']),
+      gpu: marka(p[3], ['NVIDIA', 'AMD', 'Intel'])
+    },
+    gid: GAMES.some(g => g.id === p[4]) ? p[4] : 'cs2',
+    rid: RES.some(r => r.id === p[5]) ? p[5] : '1080'
+  };
+}
 const posToBudget = t => {
   const v = BUD_MIN * Math.pow(BUD_MAX / BUD_MIN, t / SLIDER_STEPS);
   return v < 100000 ? Math.round(v / 500) * 500 : Math.round(v / 2500) * 2500;
@@ -3298,12 +3350,64 @@ function useCopy(sys, prof, plain) {
   }, [sys, prof, plain]);
   return [copied, copy];
 }
+
+/* Panoya yaz — clipboard API izin vermezse (eski tarayıcı, http) gizli bir
+   textarea ile eski yönteme düşer. useCopy'deki mantığın aynısı. */
+async function panoyaYaz(txt) {
+  try {
+    await navigator.clipboard.writeText(txt);
+    return;
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+    } catch (_) {}
+    document.body.removeChild(ta);
+  }
+}
+function usePaylas(budget, prof, pick, gid, rid) {
+  const [kopya, setKopya] = useState(false);
+  const paylas = useCallback(async () => {
+    const url = 'https://www.setuphane.com/sistem:' + sistemKodla(budget, prof.id, pick, gid, rid);
+    /* Telefonda yerel paylaşım penceresi çok daha doğal; yoksa panoya kopyala. */
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'SETUP HANE — kurduğum sistem',
+          url
+        });
+        olay('sistem_paylasildi', {
+          yol: 'native'
+        });
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      } /* kullanıcı vazgeçti */
+    }
+    await panoyaYaz(url);
+    olay('sistem_paylasildi', {
+      yol: 'kopya'
+    });
+    setKopya(true);
+    setTimeout(() => setKopya(false), 2200);
+  }, [budget, prof, pick, gid, rid]);
+  return [kopya, paylas];
+}
 function Panel({
   sys,
   act,
   prof,
   game,
-  res
+  res,
+  budget,
+  pick,
+  gid,
+  rid
 }) {
   const {
     fmt,
@@ -3320,6 +3424,7 @@ function Panel({
     saveA = useCount(save),
     pctA = useCount(savePct);
   const [copied, copy] = useCopy(sys, prof, plain);
+  const [kopya, paylas] = usePaylas(budget, prof, pick, gid, rid);
   return /*#__PURE__*/React.createElement("aside", {
     className: "hidden lg:block",
     "aria-label": "Sistem \xF6zeti"
@@ -3383,10 +3488,13 @@ function Panel({
     className: "text-[.8rem] text-dim mt-2.5 leading-relaxed"
   }, "cebinde kal\u0131yor \u2014 ", /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
-  }, "%", Math.round(pctA)), " daha ucuz. Haz\u0131r sistem fiyat\u0131, par\xE7a tutar\u0131na ortalama %", Math.round(PREBUILT_MARGIN * 100), " k\xE2r pay\u0131 ve ", fmt(ASSEMBLY), " montaj eklenerek hesapland\u0131.")), !isLap && /*#__PURE__*/React.createElement("button", {
+  }, "%", Math.round(pctA)), " daha ucuz. Haz\u0131r sistem fiyat\u0131, par\xE7a tutar\u0131na ortalama %", Math.round(PREBUILT_MARGIN * 100), " k\xE2r pay\u0131 ve ", fmt(ASSEMBLY), " montaj eklenerek hesapland\u0131.")), !isLap && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
     onClick: copy,
     className: "mt-7 w-full border border-cy text-cy py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300"
-  }, copied ? 'KOPYALANDI ✓' : 'LİSTEYİ KOPYALA'), isLap && /*#__PURE__*/React.createElement("a", {
+  }, copied ? 'KOPYALANDI ✓' : 'LİSTEYİ KOPYALA'), /*#__PURE__*/React.createElement("button", {
+    onClick: paylas,
+    className: "mt-2.5 w-full border border-line text-dim py-3 lbl hover:border-ink/30 hover:text-ink transition-colors duration-300"
+  }, kopya ? 'LİNK KOPYALANDI ✓' : 'SİSTEMİ PAYLAŞ')), isLap && /*#__PURE__*/React.createElement("a", {
     href: act.lap.url,
     target: "_blank",
     rel: "noopener noreferrer",
@@ -7895,15 +8003,21 @@ function PanelSayfa() {
 }
 function App() {
   const [mode, setMode] = useState('topla'); // 'topla' | 'laptop'
-  const [budget, setBudget] = useState(() => butceUrldenAl() || 55000);
-  const [prof, setProf] = useState(PROFILES[0]);
-  const [pick, setPick] = useState({
+  /* Paylaşılan sistem linki (/sistem:...) tüm başlangıç değerlerini belirler;
+     yoksa /fiyat: derin linki, o da yoksa varsayılanlar. Bir kez okunuyor —
+     kullanıcı sonradan oynadığında link geri sarmasın diye. */
+  const paylasilan = useRef(null);
+  if (paylasilan.current === null) paylasilan.current = sistemUrldenAl() || false;
+  const ps = paylasilan.current;
+  const [budget, setBudget] = useState(() => ps && ps.butce || butceUrldenAl() || 55000);
+  const [prof, setProf] = useState(ps ? ps.prof : PROFILES[0]);
+  const [pick, setPick] = useState(ps ? ps.pick : {
     cpu: '',
     gpu: ''
   }); // marka tercihi
   const [lap, setLap] = useState(null); // seçili laptop
-  const [gid, setGid] = useState('cs2');
-  const [rid, setRid] = useState('1080');
+  const [gid, setGid] = useState(ps ? ps.gid : 'cs2');
+  const [rid, setRid] = useState(ps ? ps.rid : '1080');
   const sys = useMemo(() => buildSystem(budget, prof, pick), [budget, prof, pick]);
   const game = GAMES.find(g => g.id === gid),
     res = RES.find(r => r.id === rid);
@@ -8098,7 +8212,11 @@ function App() {
     act: act,
     prof: prof,
     game: game,
-    res: res
+    res: res,
+    budget: budget,
+    pick: pick,
+    gid: gid,
+    rid: rid
   })), /*#__PURE__*/React.createElement(Footer, null)), route === 'ana' && /*#__PURE__*/React.createElement(MobileDock, {
     sys: sys,
     act: act,
