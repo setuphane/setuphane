@@ -11,7 +11,6 @@
 <meta property="og:title" content="SETUP HANE — Bütçene göre doğru bilgisayar">
 <meta property="og:description" content="Bütçeni yaz, ne alman gerektiğini saniyesinde gör. Parça isimlerini bilmene gerek yok.">
 <meta name="google-site-verification" content="xjJr_ENpCktifjswCPQF-lTrk-CSHy2Y3fguFi_aBWI">
-<link rel="canonical" href="https://www.setuphane.com/">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
 <meta property="og:url" content="https://www.setuphane.com/">
@@ -7152,9 +7151,18 @@ function App() {
       if (md) md.setAttribute('content', meta.d);
       /* /fiyat:55000 gibi derin linkler hep '/' olarak kanonikleşiyor —
          yoksa her paylaşılan bütçe değeri Google'a ayrı bir sayfa gibi
-         görünür ve aynı içerik binlerce URL'e bölünür. */
-      const can = document.querySelector('link[rel="canonical"]');
-      if (can) can.setAttribute('href', 'https://www.setuphane.com' + (r.route === 'ana' ? '/' : location.pathname));
+         görünür ve aynı içerik binlerce URL'e bölünür.
+         Etiket <head>'de sabit durmuyor: sunucu her rota için aynı index.html'i
+         döndürdüğü için sabit href='/' tüm alt sayfalara "ben ana sayfayım"
+         dedirtiyordu (Search Console: "doğru standart etikete sahip alternatif
+         sayfa"). Artık rota çözülünce doğru değerle oluşturuluyor. */
+      let can = document.querySelector('link[rel="canonical"]');
+      if (!can) {
+        can = document.createElement('link');
+        can.setAttribute('rel', 'canonical');
+        document.head.appendChild(can);
+      }
+      can.setAttribute('href', 'https://www.setuphane.com' + (r.route === 'ana' ? '/' : location.pathname));
       /* Ürünsüz sayfalar (ör. aksesuarlar) Google'a girmesin diye rota
          değişince robots meta'sı eklenip kaldırılıyor. Google JS ile eklenen
          robots meta'yı destekliyor (render aşamasında okunuyor). */
