@@ -217,8 +217,11 @@ select option{background:#0E0E15;color:#ECEBF2}
          buydu. Yükseklik büyütülüp genişlik oranla ayarlandı. -->
     <svg width="64" height="43" viewBox="40 0 220 148" fill="none" aria-hidden="true" style="margin:0 auto 14px;filter:drop-shadow(0 0 6px rgba(45,226,230,.6))">
       <path d="M59.8 140.8A96 96 0 1 1 240.2 140.8" stroke="#FF2D95" stroke-width="9" stroke-linecap="round"/>
-      <rect x="96" y="56" width="78" height="50" rx="6" stroke="#2DE2E6" stroke-width="9"/>
-      <path d="M135 106v16M116 130h38" stroke="#2DE2E6" stroke-width="9" stroke-linecap="round"/>
+      <!-- Ekran grubu kemerle ortak merkezde olmalı: kemer x=150 merkezli
+           (59.8↔240.2), ekran ise x=135'te duruyordu — 15px sola kaymış
+           görünüyordu. Rect ve ayak +15 kaydırıldı. -->
+      <rect x="111" y="56" width="78" height="50" rx="6" stroke="#2DE2E6" stroke-width="9"/>
+      <path d="M150 106v16M131 130h38" stroke="#2DE2E6" stroke-width="9" stroke-linecap="round"/>
     </svg>
     <!-- .neonWord/.hn: Wordmark bileşeniyle aynı CSS sınıfları — JS henüz
          yüklenmediği için burada React değil, aynı görünümü veren düz HTML. -->
@@ -875,17 +878,17 @@ const SEKMELER=[
 const ROTA_META={
   ana:     {t:'SETUP HANE — Bütçene göre doğru bilgisayarı kuralım',
             d:'Ne kadar paran varsa yaz, o paraya alınabilecek en iyi bilgisayarı parça parça göster. Bilgisayardan hiç anlamayanlar için.'},
-  /* noindex: ürünler boş — Google bunu "içeriksiz sayfa" görüp genel SEO'ya
-     zarar vermesin diye ürünler eklenene kadar arama sonuçlarından gizli.
-     Sayfa çalışmaya devam ediyor; Instagram/iş birliği linkleriyle gelenler
-     etkilenmez, sadece Google'da görünmüyor. */
+  /* noindex kalktı: 10 kategorinin hepsinde gerçek iş birliği ürünü var,
+     sayfa artık Google'ın "içeriksiz sayfa" saydığı durumda değil.
+     Ürünler /panel'den yönetiliyor. */
   aksesuarlar: {t:'Setup Aksesuarları — Kategorilere göre keşfet | SETUP HANE',
-            d:'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.',
-            noindex:true},
-  /* Deneme aşaması: eşleştirme mantığı gerçek ama ürün verisi örnek/placeholder.
-     Aksesuarlar'daki gibi gerçek ürünler gelene kadar Google'dan gizli. */
-  oner: {t:'Sana Göre Öner (Deneme) | SETUP HANE',
-            d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim. Şu an örnek verilerle çalışan bir deneme.',
+            d:'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.'},
+  oner: {t:'Sana Göre Öner — Bütçene uygun setup aksesuarı | SETUP HANE',
+            d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim. Kayıt yok, kurulum yok.'},
+  /* Yönetim ekranı: arama sonucunda yeri yok. Asıl koruma Supabase RLS'inde,
+     noindex yalnızca gereksiz taramayı önlüyor. */
+  panel: {t:'Panel | SETUP HANE',
+            d:'Site yöneticisi için ürün yönetim ekranı.',
             noindex:true},
   testler: {t:'Donanım Testleri — FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
             d:'12 ücretsiz araç: FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri. Kurulum gerekmez.'},
@@ -909,6 +912,7 @@ function rotaCoz(){
   if(p==='/hakkimizda') return {route:'hakkimizda', sub:null};
   if(p==='/isbirlikleri') return {route:'isbirlikleri', sub:null};
   if(p==='/gizlilik') return {route:'gizlilik', sub:null};
+  if(p==='/panel') return {route:'panel', sub:null};
   return {route:'ana', sub:null};
 }
 
@@ -2591,7 +2595,10 @@ async function sb(yol,opts){
   opts=opts||{};
   const r=await fetch(SUPABASE.url.replace(/\/$/,'')+'/rest/v1/'+yol,{
     method:opts.method||'GET',
-    headers:{ apikey:SUPABASE.anon, Authorization:'Bearer '+SUPABASE.anon,
+    /* opts.token: /panel'de oturum açmış yöneticinin jetonu. RLS'te yazma
+       yetkisi yalnızca authenticated rolüne verildiği için, jeton olmadan
+       yapılan istek okumada çalışır ama yazmada 401 döner — istenen davranış. */
+    headers:{ apikey:SUPABASE.anon, Authorization:'Bearer '+(opts.token||SUPABASE.anon),
               'Content-Type':'application/json', Prefer:opts.prefer||'return=representation' },
     body:opts.body?JSON.stringify(opts.body):undefined
   });
@@ -4351,14 +4358,270 @@ const AKSESUAR_URUNLERI={
      gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Kitsune_350x.png?v=1772215666',
      link:'https://ulugames.com.tr/products/ulugames-aruw-hybrid-mousepad?bg_ref=CsmfVOpQxV',
      anahtar:['mousepad','mouse pad','mouse','fare','tilki','anime','illüstrasyon','tasarım']},
+    {ad:'UluGames GlassPad Cam Mousepad', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/UluGames-luna-yazisiz-shpfy.png?v=1758226595&width=400',
+     link:'https://ulugames.com.tr/products/ulugames-cam-mousepad?bg_ref=CsmfVOpQxV',
+     anahtar:['mousepad','mouse pad','mouse','fare','cam','hızlı','kaygan','rekabetçi','fps','nişan']},
+    {ad:'Axgamingpunk Jade Poron Mousepad', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/axgamin-jade-kirmizi.png?v=1774465199&width=400',
+     link:'https://ulugames.com.tr/products/axgamingpunk-jade-poron-mousepad?bg_ref=CsmfVOpQxV',
+     anahtar:['mousepad','mouse pad','mouse','fare','poron','dengeli','kırmızı']},
+    {ad:'Wraith Blade X Semi-Hard Mousepad', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/BladeX-product-1.png?v=1688064815&width=400',
+     link:'https://wraithesports.com/products/blade-x-semi-hard-mousepad',
+     anahtar:['mousepad','mouse pad','mouse','fare','sert','yarı sert','hızlı','kontrol']},
+    {ad:'Wraith Cosmic Glass V2 Cam Mousepad', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/cosmic-glass-1.png?v=1774873673&width=400',
+     link:'https://wraithesports.com/products/wraith-cosmic-glass-v2-cam-mousepad',
+     anahtar:['mousepad','mouse pad','mouse','fare','cam','kaygan','hızlı','rekabetçi']},
+    {ad:'Wraith Litepad Mousepad', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Untitled-1.jpg?v=1739273156&width=400',
+     link:'https://wraithesports.com/products/wraith-litepad-mousepad',
+     anahtar:['mousepad','mouse pad','mouse','fare','kumaş','ince','uygun fiyat','başlangıç']},
+    {ad:'Wraith Ace Series Poron Mousepad', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Surge_43x48_Koyu_Mavi.png?v=1780660479&width=400',
+     link:'https://wraithesports.com/products/wraith-ace-series-poron-mousepad',
+     anahtar:['mousepad','mouse pad','mouse','fare','poron','dengeli','xl','büyük']},
   ],
   kablo:[
     {ad:'Wraith Çift Başlıklı Kablo', kaynak:'Wraith Esports',
      gorsel:'https://wraithesports.com/cdn/shop/files/Siyah_79a34e20-32ba-43ea-bee6-46f4b453683e_350x.png?v=1759217239',
      link:'https://wraithesports.com/products/wraith-cift-baslikli-kablo',
      anahtar:['kablo','kablo yönetimi','kablo düzeni','kablo karmaşası','klavye','mouse','fare','usb','type-c','çift çıkış','8000hz','toparla']},
+    {ad:'Wraith Çift Yönlü Coiled Kablo', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Beyaz.jpg?v=1776321352&width=400',
+     link:'https://wraithesports.com/products/wraith-bidirectional-coiled-kablo',
+     anahtar:['kablo','coiled','spiral','klavye','usb','type-c','düzen','estetik']},
+    {ad:'Hm Lab 8000Hz RGB Kablo', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/cable2.webp?v=1773946172&width=400',
+     link:'https://ulugames.com.tr/products/hmlab-8000hz-rgb-kablo?bg_ref=CsmfVOpQxV',
+     anahtar:['kablo','mouse','fare','8000hz','rgb','ışıklı','paracord']},
+    {ad:'Ipi Çift Başlı 8000Hz USB Kablo', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/103348298.webp?v=1779319709&width=400',
+     link:'https://ulugames.com.tr/products/ipi-cift-basli-8000hz-usb-kablo?bg_ref=CsmfVOpQxV',
+     anahtar:['kablo','mouse','fare','8000hz','usb','çift çıkış','dongle']},
+    {ad:'HM Lab Z-Neo 8K Gaming Hub', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Black_PinkGrungeComingSoonInstagramPostKopyasi_2.png?v=1760832990&width=400',
+     link:'https://ulugames.com.tr/products/hm-lab-z-neo-8k-gaming-hub?bg_ref=CsmfVOpQxV',
+     anahtar:['usb hub','hub','çoklayıcı','port','kablo','düzen','8k','dongle']},
+    {ad:'HM Lab HUB Little USB Hub', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/back_4f129a73-b2f2-4e15-9d5e-a58a174ccc38.png?v=1784204376&width=400',
+     link:'https://wraithesports.com/products/hm-lab-hub-little-usb-hub',
+     anahtar:['usb hub','hub','çoklayıcı','port','kablo','düzen','küçük','kompakt']},
+  ],
+  bilek:[
+    {ad:'Ulugames Bilek Desteği', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Ulugames-bilek-destegi-1.png?v=1776359098&width=400',
+     link:'https://ulugames.com.tr/products/ulugames-bilek-destegi?bg_ref=CsmfVOpQxV',
+     anahtar:['bilek','bilek desteği','ağrı','konfor','destek','klavye','uzun oturum','ergonomi']},
+    {ad:'Wraith Ahşap Bilek Desteği', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Bilek_Destegi.jpg?v=1738594158&width=400',
+     link:'https://wraithesports.com/products/wraith-ahsap-bilek-destegi',
+     anahtar:['bilek','bilek desteği','ahşap','klavye','konfor','ergonomi','ağrı']},
+    {ad:'Wraith Alüminyum Bilek Desteği', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/60mavi.png?v=1774882220&width=400',
+     link:'https://wraithesports.com/products/wraith-aluminyum-bilek-destegi',
+     anahtar:['bilek','bilek desteği','alüminyum','metal','klavye','konfor','ergonomi']},
+    {ad:'Lofree Tofu Bilek Desteği', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Tofu.png?v=1771922682&width=400',
+     link:'https://wraithesports.com/products/lofree-tofu-bilek-destegi',
+     anahtar:['bilek','bilek desteği','yumuşak','jel','konfor','ağrı','uzun oturum']},
+    {ad:'LUMINKEY Split Bilek Desteği', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Black-CF.png?v=1756190275&width=400',
+     link:'https://wraithesports.com/products/luminkey-split-bilek-destegi',
+     anahtar:['bilek','bilek desteği','ayrık','split','karbon','klavye','ergonomi']},
+  ],
+  tustakimi:[
+    {ad:'Ulugames Şeffaf Keycap Seti', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/seffaf-siyah-k.png?v=1776354786&width=400',
+     link:'https://ulugames.com.tr/products/ulugames-seffaf-keycap-seti?bg_ref=CsmfVOpQxV',
+     anahtar:['keycap','tuş takımı','tuş','klavye','şeffaf','rgb','özelleştir','mekanik']},
+    {ad:'Outemu White Jade Manyetik Switch', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/H902e9881f2dd4c2cbb812b7ec1c0abb4I.jpg?v=1766766333&width=400',
+     link:'https://ulugames.com.tr/products/outemu-white-jade-manyetik-switch?bg_ref=CsmfVOpQxV',
+     anahtar:['switch','anahtar','manyetik','hall effect','he','klavye','rapid trigger','mekanik']},
+    {ad:'Wraith Çift Enjeksiyonlu PBT Türkçe Tuş Takımı', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/BlackandWhite.png?v=1723474319&width=400',
+     link:'https://wraithesports.com/products/wraith-turkce-keycap-seti',
+     anahtar:['keycap','tuş takımı','tuş','klavye','pbt','türkçe','solmaz','mekanik']},
+    {ad:'Wraith Işık Geçirgen PBT Türkçe Tuş Takımı', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/wraith-st-b-2.png?v=1785482966&width=400',
+     link:'https://wraithesports.com/products/wraith-isik-gecirgen-cift-enjeksiyonlu-pbt-turkce-tus-takimi',
+     anahtar:['keycap','tuş takımı','tuş','klavye','pbt','türkçe','rgb','ışık geçirgen','shine through']},
+    {ad:'Cherry Screw-in Stabilizer', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/60_32dd506e-d07e-4687-85b8-df657cd27644.png?v=1756891555&width=400',
+     link:'https://wraithesports.com/products/cherry-screw-in-stabilizer',
+     anahtar:['stabilizatör','stabilizer','klavye','boşluk tuşu','takırtı','mod','özelleştir']},
+    {ad:'Wraith Klavye Lube Kit', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/4.jpg?v=1757672161&width=400',
+     link:'https://wraithesports.com/products/wraith-klavye-lube-kit',
+     anahtar:['lube','yağ','klavye','switch','mod','sessiz','özelleştir','bakım']},
+  ],
+  mouseaksesuar:[
+    {ad:'UluGames Universal Dot Skates', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/ggskate_600x800piksel.png?v=1756046104&width=400',
+     link:'https://ulugames.com.tr/products/ulugames-universal-dot-skates-100-ptfe-cam?bg_ref=CsmfVOpQxV',
+     anahtar:['skate','paten','kaydırıcı','mouse','fare','ptfe','kayganlık','universal']},
+    {ad:'3M Mouse Grip Tape', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/image_2025_02_24T19_53_14_428Z_6cdd0a4a-c197-497f-95f2-e32e4c662ff5.png?v=1740428522&width=400',
+     link:'https://ulugames.com.tr/products/orjinal-3m-grip-tape?bg_ref=CsmfVOpQxV',
+     anahtar:['grip','grip tape','bant','mouse','fare','kavrama','terleme','tutuş']},
+    {ad:'Attack Shark X3 / X3 Pro Yedek Skates', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/Paragrafmetniniz.png?v=1736024817&width=400',
+     link:'https://ulugames.com.tr/products/attack-shark-x3-ve-x3-pro-yedek-skates?bg_ref=CsmfVOpQxV',
+     anahtar:['skate','paten','kaydırıcı','mouse','fare','attack shark','yedek']},
+    {ad:'Universal Hoverpad V3 Mouse Skate', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/profil_1.png?v=1751290516&width=400',
+     link:'https://wraithesports.com/products/universal-hoverpad-v2-mouse-skate',
+     anahtar:['skate','paten','kaydırıcı','mouse','fare','hoverpad','universal','kayganlık']},
+    {ad:'Universal Kesim Grip Tape V2', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/grip_tape_siyah2.jpg?v=1701342013&width=400',
+     link:'https://wraithesports.com/products/universal-kesim-grip-tape-v2',
+     anahtar:['grip','grip tape','bant','mouse','fare','kavrama','terleme','universal']},
+    {ad:'Wraith Glass Mouse Skates', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/glass.png?v=1755687828&width=400',
+     link:'https://wraithesports.com/products/wraith-glass-mouse-skates',
+     anahtar:['skate','paten','cam','mouse','fare','hızlı','kayganlık']},
+  ],
+  rgb:[
+    {ad:'TRYX ROTA SL ARGB Kasa Fanı', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Beyaz1_02f731c6-ce17-49b5-b70b-c74ab8e25d3b.png?v=1758279955&width=400',
+     link:'https://wraithesports.com/products/tryx-rota-sl-argb-kasa-fani',
+     anahtar:['rgb','argb','ışık','fan','kasa fanı','aydınlatma','soğutma','senkron']},
+    {ad:'APNX FP1-R ARGB Kasa Fanı', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/fp1-r_siyah.jpg?v=1737116914&width=400',
+     link:'https://wraithesports.com/products/apnx-fp1-r-kasa-fani',
+     anahtar:['rgb','argb','ışık','fan','kasa fanı','aydınlatma','soğutma']},
+    {ad:'AsiaHorse Hydrus ARGB PSU Uzatma Kablosu', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/kapak_516272cd-48e1-4b7d-a88a-180a54633221.png?v=1761734940&width=400',
+     link:'https://wraithesports.com/products/asiahorse-hydrus-argb-uzatma-kablosu',
+     anahtar:['rgb','argb','ışık','kablo','uzatma','psu','kasa içi','aydınlatma','estetik']},
+  ],
+  sesgoruntu:[
+    {ad:'MiraBox N3 Stream Deck', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/mirabox-n3-white.png?v=1781964837&width=400',
+     link:'https://ulugames.com.tr/products/mirabox-n3-stream-deck?bg_ref=CsmfVOpQxV',
+     anahtar:['stream deck','yayın','stream','kısayol','tuş','obs','twitch','kontrol']},
+    {ad:'MiraBox N4 Pro Stream Deck', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/mirabox-n4-pro-black.png?v=1781964239&width=400',
+     link:'https://ulugames.com.tr/products/mirabox-n4-pro-stream-deck?bg_ref=CsmfVOpQxV',
+     anahtar:['stream deck','yayın','stream','kısayol','obs','twitch','ekranlı','kontrol']},
+    {ad:'MiraBox XL Stream Deck', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/mirabox-xl-mini-black.png?v=1781913356&width=400',
+     link:'https://ulugames.com.tr/products/mirabox-xl-stream-deck?bg_ref=CsmfVOpQxV',
+     anahtar:['stream deck','yayın','stream','kısayol','obs','twitch','büyük','kontrol']},
+    {ad:'Maono PD100X Dinamik Mikrofon', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/1_25dbaa54-082d-48dd-95f8-f6d560185c37.png?v=1751269766&width=400',
+     link:'https://wraithesports.com/products/maono-pd100x-dynamic-mikrofon',
+     anahtar:['mikrofon','ses','yayın','stream','podcast','kayıt','dinamik','xlr']},
+    {ad:'Maonocaster G1 NEO Audio Mixer', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/1_a9c42b80-b47f-4b2f-b6f5-78f09b6bfa00.png?v=1751268563&width=400',
+     link:'https://wraithesports.com/products/maonocaster-g1-neo-audio-mixer',
+     anahtar:['ses kartı','mikser','mixer','yayın','stream','podcast','mikrofon','ses']},
+    {ad:'OBSBOT Meet SE Webcam', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/White_b5ccb64f-2e86-4111-a445-dc1b0c2e08a9.png?v=1751265690&width=400',
+     link:'https://wraithesports.com/products/obsbot-meet-se-webcam',
+     anahtar:['webcam','kamera','görüntü','toplantı','yayın','stream','zoom']},
+    {ad:'OBSBOT Tiny 2 Lite Webcam', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/1_ef5cec90-0076-4e60-8883-14b3d0df30ff.png?v=1751266067&width=400',
+     link:'https://wraithesports.com/products/obsbot-tiny-2-webcam',
+     anahtar:['webcam','kamera','görüntü','takip','yayın','stream','ptz','4k']},
+  ],
+  standlar:[
+    {ad:'Spyne Axis-1 Monitör Kolu', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/1a-w.png?v=1775066863&width=400',
+     link:'https://wraithesports.com/products/spyne-axis-1-monitor-kolu',
+     anahtar:['monitör','stand','kol','ayak','yükseklik','ergonomi','boyun','masada yer']},
+    {ad:'Spyne Axis-2 Monitör Kolu (Çift)', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/2a-w.png?v=1775066447&width=400',
+     link:'https://wraithesports.com/products/spyne-axis-2-monitor-kolu',
+     anahtar:['monitör','stand','kol','çift monitör','ikili','yükseklik','ergonomi']},
+    {ad:'Wraith Studio HP-01 Mikrofon Standı', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/hp1.png?v=1762944850&width=400',
+     link:'https://wraithesports.com/products/wraith-studio-hp-01-mikrofon-kolu',
+     anahtar:['mikrofon kolu','stand','mikrofon','yayın','stream','podcast','masa']},
+    {ad:'Spyne Atlas Yükseklik Ayarlı Masa', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Spyne-Siyah-160-1.png?v=1786715946&width=400',
+     link:'https://wraithesports.com/products/spyne-atlas-tek-motorlu-masa',
+     anahtar:['masa','yükseklik ayarlı','ayakta çalışma','ergonomi','motorlu','setup']},
+  ],
+  kontrolcu:[
+    {ad:'MOJHON Blitz 2 Oyun Kolu', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/blitz_2.png?v=1782900785&width=400',
+     link:'https://wraithesports.com/products/mojhon-blitz-2-alps-oyun-kolu',
+     anahtar:['oyun kolu','kumanda','gamepad','controller','joystick','pc','konsol']},
+    {ad:'Fantech Nova Pro V2 Oyun Kolu', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Nova_Pro_V2_Siyah.png?v=1760093561&width=400',
+     link:'https://wraithesports.com/products/fantech-nova-pro-wgp14-v2',
+     anahtar:['oyun kolu','kumanda','gamepad','controller','kablosuz','pc']},
+    {ad:'FLYDIGI Charging Dock 2 Pro Şarj Ünitesi', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/pro.png?v=1770273572&width=400',
+     link:'https://wraithesports.com/products/flydigi-charging-dock-2-kablosuz-sarj-unitesi',
+     anahtar:['şarj','şarj istasyonu','dock','kumanda','oyun kolu','kablosuz','düzen']},
+    {ad:'Pulsar Supergrip Dualsense Grip Tape', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/11_2f2ab058-9718-422a-af9a-6e768b8ada62.png?v=1772111705&width=400',
+     link:'https://wraithesports.com/products/pulsar-supergrip-dualsense-grip-tape',
+     anahtar:['grip','grip tape','kumanda','dualsense','ps5','kavrama','terleme']},
+  ],
+  dekor:[
+    {ad:'UluGames Sleeve', kaynak:'Ulugames',
+     gorsel:'https://cdn.shopify.com/s/files/1/0607/2264/3053/files/yeniprinton.png?v=1768753151&width=400',
+     link:'https://ulugames.com.tr/products/ulugames-sleeve?bg_ref=CsmfVOpQxV',
+     anahtar:['sleeve','kolluk','kişiselleştirme','estetik','oyuncu','aksesuar']},
+    {ad:'Wraith Studio Jungle Maze Deskmat', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Acik_Mavi.png?v=1760427854&width=400',
+     link:'https://wraithesports.com/products/wraith-studio-jungle-maze-deskmat',
+     anahtar:['deskmat','masa örtüsü','xl','dekor','masa','estetik','desen']},
+    {ad:'Wraith Kitsune Edition Deskmat', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Kitsune.png?v=1776088228&width=400',
+     link:'https://wraithesports.com/products/wraith-kitsune-deskmat',
+     anahtar:['deskmat','masa örtüsü','xl','dekor','anime','tilki','estetik']},
+    {ad:'Wraith Studio Daydream Deskmat', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/Beyaz_87c1cd1a-1178-4d42-acf7-5956d463d772.png?v=1776080419&width=400',
+     link:'https://wraithesports.com/products/wraith-studio-daydream-deskmat',
+     anahtar:['deskmat','masa örtüsü','xl','dekor','sade','beyaz','estetik']},
+    {ad:'Wraith Esports Arm Sleeve', kaynak:'Wraith Esports',
+     gorsel:'https://cdn.shopify.com/s/files/1/0564/0096/9921/files/kitsune-parmakli.png?v=1762437101&width=400',
+     link:'https://wraithesports.com/products/wraith-esports-arm-sleeve',
+     anahtar:['sleeve','kolluk','kişiselleştirme','estetik','oyuncu','sürtünme']},
   ],
 };
+
+/* ── Ürünlerin canlı kaynağı ──────────────────────────────────────────
+   Yukarıdaki AKSESUAR_URUNLERI artık "kodla birlikte gelen" sürüm:
+   Supabase kapalıysa/yavaşsa sayfa yine dolu görünür ve Google render
+   ederken içeriği kesin bulur. Supabase'den satır gelirse o kazanır —
+   /panel'den yapılan ekleme/çıkarma böylece derleme beklemeden yayına
+   girer. İki kaynak birleştirilmez; karışık liste çıkmasın diye
+   Supabase varsa tamamen onun listesi kullanılır. */
+let _urunSozu=null;
+function urunleriGetir(){
+  if(!uzakVar()) return Promise.resolve(null);
+  if(!_urunSozu){
+    _urunSozu=sb('urunler?select=kat,ad,kaynak,gorsel,link,anahtar&aktif=eq.true&order=kat.asc,sira.asc')
+      .then(satirlar=>{
+        if(!Array.isArray(satirlar)||!satirlar.length) return null;
+        const g={};
+        for(const s of satirlar) (g[s.kat]=g[s.kat]||[]).push({
+          ad:s.ad, kaynak:s.kaynak, gorsel:s.gorsel, link:s.link,
+          anahtar:Array.isArray(s.anahtar)?s.anahtar:[]
+        });
+        return g;
+      })
+      .catch(()=>null);
+  }
+  return _urunSozu;
+}
+
+function useUrunler(){
+  const [urunler,setUrunler]=useState(AKSESUAR_URUNLERI);
+  useEffect(()=>{
+    let iptal=false;
+    urunleriGetir().then(g=>{ if(g&&!iptal) setUrunler(g); });
+    return()=>{ iptal=true; };
+  },[]);
+  return urunler;
+}
 
 function AksesuarBosKart(){
   return (
@@ -4392,6 +4655,7 @@ function AksesuarlarHub(){
      10 kategori × 3 boş kart üst üste yığılıp kafa karıştırıyordu.
      Tek seferde en çok bir kategori açık, geri kalanı tek satır başlık. */
   const [acik,setAcik]=useState(null);
+  const urunler=useUrunler();
   return (
     <div className="py-8 lg:py-12">
       <Reveal>
@@ -4402,9 +4666,9 @@ function AksesuarlarHub(){
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
           Mouse pad’den kablo düzenine, RGB’den masa dekoruna kadar — iş birliği
-          yaptığımız markaların ürünleri kategori kategori burada olacak.
-          <span className="text-ink/80"> Şu an vitrin taslak</span>, ürünler
-          anlaşmalar netleşince eklenecek. Bir kategoriye tıkla, ürünlerini gör.
+          yaptığımız markaların ürünleri kategori kategori burada.
+          <span className="text-ink/80"> Fiyat yazmıyoruz</span>: mağazada
+          değişiyor, burada bayat kalmasın. Bir kategoriye tıkla, ürünlerini gör.
         </p>
       </Reveal>
 
@@ -4432,10 +4696,10 @@ function AksesuarlarHub(){
                 <div id={pid} role="region" aria-labelledby={bid} className={'acc '+(on?'open':'')}>
                   <div className="accIn">
                     <div className="pb-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {(AKSESUAR_URUNLERI[kat.id]||[]).map(u=>
+                      {(urunler[kat.id]||[]).map(u=>
                         <AksesuarUrunKart key={u.link} u={u}/>
                       )}
-                      {Array.from({length:Math.max(0,AKSESUAR_BOS_SAYISI-(AKSESUAR_URUNLERI[kat.id]||[]).length)}).map((_,pi)=>
+                      {Array.from({length:Math.max(0,AKSESUAR_BOS_SAYISI-(urunler[kat.id]||[]).length)}).map((_,pi)=>
                         <AksesuarBosKart key={pi}/>
                       )}
                     </div>
@@ -4532,14 +4796,15 @@ function benzerKelime(a,b){
    verisi otomatik devre dışı kalır — kullanıcı gerçek ürünle örnek ürünü
    aynı anda görmesin. Kategori dolunca burada elle bir şey değiştirmeye
    gerek yok, liste kendiliğinden gerçek ürüne geçiyor. */
-function oneriKaynaklari(){
-  const gercekKatlar=Object.keys(AKSESUAR_URUNLERI).filter(k=>AKSESUAR_URUNLERI[k].length>0);
-  const gercek=gercekKatlar.flatMap(kat=>AKSESUAR_URUNLERI[kat].map(u=>({...u, kat, gercek:true})));
+function oneriKaynaklari(urunler){
+  urunler=urunler||AKSESUAR_URUNLERI;
+  const gercekKatlar=Object.keys(urunler).filter(k=>urunler[k].length>0);
+  const gercek=gercekKatlar.flatMap(kat=>urunler[kat].map(u=>({...u, kat, gercek:true})));
   const ornek=ONERI_URUNLER.filter(u=>!gercekKatlar.includes(u.kat));
   return [...gercek, ...ornek];
 }
 
-function oneriUret(butce, istek){
+function oneriUret(butce, istek, urunler){
   /* Bütçe eşleşmesi TEK BAŞINA ürün göstermeye yetiyordu: "mouse pad" yazan
      biri, bütçesi RGB/mikrofon aralığına da denk geldiği için alakasız
      kategoriler görüyordu. Kural artık net: kullanıcı bir şey yazdıysa,
@@ -4562,7 +4827,7 @@ function oneriUret(butce, istek){
      girilmiyor) — bütçe filtresi onları elemiyor, sadece kelime eşleşmesi
      belirleyici. Skor sıralamasında da gerçek ürünler küçük bir öncelik alır
      (bunlar gösterildiğinde asıl önerilmesi gereken şey onlar). */
-  return oneriKaynaklari()
+  return oneriKaynaklari(urunler)
     .map(u=>{
       let skor=u.gercek?1:0, eslesenVar=false;
       for(const k of u.anahtar){
@@ -4584,10 +4849,11 @@ function OnerHub(){
   const [butce,setButce]=useState('');
   const [istek,setIstek]=useState('');
   const [sonuc,setSonuc]=useState(null);
+  const urunler=useUrunler();
 
   const ara=e=>{
     e.preventDefault();
-    setSonuc(oneriUret(Number(butce)||0, istek));
+    setSonuc(oneriUret(Number(butce)||0, istek, urunler));
   };
 
   return (
@@ -4874,6 +5140,288 @@ function Footer(){
 }
 
 /* ═══════════════════ UYGULAMA ═══════════════════ */
+/* ═══════════════════ PANEL — ürün yönetimi ═══════════════════
+   /aksesuarlar ve /oner listelerini kod değiştirmeden güncellemek için.
+   Yetki tamamen Supabase tarafında: yazma politikaları yalnızca
+   authenticated rolüne açık, bu yüzden panelin "gizli" olması değil,
+   oturum jetonu koruma sağlıyor. Sayfayı bilen biri açabilir ama
+   giriş yapmadan tek bir satır bile değiştiremez. */
+const PANEL_KEY='sh_panel_v1';
+const PANEL_BOS_URUN={kat:'mousepad', ad:'', kaynak:'Ulugames', gorsel:'', link:'', anahtar:'', sira:0, aktif:true};
+
+function panelOturumOku(){
+  try{
+    const o=JSON.parse(localStorage.getItem(PANEL_KEY)||'null');
+    return (o&&o.token&&o.bitis>Date.now())?o:null;
+  }catch(e){ return null; }
+}
+function panelOturumYaz(o){
+  try{ o?localStorage.setItem(PANEL_KEY,JSON.stringify(o)):localStorage.removeItem(PANEL_KEY); }catch(e){}
+}
+async function panelGiris(eposta,sifre){
+  const r=await fetch(SUPABASE.url.replace(/\/$/,'')+'/auth/v1/token?grant_type=password',{
+    method:'POST',
+    headers:{ apikey:SUPABASE.anon, 'Content-Type':'application/json' },
+    body:JSON.stringify({email:eposta,password:sifre})
+  });
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error_description||j.msg||j.message||'Giriş yapılamadı');
+  /* 60 sn pay: jeton tam istek sırasında dolup 401 dönmesin. */
+  return { token:j.access_token, bitis:Date.now()+(((j.expires_in||3600)-60)*1000), eposta };
+}
+
+const PANEL_INPUT='w-full bg-transparent border border-line px-3.5 py-2.5 text-ink text-[.9rem] placeholder:text-dim/50 focus:border-cy transition-colors';
+
+function PanelGirisEkrani({onGiris}){
+  const [eposta,setEposta]=useState('');
+  const [sifre,setSifre]=useState('');
+  const [hata,setHata]=useState('');
+  const [mesgul,setMesgul]=useState(false);
+  const gonder=async e=>{
+    e.preventDefault();
+    setHata(''); setMesgul(true);
+    try{ onGiris(await panelGiris(eposta.trim(),sifre)); }
+    catch(err){ setHata(err.message||'Giriş yapılamadı'); }
+    finally{ setMesgul(false); }
+  };
+  return (
+    <div className="max-w-[420px] mx-auto">
+      <Label className="mb-4">PANEL</Label>
+      <div className="rule mb-8"/>
+      <h1 className="h-xl text-[clamp(1.6rem,4.6vw,2.4rem)]">Ürün yönetimi</h1>
+      <p className="mt-4 text-dim text-[.9rem] leading-relaxed">
+        Bu ekran yalnızca site yöneticisi içindir. Giriş bilgilerin Supabase
+        hesabındaki kullanıcıya aittir.
+      </p>
+      <form onSubmit={gonder} className="mt-8 grid gap-4">
+        <div>
+          <label htmlFor="pn-eposta" className="lbl text-dim mb-2 block">E-POSTA</label>
+          <input id="pn-eposta" type="email" autoComplete="username" required
+                 value={eposta} onChange={e=>setEposta(e.target.value)} className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pn-sifre" className="lbl text-dim mb-2 block">ŞİFRE</label>
+          <input id="pn-sifre" type="password" autoComplete="current-password" required
+                 value={sifre} onChange={e=>setSifre(e.target.value)} className={PANEL_INPUT}/>
+        </div>
+        {hata && <p className="text-[.85rem] text-mg">{hata}</p>}
+        <button type="submit" disabled={mesgul}
+          className="border border-cy text-cy px-6 py-3 lbl hover:bg-cy hover:text-bg transition-colors duration-300 disabled:opacity-40">
+          {mesgul?'KONTROL EDİLİYOR…':'GİRİŞ YAP'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function PanelUrunForm({deger,setDeger,onKaydet,onIptal,mesgul}){
+  const alan=(k,v)=>setDeger(d=>({...d,[k]:v}));
+  return (
+    <form onSubmit={onKaydet} className="border border-cy/40 p-4 sm:p-5 grid gap-4 bg-bg2/40">
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="pu-kat" className="lbl text-dim mb-2 block">KATEGORİ</label>
+          <select id="pu-kat" value={deger.kat} onChange={e=>alan('kat',e.target.value)} className={PANEL_INPUT}>
+            {AKSESUAR_KATEGORILERI.map(k=><option key={k.id} value={k.id}>{k.ad}</option>)}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="pu-kaynak" className="lbl text-dim mb-2 block">MAĞAZA</label>
+          <input id="pu-kaynak" required value={deger.kaynak} onChange={e=>alan('kaynak',e.target.value)}
+                 placeholder="Ulugames" className={PANEL_INPUT}/>
+        </div>
+      </div>
+      <div>
+        <label htmlFor="pu-ad" className="lbl text-dim mb-2 block">ÜRÜN ADI</label>
+        <input id="pu-ad" required value={deger.ad} onChange={e=>alan('ad',e.target.value)} className={PANEL_INPUT}/>
+      </div>
+      <div>
+        <label htmlFor="pu-link" className="lbl text-dim mb-2 block">ÜRÜN LİNKİ</label>
+        <input id="pu-link" required type="url" value={deger.link} onChange={e=>alan('link',e.target.value)}
+               placeholder="https://…" className={PANEL_INPUT}/>
+      </div>
+      <div>
+        <label htmlFor="pu-gorsel" className="lbl text-dim mb-2 block">GÖRSEL ADRESİ</label>
+        <div className="flex gap-3 items-start">
+          <input id="pu-gorsel" required type="url" value={deger.gorsel} onChange={e=>alan('gorsel',e.target.value)}
+                 placeholder="https://…" className={PANEL_INPUT}/>
+          <div className="w-20 h-16 shrink-0 border border-line grid place-items-center overflow-hidden">
+            {deger.gorsel
+              ? <img src={deger.gorsel} alt="" className="w-full h-full object-cover"/>
+              : <span className="lbl text-[.55rem] text-dim/60">ÖNİZLEME</span>}
+          </div>
+        </div>
+        <p className="text-[.75rem] text-dim/70 mt-2 leading-relaxed">
+          Mağaza sayfasındaki görsele sağ tıkla → “Resim adresini kopyala”.
+        </p>
+      </div>
+      <div>
+        <label htmlFor="pu-anahtar" className="lbl text-dim mb-2 block">ANAHTAR KELİMELER</label>
+        <input id="pu-anahtar" value={deger.anahtar} onChange={e=>alan('anahtar',e.target.value)}
+               placeholder="mousepad, mouse pad, fare, cam" className={PANEL_INPUT}/>
+        <p className="text-[.75rem] text-dim/70 mt-2 leading-relaxed">
+          Virgülle ayır. ÖNER sayfası kullanıcının yazdığını bu kelimelerle eşleştiriyor.
+        </p>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4 items-end">
+        <div>
+          <label htmlFor="pu-sira" className="lbl text-dim mb-2 block">SIRA</label>
+          <input id="pu-sira" type="number" value={deger.sira} onChange={e=>alan('sira',e.target.value)}
+                 className={PANEL_INPUT}/>
+        </div>
+        <label className="flex items-center gap-2.5 text-[.9rem] text-ink/90 pb-2.5 cursor-pointer">
+          <input type="checkbox" checked={deger.aktif} onChange={e=>alan('aktif',e.target.checked)}
+                 className="accent-cy w-4 h-4"/>
+          Sitede görünsün
+        </label>
+      </div>
+      <div className="flex gap-3 flex-wrap">
+        <button type="submit" disabled={mesgul}
+          className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors disabled:opacity-40">
+          {mesgul?'KAYDEDİLİYOR…':'KAYDET'}
+        </button>
+        <button type="button" onClick={onIptal}
+          className="border border-line text-dim px-5 py-2.5 lbl hover:border-ink/30 hover:text-ink transition-colors">
+          VAZGEÇ
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function PanelSayfa(){
+  const [oturum,setOturum]=useState(panelOturumOku);
+  const [liste,setListe]=useState(null);
+  const [hata,setHata]=useState('');
+  const [duzen,setDuzen]=useState(null);   /* {id|null, ...alanlar} — form açıksa dolu */
+  const [mesgul,setMesgul]=useState(false);
+  const [suzgec,setSuzgec]=useState('hepsi');
+
+  const cikis=()=>{ panelOturumYaz(null); setOturum(null); setListe(null); };
+
+  /* Jeton süresi dolduğunda REST 401 döner; kullanıcıyı boş ekranda
+     bırakmak yerine oturumu kapatıp giriş formuna alıyoruz. */
+  const yakala=e=>{
+    const m=String(e&&e.message||e);
+    if(m.includes('401')||m.includes('JWT')) { cikis(); setHata('Oturum süresi doldu, tekrar giriş yap.'); }
+    else setHata(m.replace(/^Supabase\s*/,''));
+  };
+
+  const yenile=useCallback(async ()=>{
+    try{
+      setHata('');
+      setListe(await sb('urunler?select=*&order=kat.asc,sira.asc,ad.asc'));
+    }catch(e){ yakala(e); }
+  },[]);
+
+  useEffect(()=>{ if(oturum) yenile(); },[oturum,yenile]);
+
+  const kaydet=async e=>{
+    e.preventDefault();
+    setMesgul(true);
+    try{
+      const g={
+        kat:duzen.kat, ad:duzen.ad.trim(), kaynak:duzen.kaynak.trim(),
+        gorsel:duzen.gorsel.trim(), link:duzen.link.trim(),
+        anahtar:String(duzen.anahtar||'').split(',').map(s=>s.trim()).filter(Boolean),
+        sira:Number(duzen.sira)||0, aktif:!!duzen.aktif
+      };
+      if(duzen.id) await sb('urunler?id=eq.'+duzen.id,{method:'PATCH',body:g,token:oturum.token});
+      else         await sb('urunler',{method:'POST',body:g,token:oturum.token});
+      _urunSozu=null;              /* ziyaretçi tarafı yeni listeyi çeksin */
+      setDuzen(null);
+      await yenile();
+    }catch(e){ yakala(e); }
+    finally{ setMesgul(false); }
+  };
+
+  const sil=async u=>{
+    if(!window.confirm('“'+u.ad+'” silinsin mi? Bu geri alınamaz.')) return;
+    try{
+      await sb('urunler?id=eq.'+u.id,{method:'DELETE',prefer:'return=minimal',token:oturum.token});
+      _urunSozu=null;
+      await yenile();
+    }catch(e){ yakala(e); }
+  };
+
+  if(!oturum) return (
+    <div className="py-8 lg:py-12">
+      <PanelGirisEkrani onGiris={o=>{ panelOturumYaz(o); setOturum(o); }}/>
+    </div>
+  );
+
+  const gorunen=(liste||[]).filter(u=>suzgec==='hepsi'||u.kat===suzgec);
+  const katAd=id=>(AKSESUAR_KATEGORILERI.find(k=>k.id===id)||{ad:id}).ad;
+
+  return (
+    <div className="py-8 lg:py-12">
+      <Label className="mb-4">PANEL</Label>
+      <div className="rule mb-8"/>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="h-xl text-[clamp(1.6rem,4.6vw,2.4rem)]">Ürün yönetimi</h1>
+          <p className="mt-3 text-dim text-[.86rem]">
+            {oturum.eposta} · {liste?liste.length:'…'} ürün
+          </p>
+        </div>
+        <button onClick={cikis}
+          className="border border-line text-dim px-4 py-2 lbl hover:border-ink/30 hover:text-ink transition-colors">
+          ÇIKIŞ
+        </button>
+      </div>
+
+      {hata && <p className="mt-6 border border-mg/50 text-mg text-[.85rem] px-4 py-3">{hata}</p>}
+
+      <div className="mt-8 flex gap-3 flex-wrap items-center">
+        <button onClick={()=>setDuzen({...PANEL_BOS_URUN, id:null})}
+          className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors">
+          + YENİ ÜRÜN
+        </button>
+        <select value={suzgec} onChange={e=>setSuzgec(e.target.value)}
+                className="bg-transparent border border-line px-3.5 py-2.5 text-ink text-[.85rem] focus:border-cy transition-colors">
+          <option value="hepsi">Tüm kategoriler</option>
+          {AKSESUAR_KATEGORILERI.map(k=><option key={k.id} value={k.id}>{k.ad}</option>)}
+        </select>
+      </div>
+
+      {duzen && (
+        <div className="mt-6">
+          <PanelUrunForm deger={duzen} setDeger={setDuzen} onKaydet={kaydet}
+                         onIptal={()=>setDuzen(null)} mesgul={mesgul}/>
+        </div>
+      )}
+
+      <div className="mt-8 border-t border-line">
+        {liste===null && <p className="py-6 text-dim text-[.9rem]">Yükleniyor…</p>}
+        {liste!==null && !gorunen.length && <p className="py-6 text-dim text-[.9rem]">Bu kategoride ürün yok.</p>}
+        {gorunen.map(u=>(
+          <div key={u.id} className="border-b border-line py-3.5 flex items-center gap-4">
+            <div className="w-14 h-11 shrink-0 border border-line overflow-hidden">
+              <img src={u.gorsel} alt="" loading="lazy" className="w-full h-full object-cover"/>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className={'text-[.9rem] truncate '+(u.aktif?'text-ink':'text-dim line-through')}>{u.ad}</div>
+              <div className="text-[.75rem] text-dim mt-0.5 truncate">
+                {katAd(u.kat)} · {u.kaynak} · sıra {u.sira}{!u.aktif && ' · gizli'}
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button onClick={()=>setDuzen({...u, anahtar:(u.anahtar||[]).join(', ')})}
+                className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors">
+                DÜZENLE
+              </button>
+              <button onClick={()=>sil(u)}
+                className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-mg hover:text-mg transition-colors">
+                SİL
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function App(){
   const [mode,setMode]=useState('topla');           // 'topla' | 'laptop'
   const [budget,setBudget]=useState(()=>butceUrldenAl()||55000);
@@ -5004,6 +5552,13 @@ function App(){
       {route==='gizlilik' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
           <GizlilikSayfa/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='panel' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <PanelSayfa/>
           <Footer/>
         </main>
       )}

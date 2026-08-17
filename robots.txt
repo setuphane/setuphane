@@ -1,4 +1,6 @@
 ﻿User-agent: *
 Allow: /
+# Yonetim ekrani: aranacak bir icerigi yok. Asil koruma Supabase RLS'inde.
+Disallow: /panel
 
 Sitemap: https://www.setuphane.com/sitemap.xml
