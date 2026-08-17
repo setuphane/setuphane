@@ -244,8 +244,15 @@ select option{background:#0E0E15;color:#ECEBF2}
      yerel geliştirmede 404 döner, zararsızdır. -->
 <script defer src="/_vercel/insights/script.js"></script>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<!-- integrity (SRI): React'i unpkg'den çekiyoruz. Bu dosyalar bir gün
+     değiştirilirse (CDN ele geçirilmesi, DNS yönlendirmesi) sayfada yabancı
+     kod çalışır ve ziyaretçinin gördüğü her şeyi — panel oturum jetonu dahil —
+     ele geçirebilirdi. Hash tutmazsa tarayıcı script'i hiç çalıştırmaz.
+     Sürüm yükseltirken hash'i de güncellemek gerekir. -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin
+        integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin
+        integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1"></script>
 <script src="https://unpkg.com/@babel/standalone@7.24.10/babel.min.js"></script>
 
 <script type="text/babel" data-presets="react">
@@ -2981,9 +2988,12 @@ function Forum({sys,prof}){
       const eskiCev=((data.konular.find(x=>x.id===k.id)||{}).cevaplar||[]).length;
       if(k.cevaplar.length>eskiCev){
         const y=k.cevaplar[k.cevaplar.length-1];
-        const kayit=await sb('cevaplar',{method:'POST',
+        /* return=minimal: yazarın cihaz kimliği artık okumaya kapalı (gizlilik),
+           bu yüzden eklenen satırı geri istemek yetki hatası veriyor. Başarı
+           zaten sb()'nin hata atmamasından belli; listeyi yeniden çekiyoruz. */
+        await sb('cevaplar',{method:'POST', prefer:'return=minimal',
           body:{konu_id:k.id,govde:y.govde,yazar:y.yazar,renk:y.renk,cihaz:ben}});
-        if(kayit&&kayit[0]) uzaktanCek();
+        uzaktanCek();
       }
     }catch(e){ setBildirim('Gönderilemedi: '+e.message); setTimeout(()=>setBildirim(''),4000); uzaktanCek(); }
   };
@@ -2996,9 +3006,10 @@ function Forum({sys,prof}){
   const ekle = async k => {
     if(!uzakVar()){ setData(d=>({...d, konular:[k,...d.konular]})); return; }
     try{
-      const kayit=await sb('konular',{method:'POST',
+      /* return=minimal — gerekçe için cevap gönderimindeki nota bak. */
+      await sb('konular',{method:'POST', prefer:'return=minimal',
         body:{kat:k.kat,baslik:k.baslik,govde:k.govde,yazar:k.yazar,renk:k.renk,cihaz:ben}});
-      if(kayit&&kayit[0]) uzaktanCek();
+      uzaktanCek();
     }catch(e){ setBildirim('Konu açılamadı: '+e.message); setTimeout(()=>setBildirim(''),4000); }
   };
 

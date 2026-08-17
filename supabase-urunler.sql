@@ -37,11 +37,18 @@ alter table urunler enable row level security;
 -- Herkes okur: /aksesuarlar ve /oner anon anahtarla listeliyor.
 create policy oku_u on urunler for select using (true);
 
--- Yazma yalnizca giris yapmis yoneticiye. anon anahtar tarayicida acikta
--- oldugu icin koruma burada: jetonsuz istek 401 alir.
-create policy ekle_u  on urunler for insert to authenticated with check (true);
-create policy guncel_u on urunler for update to authenticated using (true) with check (true);
-create policy sil_u   on urunler for delete to authenticated using (true);
+-- Yazma yalnizca YONETICIYE. Dikkat: "to authenticated" tek basina YETMEZ —
+-- projede kayit acik oldugu icin herhangi biri hesap acip authenticated
+-- olabiliyor ve o hakla urunleri degistirebilirdi. Bu yuzden e-posta esitligi
+-- de sart. Panel kullanicisini bu e-postayla olustur; degistirirsen burayi da
+-- degistir, yoksa panel yazma yapamaz.
+create policy ekle_u on urunler for insert to authenticated
+  with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
+create policy guncel_u on urunler for update to authenticated
+  using      (auth.jwt() ->> 'email' = 'setuphane@gmail.com')
+  with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
+create policy sil_u on urunler for delete to authenticated
+  using      (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
 
 -- ── Baslangic verisi ────────────────────────────────────────────────────
 -- Koddaki katalogla ayni 61 urun. Panelden degistirdikce burasi gecerliligini
