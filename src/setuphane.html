@@ -545,8 +545,11 @@ const PREBUILT_MARGIN=.22, ASSEMBLY=3500;
    bu geçişte doğrulanmadı, eski tahmini fiyatta kaldı. */
 const FIYAT_TARIHI='2026-08-13';
 function fiyatYasi(){
-  const g=Math.floor((Date.now()-new Date(FIYAT_TARIHI+'T12:00:00').getTime())/86400000);
-  const m=new Date(FIYAT_TARIHI+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  /* Panelden fiyat girildiyse tarih oradan gelir; kullanıcıya gösterilen
+     "şu tarihte güncellendi" bilgisi böyle kendiliğinden doğru kalıyor. */
+  const T=(typeof PARCA_FIYAT_TARIHI!=='undefined' && PARCA_FIYAT_TARIHI) || FIYAT_TARIHI;
+  const g=Math.floor((Date.now()-new Date(T+'T12:00:00').getTime())/86400000);
+  const m=new Date(T+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   return {gun:Math.max(0,g), metin:m,
           bayat:g>30, uyari:g>30?'Bir aydan eski — alım öncesi kendin de kontrol et.':null};
 }
@@ -613,7 +616,108 @@ const LAPTOPS=[
  {name:'MSI Raider 16 Max HX B2WJ-022TR Ultra 9 290HX Plus 32GB RAM 2TB SSD 24GB RTX 5090 Windows 11 Home 16 inç OLED Oyun Bilgisayarı',brand:'MSI',price:297039,image:'https://cdn.cimri.io/image/296x296/msi-raider-16-max-hx-b2wj-022tr-ultra-9-290hx-plus-32gb-ram-2tb-ssd-24gb-rtx-5090-windows-11-home-16-inc-oled-oyun-bilgisayari_1064075718.jpg',url:'https://www.cimri.com/oyun-bilgisayari/en-ucuz-msi-raider-16-max-hx-b2wj-022tr-ultra-9-290hx-plus-32gb-ram-2tb-ssd-24gb-rtx-5090-windows-11-home-16-inc-oled-oyun-bilgisayari-fiyatlari,2591076844',store:null,offers:21,gpu:'rtx 5090',idx:110,cpu:'Ultra 9 290HX',ram:32,ssd:2000,inch:'16'},
 ];
 /* LAPTOPS:END */
-const laptopFps = (l,game,res)=> Math.max(12, Math.round(l.idx*res.mul*game.k));
+
+/* Laptop güç puanı ekran kartından türetilir — panelden elle girilmez.
+   Panelde yanlış bir sayı yazılıp FPS tahminlerinin sessizce bozulması
+   ihtimalini böylece tamamen kapatıyoruz. Ölçek: masaüstü RTX 5070 = 100. */
+const GPU_IDX={'rtx 3050':28,'rtx 4050':38,'rtx 5050':42,'rtx 3060':40,'rtx 4060':52,
+  'rtx 5060':55,'rtx 5060 ti':62,'rtx 4070':62,'rtx 5070':68,'rtx 5070 ti':80,
+  'rtx 4080':82,'rtx 5080':92,'rtx 4090':95,'rtx 5090':110};
+
+/* Laptoplar ve parça fiyatları da aksesuarlar gibi Supabase'den geliyor;
+   yukarıdaki liste ve GPUS/CPUS/... içindeki fiyatlar yedek. Supabase
+   kapalıysa site eksiksiz çalışmaya devam eder. */
+let _laptopSozu=null;
+function laptoplariGetir(){
+  if(!uzakVar()) return Promise.resolve(null);
+  if(!_laptopSozu){
+    _laptopSozu=sb('laptoplar?select=ad,marka,fiyat,gorsel,link,gpu,cpu,ram,ssd,inch,saticilar&aktif=eq.true&order=fiyat.asc')
+      .then(r=>{
+        if(!Array.isArray(r)||!r.length) return null;
+        return r.map(x=>({name:x.ad, brand:x.marka, price:x.fiyat, image:x.gorsel, url:x.link,
+          store:null, offers:x.saticilar||0, gpu:x.gpu, idx:GPU_IDX[x.gpu]||40,
+          cpu:x.cpu, ram:x.ram, ssd:x.ssd, inch:x.inch}));
+      }).catch(()=>null);
+  }
+  return _laptopSozu;
+}
+function useLaptoplar(){
+  const [l,setL]=useState(LAPTOPS);
+  useEffect(()=>{ let iptal=false;
+    laptoplariGetir().then(r=>{ if(r&&!iptal) setL(r); });
+    return()=>{ iptal=true; };
+  },[]);
+  return l;
+}
+
+/* Parça fiyatları: SADECE 'p' alanı eziliyor. Güç/soket/watt gibi algoritma
+   girdileri kodda kalıyor — hatalı tek bir değer uyumsuz anakart ya da
+   yetersiz güç kaynağı önerilmesine yol açabilirdi.
+   Diziler yerinde güncelleniyor çünkü buildSystem() bu sabitleri doğrudan
+   okuyor ve üç ayrı bileşen sonucu useMemo'da tutuyor; bu yüzden veri ilk
+   render'DAN ÖNCE yükleniyor (aşağıda basla()). */
+let _fiyatSozu=null, PARCA_FIYAT_TARIHI=null;
+function parcaFiyatlariniGetir(){
+  if(!uzakVar()) return Promise.resolve(false);
+  if(!_fiyatSozu){
+    _fiyatSozu=sb('parca_fiyat?select=anahtar,fiyat,guncelleme')
+      .then(r=>{
+        if(!Array.isArray(r)||!r.length) return false;
+        const m=new Map(r.map(x=>[x.anahtar,x.fiyat]));
+        const ez=(kat,liste)=>liste.forEach(x=>{ const v=m.get(kat+':'+x.id); if(typeof v==='number') x.p=v; });
+        ez('gpu',GPUS); ez('cpu',CPUS); ez('ram',RAMS); ez('ssd',SSDS); ez('psu',PSUS); ez('sogutucu',COOLERS);
+        Object.keys(BOARDS).forEach(pl=>BOARDS[pl].forEach((b,i)=>{ const v=m.get('anakart:'+pl+'-'+i); if(typeof v==='number') b.p=v; }));
+        CASES.forEach((c,i)=>{ const v=m.get('kasa:'+i); if(typeof v==='number') c.p=v; });
+        const en=r.map(x=>x.guncelleme).filter(Boolean).sort().pop();
+        if(en) PARCA_FIYAT_TARIHI=String(en).slice(0,10);
+        return true;
+      }).catch(()=>false);
+  }
+  return _fiyatSozu;
+}
+
+/* ── Laptop FPS girdileri ────────────────────────────────────────────────
+   Buradaki iki tablo olmadan laptop FPS'i masaüstünden daha kaba çıkıyordu:
+   asActive() her laptop için vram'ı sabit 8 yazıyordu (RTX 5090'ın 24 GB'ı
+   da 8 sayılıyordu) ve cIdx null olduğu için işlemci sınırı hiç uygulanmıyordu.
+   Üstelik listedeki laptopFps() ile paneldeki activeFps() farklı sonuç
+   üretiyordu — aynı laptop iki yerde iki ayrı FPS gösteriyordu. */
+const LAPTOP_VRAM={'rtx 3050':6,'rtx 4050':6,'rtx 5050':8,'rtx 3060':6,'rtx 4060':8,
+  'rtx 5060':8,'rtx 5060 ti':8,'rtx 4070':8,'rtx 5070':8,'rtx 5070 ti':12,
+  'rtx 4080':12,'rtx 5080':16,'rtx 4090':16,'rtx 5090':24};
+
+/* Masaüstü CPUS[].g ile AYNI ölçek (Ryzen 5 8500G=55 … 9950X3D=128).
+   Mobil işlemciler aynı isimli masaüstü kardeşinden düşük tutuldu: güç
+   sınırı ve ısı yüzünden oyunda belirgin şekilde geride kalıyorlar.
+   Değerler yaklaşık — model/TGP farkıyla ±%10 oynayabilir. */
+const LAPTOP_CPU_IDX={
+  'i5-12450HX':58,'i5-13420H':55,'i5-13450HX':62,'i5-13500HX':66,
+  'Core 5 210H':58,'Core 7 240H':64,'Core 7 250H':66,
+  'i7-13620H':66,'i7-13700HX':78,'i7-14650HX':80,
+  'i9-13900H':72,'i9-13900HX':84,'i9-13980HX':86,'i9-14900HX':88,
+  'Ryzen 7 7840HS':70,'Ryzen 7 7435HS':62,'Ryzen 7 8845HS':72,
+  'Ryzen AI 5 340':66,'Ryzen AI 7 350':74,'Ryzen AI 9 365':78,
+  'Ryzen 9 8940HX':82,'Ryzen 9 9955HX':92,
+  'Ultra 5 225H':64,'Ultra 7 255HX':86,'Ultra 9 275HX':92,'Ultra 9 290HX':95,
+  'Ultra 9 386H':80};
+
+/* Bilinmeyen işlemcide sınır uygulanmıyor (null): uydurma bir değerle
+   FPS'i yanlış kısmaktansa, o laptopta yalnızca ekran kartı belirleyici olsun. */
+function laptopCpuIdx(ad){
+  if(!ad) return null;
+  const t=String(ad).trim();
+  if(LAPTOP_CPU_IDX[t]) return LAPTOP_CPU_IDX[t];
+  const k=Object.keys(LAPTOP_CPU_IDX).find(x=>x.toLowerCase()===t.toLowerCase());
+  return k?LAPTOP_CPU_IDX[k]:null;
+}
+/* Laptopu masaüstüyle aynı şekle indirger; FPS hesabı tek koddan (activeFps)
+   yürüsün diye. Liste ile panelin ayrışması böyle engelleniyor. */
+function laptopAktif(l){
+  return {kind:'laptop', gIdx:l.idx, cIdx:laptopCpuIdx(l.cpu), total:l.price,
+          gName:(l.gpu||'').toUpperCase(), cName:l.cpu||'—',
+          vram:LAPTOP_VRAM[l.gpu]||8, lap:l};
+}
+const laptopFps=(l,game,res)=>activeFps(laptopAktif(l),game,res);
 
 /* Cimri'nin ürün adı her şeyi tek satıra sıkıştırıyor:
    "Lenovo LOQ 15IRX10 83JE00EQTR i5-13450HX 12GB RAM 512GB SSD RTX 5060 FreeDOS 15.6 inç Oyun Bilgisayarı"
@@ -1146,8 +1250,7 @@ function How(){
 function asActive(mode,sys,lap){
   if(mode==='laptop'){
     if(!lap) return null;
-    return {kind:'laptop', gIdx:lap.idx, cIdx:null, total:lap.price,
-            gName:lap.gpu.toUpperCase(), cName:lap.cpu||'—', vram:8, lap};
+    return laptopAktif(lap);
   }
   if(!sys) return null;
   return {kind:'masaüstü', gIdx:sys.g.idx, cIdx:sys.c.g, total:sys.total,
@@ -1324,7 +1427,8 @@ function AmdIntelCompare({budget,prof,game,res}){
 /* ═══════════════════ HAZIR LAPTOP SEÇİCİ ═══════════════════ */
 function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
   const {fmt}=useCur();
-  const list=useMemo(()=>LAPTOPS.filter(l=>l.price<=budget).sort((x,y)=>y.idx-x.idx || x.price-y.price),[budget]);
+  const LAP=useLaptoplar();
+  const list=useMemo(()=>LAP.filter(l=>l.price<=budget).sort((x,y)=>y.idx-x.idx || x.price-y.price),[budget,LAP]);
   const best=list[0]||null;
 
   useEffect(()=>{
@@ -1344,7 +1448,7 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
       {list.length===0 ? (
         <p className="mt-9 text-[.95rem] text-dim leading-relaxed max-w-[46ch]">
           Bu bütçeye uyan oyun laptop'u bulamadık. Listedeki en ucuzu{' '}
-          <span className="num text-ink">{fmt(Math.min.apply(null,LAPTOPS.map(l=>l.price)))}</span>.
+          <span className="num text-ink">{fmt(Math.min.apply(null,LAP.map(l=>l.price)))}</span>.
         </p>
       ) : (
         <>
@@ -1353,7 +1457,7 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
             <span className="lbl text-dim">CİMRİ VERİSİ</span>
           </div>
           {(() => {
-            const enPahali=Math.max.apply(null,LAPTOPS.map(l=>l.price));
+            const enPahali=Math.max.apply(null,LAP.map(l=>l.price));
             return budget>enPahali*1.15 ? (
               <p className="text-[.82rem] text-dim leading-relaxed mb-4 max-w-[52ch]">
                 Elimizdeki listede en pahalı laptop <span className="num text-ink">{fmt(enPahali)}</span>.
@@ -5418,90 +5522,104 @@ function PanelUrunForm({deger,setDeger,onKaydet,onIptal,mesgul}){
   );
 }
 
-function PanelSayfa(){
-  const [oturum,setOturum]=useState(panelOturumOku);
+/* Fiyat ızgarası — panelin asıl iş gören ekranı.
+   Bayatlayan şey fiyat; onu tek tek form açarak güncellemek 50-100 kalemde
+   işkenceye dönüyordu. Burada bütün satırlar tek ekranda, yalnızca fiyat
+   sütunu yazılabilir; değişenler işaretlenip tek seferde kaydediliyor. */
+function PanelFiyatIzgara({satirlar, onKaydet, yukleniyor}){
+  const [taslak,setTaslak]=useState({});
+  const [mesgul,setMesgul]=useState(false);
+  const [ara,setAra]=useState('');
+  const sayi=v=>{ const n=Number(String(v).replace(/[^\d]/g,'')); return isFinite(n)?n:NaN; };
+  const degisen=satirlar.filter(s=>{
+    const v=taslak[s.id];
+    if(v===undefined||String(v).trim()==='') return false;
+    const n=sayi(v);
+    return !isNaN(n) && n!==s.fiyat;
+  });
+  const gorunen=ara.trim()
+    ? satirlar.filter(s=>(s.ad+' '+(s.alt||'')).toLocaleLowerCase('tr').includes(ara.toLocaleLowerCase('tr')))
+    : satirlar;
+  const kaydet=async()=>{
+    setMesgul(true);
+    try{ await onKaydet(degisen.map(s=>({...s, yeniFiyat:sayi(taslak[s.id])}))); setTaslak({}); }
+    finally{ setMesgul(false); }
+  };
+  return (
+    <div>
+      <div className="flex gap-3 items-center flex-wrap mb-4">
+        <input value={ara} onChange={e=>setAra(e.target.value)} placeholder="Listede ara…"
+               className="bg-transparent border border-line px-3.5 py-2 text-ink text-[.85rem] placeholder:text-dim/50 focus:border-cy transition-colors w-full sm:w-64"/>
+        <span className="text-[.8rem] text-dim">
+          {satirlar.length} kalem{degisen.length>0 && <span className="text-cy"> · {degisen.length} değişiklik bekliyor</span>}
+        </span>
+        <button onClick={kaydet} disabled={!degisen.length||mesgul}
+          className="ml-auto border border-cy text-cy px-5 py-2 lbl hover:bg-cy hover:text-bg transition-colors disabled:opacity-35">
+          {mesgul?'KAYDEDİLİYOR…':'DEĞİŞİKLİKLERİ KAYDET'}
+        </button>
+      </div>
+      <div className="border-t border-line">
+        {yukleniyor && <p className="py-6 text-dim text-[.9rem]">Yükleniyor…</p>}
+        {!yukleniyor && !gorunen.length && <p className="py-6 text-dim text-[.9rem]">Kayıt yok.</p>}
+        {gorunen.map(s=>{
+          const v=taslak[s.id];
+          const bekliyor=degisen.some(d=>d.id===s.id);
+          return (
+            <div key={s.id} className={'border-b border-line py-2.5 flex items-center gap-3 '+(bekliyor?'bg-cy/[.05]':'')}>
+              <div className="flex-1 min-w-0">
+                <div className="text-[.88rem] text-ink truncate">{s.ad}</div>
+                {s.alt && <div className="text-[.72rem] text-dim mt-0.5 truncate">{s.alt}</div>}
+              </div>
+              <input inputMode="numeric" value={v!==undefined?v:String(s.fiyat)}
+                     onChange={e=>setTaslak(t=>({...t,[s.id]:e.target.value}))}
+                     className={'num w-28 shrink-0 bg-transparent border px-2.5 py-1.5 text-right text-[.85rem] transition-colors '+
+                       (bekliyor?'border-cy text-cy':'border-line text-ink focus:border-cy')}/>
+              <span className="text-dim text-[.8rem] w-4 shrink-0">₺</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ── Aksesuarlar sekmesi ─────────────────────────────────────────────── */
+function PanelAksesuar({oturum, yakala}){
   const [liste,setListe]=useState(null);
-  const [hata,setHata]=useState('');
-  const [duzen,setDuzen]=useState(null);   /* {id|null, ...alanlar} — form açıksa dolu */
+  const [duzen,setDuzen]=useState(null);
   const [mesgul,setMesgul]=useState(false);
   const [suzgec,setSuzgec]=useState('hepsi');
 
-  const cikis=()=>{ panelOturumYaz(null); setOturum(null); setListe(null); };
-
-  /* Jeton süresi dolduğunda REST 401 döner; kullanıcıyı boş ekranda
-     bırakmak yerine oturumu kapatıp giriş formuna alıyoruz. */
-  const yakala=e=>{
-    const m=String(e&&e.message||e);
-    if(m.includes('401')||m.includes('JWT')) { cikis(); setHata('Oturum süresi doldu, tekrar giriş yap.'); }
-    else setHata(m.replace(/^Supabase\s*/,''));
-  };
-
-  const yenile=useCallback(async ()=>{
-    try{
-      setHata('');
-      setListe(await sb('urunler?select=*&order=kat.asc,sira.asc,ad.asc'));
-    }catch(e){ yakala(e); }
-  },[]);
-
-  useEffect(()=>{ if(oturum) yenile(); },[oturum,yenile]);
+  const yenile=useCallback(async()=>{
+    try{ setListe(await sb('urunler?select=*&order=kat.asc,sira.asc,ad.asc')); }catch(e){ yakala(e); }
+  },[yakala]);
+  useEffect(()=>{ yenile(); },[yenile]);
 
   const kaydet=async e=>{
-    e.preventDefault();
-    setMesgul(true);
+    e.preventDefault(); setMesgul(true);
     try{
-      const g={
-        kat:duzen.kat, ad:duzen.ad.trim(), kaynak:duzen.kaynak.trim(),
+      const g={ kat:duzen.kat, ad:duzen.ad.trim(), kaynak:duzen.kaynak.trim(),
         gorsel:duzen.gorsel.trim(), link:duzen.link.trim(),
         anahtar:String(duzen.anahtar||'').split(',').map(s=>s.trim()).filter(Boolean),
-        sira:Number(duzen.sira)||0, aktif:!!duzen.aktif
-      };
+        sira:Number(duzen.sira)||0, aktif:!!duzen.aktif };
       if(duzen.id) await sb('urunler?id=eq.'+duzen.id,{method:'PATCH',body:g,token:oturum.token});
       else         await sb('urunler',{method:'POST',body:g,token:oturum.token});
-      _urunSozu=null;              /* ziyaretçi tarafı yeni listeyi çeksin */
-      setDuzen(null);
-      await yenile();
-    }catch(e){ yakala(e); }
-    finally{ setMesgul(false); }
+      _urunSozu=null; setDuzen(null); await yenile();
+    }catch(e){ yakala(e); } finally{ setMesgul(false); }
   };
-
   const sil=async u=>{
-    if(!window.confirm('“'+u.ad+'” silinsin mi? Bu geri alınamaz.')) return;
-    try{
-      await sb('urunler?id=eq.'+u.id,{method:'DELETE',prefer:'return=minimal',token:oturum.token});
-      _urunSozu=null;
-      await yenile();
+    if(!window.confirm(u.ad+' silinsin mi? Bu geri alınamaz.')) return;
+    try{ await sb('urunler?id=eq.'+u.id,{method:'DELETE',prefer:'return=minimal',token:oturum.token});
+      _urunSozu=null; await yenile();
     }catch(e){ yakala(e); }
   };
-
-  if(!oturum) return (
-    <div className="py-8 lg:py-12">
-      <PanelGirisEkrani onGiris={o=>{ panelOturumYaz(o); setOturum(o); }}/>
-    </div>
-  );
 
   const gorunen=(liste||[]).filter(u=>suzgec==='hepsi'||u.kat===suzgec);
   const katAd=id=>(AKSESUAR_KATEGORILERI.find(k=>k.id===id)||{ad:id}).ad;
 
   return (
-    <div className="py-8 lg:py-12">
-      <Label className="mb-4">PANEL</Label>
-      <div className="rule mb-8"/>
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="h-xl text-[clamp(1.6rem,4.6vw,2.4rem)]">Ürün yönetimi</h1>
-          <p className="mt-3 text-dim text-[.86rem]">
-            {oturum.eposta} · {liste?liste.length:'…'} ürün
-          </p>
-        </div>
-        <button onClick={cikis}
-          className="border border-line text-dim px-4 py-2 lbl hover:border-ink/30 hover:text-ink transition-colors">
-          ÇIKIŞ
-        </button>
-      </div>
-
-      {hata && <p className="mt-6 border border-mg/50 text-mg text-[.85rem] px-4 py-3">{hata}</p>}
-
-      <div className="mt-8 flex gap-3 flex-wrap items-center">
+    <div>
+      <div className="flex gap-3 flex-wrap items-center">
         <button onClick={()=>setDuzen({...PANEL_BOS_URUN, id:null})}
           className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors">
           + YENİ ÜRÜN
@@ -5511,6 +5629,7 @@ function PanelSayfa(){
           <option value="hepsi">Tüm kategoriler</option>
           {AKSESUAR_KATEGORILERI.map(k=><option key={k.id} value={k.id}>{k.ad}</option>)}
         </select>
+        <span className="text-[.8rem] text-dim">{liste?liste.length+' ürün':'…'}</span>
       </div>
 
       {duzen && (
@@ -5536,16 +5655,328 @@ function PanelSayfa(){
             </div>
             <div className="flex gap-2 shrink-0">
               <button onClick={()=>setDuzen({...u, anahtar:(u.anahtar||[]).join(', ')})}
-                className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors">
-                DÜZENLE
-              </button>
+                className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors">DÜZENLE</button>
               <button onClick={()=>sil(u)}
-                className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-mg hover:text-mg transition-colors">
-                SİL
-              </button>
+                className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-mg hover:text-mg transition-colors">SİL</button>
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Laptop formu ───────────────────────────────────────────────────── */
+const PANEL_BOS_LAPTOP={ad:'',marka:'',fiyat:'',gorsel:'',link:'',gpu:'rtx 5060',cpu:'',ram:'',ssd:'',inch:'',saticilar:0,sira:0,aktif:true};
+
+function PanelLaptopForm({deger,setDeger,onKaydet,onIptal,mesgul}){
+  const alan=(k,v)=>setDeger(d=>({...d,[k]:v}));
+  return (
+    <form onSubmit={onKaydet} className="border border-cy/40 p-4 sm:p-5 grid gap-4 bg-bg2/40">
+      <div>
+        <label htmlFor="pl-ad" className="lbl text-dim mb-2 block">TAM ÜRÜN ADI</label>
+        <input id="pl-ad" required value={deger.ad} onChange={e=>alan('ad',e.target.value)} className={PANEL_INPUT}/>
+      </div>
+      <div className="grid sm:grid-cols-3 gap-4">
+        <div>
+          <label htmlFor="pl-marka" className="lbl text-dim mb-2 block">MARKA</label>
+          <input id="pl-marka" required value={deger.marka} onChange={e=>alan('marka',e.target.value)} placeholder="Lenovo" className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pl-fiyat" className="lbl text-dim mb-2 block">FİYAT (TL)</label>
+          <input id="pl-fiyat" required inputMode="numeric" value={deger.fiyat} onChange={e=>alan('fiyat',e.target.value)} className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pl-gpu" className="lbl text-dim mb-2 block">EKRAN KARTI</label>
+          {/* Sabit liste: güç puanı buradan türetiliyor, elle girilmiyor. */}
+          <select id="pl-gpu" value={deger.gpu} onChange={e=>alan('gpu',e.target.value)} className={PANEL_INPUT}>
+            {Object.keys(GPU_IDX).map(g=><option key={g} value={g}>{g.toLocaleUpperCase('tr')}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-4 gap-4">
+        <div>
+          <label htmlFor="pl-cpu" className="lbl text-dim mb-2 block">İŞLEMCİ</label>
+          <input id="pl-cpu" value={deger.cpu||''} onChange={e=>alan('cpu',e.target.value)} placeholder="i5-13450HX" className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pl-ram" className="lbl text-dim mb-2 block">RAM (GB)</label>
+          <input id="pl-ram" inputMode="numeric" value={deger.ram||''} onChange={e=>alan('ram',e.target.value)} className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pl-ssd" className="lbl text-dim mb-2 block">SSD (GB)</label>
+          <input id="pl-ssd" inputMode="numeric" value={deger.ssd||''} onChange={e=>alan('ssd',e.target.value)} placeholder="512 / 1000" className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pl-inch" className="lbl text-dim mb-2 block">EKRAN (inç)</label>
+          <input id="pl-inch" value={deger.inch||''} onChange={e=>alan('inch',e.target.value)} placeholder="15.6" className={PANEL_INPUT}/>
+        </div>
+      </div>
+      <div>
+        <label htmlFor="pl-link" className="lbl text-dim mb-2 block">ÜRÜN LİNKİ</label>
+        <input id="pl-link" required type="url" value={deger.link} onChange={e=>alan('link',e.target.value)} placeholder="https://…" className={PANEL_INPUT}/>
+      </div>
+      <div>
+        <label htmlFor="pl-gorsel" className="lbl text-dim mb-2 block">GÖRSEL ADRESİ</label>
+        <div className="flex gap-3 items-start">
+          <input id="pl-gorsel" required type="url" value={deger.gorsel} onChange={e=>alan('gorsel',e.target.value)} placeholder="https://…" className={PANEL_INPUT}/>
+          <div className="w-20 h-16 shrink-0 border border-line grid place-items-center overflow-hidden">
+            {deger.gorsel ? <img src={deger.gorsel} alt="" className="w-full h-full object-contain"/>
+                          : <span className="lbl text-[.55rem] text-dim/60">ÖNİZLEME</span>}
+          </div>
+        </div>
+      </div>
+      <div className="grid sm:grid-cols-3 gap-4 items-end">
+        <div>
+          <label htmlFor="pl-sat" className="lbl text-dim mb-2 block">SATICI SAYISI</label>
+          <input id="pl-sat" inputMode="numeric" value={deger.saticilar} onChange={e=>alan('saticilar',e.target.value)} className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pl-sira" className="lbl text-dim mb-2 block">SIRA</label>
+          <input id="pl-sira" inputMode="numeric" value={deger.sira} onChange={e=>alan('sira',e.target.value)} className={PANEL_INPUT}/>
+        </div>
+        <label className="flex items-center gap-2.5 text-[.9rem] text-ink/90 pb-2.5 cursor-pointer">
+          <input type="checkbox" checked={deger.aktif} onChange={e=>alan('aktif',e.target.checked)} className="accent-cy w-4 h-4"/>
+          Sitede görünsün
+        </label>
+      </div>
+      <div className="flex gap-3 flex-wrap">
+        <button type="submit" disabled={mesgul}
+          className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors disabled:opacity-40">
+          {mesgul?'KAYDEDİLİYOR…':'KAYDET'}
+        </button>
+        <button type="button" onClick={onIptal}
+          className="border border-line text-dim px-5 py-2.5 lbl hover:border-ink/30 hover:text-ink transition-colors">VAZGEÇ</button>
+      </div>
+    </form>
+  );
+}
+
+/* ── Laptoplar sekmesi ──────────────────────────────────────────────── */
+function PanelLaptop({oturum, yakala}){
+  const [liste,setListe]=useState(null);
+  const [gorunum,setGorunum]=useState('fiyat');   /* 'fiyat' | 'liste' */
+  const [duzen,setDuzen]=useState(null);
+  const [mesgul,setMesgul]=useState(false);
+
+  const yenile=useCallback(async()=>{
+    try{ setListe(await sb('laptoplar?select=*&order=fiyat.asc')); }catch(e){ yakala(e); }
+  },[yakala]);
+  useEffect(()=>{ yenile(); },[yenile]);
+
+  const fiyatKaydet=async degisenler=>{
+    try{
+      for(const d of degisenler){
+        await sb('laptoplar?id=eq.'+d.id,{method:'PATCH',prefer:'return=minimal',token:oturum.token,
+          body:{fiyat:d.yeniFiyat, guncelleme:new Date().toISOString()}});
+      }
+      _laptopSozu=null; await yenile();
+    }catch(e){ yakala(e); }
+  };
+
+  const kaydet=async e=>{
+    e.preventDefault(); setMesgul(true);
+    try{
+      const s=v=>{ const n=Number(String(v).replace(/[^\d]/g,'')); return isFinite(n)&&n>0?n:null; };
+      const g={ ad:duzen.ad.trim(), marka:duzen.marka.trim(), fiyat:s(duzen.fiyat),
+        gorsel:duzen.gorsel.trim(), link:duzen.link.trim(), gpu:duzen.gpu,
+        cpu:(duzen.cpu||'').trim()||null, ram:s(duzen.ram), ssd:s(duzen.ssd),
+        inch:(duzen.inch||'').trim()||null, saticilar:Number(duzen.saticilar)||0,
+        sira:Number(duzen.sira)||0, aktif:!!duzen.aktif, guncelleme:new Date().toISOString() };
+      if(!g.fiyat){ yakala(new Error('Fiyat geçerli bir sayı olmalı.')); return; }
+      if(duzen.id) await sb('laptoplar?id=eq.'+duzen.id,{method:'PATCH',body:g,prefer:'return=minimal',token:oturum.token});
+      else         await sb('laptoplar',{method:'POST',body:g,prefer:'return=minimal',token:oturum.token});
+      _laptopSozu=null; setDuzen(null); await yenile();
+    }catch(e){ yakala(e); } finally{ setMesgul(false); }
+  };
+
+  const sil=async l=>{
+    if(!window.confirm(l.ad.slice(0,60)+' silinsin mi? Bu geri alınamaz.')) return;
+    try{ await sb('laptoplar?id=eq.'+l.id,{method:'DELETE',prefer:'return=minimal',token:oturum.token});
+      _laptopSozu=null; await yenile();
+    }catch(e){ yakala(e); }
+  };
+
+  /* Tablo bosken kodda duran listeyi tek tikla iceri aktarir. Kurulum SQL'i
+     49 satirlik INSERT ile sismesin diye tercih edildi; ayrica ileride listeyi
+     sifirdan yenilemek gerekirse yine buradan yapilabiliyor. */
+  const iceriAktar=async()=>{
+    if(!window.confirm('Kodda tanımlı '+LAPTOPS.length+' laptop veritabanına yazılacak. Devam edilsin mi?')) return;
+    setMesgul(true);
+    try{
+      const g=LAPTOPS.map((l,i)=>({ad:l.name, marka:l.brand, fiyat:l.price, gorsel:l.image,
+        link:l.url, gpu:l.gpu, cpu:l.cpu||null, ram:l.ram||null, ssd:l.ssd||null,
+        inch:l.inch||null, saticilar:l.offers||0, sira:i*10, aktif:true}));
+      await sb('laptoplar',{method:'POST', body:g, prefer:'return=minimal', token:oturum.token});
+      _laptopSozu=null; await yenile();
+    }catch(e){ yakala(e); } finally{ setMesgul(false); }
+  };
+
+  const izgara=(liste||[]).map(l=>({
+    id:l.id, fiyat:l.fiyat,
+    ad:l.ad.length>72?l.ad.slice(0,72)+'…':l.ad,
+    alt:(l.gpu||'').toLocaleUpperCase('tr')+(l.ram?' · '+l.ram+' GB':'')+(l.aktif?'':' · GİZLİ')
+  }));
+
+  return (
+    <div>
+      <div className="flex gap-3 flex-wrap items-center mb-6">
+        {[['fiyat','FİYAT GÜNCELLE'],['liste','MODEL YÖNETİMİ']].map(([k,t])=>(
+          <button key={k} onClick={()=>{setGorunum(k);setDuzen(null);}}
+            className={'px-4 py-2 lbl border transition-colors '+(gorunum===k?'border-cy text-cy':'border-line text-dim hover:text-ink')}>{t}</button>
+        ))}
+        <span className="text-[.8rem] text-dim ml-auto">{liste?liste.length+' laptop':'…'}</span>
+      </div>
+
+      {liste && liste.length===0 && (
+        <div className="border border-cy/40 p-5 mb-6 bg-bg2/40">
+          <p className="text-[.88rem] text-ink/90 leading-relaxed max-w-[62ch]">
+            Laptop tablosu boş. Site şu an kodda duran listeyi gösteriyor.
+            Aşağıdaki düğme o listeyi veritabanına yazar; sonrasında fiyatları
+            buradan güncelleyebilirsin.
+          </p>
+          <button onClick={iceriAktar} disabled={mesgul}
+            className="mt-4 border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors disabled:opacity-40">
+            {mesgul?'AKTARILIYOR…':'KODDAKİ LİSTEYİ İÇERİ AKTAR ('+LAPTOPS.length+')'}
+          </button>
+        </div>
+      )}
+
+      {gorunum==='fiyat' && (
+        <PanelFiyatIzgara satirlar={izgara} onKaydet={fiyatKaydet} yukleniyor={liste===null}/>
+      )}
+
+      {gorunum==='liste' && (
+        <div>
+          <button onClick={()=>setDuzen({...PANEL_BOS_LAPTOP, id:null})}
+            className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors">
+            + YENİ LAPTOP
+          </button>
+          {duzen && <div className="mt-6"><PanelLaptopForm deger={duzen} setDeger={setDuzen} onKaydet={kaydet} onIptal={()=>setDuzen(null)} mesgul={mesgul}/></div>}
+          <div className="mt-8 border-t border-line">
+            {liste===null && <p className="py-6 text-dim text-[.9rem]">Yükleniyor…</p>}
+            {(liste||[]).map(l=>(
+              <div key={l.id} className="border-b border-line py-3.5 flex items-center gap-4">
+                <div className="w-14 h-11 shrink-0 border border-line overflow-hidden bg-[#0b0b12]">
+                  <img src={l.gorsel} alt="" loading="lazy" className="w-full h-full object-contain"/>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className={'text-[.9rem] truncate '+(l.aktif?'text-ink':'text-dim line-through')}>{l.ad}</div>
+                  <div className="text-[.75rem] text-dim mt-0.5 truncate">
+                    <span className="num">{l.fiyat.toLocaleString('tr-TR')} TL</span> · {(l.gpu||'').toLocaleUpperCase('tr')} · güç {GPU_IDX[l.gpu]||'?'}
+                  </div>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={()=>setDuzen({...l})}
+                    className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors">DÜZENLE</button>
+                  <button onClick={()=>sil(l)}
+                    className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-mg hover:text-mg transition-colors">SİL</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Parça fiyatları sekmesi ────────────────────────────────────────── */
+const PARCA_KAT_AD={gpu:'Ekran kartı',cpu:'İşlemci',ram:'RAM',ssd:'SSD',psu:'Güç kaynağı',sogutucu:'Soğutucu',anakart:'Anakart',kasa:'Kasa'};
+
+function PanelParca({oturum, yakala}){
+  const [liste,setListe]=useState(null);
+  const [kat,setKat]=useState('hepsi');
+
+  const yenile=useCallback(async()=>{
+    try{ setListe(await sb('parca_fiyat?select=*&order=kat.asc,fiyat.asc')); }catch(e){ yakala(e); }
+  },[yakala]);
+  useEffect(()=>{ yenile(); },[yenile]);
+
+  const kaydet=async degisenler=>{
+    try{
+      for(const d of degisenler){
+        await sb('parca_fiyat?anahtar=eq.'+encodeURIComponent(d.id),{method:'PATCH',prefer:'return=minimal',
+          token:oturum.token, body:{fiyat:d.yeniFiyat, guncelleme:new Date().toISOString()}});
+      }
+      _fiyatSozu=null; await yenile();
+    }catch(e){ yakala(e); }
+  };
+
+  const suzulmus=(liste||[]).filter(p=>kat==='hepsi'||p.kat===kat);
+  const izgara=suzulmus.map(p=>({ id:p.anahtar, fiyat:p.fiyat, ad:p.ad,
+    alt:(PARCA_KAT_AD[p.kat]||p.kat)+(p.guncelleme?' · '+String(p.guncelleme).slice(0,10):'') }));
+
+  return (
+    <div>
+      <div className="flex gap-3 flex-wrap items-center mb-5">
+        <select value={kat} onChange={e=>setKat(e.target.value)}
+                className="bg-transparent border border-line px-3.5 py-2 text-ink text-[.85rem] focus:border-cy transition-colors">
+          <option value="hepsi">Tüm parçalar</option>
+          {Object.keys(PARCA_KAT_AD).map(k=><option key={k} value={k}>{PARCA_KAT_AD[k]}</option>)}
+        </select>
+      </div>
+      <p className="text-[.8rem] text-dim leading-relaxed mb-5 max-w-[64ch]">
+        Buradaki fiyatlar sistem kurma hesabını doğrudan besliyor. Güç, soket ve
+        watt gibi teknik değerler bilerek düzenlenemiyor — yanlış bir değer,
+        uyumsuz parçalardan oluşan bir sistem önerilmesine yol açabilirdi.
+      </p>
+      <PanelFiyatIzgara satirlar={izgara} onKaydet={kaydet} yukleniyor={liste===null}/>
+    </div>
+  );
+}
+
+/* ── Panel kabuğu: oturum + sekmeler ────────────────────────────────── */
+function PanelSayfa(){
+  const [oturum,setOturum]=useState(panelOturumOku);
+  const [hata,setHata]=useState('');
+  const [sekme,setSekme]=useState('aksesuar');
+
+  const cikis=useCallback(()=>{ panelOturumYaz(null); setOturum(null); },[]);
+
+  /* Jeton süresi dolduğunda REST 401 döner; kullanıcıyı boş ekranda
+     bırakmak yerine oturumu kapatıp giriş formuna alıyoruz. */
+  const yakala=useCallback(e=>{
+    const m=String(e&&e.message||e);
+    if(m.includes('401')||m.includes('JWT')){ cikis(); setHata('Oturum süresi doldu, tekrar giriş yap.'); }
+    else setHata(m.replace(/^Supabase\s*/,''));
+  },[cikis]);
+
+  if(!oturum) return (
+    <div className="py-8 lg:py-12">
+      <PanelGirisEkrani onGiris={o=>{ panelOturumYaz(o); setOturum(o); }}/>
+    </div>
+  );
+
+  const sekmeler=[['aksesuar','AKSESUARLAR'],['laptop','LAPTOPLAR'],['parca','PARÇA FİYATLARI']];
+
+  return (
+    <div className="py-8 lg:py-12">
+      <Label className="mb-4">PANEL</Label>
+      <div className="rule mb-8"/>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="h-xl text-[clamp(1.6rem,4.6vw,2.4rem)]">Veri yönetimi</h1>
+          <p className="mt-3 text-dim text-[.86rem]">{oturum.eposta}</p>
+        </div>
+        <button onClick={cikis}
+          className="border border-line text-dim px-4 py-2 lbl hover:border-ink/30 hover:text-ink transition-colors">ÇIKIŞ</button>
+      </div>
+
+      {hata && <p className="mt-6 border border-mg/50 text-mg text-[.85rem] px-4 py-3">{hata}</p>}
+
+      <div className="mt-8 flex gap-2 flex-wrap border-b border-line">
+        {sekmeler.map(([k,t])=>(
+          <button key={k} onClick={()=>{setSekme(k);setHata('');}}
+            className={'px-4 py-2.5 lbl border-b-2 -mb-px transition-colors '+
+              (sekme===k?'border-cy text-cy':'border-transparent text-dim hover:text-ink')}>{t}</button>
+        ))}
+      </div>
+
+      <div className="mt-8">
+        {sekme==='aksesuar' && <PanelAksesuar oturum={oturum} yakala={yakala}/>}
+        {sekme==='laptop'   && <PanelLaptop   oturum={oturum} yakala={yakala}/>}
+        {sekme==='parca'    && <PanelParca    oturum={oturum} yakala={yakala}/>}
       </div>
     </div>
   );
@@ -5751,7 +6182,14 @@ function App(){
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<CurProvider><LangProvider><App/></LangProvider></CurProvider>);
+/* Parça fiyatlarını ilk çizimden ÖNCE yüklüyoruz: buildSystem() sonuçları
+   üç ayrı bileşende useMemo ile tutuluyor, sonradan gelen fiyat bu önbellekleri
+   tazelemezdi. Supabase yavaşsa ya da kapalıysa 1,5 saniyede vazgeçip koddaki
+   fiyatlarla açılıyoruz — site hiçbir koşulda beklemede kalmıyor. */
+function basla(){
+  ReactDOM.createRoot(document.getElementById('root')).render(<CurProvider><LangProvider><App/></LangProvider></CurProvider>);
+}
+Promise.race([parcaFiyatlariniGetir(), new Promise(r=>setTimeout(()=>r('zamanasimi'),1500))]).then(basla, basla);
 </script>
 </body>
 </html>
