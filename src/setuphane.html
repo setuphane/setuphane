@@ -6146,24 +6146,38 @@ function PanelParca({oturum, yakala}){
   };
 
   /* Tablo bosken kodda duran parcalari tek tikla iceri aktarir; kurulum
-     betigi 50 satirlik INSERT ile sismesin diye. */
+     betigi 50 satirlik INSERT ile sismesin diye.
+     PostgREST toplu eklemede TUM nesnelerin ayni alanlara sahip olmasini
+     sart kosuyor (aksi halde "All object keys must match" hatasi verir).
+     Kategoriye gore alanlar degistigi icin her satiri ayni sablona
+     tamamliyoruz; ilgisiz alanlar null gidiyor. */
+  const PARCA_ALAN_SABLONU={ anahtar:null, kat:null, ad:null, marka:null, fiyat:null,
+    idx:null, vram:null, tdp:null, plat:null, oyun:null, coklu_is:null,
+    dahili_grafik:null, watt:null, kapasite:null, sogutma_kap:null,
+    kademe:null, butce_ust:null, sira:0, aktif:true };
+
   const iceriAktar=async()=>{
     const g=[];
-    const s2=(k,ad)=>({anahtar:k, ad});
-    GPUS.forEach((x,i)=>g.push({anahtar:'gpu:'+x.id, kat:'gpu', ad:x.n, marka:x.b||null, fiyat:x.p, idx:x.idx, vram:x.vram, tdp:x.tdp, sira:(i+1)*10}));
-    CPUS.forEach((x,i)=>g.push({anahtar:'cpu:'+x.id, kat:'cpu', ad:x.n, fiyat:x.p, plat:x.plat, oyun:x.g, coklu_is:x.m, tdp:x.tdp, dahili_grafik:!!x.ig, sira:(i+1)*10}));
-    RAMS.forEach((x,i)=>g.push({anahtar:'ram:'+x.id, kat:'ram', ad:x.n, fiyat:x.p, kapasite:x.gb, sira:(i+1)*10}));
-    SSDS.forEach((x,i)=>g.push({anahtar:'ssd:'+x.id, kat:'ssd', ad:x.n, fiyat:x.p, kapasite:x.gb, sira:(i+1)*10}));
-    PSUS.forEach((x,i)=>g.push({anahtar:'psu:'+x.id, kat:'psu', ad:x.n, fiyat:x.p, watt:x.w, sira:(i+1)*10}));
-    COOLERS.forEach((x,i)=>g.push({anahtar:'sogutucu:'+x.id, kat:'sogutucu', ad:x.n, fiyat:x.p, sogutma_kap:x.cap, sira:(i+1)*10}));
-    Object.keys(BOARDS).forEach(pl=>BOARDS[pl].forEach((x,i)=>g.push({anahtar:'anakart:'+pl+'-'+i, kat:'anakart', ad:x.n, fiyat:x.p, plat:pl, kademe:x.t, sira:(i+1)*10})));
-    CASES.forEach((x,i)=>g.push({anahtar:'kasa:'+i, kat:'kasa', ad:x.n, fiyat:x.p, butce_ust:isFinite(x.upTo)?x.upTo:null, sira:(i+1)*10}));
+    const ekle=o=>g.push(Object.assign({}, PARCA_ALAN_SABLONU, o));
+    GPUS.forEach((x,i)=>ekle({anahtar:'gpu:'+x.id, kat:'gpu', ad:x.n, marka:x.b||null,
+      fiyat:x.p, idx:x.idx, vram:x.vram, tdp:x.tdp, sira:(i+1)*10}));
+    CPUS.forEach((x,i)=>ekle({anahtar:'cpu:'+x.id, kat:'cpu', ad:x.n, fiyat:x.p,
+      plat:x.plat, oyun:x.g, coklu_is:x.m, tdp:x.tdp, dahili_grafik:!!x.ig, sira:(i+1)*10}));
+    RAMS.forEach((x,i)=>ekle({anahtar:'ram:'+x.id, kat:'ram', ad:x.n, fiyat:x.p, kapasite:x.gb, sira:(i+1)*10}));
+    SSDS.forEach((x,i)=>ekle({anahtar:'ssd:'+x.id, kat:'ssd', ad:x.n, fiyat:x.p, kapasite:x.gb, sira:(i+1)*10}));
+    PSUS.forEach((x,i)=>ekle({anahtar:'psu:'+x.id, kat:'psu', ad:x.n, fiyat:x.p, watt:x.w, sira:(i+1)*10}));
+    COOLERS.forEach((x,i)=>ekle({anahtar:'sogutucu:'+x.id, kat:'sogutucu', ad:x.n, fiyat:x.p, sogutma_kap:x.cap, sira:(i+1)*10}));
+    Object.keys(BOARDS).forEach(pl=>BOARDS[pl].forEach((x,i)=>ekle({anahtar:'anakart:'+pl+'-'+i,
+      kat:'anakart', ad:x.n, fiyat:x.p, plat:pl, kademe:x.t, sira:(i+1)*10})));
+    CASES.forEach((x,i)=>ekle({anahtar:'kasa:'+i, kat:'kasa', ad:x.n, fiyat:x.p,
+      butce_ust:isFinite(x.upTo)?x.upTo:null, sira:(i+1)*10}));
     if(!window.confirm('Kodda tanımlı '+g.length+' parça veritabanına yazılacak. Devam edilsin mi?')) return;
     setMesgul(true);
     try{ await sb('parcalar',{method:'POST', body:g, prefer:'return=minimal', token:oturum.token});
       _fiyatSozu=null; await yenile();
     }catch(e){ yakala(e); } finally{ setMesgul(false); }
   };
+
   const hepsi=liste||[];
   const suzulmus=hepsi.filter(p=>kat==='hepsi'||p.kat===kat);
   const izgara=suzulmus.map(p=>({ id:p.id, fiyat:p.fiyat, ad:p.ad,
