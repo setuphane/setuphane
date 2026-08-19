@@ -1,10 +1,12 @@
-// src/setuphane.html icindeki laptop ve parca verisini okuyup Supabase seed
-// SQL'i uretir:  node scripts/veri-sql.mjs > supabase-laptop-parca.sql
+// src/setuphane.html icindeki parca verisini okuyup Supabase seed SQL'i uretir:
+//   node scripts/veri-sql.mjs > supabase-parcalar.sql
 // Amac: kodda duran veriyi elle SQL'e cevirmek yerine tek kaynaktan uretmek.
 import { readFileSync } from 'node:fs';
 
 const s = readFileSync(new URL('../src/setuphane.html', import.meta.url), 'utf8');
 const q = v => v == null ? 'null' : "'" + String(v).replace(/'/g, "''") + "'";
+const n = v => (v == null || !isFinite(v)) ? 'null' : String(Math.round(v));
+const b = v => v == null ? 'null' : (v ? 'true' : 'false');
 
 // Kendi dosyamizdaki duz nesne dizileri; disaridan veri gelmiyor.
 function dizi(ad) {
@@ -20,95 +22,79 @@ function nesne(ad) {
   return new Function('return ' + s.slice(i + ('const ' + ad + '=').length, j + 2))();
 }
 
-const parcalar = [];
-const ekle = (kat, anahtar, adi, fiyat) =>
-  parcalar.push({ anahtar: kat + ':' + anahtar, kat, ad: adi, fiyat: Math.round(fiyat) });
+const satirlar = [];
+let sira = 0;
+const ekle = o => satirlar.push({ sira: (sira += 10), ...o });
 
-for (const g of dizi('GPUS'))    ekle('gpu',  g.id, g.n, g.p);
-for (const c of dizi('CPUS'))    ekle('cpu',  c.id, c.n, c.p);
-for (const r of dizi('RAMS'))    ekle('ram',  r.id, r.n, r.p);
-for (const d of dizi('SSDS'))    ekle('ssd',  d.id, d.n, d.p);
-for (const p of dizi('PSUS'))    ekle('psu',  p.id, p.n, p.p);
-for (const k of dizi('COOLERS')) ekle('sogutucu', k.id, k.n, k.p);
-// BOARDS/CASES'te id yok; sirayla sabit anahtar uretiyoruz.
+dizi('GPUS').forEach(g => ekle({ anahtar:'gpu:'+g.id, kat:'gpu', ad:g.n, marka:g.b,
+  fiyat:g.p, idx:g.idx, vram:g.vram, tdp:g.tdp }));
+dizi('CPUS').forEach(c => ekle({ anahtar:'cpu:'+c.id, kat:'cpu', ad:c.n,
+  fiyat:c.p, plat:c.plat, oyun:c.g, cokluIs:c.m, tdp:c.tdp, dahiliGrafik:c.ig }));
+dizi('RAMS').forEach(r => ekle({ anahtar:'ram:'+r.id, kat:'ram', ad:r.n, fiyat:r.p, kapasite:r.gb }));
+dizi('SSDS').forEach(d => ekle({ anahtar:'ssd:'+d.id, kat:'ssd', ad:d.n, fiyat:d.p, kapasite:d.gb }));
+dizi('PSUS').forEach(p => ekle({ anahtar:'psu:'+p.id, kat:'psu', ad:p.n, fiyat:p.p, watt:p.w }));
+dizi('COOLERS').forEach(k => ekle({ anahtar:'sogutucu:'+k.id, kat:'sogutucu', ad:k.n,
+  fiyat:k.p, sogutmaKap:k.cap }));
 const B = nesne('BOARDS');
-for (const plat of Object.keys(B)) B[plat].forEach((b, i) => ekle('anakart', plat + '-' + i, b.n, b.p));
-dizi('CASES').forEach((c, i) => ekle('kasa', String(i), c.n, c.p));
+Object.keys(B).forEach(plat => B[plat].forEach((x,i) =>
+  ekle({ anahtar:'anakart:'+plat+'-'+i, kat:'anakart', ad:x.n, fiyat:x.p, plat, kademe:x.t })));
+dizi('CASES').forEach((c,i) => ekle({ anahtar:'kasa:'+i, kat:'kasa', ad:c.n, fiyat:c.p,
+  butceUst: isFinite(c.upTo) ? c.upTo : null }));
 
-const laptoplar = dizi('LAPTOPS');
+const satir = o => `(${q(o.anahtar)}, ${q(o.kat)}, ${q(o.ad)}, ${q(o.marka)}, ${n(o.fiyat)}, ` +
+  `${n(o.idx)}, ${n(o.vram)}, ${n(o.tdp)}, ${q(o.plat)}, ${n(o.oyun)}, ${n(o.cokluIs)}, ` +
+  `${b(o.dahiliGrafik)}, ${n(o.watt)}, ${n(o.kapasite)}, ${n(o.sogutmaKap)}, ${n(o.kademe)}, ` +
+  `${n(o.butceUst)}, ${o.sira})`;
 
-const satirP = parcalar.map(p =>
-  `(${q(p.anahtar)}, ${q(p.kat)}, ${q(p.ad)}, ${p.fiyat})`).join(',\n');
-const satirL = laptoplar.map((l, i) =>
-  `(${q(l.name)}, ${q(l.brand)}, ${l.price}, ${q(l.image)}, ${q(l.url)}, ${q(l.gpu)}, ${q(l.cpu)}, ` +
-  `${l.ram ?? 'null'}, ${l.ssd ?? 'null'}, ${q(l.inch)}, ${l.offers ?? 0}, ${i * 10})`).join(',\n');
-
-process.stdout.write(`-- SETUP HANE — laptop listesi + parca fiyat override tablosu
+process.stdout.write(`-- SETUP HANE - parca tablosu (/panel > PARCALAR bunu yonetir)
 -- Uretildi: node scripts/veri-sql.mjs  (kaynak: src/setuphane.html)
--- Supabase > SQL Editor > yapistir > Run.
--- DIKKAT: bastan kurar. Panelden girilmis veri varsa once yedek al.
+-- Supabase > SQL Editor > yapistir > Run.  DIKKAT: bastan kurar.
 
-drop table if exists laptoplar cascade;
-drop table if exists parca_fiyat cascade;
+drop table if exists parca_fiyat cascade;   -- yerini bu tablo aldi
+drop table if exists parcalar cascade;
 
--- ── Laptoplar ────────────────────────────────────────────────────────────
--- Tam kayit panelden yonetiliyor. idx (guc puani) BILEREK yok: kodda
--- GPU_IDX tablosundan turetiliyor, boylece panelden yanlis bir guc degeri
--- girilip FPS tahminleri sessizce bozulamiyor.
-create table laptoplar (
+-- Tek tablo, kat sutunu ayirici. Yapisal alanlar kategoriye gore dolu:
+--   gpu      -> idx, vram, tdp
+--   cpu      -> plat, oyun, coklu_is, tdp, dahili_grafik
+--   ram/ssd  -> kapasite      psu -> watt        sogutucu -> sogutma_kap
+--   anakart  -> plat, kademe  kasa -> butce_ust (null = sinirsiz)
+-- CHECK'ler panelden sacma deger girilmesini engelliyor: bu alanlar sistem
+-- kurma algoritmasini besliyor, hatali biri uyumsuz parca onerilmesine
+-- yol acabilir.
+create table parcalar (
   id uuid primary key default gen_random_uuid(),
-  ad     text not null check (char_length(ad) between 5 and 200),
-  marka  text not null check (char_length(marka) between 2 and 40),
-  fiyat  int  not null check (fiyat > 0),
-  gorsel text not null check (gorsel ~ '^https://'),
-  link   text not null check (link ~ '^https://'),
-  gpu    text not null,
-  cpu    text,
-  ram    int,
-  ssd    int,
-  inch   text,
-  saticilar int not null default 0,
-  sira   int not null default 0,
-  aktif  boolean not null default true,
+  anahtar text unique not null,
+  kat  text not null check (kat in ('gpu','cpu','ram','ssd','psu','sogutucu','anakart','kasa')),
+  ad   text not null check (char_length(ad) between 2 and 120),
+  marka text,
+  fiyat int not null check (fiyat >= 0 and fiyat < 2000000),
+  idx   int check (idx between 0 and 400),
+  vram  int check (vram between 0 and 64),
+  tdp   int check (tdp between 0 and 1000),
+  plat  text check (plat is null or plat in ('AM5','LGA1851')),
+  oyun     int check (oyun between 0 and 400),
+  coklu_is int check (coklu_is between 0 and 400),
+  dahili_grafik boolean,
+  watt        int check (watt between 0 and 3000),
+  kapasite    int check (kapasite between 0 and 100000),
+  sogutma_kap int check (sogutma_kap between 0 and 1000),
+  kademe      int check (kademe between 1 and 5),
+  butce_ust   int check (butce_ust > 0),
+  sira  int not null default 0,
+  aktif boolean not null default true,
   guncelleme timestamptz not null default now()
 );
-create index laptoplar_fiyat_idx on laptoplar (fiyat);
+create index parcalar_kat_idx on parcalar (kat, sira);
 
--- ── Parca fiyat override ────────────────────────────────────────────────
--- Yalnizca FIYAT. Guc/soket/watt gibi algoritma girdileri kodda kalir;
--- boyle bir alan panelden degistirilebilseydi, hatali tek bir deger
--- uyumsuz anakart ya da yetersiz guc kaynagi onerilmesine yol acabilirdi.
--- Site: override varsa onu, yoksa koddaki fiyati kullanir.
-create table parca_fiyat (
-  anahtar text primary key,
-  kat     text not null,
-  ad      text not null,
-  fiyat   int  not null check (fiyat >= 0),
-  guncelleme timestamptz not null default now()
-);
+alter table parcalar enable row level security;
+create policy oku_pa on parcalar for select using (true);
+create policy ekle_pa   on parcalar for insert to authenticated with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
+create policy guncel_pa on parcalar for update to authenticated using (auth.jwt() ->> 'email' = 'setuphane@gmail.com') with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
+create policy sil_pa    on parcalar for delete to authenticated using (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
 
-alter table laptoplar   enable row level security;
-alter table parca_fiyat enable row level security;
-
-create policy oku_l on laptoplar   for select using (true);
-create policy oku_p on parca_fiyat for select using (true);
-
--- Yazma yalnizca yoneticiye. "to authenticated" tek basina YETMEZ.
-create policy ekle_l   on laptoplar for insert to authenticated with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
-create policy guncel_l on laptoplar for update to authenticated using (auth.jwt() ->> 'email' = 'setuphane@gmail.com') with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
-create policy sil_l    on laptoplar for delete to authenticated using (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
-create policy ekle_p   on parca_fiyat for insert to authenticated with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
-create policy guncel_p on parca_fiyat for update to authenticated using (auth.jwt() ->> 'email' = 'setuphane@gmail.com') with check (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
-create policy sil_p    on parca_fiyat for delete to authenticated using (auth.jwt() ->> 'email' = 'setuphane@gmail.com');
-
-insert into parca_fiyat (anahtar, kat, ad, fiyat) values
-${satirP};
-
--- Laptop satirlari BILEREK burada degil: 49 kayit bu betigi gereksiz
--- sisiriyordu. Tablo bos oldugunda /panel > LAPTOPLAR sekmesinde
--- "KODDAKI LISTEYI ICERI AKTAR" dugmesi cikiyor; kodda duran liste tek
--- tikla buraya yaziliyor. Ayni dugme ileride listeyi yenilemek icin de
--- kullanilabilir.
+insert into parcalar (anahtar, kat, ad, marka, fiyat, idx, vram, tdp, plat, oyun, coklu_is,
+                      dahili_grafik, watt, kapasite, sogutma_kap, kademe, butce_ust, sira) values
+${satirlar.map(satir).join(',\n')};
 
 notify pgrst, 'reload schema';
 `);
