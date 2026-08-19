@@ -4935,15 +4935,31 @@ async function sb(yol, opts) {
     /* opts.token: /panel'de oturum açmış yöneticinin jetonu. RLS'te yazma
        yetkisi yalnızca authenticated rolüne verildiği için, jeton olmadan
        yapılan istek okumada çalışır ama yazmada 401 döner — istenen davranış. */
-    headers: {
+    /* opts.cihaz: begeni silme politikasi bu basligi satirdaki cihaz ile
+       karsilastiriyor. Onceden politika 'using (true)' idi ve tek istekle
+       sitedeki TUM begeniler silinebiliyordu. */
+    headers: Object.assign({
       apikey: SUPABASE.anon,
       Authorization: 'Bearer ' + (opts.token || SUPABASE.anon),
       'Content-Type': 'application/json',
       Prefer: opts.prefer || 'return=representation'
-    },
+    }, opts.cihaz ? {
+      'X-Cihaz': opts.cihaz
+    } : {}),
     body: opts.body ? JSON.stringify(opts.body) : undefined
   });
-  if (!r.ok) throw new Error('Supabase ' + r.status + ': ' + (await r.text()).slice(0, 160));
+  if (!r.ok) {
+    /* PostgREST hatayi JSON dondurur; ham govdeyi kullaniciya gostermek
+       yerine message alanini ayikliyoruz. Hiz siniri tetiklendiginde
+       kullanici 'Cok hizli gonderim yaptin...' gibi anlasilir bir metin
+       gorsun, kod ve suslu parantez yigini degil. */
+    const ham = await r.text();
+    let mesaj = '';
+    try {
+      mesaj = (JSON.parse(ham) || {}).message || '';
+    } catch (e) {}
+    throw new Error(mesaj || 'Supabase ' + r.status + ': ' + ham.slice(0, 160));
+  }
   return r.status === 204 ? null : r.json();
 }
 
@@ -5528,7 +5544,8 @@ function Forum({
         prefer: 'return=minimal'
       });else if (!yeniBegeni.includes(ben) && oncekiBegeni.includes(ben)) await sb('begeniler?konu_id=eq.' + k.id + '&cihaz=eq.' + encodeURIComponent(ben), {
         method: 'DELETE',
-        prefer: 'return=minimal'
+        prefer: 'return=minimal',
+        cihaz: ben
       });
       const eskiCev = ((data.konular.find(x => x.id === k.id) || {}).cevaplar || []).length;
       if (k.cevaplar.length > eskiCev) {
