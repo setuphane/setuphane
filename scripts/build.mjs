@@ -14,6 +14,10 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const srcPath = path.join(root, 'src/setuphane.html');
 const outPath = path.join(root, 'index.html');
 
+// Veri butunlugu once: bozuk bir veriyle derleyip yayina cikarmaktansa
+// burada durmak iyi. Ayrintili gerekce icin scripts/kontrol.mjs.
+execFileSync(process.execPath, [path.join(root, 'scripts/kontrol.mjs')], { stdio: 'inherit' });
+
 const src = await readFile(srcPath, 'utf8');
 
 // 1) JSX <script> bloğunu çıkar ve Babel ile derle.
