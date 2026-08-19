@@ -1,0 +1,6 @@
+# vendor/ ve urun/ icerigi OLDUGU GIBI kalmali.
+# Git, Windows'ta metin dosyalarinin satir sonlarini cevirir; React'in
+# minified dosyalari bundan etkilenirse indirildikleri anda dogrulanan
+# SRI hash'leri artik tutmaz ve dosya "orijinal" olmaktan cikar.
+vendor/** -text
+urun/**   -text binary
