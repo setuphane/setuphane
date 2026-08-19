@@ -6285,6 +6285,25 @@ function PanelSayfa(){
     </div>
   );
 
+  /* Fiyat tazeligi: site 30 gunden eski fiyatta ziyaretciye uyari gosteriyor.
+     O uyariyi ziyaretci gormeden once BURADA gormek gerekiyor — panel, isin
+     yapildigi yer. En taze guncelleme tarihini iki tablodan da aliyoruz. */
+  const [tazelik,setTazelik]=useState(null);
+  useEffect(()=>{
+    let iptal=false;
+    Promise.all([
+      sb('parcalar?select=guncelleme&order=guncelleme.desc&limit=1').catch(()=>null),
+      sb('laptoplar?select=guncelleme&order=guncelleme.desc&limit=1').catch(()=>null),
+    ]).then(([p,l])=>{
+      if(iptal) return;
+      const t=[p&&p[0]&&p[0].guncelleme, l&&l[0]&&l[0].guncelleme].filter(Boolean).sort().pop();
+      if(!t){ setTazelik({bos:true}); return; }
+      const gun=Math.floor((Date.now()-new Date(t).getTime())/86400000);
+      setTazelik({gun, tarih:new Date(t).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})});
+    });
+    return()=>{ iptal=true; };
+  },[]);
+
   /* Yedek: veri artik koddan (git'te, geri alinabilir) veritabanina tasindi.
      Site tarafi guvende — Supabase kapaliysa koddaki liste devreye giriyor —
      ama PANELDEN yapilan duzenlemelerin tek kopyasi var. Yanlis bir silme ya
@@ -6341,6 +6360,14 @@ function PanelSayfa(){
               (sekme===k?'border-cy text-cy':'border-transparent text-dim hover:text-ink')}>{t}</button>
         ))}
       </div>
+
+      {tazelik && !tazelik.bos && (
+        <p className={'mt-6 text-[.84rem] px-4 py-3 border '+
+          (tazelik.gun>30?'border-mg/50 text-mg':tazelik.gun>14?'border-cy/40 text-cy':'border-line text-dim')}>
+          Fiyatlar en son <span className="num">{tazelik.gun}</span> gün önce güncellendi ({tazelik.tarih}).
+          {tazelik.gun>30 && ' Site ziyaretçiye bir aydan eski uyarısı gösteriyor — tazelemek iyi olur.'}
+        </p>
+      )}
 
       <div className="mt-8">
         {sekme==='aksesuar' && <PanelAksesuar oturum={oturum} yakala={yakala}/>}
