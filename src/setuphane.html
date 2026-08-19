@@ -2938,6 +2938,50 @@ function cihazId(){
   }catch(e){ return 'anon'; }
 }
 
+
+/* ── Hata bildirimi ──────────────────────────────────────────────────────
+   Site bir ziyaretçide bozulursa kimsenin haberi olmuyordu; sorunu ancak
+   elle test ederken görüyorduk. Üçüncü taraf bir servis (Sentry vb.) yerine
+   kendi veritabanımıza yazıyoruz — az önce React'i kendi sunucumuza aldık,
+   yerine yeni bir dış bağımlılık koymak tutarsız olurdu.
+
+   Kişisel veri toplanmıyor: tam User-Agent yerine "Chrome / Windows" gibi
+   kaba bir etiket yazılıyor, IP ya da kullanıcı kimliği yok.
+   Hatalar /panel > HATALAR sekmesinde görünür; okuma yetkisi yalnızca
+   yöneticide (RLS). */
+const HATA_SINIRI=3;              /* sayfa başına en fazla — döngüye girmesin */
+let _hataSayaci=0, _sonHataMesaji='';
+
+function hataBildir(mesaj, kaynak){
+  try{
+    if(typeof uzakVar!=='function' || !uzakVar()) return;
+    mesaj=String(mesaj||'').trim().slice(0,500);
+    if(!mesaj || mesaj===_sonHataMesaji || _hataSayaci>=HATA_SINIRI) return;
+    _hataSayaci++; _sonHataMesaji=mesaj;
+    const t=navigator.userAgent||'';
+    const tarayici=[
+      /Edg\//.test(t)?'Edge':/Chrome\//.test(t)?'Chrome':/Firefox\//.test(t)?'Firefox':/Safari\//.test(t)?'Safari':'Diğer',
+      /Windows/.test(t)?'Windows':/Android/.test(t)?'Android':/iPhone|iPad/.test(t)?'iOS':/Mac/.test(t)?'macOS':/Linux/.test(t)?'Linux':'Diğer'
+    ].join(' / ');
+    sb('hatalar',{method:'POST', prefer:'return=minimal', body:{
+      mesaj, kaynak:String(kaynak||'').slice(0,300),
+      yol:String(location.pathname||'').slice(0,200), tarayici, cihaz:cihazId()
+    }}).catch(()=>{});   /* bildirim başarısızsa sessiz kal: hata üstüne hata olmasın */
+  }catch(e){}
+}
+
+window.addEventListener('error', e=>{
+  /* Tarayıcı eklentilerinden ve dış kaynaklardan gelen gürültüyü alma:
+     yalnızca kendi dosyalarımızdan çıkan hatalar bizi ilgilendiriyor. */
+  const k=e.filename||'';
+  if(k && location.origin && k.indexOf(location.origin)!==0) return;
+  hataBildir(e.message, k+(e.lineno?':'+e.lineno:''));
+});
+window.addEventListener('unhandledrejection', e=>{
+  const r=e&&e.reason;
+  hataBildir((r&&r.message)||String(r), 'söz (promise)');
+});
+
 const FORUM_KEY='sh_forum_v1', USER_KEY='sh_user_v1';
 const KATEGORILER=[
   {id:'tavsiye', n:'Sistem tavsiyesi', d:'Bütçeni yaz, ne alsam de'},
@@ -6306,6 +6350,84 @@ function PanelParca({oturum, yakala}){
   );
 }
 
+/* ── Hatalar sekmesi ────────────────────────────────────────────────────
+   Ziyaretçilerin tarayıcısında oluşan JavaScript hataları. Okuma yetkisi
+   yalnızca yöneticide (RLS); anonim ziyaretçi yazabilir ama okuyamaz. */
+function PanelHatalar({oturum, yakala}){
+  const [liste,setListe]=useState(null);
+  const [mesgul,setMesgul]=useState(false);
+
+  const yenile=useCallback(async()=>{
+    try{ setListe(await sb('hatalar?select=*&order=olusturma.desc&limit=200',{token:oturum.token})); }
+    catch(e){ yakala(e); }
+  },[yakala,oturum.token]);
+  useEffect(()=>{ yenile(); },[yenile]);
+
+  const temizle=async()=>{
+    if(!window.confirm('Kayıtlı tüm hatalar silinsin mi? Bu geri alınamaz.')) return;
+    setMesgul(true);
+    try{
+      /* PostgREST filtresiz DELETE kabul etmiyor; her satiri kapsayan bir
+         kosul veriyoruz. */
+      await sb('hatalar?id=not.is.null',{method:'DELETE',prefer:'return=minimal',token:oturum.token});
+      await yenile();
+    }catch(e){ yakala(e); } finally{ setMesgul(false); }
+  };
+
+  /* Ayni hata onlarca kez gelebilir; mesaja gore gruplayip sayiyoruz —
+     100 satir listelemek yerine "su hata 37 kez" demek daha kullanisli. */
+  const gruplar=(()=>{
+    const g={};
+    for(const h of (liste||[])){
+      const a=h.mesaj+' | '+(h.yol||'');
+      if(!g[a]) g[a]={...h, adet:0, sonTarih:h.olusturma, tarayicilar:new Set()};
+      g[a].adet++;
+      g[a].tarayicilar.add(h.tarayici||'?');
+      if(h.olusturma>g[a].sonTarih) g[a].sonTarih=h.olusturma;
+    }
+    return Object.values(g).sort((a,b)=>b.adet-a.adet);
+  })();
+
+  return (
+    <div>
+      <div className="flex gap-3 items-center flex-wrap mb-5">
+        <span className="text-[.85rem] text-dim">
+          {liste===null?'Yükleniyor…':(liste.length?liste.length+' kayıt · '+gruplar.length+' farklı hata':'Kayıtlı hata yok — iyi haber.')}
+        </span>
+        {!!(liste&&liste.length) && (
+          <button onClick={temizle} disabled={mesgul}
+            className="ml-auto border border-line text-dim px-4 py-2 lbl hover:border-mg hover:text-mg transition-colors disabled:opacity-40">
+            {mesgul?'SİLİNİYOR…':'HEPSİNİ TEMİZLE'}
+          </button>
+        )}
+      </div>
+
+      <p className="text-[.8rem] text-dim leading-relaxed mb-5 max-w-[64ch]">
+        Ziyaretçilerin tarayıcısında oluşan JavaScript hataları buraya düşer.
+        Sayfa başına en fazla üç kayıt gönderilir ve aynı hata tekrar
+        yazılmaz; amaç sorunu görmek, veritabanını doldurmak değil.
+      </p>
+
+      <div className="border-t border-line">
+        {gruplar.map((h,i)=>(
+          <div key={i} className="border-b border-line py-3">
+            <div className="flex items-start gap-3">
+              <span className="num text-[.8rem] text-mg shrink-0 w-10">{h.adet}×</span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[.88rem] text-ink break-words">{h.mesaj}</div>
+                <div className="text-[.74rem] text-dim mt-1 break-words">
+                  {h.yol||'-'}{h.kaynak?' · '+h.kaynak:''} · {[...h.tarayicilar].join(', ')}
+                  {' · son: '+new Date(h.sonTarih).toLocaleString('tr-TR')}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Panel kabuğu: oturum + sekmeler ────────────────────────────────── */
 function PanelSayfa(){
   const [oturum,setOturum]=useState(panelOturumOku);
@@ -6373,7 +6495,7 @@ function PanelSayfa(){
     finally{ setYedekAliniyor(false); }
   };
 
-  const sekmeler=[['aksesuar','AKSESUARLAR'],['laptop','LAPTOPLAR'],['parca','PARÇALAR']];
+  const sekmeler=[['aksesuar','AKSESUARLAR'],['laptop','LAPTOPLAR'],['parca','PARÇALAR'],['hata','HATALAR']];
 
   return (
     <div className="py-8 lg:py-12">
@@ -6416,6 +6538,7 @@ function PanelSayfa(){
         {sekme==='aksesuar' && <PanelAksesuar oturum={oturum} yakala={yakala}/>}
         {sekme==='laptop'   && <PanelLaptop   oturum={oturum} yakala={yakala}/>}
         {sekme==='parca'    && <PanelParca    oturum={oturum} yakala={yakala}/>}
+        {sekme==='hata'     && <PanelHatalar oturum={oturum} yakala={yakala}/>}
       </div>
     </div>
   );
