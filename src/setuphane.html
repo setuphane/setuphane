@@ -767,6 +767,10 @@ function laptopAktif(l){
 }
 const laptopFps=(l,game,res)=>activeFps(laptopAktif(l),game,res);
 
+/* Cimri yonlendirmesi de urun tiklamasi gibi olculuyor: hangi laptobun
+   ilgi cektigini gormeden hangi segmente agirlik verilecegi bilinemiyor. */
+const laptopTik=l=>olay('laptop_tiklandi',{ad:(l&&l.name||'').slice(0,80), fiyat:l&&l.price, gpu:l&&l.gpu, sayfa:location.pathname});
+
 /* Cimri'nin ürün adı her şeyi tek satıra sıkıştırıyor:
    "Lenovo LOQ 15IRX10 83JE00EQTR i5-13450HX 12GB RAM 512GB SSD RTX 5060 FreeDOS 15.6 inç Oyun Bilgisayarı"
    Bunu ham basınca kart iki satıra taşıp ortadan kesiliyordu — üstelik
@@ -1579,7 +1583,7 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
                       Yoksa masaüstü açık ara mantıklı.</>
                   : <>Bu bütçede laptop fena değil; taşınabilirlik cabası.</>}
               </p>
-              <a href={cur.url} target="_blank" rel="noopener noreferrer"
+              <a href={cur.url} target="_blank" rel="noopener noreferrer" onClick={()=>laptopTik(cur)}
                  className="mt-6 inline-flex items-center gap-3 border border-cy text-cy px-6 py-3 lbl hover:bg-cy hover:text-bg transition-colors duration-300">
                 CİMRİ'DE FİYATLARI GÖR
               </a>
@@ -2209,7 +2213,7 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
             </>
           )}
           {isLap && (
-            <a href={act.lap.url} target="_blank" rel="noopener noreferrer"
+            <a href={act.lap.url} target="_blank" rel="noopener noreferrer" onClick={()=>laptopTik(act.lap)}
                className="mt-7 block text-center border border-cy text-cy py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300">
               CİMRİ'DE GÖR
             </a>
@@ -2289,7 +2293,7 @@ function MobileDock({sys,act,prof,game,res}){
                   className="w-full border border-cy text-cy py-3 lbl mt-1 active:bg-cy active:text-bg transition-colors">
                   {copied?'KOPYALANDI ✓':'LİSTEYİ KOPYALA'}
                 </button>
-              : <a href={act.lap.url} target="_blank" rel="noopener noreferrer"
+              : <a href={act.lap.url} target="_blank" rel="noopener noreferrer" onClick={()=>laptopTik(act.lap)}
                    className="block text-center w-full border border-cy text-cy py-3 lbl mt-1 active:bg-cy active:text-bg transition-colors">
                   CİMRİ'DE GÖR
                 </a>}
@@ -4916,9 +4920,16 @@ function AksesuarBosKart(){
   );
 }
 
-function AksesuarUrunKart({u}){
+/* Tiklama olcumu: sitenin geliri bu linklerden geliyor; hangi urunun
+   ilgi cektigi olculmezse hangi is birliginin ise yaradigi bilinemiyor.
+   kat prop olarak geliyor cunku /aksesuarlar'da urun nesnesinde kategori
+   yok; /oner'de oneriKaynaklari() ekliyor. */
+function AksesuarUrunKart({u,kat}){
+  const tik=()=>olay('urun_tiklandi',{
+    ad:(u.ad||'').slice(0,80), kaynak:u.kaynak||'-',
+    kategori:kat||u.kat||'-', sayfa:location.pathname});
   return (
-    <a href={u.link} target="_blank" rel="sponsored noopener noreferrer"
+    <a href={u.link} target="_blank" rel="sponsored noopener noreferrer" onClick={tik}
        className="group block aspect-[4/3] border border-line/70 relative overflow-hidden
                   transition-colors duration-300 hover:border-cy/50">
       <img src={u.gorsel} alt={u.ad} loading="lazy"
@@ -4978,7 +4989,7 @@ function AksesuarlarHub(){
                   <div className="accIn">
                     <div className="pb-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                       {(urunler[kat.id]||[]).map(u=>
-                        <AksesuarUrunKart key={u.link} u={u}/>
+                        <AksesuarUrunKart key={u.link} u={u} kat={kat.id}/>
                       )}
                       {Array.from({length:Math.max(0,AKSESUAR_BOS_SAYISI-(urunler[kat.id]||[]).length)}).map((_,pi)=>
                         <AksesuarBosKart key={pi}/>

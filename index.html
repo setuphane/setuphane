@@ -1940,6 +1940,15 @@ function laptopAktif(l) {
 }
 const laptopFps = (l, game, res) => activeFps(laptopAktif(l), game, res);
 
+/* Cimri yonlendirmesi de urun tiklamasi gibi olculuyor: hangi laptobun
+   ilgi cektigini gormeden hangi segmente agirlik verilecegi bilinemiyor. */
+const laptopTik = l => olay('laptop_tiklandi', {
+  ad: (l && l.name || '').slice(0, 80),
+  fiyat: l && l.price,
+  gpu: l && l.gpu,
+  sayfa: location.pathname
+});
+
 /* Cimri'nin ürün adı her şeyi tek satıra sıkıştırıyor:
    "Lenovo LOQ 15IRX10 83JE00EQTR i5-13450HX 12GB RAM 512GB SSD RTX 5060 FreeDOS 15.6 inç Oyun Bilgisayarı"
    Bunu ham basınca kart iki satıra taşıp ortadan kesiliyordu — üstelik
@@ -3310,6 +3319,7 @@ function LaptopPicker({
     href: cur.url,
     target: "_blank",
     rel: "noopener noreferrer",
+    onClick: () => laptopTik(cur),
     className: "mt-6 inline-flex items-center gap-3 border border-cy text-cy px-6 py-3 lbl hover:bg-cy hover:text-bg transition-colors duration-300"
   }, "C\u0130MR\u0130'DE F\u0130YATLARI G\xD6R"))), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-[.72rem] text-dim leading-relaxed"
@@ -4119,6 +4129,7 @@ function Panel({
     href: act.lap.url,
     target: "_blank",
     rel: "noopener noreferrer",
+    onClick: () => laptopTik(act.lap),
     className: "mt-7 block text-center border border-cy text-cy py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300"
   }, "C\u0130MR\u0130'DE G\xD6R"), /*#__PURE__*/React.createElement("p", {
     className: "mt-3 text-[.72rem] text-dim leading-relaxed"
@@ -4205,6 +4216,7 @@ function MobileDock({
     href: act.lap.url,
     target: "_blank",
     rel: "noopener noreferrer",
+    onClick: () => laptopTik(act.lap),
     className: "block text-center w-full border border-cy text-cy py-3 lbl mt-1 active:bg-cy active:text-bg transition-colors"
   }, "C\u0130MR\u0130'DE G\xD6R")))), /*#__PURE__*/React.createElement("button", {
     onClick: () => setOpen(o => !o),
@@ -7628,13 +7640,26 @@ function AksesuarBosKart() {
     className: "lbl text-[.62rem] tracking-[.16em]"
   }, "YAKINDA"));
 }
+
+/* Tiklama olcumu: sitenin geliri bu linklerden geliyor; hangi urunun
+   ilgi cektigi olculmezse hangi is birliginin ise yaradigi bilinemiyor.
+   kat prop olarak geliyor cunku /aksesuarlar'da urun nesnesinde kategori
+   yok; /oner'de oneriKaynaklari() ekliyor. */
 function AksesuarUrunKart({
-  u
+  u,
+  kat
 }) {
+  const tik = () => olay('urun_tiklandi', {
+    ad: (u.ad || '').slice(0, 80),
+    kaynak: u.kaynak || '-',
+    kategori: kat || u.kat || '-',
+    sayfa: location.pathname
+  });
   return /*#__PURE__*/React.createElement("a", {
     href: u.link,
     target: "_blank",
     rel: "sponsored noopener noreferrer",
+    onClick: tik,
     className: "group block aspect-[4/3] border border-line/70 relative overflow-hidden transition-colors duration-300 hover:border-cy/50"
   }, /*#__PURE__*/React.createElement("img", {
     src: u.gorsel,
@@ -7716,7 +7741,8 @@ function AksesuarlarHub() {
       className: "pb-7 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
     }, (urunler[kat.id] || []).map(u => /*#__PURE__*/React.createElement(AksesuarUrunKart, {
       key: u.link,
-      u: u
+      u: u,
+      kat: kat.id
     })), Array.from({
       length: Math.max(0, AKSESUAR_BOS_SAYISI - (urunler[kat.id] || []).length)
     }).map((_, pi) => /*#__PURE__*/React.createElement(AksesuarBosKart, {
