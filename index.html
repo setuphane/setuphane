@@ -39,7 +39,6 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://unpkg.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@1,6..72,200;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -249,15 +248,13 @@ select option{background:#0E0E15;color:#ECEBF2}
      yerel geliştirmede 404 döner, zararsızdır. -->
 <script defer src="/_vercel/insights/script.js"></script>
 
-<!-- integrity (SRI): React'i unpkg'den çekiyoruz. Bu dosyalar bir gün
-     değiştirilirse (CDN ele geçirilmesi, DNS yönlendirmesi) sayfada yabancı
-     kod çalışır ve ziyaretçinin gördüğü her şeyi — panel oturum jetonu dahil —
-     ele geçirebilirdi. Hash tutmazsa tarayıcı script'i hiç çalıştırmaz.
-     Sürüm yükseltirken hash'i de güncellemek gerekir. -->
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin
-        integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin
-        integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1"></script>
+<!-- React kendi sunucumuzdan. Onceden unpkg.com'dan geliyordu: o CDN'e
+     ulasilamadigi anda site hic acilmiyordu (yukleniyor ekraninda kaliyordu).
+     Dosyalar unpkg'ten indirildi ve SRI hash'leriyle dogrulandi; ayni kaynaktan
+     servis edildikleri icin artik integrity gerekmiyor.
+     Surum yukseltirken vendor/ icindeki iki dosyayi da degistir. -->
+<script src="/vendor/react-18.3.1.production.min.js"></script>
+<script src="/vendor/react-dom-18.3.1.production.min.js"></script>
 
 
 <script>
@@ -1669,6 +1666,31 @@ const LAPTOPS = [{
   inch: '16'
 }];
 /* LAPTOPS:END */
+
+/* Ürün görselleri: önce kendi sunucumuz, olmazsa mağazanın adresi.
+   Görseller Shopify/Cimri CDN'lerinden çekiliyordu; onlar adresi değiştirse
+   ya da dışarıya görsel vermeyi kapatsa 100'den fazla görsel aynı anda
+   kırılırdı. scripts/gorsel-indir.mjs katalogdaki görselleri /urun/ altına
+   indiriyor; buradaki fonksiyon AYNI dosya adını üretiyor.
+   Panelden yeni ürün eklendiğinde görsel yine dışarıdan gelir — yerel kopya
+   bulunmazsa onError orijinal adrese geri döner, hiçbir şey bozulmaz. */
+const GORSEL_KAYNAKLARI = /cdn\.shopify\.com|cdn\.cimri\.io|wraithesports\.com\/cdn/;
+function gorselYolu(u) {
+  if (!u || !GORSEL_KAYNAKLARI.test(u)) return u;
+  const ad = (u.split('?')[0].split('/').pop() || '').replace(/[^a-zA-Z0-9._-]/g, '');
+  return ad ? '/urun/' + ad : u;
+}
+/* İlk hatada mağazanın adresine dön, ikinci hatada görseli gizle —
+   kırık resim ikonu göstermek karttan daha kötü duruyor. */
+function gorselHatasi(e) {
+  const el = e.currentTarget;
+  if (el.dataset.denendi) {
+    el.style.visibility = 'hidden';
+    return;
+  }
+  el.dataset.denendi = '1';
+  if (el.dataset.asil && el.src !== el.dataset.asil) el.src = el.dataset.asil;else el.style.visibility = 'hidden';
+}
 
 /* Laptop güç puanı ekran kartından türetilir — panelden elle girilmez.
    Panelde yanlış bir sayı yazılıp FPS tahminlerinin sessizce bozulması
@@ -3257,7 +3279,8 @@ function LaptopPicker({
     }, /*#__PURE__*/React.createElement("span", {
       className: "w-12 h-12 sm:w-20 sm:h-20 shrink-0 bg-[#0b0b12] grid place-items-center overflow-hidden"
     }, /*#__PURE__*/React.createElement("img", {
-      src: l.image,
+      src: gorselYolu(l.image),
+      "data-asil": l.image,
       alt: "",
       loading: "lazy",
       decoding: "async",
@@ -7691,7 +7714,9 @@ function AksesuarUrunKart({
     onClick: tik,
     className: "group block aspect-[4/3] border border-line/70 relative overflow-hidden transition-colors duration-300 hover:border-cy/50"
   }, /*#__PURE__*/React.createElement("img", {
-    src: u.gorsel,
+    src: gorselYolu(u.gorsel),
+    "data-asil": u.gorsel,
+    onError: gorselHatasi,
     alt: u.ad,
     loading: "lazy",
     className: "absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -8700,7 +8725,9 @@ function PanelAksesuar({
   }, /*#__PURE__*/React.createElement("div", {
     className: "w-14 h-11 shrink-0 border border-line overflow-hidden"
   }, /*#__PURE__*/React.createElement("img", {
-    src: u.gorsel,
+    src: gorselYolu(u.gorsel),
+    "data-asil": u.gorsel,
+    onError: gorselHatasi,
     alt: "",
     loading: "lazy",
     className: "w-full h-full object-cover"
@@ -9097,7 +9124,9 @@ function PanelLaptop({
   }, /*#__PURE__*/React.createElement("div", {
     className: "w-14 h-11 shrink-0 border border-line overflow-hidden bg-[#0b0b12]"
   }, /*#__PURE__*/React.createElement("img", {
-    src: l.gorsel,
+    src: gorselYolu(l.gorsel),
+    "data-asil": l.gorsel,
+    onError: gorselHatasi,
     alt: "",
     loading: "lazy",
     className: "w-full h-full object-contain"

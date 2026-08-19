@@ -39,7 +39,6 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@1,6..72,200;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -262,15 +261,13 @@ select option{background:#0E0E15;color:#ECEBF2}
      yerel geliştirmede 404 döner, zararsızdır. -->
 <script defer src="/_vercel/insights/script.js"></script>
 
-<!-- integrity (SRI): React'i unpkg'den çekiyoruz. Bu dosyalar bir gün
-     değiştirilirse (CDN ele geçirilmesi, DNS yönlendirmesi) sayfada yabancı
-     kod çalışır ve ziyaretçinin gördüğü her şeyi — panel oturum jetonu dahil —
-     ele geçirebilirdi. Hash tutmazsa tarayıcı script'i hiç çalıştırmaz.
-     Sürüm yükseltirken hash'i de güncellemek gerekir. -->
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin
-        integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin
-        integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1"></script>
+<!-- React kendi sunucumuzdan. Onceden unpkg.com'dan geliyordu: o CDN'e
+     ulasilamadigi anda site hic acilmiyordu (yukleniyor ekraninda kaliyordu).
+     Dosyalar unpkg'ten indirildi ve SRI hash'leriyle dogrulandi; ayni kaynaktan
+     servis edildikleri icin artik integrity gerekmiyor.
+     Surum yukseltirken vendor/ icindeki iki dosyayi da degistir. -->
+<script src="/vendor/react-18.3.1.production.min.js"></script>
+<script src="/vendor/react-dom-18.3.1.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.24.10/babel.min.js"></script>
 
 <script type="text/babel" data-presets="react">
@@ -616,6 +613,29 @@ const LAPTOPS=[
  {name:'MSI Raider 16 Max HX B2WJ-022TR Ultra 9 290HX Plus 32GB RAM 2TB SSD 24GB RTX 5090 Windows 11 Home 16 inç OLED Oyun Bilgisayarı',brand:'MSI',price:297039,image:'https://cdn.cimri.io/image/296x296/msi-raider-16-max-hx-b2wj-022tr-ultra-9-290hx-plus-32gb-ram-2tb-ssd-24gb-rtx-5090-windows-11-home-16-inc-oled-oyun-bilgisayari_1064075718.jpg',url:'https://www.cimri.com/oyun-bilgisayari/en-ucuz-msi-raider-16-max-hx-b2wj-022tr-ultra-9-290hx-plus-32gb-ram-2tb-ssd-24gb-rtx-5090-windows-11-home-16-inc-oled-oyun-bilgisayari-fiyatlari,2591076844',store:null,offers:21,gpu:'rtx 5090',idx:110,cpu:'Ultra 9 290HX',ram:32,ssd:2000,inch:'16'},
 ];
 /* LAPTOPS:END */
+
+/* Ürün görselleri: önce kendi sunucumuz, olmazsa mağazanın adresi.
+   Görseller Shopify/Cimri CDN'lerinden çekiliyordu; onlar adresi değiştirse
+   ya da dışarıya görsel vermeyi kapatsa 100'den fazla görsel aynı anda
+   kırılırdı. scripts/gorsel-indir.mjs katalogdaki görselleri /urun/ altına
+   indiriyor; buradaki fonksiyon AYNI dosya adını üretiyor.
+   Panelden yeni ürün eklendiğinde görsel yine dışarıdan gelir — yerel kopya
+   bulunmazsa onError orijinal adrese geri döner, hiçbir şey bozulmaz. */
+const GORSEL_KAYNAKLARI=/cdn\.shopify\.com|cdn\.cimri\.io|wraithesports\.com\/cdn/;
+function gorselYolu(u){
+  if(!u || !GORSEL_KAYNAKLARI.test(u)) return u;
+  const ad=(u.split('?')[0].split('/').pop()||'').replace(/[^a-zA-Z0-9._-]/g,'');
+  return ad ? '/urun/'+ad : u;
+}
+/* İlk hatada mağazanın adresine dön, ikinci hatada görseli gizle —
+   kırık resim ikonu göstermek karttan daha kötü duruyor. */
+function gorselHatasi(e){
+  const el=e.currentTarget;
+  if(el.dataset.denendi){ el.style.visibility='hidden'; return; }
+  el.dataset.denendi='1';
+  if(el.dataset.asil && el.src!==el.dataset.asil) el.src=el.dataset.asil;
+  else el.style.visibility='hidden';
+}
 
 /* Laptop güç puanı ekran kartından türetilir — panelden elle girilmez.
    Panelde yanlış bir sayı yazılıp FPS tahminlerinin sessizce bozulması
@@ -1532,7 +1552,7 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
                     {/* Telefonda 64px görsel yazıya 187px bırakıyordu ve özellik
                         satırı sıkışıp okunmuyordu. 48px'e indirildi. */}
                     <span className="w-12 h-12 sm:w-20 sm:h-20 shrink-0 bg-[#0b0b12] grid place-items-center overflow-hidden">
-                      <img src={l.image} alt="" loading="lazy" decoding="async"
+                      <img src={gorselYolu(l.image)} data-asil={l.image} alt="" loading="lazy" decoding="async"
                            className="w-full h-full object-contain"
                            style={{filter:'grayscale(.55) brightness(.92)'}}
                            onError={e=>{e.currentTarget.style.display='none'}}/>
@@ -4953,7 +4973,8 @@ function AksesuarUrunKart({u,kat}){
     <a href={u.link} target="_blank" rel="sponsored noopener noreferrer" onClick={tik}
        className="group block aspect-[4/3] border border-line/70 relative overflow-hidden
                   transition-colors duration-300 hover:border-cy/50">
-      <img src={u.gorsel} alt={u.ad} loading="lazy"
+      <img src={gorselYolu(u.gorsel)} data-asil={u.gorsel} onError={gorselHatasi}
+           alt={u.ad} loading="lazy"
            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
       <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-bg/95 via-bg/70 to-transparent">
         <div className="text-[.74rem] text-ink/90 leading-snug line-clamp-2">{u.ad}</div>
@@ -5725,7 +5746,7 @@ function PanelAksesuar({oturum, yakala}){
         {gorunen.map(u=>(
           <div key={u.id} className="border-b border-line py-3.5 flex items-center gap-4">
             <div className="w-14 h-11 shrink-0 border border-line overflow-hidden">
-              <img src={u.gorsel} alt="" loading="lazy" className="w-full h-full object-cover"/>
+              <img src={gorselYolu(u.gorsel)} data-asil={u.gorsel} onError={gorselHatasi} alt="" loading="lazy" className="w-full h-full object-cover"/>
             </div>
             <div className="flex-1 min-w-0">
               <div className={'text-[.9rem] truncate '+(u.aktif?'text-ink':'text-dim line-through')}>{u.ad}</div>
@@ -5938,7 +5959,7 @@ function PanelLaptop({oturum, yakala}){
             {(liste||[]).map(l=>(
               <div key={l.id} className="border-b border-line py-3.5 flex items-center gap-4">
                 <div className="w-14 h-11 shrink-0 border border-line overflow-hidden bg-[#0b0b12]">
-                  <img src={l.gorsel} alt="" loading="lazy" className="w-full h-full object-contain"/>
+                  <img src={gorselYolu(l.gorsel)} data-asil={l.gorsel} onError={gorselHatasi} alt="" loading="lazy" className="w-full h-full object-contain"/>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className={'text-[.9rem] truncate '+(l.aktif?'text-ink':'text-dim line-through')}>{l.ad}</div>
