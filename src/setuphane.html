@@ -701,6 +701,32 @@ const LAPTOP_CPU_IDX={
   'Ultra 5 225H':64,'Ultra 7 255HX':86,'Ultra 9 275HX':92,'Ultra 9 290HX':95,
   'Ultra 9 386H':80};
 
+/* ── Kasa sınıfı (TGP yaklaşımı) ─────────────────────────────────────────
+   Aynı ekran kartı laptoptan laptoba ciddi fark eder: kartın adı değil,
+   kasanın ona verdiği güç (TGP) belirleyicidir. Ölçülmüş örnekler:
+   60 W'a kısılmış bir RTX 5070 ortalama bir RTX 5070 laptopun ~%20 altında
+   kalıyor; 50 W ile 115 W arasındaki fark %35'i aşabiliyor. RTX 5090 ince
+   kasalı Zephyrus G16'da 115 W'a kısılıyken Legion Pro / Raider gibi kalın
+   kasalarda 175 W çalışıyor.
+
+   Tek tek 49 modelin TGP'sini doğrulayamadık: Cimri bu bilgiyi vermiyor,
+   Casper / Monster / Game Garaj / Erazer gibi yerel markalar için de bağımsız
+   ölçüm yok. Bu yüzden model bazlı değil, KASA SINIFI bazlı bir katsayı
+   kullanıyoruz — kaba ama yönü doğru ve tamamen şeffaf.
+   GPU_IDX değerleri "o kartın ortalama laptop hâli" kabul ediliyor. */
+const KASA_SINIFLARI=[
+  /* İnce/taşınabilir: kart güç sınırına takılıyor. */
+  {re:/zephyrus|stealth|\bair\b|low-profile/i, sinif:'ince', k:0.87},
+  /* Kalın performans kasaları: karta neredeyse tam güç veriliyor. */
+  {re:/legion pro|legion 9|rog strix|scar|predator helios|raider|titan|vector|omen max|beast 1[68]|slayer5|nitro 18/i, sinif:'performans', k:1.07},
+];
+/* Eşleşmeyen her şey ana akım kabul ediliyor (Nitro V, Victus, LOQ, TUF,
+   Katana, Deputy, Tulpar, Excalibur, OMEN 16/17 …). */
+function kasaSinifi(ad){
+  for(const x of KASA_SINIFLARI) if(x.re.test(ad||'')) return x;
+  return {sinif:'dengeli', k:1.00};
+}
+
 /* Bilinmeyen işlemcide sınır uygulanmıyor (null): uydurma bir değerle
    FPS'i yanlış kısmaktansa, o laptopta yalnızca ekran kartı belirleyici olsun. */
 function laptopCpuIdx(ad){
@@ -713,7 +739,9 @@ function laptopCpuIdx(ad){
 /* Laptopu masaüstüyle aynı şekle indirger; FPS hesabı tek koddan (activeFps)
    yürüsün diye. Liste ile panelin ayrışması böyle engelleniyor. */
 function laptopAktif(l){
-  return {kind:'laptop', gIdx:l.idx, cIdx:laptopCpuIdx(l.cpu), total:l.price,
+  const ks=kasaSinifi(l.name);
+  return {kind:'laptop', gIdx:Math.round(l.idx*ks.k), kasa:ks.sinif,
+          cIdx:laptopCpuIdx(l.cpu), total:l.price,
           gName:(l.gpu||'').toUpperCase(), cName:l.cpu||'—',
           vram:LAPTOP_VRAM[l.gpu]||8, lap:l};
 }
