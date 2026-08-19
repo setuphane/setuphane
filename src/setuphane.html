@@ -2897,7 +2897,15 @@ async function sb(yol,opts){
     try{ mesaj=(JSON.parse(ham)||{}).message||''; }catch(e){}
     throw new Error(mesaj || ('Supabase '+r.status+': '+ham.slice(0,160)));
   }
-  return r.status===204?null:r.json();
+  /* Prefer: return=minimal ile POST 201 doner ve GOVDE BOSTUR (204 degil).
+     Eskiden yalnizca 204 bos sayiliyordu, bu yuzden basarili bir ekleme
+     "Unexpected end of JSON input" hatasi olarak gorunuyordu: kayit
+     veritabanina yaziliyor ama arayuz hata gosteriyordu. Artik govde bos
+     ya da JSON degilse null donuyoruz. */
+  if(r.status===204) return null;
+  const govde=await r.text();
+  if(!govde) return null;
+  try{ return JSON.parse(govde); }catch(e){ return null; }
 }
 
 /* Cihaza özel kimlik — kim neyi beğendi/yazdı ayırmak için. Kişisel veri değil. */
