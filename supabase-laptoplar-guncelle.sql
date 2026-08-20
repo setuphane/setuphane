@@ -1,0 +1,58 @@
+-- Laptop fiyat ve satici sayisi guncellemesi
+-- Uretildi: node scripts/laptop-sql.mjs   (kaynak: src/setuphane.html)
+-- Satir silmez/eklemez; yalnizca fiyat ve saticilar alanlarini gunceller.
+update laptoplar as l set fiyat = y.fiyat, saticilar = y.saticilar
+from (values
+  ('Acer Nitro V 15 ANV15-52-504A NH.QZ7EY.003 i5-13420H 8GB RAM 512GB SSD RTX 5050 FreeDOS 15.6 inç Oyun Bilgisayarı', 39945, 6),
+  ('Lenovo LOQ 15IAX9 83GS00PGTR i5-12450HX 8GB RAM 512GB SSD RTX 4060 FreeDOS 15.6 inç Oyun Bilgisayarı', 44549, 3),
+  ('Erazer Deputy 15 P1 MD62763 Intel Core 5 210H 16GB RAM 1TB SSD RTX 5060 Windows 11 Home 15.6 inç Oyun Bilgisayarı', 49999, 2),
+  ('HP Victus 15-FA2019NT C21SGEA Core 5 210H 16GB RAM 1TB SSD RTX 5060 FreeDOS 15.6 inç Oyun Bilgisayarı', 51999, 5),
+  ('HP Victus 16-S0003NT 7Z4P9EA Ryzen 7 7840HS 16GB RAM 512GB SSD RTX 4070 Windows 11 Home 16.1 inç Oyun Bilgisayarı', 63499, 4),
+  ('Acer Nitro V 16 ANV16-72-72B9 NH.QZREY.002 Core 7 240H 16GB RAM 1TB SSD RTX 5070 FreeDOS 16 inç Oyun Bilgisayarı', 60999, 4),
+  ('HP OMEN 17-DB1016NT C2EZ6EA Ryzen AI 5 340 32GB RAM 1TB SSD RTX 5060 FreeDOS 17.3 inç Oyun Bilgisayarı', 69944, 4),
+  ('HP OMEN 17-DB1006NT C67G3EA Ryzen AI 7 350 16GB RAM 1TB SSD RTX 5070 FreeDOS 17.3 inç Laptop - Notebook', 72828, 3),
+  ('HP OMEN 16-AP0006NT C52R1EA Ryzen AI 7 350 32GB RAM 1TB SSD RTX 5070 FreeDOS 16 inç Oyun Bilgisayarı', 81799, 7),
+  ('Acer Nitro 18 AI AN18-61-R39E NH.QYDEY.002 Ryzen AI 7 350 16GB RAM 1TB SSD RTX 5070 Ti FreeDOS 18 inç Oyun Bilgisayarı', 95549, 1),
+  ('Casper Excalibur G915.1362-DF70A-C i7-13620H 32GB RAM 1TB SSD 8GB RTX 5070 Windows 11 Home 16 inç Oyun Bilgisayarı', 91844, 4),
+  ('Casper Excalibur G870.1362-DX70X-C i7-13620H 32GB RAM 2TB SSD RTX 5070 FreeDOS 15.6 inç Oyun Bilgisayarı', 93794, 4),
+  ('Monster Tulpar T6 V3.4.9 i7-13700HX 64GB RAM 1TB SSD RTX 5070 Windows 11 Home 16 inç Oyun Bilgisayarı', 105490, 2),
+  ('MSI Katana 17 HX B14WGK-048XTR i9-14900HX 32GB RAM 1TB SSD RTX 5070 FreeDOS 17.3 inç Oyun Bilgisayarı', 100912, 21),
+  ('Game Garaj Slayer R9T-5070TI C1 Ryzen 9 9955HX 32GB RAM 1TB SSD RTX 5070 Ti FreeDOS 16 inç Oyun Bilgisayarı', 116344, 1),
+  ('Casper Excalibur G880.1362-EF70X-C i7-13620H 64GB RAM 1TB SSD RTX 5070 FreeDOS 15.6 inç Oyun Bilgisayarı', 112611, 5),
+  ('Casper Excalibur G870.1362-EX70X-C i7-13620H 64GB RAM 2TB SSD RTX 5070 FreeDOS 15.6 inç Oyun Bilgisayarı', 117487, 4),
+  ('MSI Vector 16 HX A13VHG-495TR i7-13700HX 16GB RAM 1TB SSD RTX 4080 Windows 11 Home 16 inç Oyun Bilgisayarı', 124899, 1),
+  ('Acer Predator Helios Neo 16 AI PHN16-73-94TF NH.QX4EY.003 Ultra 9 275HX 32GB RAM 2TB SSD RTX 5070 Ti FreeDOS 16 inç Oyun Bilgisayarı', 153367, 1),
+  ('Game Garaj Slayer R9T-5070TI V2 C5 Ryzen 9 9955HX 32GB RAM 2TB SSD RTX 5070 Ti FreeDOS 16 inç Gaming Laptop', 130999, 2),
+  ('Monster Tulpar T6 V3.7.9 i9-13900HX 64GB RAM 1TB SSD RTX 5070 Ti Windows 11 Home 16 inç Oyun Bilgisayarı', 132999, 3),
+  ('Casper Excalibur G920.1490-DXP0X-E i9-14900HX 32GB RAM 2TB SSD RTX 5070 Ti FreeDOS 16 inç Oyun Bilgisayarı', 142369, 1),
+  ('Lenovo Legion 9 16IRX8 83AG000JTR i9-13980HX 32GB RAM 1TB SSD RTX 4080 FreeDOS 16 inç Oyun Bilgisayarı', 149000, 4),
+  ('Asus ROG Strix G16 G614PW-RV037 Ryzen 9 8940HX 32GB RAM 1TB SSD RTX 5080 FreeDOS 16 inç Oyun Bilgisayarı', 153599, 1),
+  ('Game Garaj Slayer5 9XL-5080 C2 Ultra 9 275HX 32GB RAM 2TB SSD RTX 5080 FreeDOS 17 inç Oyun Bilgisayarı', 165499, 2),
+  ('Erazer Beast 18 X1 MD62731 Ultra 9 275HX 32GB RAM 2TB SSD RTX 5080 Windows 11 Home 18 inç Oyun Bilgisayarı', 164999, 1),
+  ('Asus ROG Zephyrus M16 GU604VY-NM041W i9-13900H 32GB RAM 2TB SSD RTX 4090 Windows 11 Home 16 inç Oyun Bilgisayarı', 165388, 1),
+  ('HP OMEN MAX 16-AH0013NT B8SQ8EA Ultra 7 255HX 32GB RAM 1TB SSD RTX 5080 Windows 11 Home 16 Inç Oyun Bilgisayarı', 174999, 2),
+  ('Game Garaj Slayer5 9XL-5080 C3 Ultra 9 275HX 64GB RAM 2TB SSD RTX 5080 FreeDOS 17 inç Oyun Bilgisayarı', 187399, 2),
+  ('MSI Vector A18 HX A9WIG-093TR Ryzen 9 9955HX 32GB RAM 1TB SSD RTX 5080 Windows 11 Home 18 inç Oyun Bilgisayarı', 185000, 1),
+  ('MSI Vector 16 HX AI A2XWIG-089TR Ultra 9 275HX 32GB RAM 1TB SSD RTX 5080 Windows 11 Home 16 inç Oyun Bilgisayarı', 195774, 3),
+  ('Casper Excalibur G920.1490-DX80X-E i9-14900HX 32GB RAM 2TB SSD 16GB RTX 5080 FreeDOS 16 inç Oyun Bilgisayarı', 193829, 1),
+  ('Lenovo Legion 9 16IRX9 83G00010TR i9-14900HX 64GB RAM 2TB SSD RTX 4090 Windows 11 Home 16 inç Oyun Bilgisayarı', 207999, 2),
+  ('Casper Excalibur G920.1490-DF90A-E i9-14900HX 32GB RAM 1TB SSD 24GB RTX 5090 Windows 11 Home 16 inç Oyun Bilgisayarı', 202409, 5),
+  ('Asus ROG Strix G18 G815LR-TT341W Ultra 9 290HX Plus 32GB RAM 2TB SSD RTX 5070 Ti Windows 11 Home 18 inç Gaming Laptop', 209999, 1),
+  ('Casper Excalibur G920.1490-DX90A-E i9-14900HX 32GB RAM 2TB SSD 24GB RTX 5090 Windows 11 Home 16 inç Oyun Bilgisayarı', 211964, 4),
+  ('Lenovo Legion Pro 7 16IAX10H 83F500J8TR Ultra 7 255HX 64GB RAM 2TB SSD RTX 5070 Ti FreeDOS 16 inç Oyun Bilgisayarı', 219999, 6),
+  ('HP OMEN MAX 16-AH0009NT B92QQEA Ultra 9 275HX 64GB RAM 2TB SSD RTX 5080 Windows 11 Home 16 inç Oyun Bilgisayarı', 223041, 2),
+  ('Game Garaj Slayer5 9XL-5090 C3 Ultra 9 275HX 64GB RAM 2TB SSD RTX 5090 FreeDOS 17 inç Oyun Bilgisayarı', 225399, 2),
+  ('Erazer Beast 18 X1 MD62729 Ultra 9 275HX 64GB RAM 4TB SSD RTX 5090 Windows 11 Home 18 inç Oyun Bilgisayarı', 244999, 3),
+  ('MSI Vector 18 HX AI A2XWIG-667TR Ultra 9 275HX 32GB RAM 1TB SSD RTX 5080 Windows 11 Home 18 inç Oyun Bilgisayarı', 207234, 1),
+  ('MSI Raider 16 Max HX B2WI-092TR Ultra 9 290HX Plus 32GB RAM 2TB SSD 16GB RTX 5080 Windows 11 Home 16 inç OLED Oyun Bilgisayarı', 236907, 19),
+  ('Asus ROG Zephyrus G16 GU606AR-TB046 Ultra 9 386H 32GB RAM 2TB SSD RTX 5070 Ti FreeDOS 16 inç Oyun Bilgisayarı', 249799, 5),
+  ('MSI Stealth 18 HX A2WI-081TR Ultra 9 290HX Plus 32GB RAM 2TB SSD 16GB RTX 5080 Windows 11 Home 18 inç Mini LED Oyun Bilgisayarı', 241458, 20),
+  ('Erazer Beast 18 X1 MD62730 Ultra 9 275HX 32GB RAM 2TB SSD RTX 5090 Windows 11 Home 18 inç Oyun Bilgisayarı', 260000, 1),
+  ('Erazer Beast 16 X10 MD600094 Ultimate Intel Ultra 9 290HX 32GB RAM 2TB SSD RTX 5090 Windows 11 Home 16 inç MiniLED Gaming Laptop', 264999, 3),
+  ('Lenovo Legion Pro 7 16IRX9H 83DE002KTR i9-14900HX 32GB RAM 1TB SSD RTX 4090 Windows 11 Home 16 inç Oyun Bilgisayarı', 279773, 4),
+  ('Asus ROG Strix G18 G815LW-SA307W Ultra 9 290HX Plus 32GB RAM 1TB SSD RTX 5080 Windows 11 Home 18 inç Gaming Laptop', 281999, 1),
+  ('MSI Raider 16 Max HX B2WJ-022TR Ultra 9 290HX Plus 32GB RAM 2TB SSD 24GB RTX 5090 Windows 11 Home 16 inç OLED Oyun Bilgisayarı', 300491, 20)
+) as y(ad, fiyat, saticilar)
+where l.ad = y.ad;
+
+notify pgrst, 'reload schema';
