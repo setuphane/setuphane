@@ -307,37 +307,13 @@ const GPUS = [{
    "RTX 5090 32 GB (Asus TUF Gaming)". RX 9070 (XT değil) için Türkiye'de
    tek başına satılan güvenilir bir model bulunamadı, o yüzden markasız. */
 {
-  id: '6600',
-  n: 'Radeon RX 6600 8 GB (Asus Dual)',
-  b: 'AMD',
-  idx: 40,
-  vram: 8,
-  tdp: 132,
-  p: 13949
-}, {
-  id: 'b580',
-  n: 'Intel Arc B580 12 GB (Sparkle Titan OC)',
-  b: 'Intel',
-  idx: 55,
-  vram: 12,
-  tdp: 190,
-  p: 12725
-}, {
   id: '7600',
   n: 'Radeon RX 7600 8 GB (Asus Dual Evo OC)',
   b: 'AMD',
   idx: 48,
   vram: 8,
   tdp: 165,
-  p: 10800
-}, {
-  id: '4060',
-  n: 'GeForce RTX 4060 8 GB (Asus Dual OC)',
-  b: 'NVIDIA',
-  idx: 54,
-  vram: 8,
-  tdp: 115,
-  p: 16648
+  p: 13950
 }, {
   id: '5060',
   n: 'GeForce RTX 5060 8 GB (Asus Dual OC)',
@@ -345,7 +321,7 @@ const GPUS = [{
   idx: 58,
   vram: 8,
   tdp: 145,
-  p: 16969
+  p: 18381
 }, {
   id: '9060xt',
   n: 'Radeon RX 9060 XT 16 GB (Gigabyte Gaming OC)',
@@ -353,7 +329,7 @@ const GPUS = [{
   idx: 64,
   vram: 16,
   tdp: 180,
-  p: 18599
+  p: 25499
 }, {
   id: '5060ti',
   n: 'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',
@@ -361,7 +337,7 @@ const GPUS = [{
   idx: 74,
   vram: 16,
   tdp: 180,
-  p: 33200
+  p: 35928
 }, {
   id: '9070',
   n: 'Radeon RX 9070 16 GB',
@@ -369,7 +345,7 @@ const GPUS = [{
   idx: 92,
   vram: 16,
   tdp: 220,
-  p: 42902
+  p: 37000
 }, {
   id: '5070',
   n: 'GeForce RTX 5070 12 GB (MSI Ventus 2X OC)',
@@ -377,7 +353,7 @@ const GPUS = [{
   idx: 100,
   vram: 12,
   tdp: 250,
-  p: 36599
+  p: 37239
 }, {
   id: '9070xt',
   n: 'Radeon RX 9070 XT 16 GB (XFX Swift Gaming OC)',
@@ -385,7 +361,7 @@ const GPUS = [{
   idx: 112,
   vram: 16,
   tdp: 304,
-  p: 34493
+  p: 38069
 }, {
   id: '5070ti',
   n: 'GeForce RTX 5070 Ti 16 GB (Asus Prime OC)',
@@ -393,7 +369,7 @@ const GPUS = [{
   idx: 126,
   vram: 16,
   tdp: 300,
-  p: 62399
+  p: 61448
 }, {
   id: '5080',
   n: 'GeForce RTX 5080 16 GB (PNY OC)',
@@ -401,7 +377,7 @@ const GPUS = [{
   idx: 152,
   vram: 16,
   tdp: 360,
-  p: 59999
+  p: 75999
 }, {
   id: '5090',
   n: 'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',
@@ -430,22 +406,13 @@ const CPUS = [
    — 7500F ile 9600X arasında hiç seçenek yoktu, bütçe orta segmentte
    gereğinden pahalı işlemciye zıplıyordu. */
 {
-  id: '7400f',
-  n: 'Ryzen 5 7400F',
-  plat: 'AM5',
-  g: 68,
-  m: 62,
-  tdp: 65,
-  p: 5546,
-  ig: false
-}, {
   id: '8500g',
   n: 'Ryzen 5 8500G',
   plat: 'AM5',
   g: 55,
   m: 52,
   tdp: 65,
-  p: 7383,
+  p: 7652,
   ig: true
 }, {
   id: '7500f',
@@ -454,7 +421,7 @@ const CPUS = [
   g: 74,
   m: 68,
   tdp: 65,
-  p: 6999,
+  p: 6898,
   ig: false
 }, {
   id: '7600',
@@ -463,7 +430,7 @@ const CPUS = [
   g: 78,
   m: 71,
   tdp: 65,
-  p: 7253,
+  p: 7169,
   ig: true
 }, {
   id: '245k',
@@ -472,7 +439,7 @@ const CPUS = [
   g: 88,
   m: 96,
   tdp: 125,
-  p: 10400,
+  p: 9681,
   ig: true
 }, {
   id: '9600x',
@@ -481,7 +448,7 @@ const CPUS = [
   g: 92,
   m: 80,
   tdp: 65,
-  p: 9475,
+  p: 9480,
   ig: true
 }, {
   id: '9700x',
@@ -490,7 +457,7 @@ const CPUS = [
   g: 94,
   m: 104,
   tdp: 65,
-  p: 12300,
+  p: 12399,
   ig: true
 }, {
   id: '265k',
@@ -499,7 +466,7 @@ const CPUS = [
   g: 95,
   m: 124,
   tdp: 125,
-  p: 16900,
+  p: 16820,
   ig: true
 }, {
   id: '7800x3d',
@@ -508,7 +475,7 @@ const CPUS = [
   g: 108,
   m: 88,
   tdp: 120,
-  p: 14697,
+  p: 15079,
   ig: true
 }, {
   id: '9800x3d',
@@ -517,7 +484,7 @@ const CPUS = [
   g: 125,
   m: 108,
   tdp: 120,
-  p: 21808,
+  p: 21501,
   ig: true
 }, {
   id: '285k',
@@ -526,7 +493,7 @@ const CPUS = [
   g: 96,
   m: 150,
   tdp: 125,
-  p: 27094,
+  p: 32000,
   ig: true
 }, {
   id: '9950x3d',
@@ -553,7 +520,7 @@ const RAMS = [{
   id: '32',
   n: '32 GB DDR5-6000 CL30 (2×16) (G.Skill Trident Z5 RGB)',
   gb: 32,
-  p: 22199
+  p: 25661
 }, {
   id: '64',
   n: '64 GB DDR5-6000 (2×32) (Kingston Fury Beast)',
@@ -578,38 +545,34 @@ const SSDS = [{
 }];
 const PSUS = [{
   id: '550',
-  n: '550 W 80+ Bronze (Strong ST550)',
+  n: '550 W 80+ (Frisby FR-PS55F12B)',
   w: 550,
-  p: 1059
+  p: 1589
 }, {
   id: '650',
-  n: '650 W 80+ Bronze (Rampage RMP-650-80PB)',
+  n: '650 W 80+ (James Donkey JDP650 APFC)',
   w: 650,
-  p: 2308
+  p: 2179
 }, {
-  id: '750',
-  n: '750 W 80+ Gold (MSI MAG A750GL)',
-  w: 750,
-  p: 5299
+  id: '800',
+  n: '800 W 80+ Gold (High Power Performance GD)',
+  w: 800,
+  p: 5766
 }, {
   id: '850',
-  n: '850 W 80+ Gold (Rampage P850)',
+  n: '850 W 80+ Gold (MSI MAG A850GLS PCIE5)',
   w: 850,
-  p: 4000
+  p: 7629
 }, {
   id: '1000',
-  n: '1000 W 80+ Gold (MSI MPG A1000GS)',
+  n: '1000 W 80+ Gold (MSI MAG A1000GL PCIE5)',
   w: 1000,
-  p: 10259
-},
-/* 1200 W Platinum için güvenilir tekil bir liste fiyatı bulunamadı;
-   1000 W kademesindeki fiyattan orantılı tahmin edildi — gerçek model adı
-   doğrulanamadı, o yüzden markasız bırakıldı. */
-{
-  id: '1200',
-  n: '1200 W 80+ Platinum',
-  w: 1200,
-  p: 17300
+  p: 9399
+}, {
+  id: '1300',
+  n: '1300 W 80+ Platinum (MSI MEG AI1300P PCIE5)',
+  w: 1300,
+  p: 18648
 } /* RTX 5090 sınıfı için */];
 /* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
    modeller (Akakçe, Ağustos 2026, en ucuz liste fiyatı) — her yonga
@@ -650,12 +613,6 @@ const COOLERS = [{
   n: 'Kule tipi hava soğutucu (Segotep Wind Clear T2)',
   cap: 105,
   p: 1889
-}, /* "tower" bu geçişte doğrulanmadı, eski fiyat duruyor. */
-{
-  id: 'tower',
-  n: 'Çift fanlı büyük kule',
-  cap: 180,
-  p: 2600
 }, {
   id: 'aio',
   n: '240 mm sıvı soğutma (DeepCool LE520 ARGB)',
@@ -752,14 +709,15 @@ const ssdS = s => s.gb >= 2000 ? 100 : s.gb >= 1000 ? 90 : 66;
    kullanamayacağı güçlü bir işlemciyi ödüllendiriyor ve optimizer kendi
    darboğazlı sistemini öneriyordu. Site darboğazı ölçüp gösterdiğine göre
    önerdiği sistemde de ondan kaçınmak zorunda. */
-function balPenalty(g, c) {
+function balPenalty(g, c, esik) {
   if (g.id === 'igpu') return 1;
+  esik = esik || 1.55;
   const r = c.g * 1.32 / g.idx;
   /* SADECE "işlemci fazla güçlü" yönünde ceza var.
      Ters yön (işlemci yetişemiyor) zaten puanın içindeki
      eff = min(gpu, cpu×1.32) ile cezalanıyor; ikinci kez vurunca çift sayım
      oluyordu ve 500 bin ₺ bütçede bile RTX 5090 yerine 5080 seçiliyordu. */
-  return r > 1.55 ? 1 - Math.min(.25, (r - 1.55) * .18) : 1;
+  return r > esik ? 1 - Math.min(.25, (r - esik) * .18) : 1;
 }
 const PROFILES = [
 /* Math.min(92,...): oyunda 64 GB'ın 32 GB'a gerçek üstünlüğü yok. Tavan
@@ -787,7 +745,10 @@ const PROFILES = [
   needGpu: true,
   minRam: 32,
   minSsd: 1000,
-  score: (g, c, r, s) => .32 * g.idx + .44 * c.m + .16 * ramS(r) + .08 * ssdS(s)
+  /* Tasarimda islemci agirligi dogru ama sinirsiz degil: ekran kartina
+     gore asiri kacan eslesmeler (9950X3D + RTX 5060 gibi) cezalandiriliyor.
+     Esik oyundakinden yuksek, cunku render islemciye gercekten yaslanir. */
+  score: (g, c, r, s) => (.32 * g.idx + .44 * c.m + .16 * ramS(r) + .08 * ssdS(s)) * balPenalty(g, c, 2.2)
 }, {
   id: 'ofis',
   n: 'Ofis, ders, internet',
@@ -805,19 +766,37 @@ function pickBoard(c, budget) {
   const ok = list.filter(b => b.t <= want);
   return ok.length ? ok[ok.length - 1] : list[0];
 }
-const pickPsu = (g, c) => PSUS.find(p => p.w >= (g.tdp + c.tdp + 90) * 1.35) || PSUS[PSUS.length - 1];
-const pickCooler = c => COOLERS.find(k => k.cap >= c.tdp * 1.15) || COOLERS[COOLERS.length - 1];
+/* Yeterli olanlar arasindan EN UCUZU. Onceden find() kullaniliyordu ve
+   dizideki ilk uygun parcayi aliyordu; bu yuzden daha pahali ve daha zayif
+   bir guc kaynagi/sogutucu secilebiliyordu. */
+const enUcuzUygun = (liste, yeter) => {
+  const uygun = liste.filter(yeter);
+  return uygun.length ? uygun.reduce((a, b) => b.p < a.p ? b : a) : liste[liste.length - 1];
+};
+const pickPsu = (g, c) => enUcuzUygun(PSUS, p => p.w >= (g.tdp + c.tdp + 90) * 1.35);
+const pickCooler = c => enUcuzUygun(COOLERS, k => k.cap >= c.tdp * 1.15);
 const pickCase = b => CASES.find(k => b <= k.upTo) || CASES[CASES.length - 1];
 
 /* pick: {cpu:'AMD'|'Intel'|'', gpu:'NVIDIA'|'AMD'|''} — boş = fark etmez */
 function buildSystem(budget, prof, pick) {
+  /* Once kaliteli esiklerle dene, sonuc cikmazsa esikleri kaldirip tekrar
+     dene. Kural yuzunden ziyaretciye "sistem kurulamadi" demiyoruz. */
+  return kurDene(budget, prof, pick, true) || kurDene(budget, prof, pick, false);
+}
+function kurDene(budget, prof, pick, esikliMi) {
   pick = pick || {
     cpu: '',
     gpu: ''
   };
+  /* 8 GB kart 60 bin ustu bir sistemde kotu oneri: 2026 oyunlari 1440p'de
+     bu siniri asiyor ve kart yeni haliyle bile takiliyor.
+     16 GB RAM de 120 bin ustu sistemde amiral gemisi karti bogar. */
+  const minVram = esikliMi && prof.needGpu && budget >= 60000 ? 12 : 0;
+  const minRam = Math.max(prof.minRam, esikliMi && budget >= 120000 ? 32 : 0);
   let best = null;
   for (const g of GPUS) {
     if (prof.needGpu && g.id === 'igpu') continue;
+    if (g.id !== 'igpu' && g.vram && g.vram < minVram) continue;
     if (pick.gpu && g.id !== 'igpu' && g.b !== pick.gpu) continue;
     for (const c of CPUS) {
       if (pick.cpu && cpuBrand(c) !== pick.cpu) continue;
@@ -829,7 +808,7 @@ function buildSystem(budget, prof, pick) {
         cs = pickCase(budget);
       const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p;
       for (const r of RAMS) {
-        if (r.gb < prof.minRam) continue;
+        if (r.gb < minRam) continue;
         for (const s of SSDS) {
           if (s.gb < prof.minSsd) continue;
           const total = base + r.p + s.p;
@@ -852,6 +831,21 @@ function buildSystem(budget, prof, pick) {
     }
   }
   return best;
+}
+/* "Bu bütçeyle sistem çıkmıyor" derken kullanıcıyı boşlukta bırakmamak için:
+   o amaç ve marka kısıtıyla kurulabilen EN DÜŞÜK bütçe. İkili arama yapıyoruz,
+   çünkü buildSystem bütçeye göre monoton — bir bütçede kuruluyorsa üstünde de
+   kurulur. Yalnızca sistem çıkmadığında çağrılıyor, maliyeti önemsiz. */
+function enAzButce(prof, pick) {
+  if (buildSystem(BUD_MIN, prof, pick)) return BUD_MIN;
+  if (!buildSystem(BUD_MAX, prof, pick)) return null;
+  let alt = BUD_MIN,
+    ust = BUD_MAX;
+  while (ust - alt > 500) {
+    const orta = Math.round((alt + ust) / 2);
+    if (buildSystem(orta, prof, pick)) ust = orta;else alt = orta;
+  }
+  return ust;
 }
 function fps(g, c, game, res) {
   const vramPen = g.vram && g.vram < game.vram ? .82 : 1;
@@ -3584,7 +3578,14 @@ function Builder({
     className: "text-mg text-lg font-light"
   }, "Bu b\xFCt\xE7eyle bu i\u015F i\xE7in sa\u011Flam bir sistem \xE7\u0131km\u0131yor."), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-dim mt-3 max-w-[46ch] leading-relaxed"
-  }, pick.cpu || pick.gpu ? /*#__PURE__*/React.createElement(React.Fragment, null, "Marka k\u0131s\u0131t\u0131n\u0131 gev\u015Fetmeyi dene (", [pick.cpu && 'işlemci: ' + pick.cpu, pick.gpu && 'ekran kartı: ' + pick.gpu].filter(Boolean).join(', '), "), ya da b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Ya b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek, ya da daha hafif bir ama\xE7 se\xE7. Yar\u0131m yamalak sistem \xF6nermeyiz \u2014 bir y\u0131l sonra pi\u015Fman olursun."))) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, pick.cpu || pick.gpu ? /*#__PURE__*/React.createElement(React.Fragment, null, "Marka k\u0131s\u0131t\u0131n\u0131 gev\u015Fetmeyi dene (", [pick.cpu && 'işlemci: ' + pick.cpu, pick.gpu && 'ekran kartı: ' + pick.gpu].filter(Boolean).join(', '), "), ya da b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Ya b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek, ya da daha hafif bir ama\xE7 se\xE7. Yar\u0131m yamalak sistem \xF6nermeyiz \u2014 bir y\u0131l sonra pi\u015Fman olursun.")), (() => {
+    const az = enAzButce(prof, pick);
+    return az ? /*#__PURE__*/React.createElement("p", {
+      className: "text-sm text-ink/80 mt-3"
+    }, "Bu ama\xE7 i\xE7in en az ", /*#__PURE__*/React.createElement("span", {
+      className: "num text-cy"
+    }, fmt(az)), " gerekiyor.") : null;
+  })()) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "mb-7"
   }, /*#__PURE__*/React.createElement(BottleneckBadge, {
     c: sys.c,
