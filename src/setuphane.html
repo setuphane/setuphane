@@ -289,21 +289,19 @@ const PHOTOS = { gpu:'', cpu:'', ram:'', ssd:'', psu:'', mb:'', case:'', cooler:
 /* Fiyatlar: Cimri.com'dan 2026-08-09 tarihinde cekildi (scripts/prices.ps1). Guncellemek icin tek yer burasi. */
 const GPUS=[
  {id:'igpu',   n:'Dahili grafik (ayrı kart yok)', b:'—',      idx:12,  vram:0,  tdp:0,   p:0},
- /* Parantez içindeki isim: bu fiyatın hangi gerçek karttan geldiği (Akakçe,
-    Ağustos 2026, en ucuz liste fiyatı). Kullanıcı sonucu kopyaladığında
-    hangi modeli aratacağını bilsin diye — genel "RTX 5090 32 GB" değil,
-    "RTX 5090 32 GB (Asus TUF Gaming)". RX 9070 (XT değil) için Türkiye'de
-    tek başına satılan güvenilir bir model bulunamadı, o yüzden markasız. */
- {id:'7600',   n:'Radeon RX 7600 8 GB (Asus Dual Evo OC)',       b:'AMD',    idx:48,  vram:8,  tdp:165, p:13950},
- {id:'5060',   n:'GeForce RTX 5060 8 GB (Asus Dual OC)',         b:'NVIDIA', idx:58,  vram:8,  tdp:145, p:18381},
- {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Gigabyte Gaming OC)', b:'AMD',    idx:64,  vram:16, tdp:180, p:25499},
- {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',     b:'NVIDIA', idx:74,  vram:16, tdp:180, p:35928},
- {id:'9070',   n:'Radeon RX 9070 16 GB',                         b:'AMD',    idx:92,  vram:16, tdp:220, p:37000},
- {id:'5070',   n:'GeForce RTX 5070 12 GB (MSI Ventus 2X OC)',    b:'NVIDIA', idx:100, vram:12, tdp:250, p:37239},
- {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Gaming OC)',b:'AMD',    idx:112, vram:16, tdp:304, p:38069},
- {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (Asus Prime OC)',    b:'NVIDIA', idx:126, vram:16, tdp:300, p:61448},
- {id:'5080',   n:'GeForce RTX 5080 16 GB (PNY OC)',              b:'NVIDIA', idx:152, vram:16, tdp:360, p:75999},
- {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',   b:'NVIDIA', idx:205, vram:32, tdp:575, p:263209},
+ /* Parantezdeki isim, fiyatın geldiği modelin ta kendisi (Epey, 20.08.2026,
+    en az 3 satıcısı olan en ucuz ilan). Ziyaretçi listeyi kopyalayıp aynı
+    modeli aratınca aynı fiyatı bulabilsin diye. */
+ {id:'7600',   n:'Radeon RX 7600 8 GB (Sapphire Pulse)',          b:'AMD',    idx:48,  vram:8,  tdp:165, p:16629},
+ {id:'5060',   n:'GeForce RTX 5060 8 GB (Zotac Twin Edge)',       b:'NVIDIA', idx:58,  vram:8,  tdp:145, p:18382},
+ {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (PowerColor Reaper)',   b:'AMD',    idx:64,  vram:16, tdp:180, p:24873},
+ {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (MSI Shadow 2X OC)',  b:'NVIDIA', idx:74,  vram:16, tdp:180, p:32058},
+ {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:92,  vram:16, tdp:220, p:36809},
+ {id:'5070',   n:'GeForce RTX 5070 12 GB (Inno3D Twin X2 OC)',    b:'NVIDIA', idx:100, vram:12, tdp:250, p:37239},
+ {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (Gigabyte Gaming OC)',  b:'AMD',    idx:112, vram:16, tdp:304, p:39749},
+ {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (Palit GamingPro)',   b:'NVIDIA', idx:126, vram:16, tdp:300, p:61080},
+ {id:'5080',   n:'GeForce RTX 5080 16 GB (Inno3D X3)',            b:'NVIDIA', idx:152, vram:16, tdp:360, p:75999},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',     b:'NVIDIA', idx:205, vram:32, tdp:575, p:241999},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -316,20 +314,17 @@ const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
 const BRAND={ AMD:'#FF3D45', Intel:'#3BA9F0', NVIDIA:'#76B900' };
 const brandDot = b => BRAND[b] || null;
 const CPUS=[
- /* 7400F ve 9700X eklendi (Cimri/Akakçe, Ağustos 2026, en ucuz liste fiyatı)
-    — 7500F ile 9600X arasında hiç seçenek yoktu, bütçe orta segmentte
-    gereğinden pahalı işlemciye zıplıyordu. */
- {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:55,  m:52,  tdp:65,  p:7652,  ig:true},
- {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:74,  m:68,  tdp:65,  p:6898,  ig:false},
+ {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:55,  m:52,  tdp:65,  p:7299,  ig:true},
+ {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:74,  m:68,  tdp:65,  p:6699,  ig:false},
  {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:78,  m:71,  tdp:65,  p:7169,  ig:true},
- {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:88,  m:96,  tdp:125, p:9681, ig:true},
- {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:92,  m:80,  tdp:65,  p:9480, ig:true},
+ {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:88,  m:96,  tdp:125, p:10799, ig:true},
+ {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:92,  m:80,  tdp:65,  p:9481,  ig:true},
  {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:94,  m:104, tdp:65,  p:12399, ig:true},
- {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:95,  m:124, tdp:125, p:16820, ig:true},
- {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:108, m:88,  tdp:120, p:15079, ig:true},
- {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:21501, ig:true},
- {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:96,  m:150, tdp:125, p:32000, ig:true},
- {id:'9950x3d',n:'Ryzen 9 9950X3D',  plat:'AM5',     g:128, m:165, tdp:170, p:33564, ig:true},
+ {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:95,  m:124, tdp:125, p:16981, ig:true},
+ {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:108, m:88,  tdp:120, p:15080, ig:true},
+ {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:21440, ig:true},
+ {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:96,  m:150, tdp:125, p:29119, ig:true},
+ {id:'9950x3d',n:'Ryzen 9 9950X3D',   plat:'AM5',     g:128, m:165, tdp:170, p:33518, ig:true},
 ];
 /* RAM fiyatları: 2026'da yapay zeka veri merkezlerinin (HBM) bellek talebi
    yüzünden küresel bir DDR5 arz krizi var — üreticiler üretimi yüksek
@@ -338,22 +333,22 @@ const CPUS=[
    2028'e kadar süreceğini öngörüyor. Eski fiyatlar (16/32/64 GB için
    2.400/4.300/8.600₺) bu krizden önceydi ve artık gerçekçi değil. */
 const RAMS=[
- {id:'16',n:'16 GB DDR5-6000 (2×8) (Kingston Fury Beast)',        gb:16,p:12999},
- {id:'32',n:'32 GB DDR5-6000 CL30 (2×16) (G.Skill Trident Z5 RGB)',gb:32,p:25661},
- {id:'64',n:'64 GB DDR5-6000 (2×32) (Kingston Fury Beast)',       gb:64,p:51206},
+ {id:'16',n:'16 GB DDR5-6000 (XPG Lancer Blade)',            gb:16,p:11999},
+ {id:'32',n:'32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',gb:32,p:25599},
+ {id:'64',n:'64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',         gb:64,p:52849},
 ];
 const SSDS=[
- {id:'500',n:'500 GB NVMe Gen4 (SanDisk Extreme)',gb:500, p:3143},
- {id:'1t', n:'1 TB NVMe Gen4 (Kingston KC3000)',  gb:1000,p:3275},
- {id:'2t', n:'2 TB NVMe Gen4 (Kingston NV2)',     gb:2000,p:12141},
+ {id:'500',n:'500 GB NVMe Gen4 (WD Blue SN5100)', gb:500, p:4549},
+ {id:'1t', n:'1 TB NVMe Gen4 (WD Blue SN5100)',   gb:1000,p:7438},
+ {id:'2t', n:'2 TB NVMe Gen4 (WD Blue SN5100)',   gb:2000,p:15639},
 ];
 const PSUS=[
- {id:'550', n:'550 W 80+ (Frisby FR-PS55F12B)',              w:550, p:1589},
- {id:'650', n:'650 W 80+ (James Donkey JDP650 APFC)',        w:650, p:2179},
- {id:'800', n:'800 W 80+ Gold (High Power Performance GD)',  w:800, p:5766},
- {id:'850', n:'850 W 80+ Gold (MSI MAG A850GLS PCIE5)',      w:850, p:7629},
- {id:'1000',n:'1000 W 80+ Gold (MSI MAG A1000GL PCIE5)',     w:1000,p:9399},
- {id:'1300',n:'1300 W 80+ Platinum (MSI MEG AI1300P PCIE5)', w:1300,p:18648},   /* RTX 5090 sınıfı için */
+ {id:'550', n:'550 W 80+ (MSI MAG A550BNL)',            w:550, p:2068},
+ {id:'650', n:'650 W 80+ (MSI MAG A650BNL)',            w:650, p:2629},
+ {id:'750', n:'750 W 80+ (MSI MAG A750BN)',             w:750, p:3539},
+ {id:'850', n:'850 W 80+ Gold (MSI MAG A850GN)',        w:850, p:5829},
+ {id:'1000',n:'1000 W 80+ Gold (MSI MAG A1000GL)',      w:1000,p:8259},
+ {id:'1200',n:'1200 W 80+ Gold (NZXT C1200)',           w:1200,p:9190},
 ];
 /* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
    modeller (Akakçe, Ağustos 2026, en ucuz liste fiyatı) — her yonga
@@ -362,24 +357,24 @@ const PSUS=[
    sadece isim/fiyat artık soyut değil. */
 const BOARDS={
  AM5:[
-  {n:'Gigabyte A620M H (A620)',            p:3689,t:1},
-  {n:'Biostar B650MP-E Pro (B650)',        p:4069,t:2},
-  {n:'Asus B650E Max Gaming Wi-Fi (B650E)',p:9799,t:3},
+  {n:'MSI Pro A620AM-G Evo WiFi (A620)',      p:4849, t:1},
+  {n:'MSI B650M Gaming WiFi (B650)',          p:7631, t:2},
+  {n:'Asus B650E Max Gaming WiFi W (B650E)',  p:10693,t:3},
  ],
  LGA1851:[
-  {n:'Gigabyte B860 DS3H WIFI6E (B860)',      p:7006,t:2},
-  {n:'Asus TUF Gaming Z890-PLUS Wi-Fi (Z890)',p:14432,t:3},
+  {n:'MSI Pro B860M-E (B860)',                p:5660, t:2},
+  {n:'MSI Pro Z890-S WiFi6E (Z890)',          p:9799, t:3},
  ]
 };
 const COOLERS=[
- {id:'stock',n:'Kutudan çıkan soğutucu',                    cap:65, p:0},
- {id:'air',  n:'Kule tipi hava soğutucu (Segotep Wind Clear T2)',cap:105,p:1889},
-  {id:'aio',  n:'240 mm sıvı soğutma (DeepCool LE520 ARGB)', cap:260,p:2290},
+ {id:'stock',n:'Kutudan çıkan soğutucu',                              cap:65, p:0},
+ {id:'air',  n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',cap:180,p:1185},
+ {id:'aio',  n:'240 mm sıvı soğutma (Thermalright Frozen Magic 240)', cap:260,p:2841},
 ];
 const CASES=[
- {n:'Hava akışlı standart kasa (MSI)',                    p:2169,upTo:35000},
- {n:'Mesh ön panelli kasa (MSI Mag Forge 320R Airflow)',  p:3219,upTo:70000},
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D)',p:5041,upTo:Infinity},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2231,upTo:35000},
+ {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3256,upTo:70000},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',p:6270,upTo:Infinity},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -416,7 +411,11 @@ function balPenalty(g,c,esik){
 const PROFILES=[
  /* Math.min(92,...): oyunda 64 GB'ın 32 GB'a gerçek üstünlüğü yok. Tavan
     koymazsak artan bütçeyi işe yaramayan RAM'e harcıyordu. */
- {id:'oyun',n:'Oyun oynayacağım',sub:'Akıcılık her şeyden önemli',needGpu:true,minRam:16,minSsd:1000,
+ /* minSsd 1000 -> 500: DDR5 ve NVMe fiyatlari 2026'da ciktigi icin 1 TB
+    zorunlulugu giris seviyesinde sistemi tamamen kurulamaz hale getiriyordu.
+    500 GB Gen4 NVMe sistemi ZEDELEYEN bir tercih degil, sadece kucuk olani;
+    butce yettigi anda puanlamadaki ssdS terimi zaten 1-2 TB'a gecisi seciyor. */
+ {id:'oyun',n:'Oyun oynayacağım',sub:'Akıcılık her şeyden önemli',needGpu:true,minRam:16,minSsd:500,
   /* Küçük ama gerçek bir SSD terimi: oyunda 64 GB RAM işe yaramaz, ama
      2 TB disk yarar — 2026 oyunları tek başına 150-200 GB. Terim olmayınca
      yüksek bütçede artan para hiçbir şeye gitmiyor, 1 TB'de kalıyorduk. */
@@ -433,9 +432,17 @@ const PROFILES=[
 ];
 
 /* ═══════════════════ hesap motoru ═══════════════════ */
-function pickBoard(c,budget){
+function pickBoard(c,budget,g){
   const list=BOARDS[c.plat];
-  const want = c.p>=20000 ? 3 : c.p>=13000 ? 2 : (budget>40000?2:1);
+  /* Anakart kademesi ISLEMCIYE gore secilir, butceye gore degil.
+     65 W bir Ryzen 5 icin A620 fazlasiyla yeterli; onu B650a zorlamak
+     bosuna 2.800 TL yakiyor ve o para ekran kartindan kesiliyordu.
+     Butce esigi 40 binken B650 4.069 TL idi; artik 7.631 TL. */
+  /* Ust segment bir ekran karti takilacaksa en dusuk kademe anakart
+     mantiksiz duruyor: guclu kart daha iyi PCIe ve daha saglam guc
+     dagitimi hak ediyor. Kart 35 bin ustuyse kademe en az 2. */
+  const kartAgir = g && g.id!=="igpu" && g.p>=35000;
+  const want = c.p>=20000 ? 3 : (c.p>=13000 || c.tdp>=120 || kartAgir) ? 2 : (budget>90000 ? 2 : 1);
   const ok=list.filter(b=>b.t<=want);
   return ok.length ? ok[ok.length-1] : list[0];
 }
@@ -472,7 +479,7 @@ function kurDene(budget,prof,pick,esikliMi){
       if(pick.cpu && cpuBrand(c)!==pick.cpu) continue;
       if(g.id==='igpu' && !c.ig) continue;
       if(g.p+c.p>budget) continue;
-      const mb=pickBoard(c,budget), psu=pickPsu(g,c), cl=pickCooler(c), cs=pickCase(budget);
+      const mb=pickBoard(c,budget,g), psu=pickPsu(g,c), cl=pickCooler(c), cs=pickCase(budget);
       const base=g.p+c.p+mb.p+psu.p+cl.p+cs.p;
       for(const r of RAMS){
         if(r.gb<minRam) continue;
