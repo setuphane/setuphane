@@ -12,11 +12,15 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 const OEM = JSON.parse(readFileSync('.oem.json', 'utf8'));
 
-/* Ekran karti gucu — sitenin kendi GPUS tablosuyla ayni olcek. */
+/* Ekran karti gucu — sitenin GPUS tablosuyla AYNI olcek ve ayni kaynak:
+   TechPowerUp goreli performans 1080p, RTX 5070 = 100. Olcumu olmayan
+   kartlar bilerek listede yok; taninmayan kart eleniyor, cunku uydurma
+   bir puan verip sistemi siraya sokmak en tehlikeli hata olurdu. */
 const KART = {
-  'rtx 3060': 40, 'rx 7600': 48, 'rtx 5060': 58, 'rx 9060': 55, 'rx 9060 xt': 64,
-  'rtx 4060': 52, 'rtx 5060 ti': 74, 'rtx 4070': 88, 'rx 9070': 92, 'rtx 5070': 100,
-  'rtx 4070 super': 104, 'rx 9070 xt': 112, 'rtx 5070 ti': 126, 'rtx 5080': 152, 'rtx 5090': 205,
+  'rtx 3060': 44, 'rx 7600': 48, 'rtx 4060': 51, 'rtx 5060': 67,
+  'rx 9060 xt': 71, 'rtx 5060 ti': 74, 'rtx 4070': 85, 'rtx 5070': 100,
+  'rx 9070': 109, 'rx 9070 xt': 117, 'rtx 5070 ti': 121, 'rtx 5080': 131,
+  'rtx 5090': 168,
 };
 /* Islemcinin oyun gucu — sitedeki CPUS.g ile ayni olcek. */
 const ISLEMCI = {

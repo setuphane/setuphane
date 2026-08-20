@@ -1,19 +1,19 @@
 -- Katalog eslestirme: tablo yapisina DOKUNMAZ, sadece satirlari yeniler.
--- 20.08.2026 - fiyatlar Epey uzerinden 3+ satici kuraliyla dogrulandi.
+-- 20.08.2026 - fiyatlar Epey, performans degerleri TechPowerUp kaynakli.
 delete from parcalar;
 insert into parcalar (anahtar, kat, ad, marka, fiyat, idx, vram, tdp, plat, oyun, coklu_is,
                       dahili_grafik, watt, kapasite, sogutma_kap, kademe, butce_ust, sira) values
 ('gpu:igpu', 'gpu', 'Dahili grafik (ayrı kart yok)', '—', 0, 12, 0, 0, null, null, null, null, null, null, null, null, null, 10),
 ('gpu:7600', 'gpu', 'Radeon RX 7600 8 GB (Sapphire Pulse)', 'AMD', 16629, 48, 8, 165, null, null, null, null, null, null, null, null, null, 20),
-('gpu:5060', 'gpu', 'GeForce RTX 5060 8 GB (Zotac Twin Edge)', 'NVIDIA', 18382, 58, 8, 145, null, null, null, null, null, null, null, null, null, 30),
-('gpu:9060xt', 'gpu', 'Radeon RX 9060 XT 16 GB (PowerColor Reaper)', 'AMD', 24873, 64, 16, 180, null, null, null, null, null, null, null, null, null, 40),
+('gpu:5060', 'gpu', 'GeForce RTX 5060 8 GB (Zotac Twin Edge)', 'NVIDIA', 18382, 67, 8, 145, null, null, null, null, null, null, null, null, null, 30),
+('gpu:9060xt', 'gpu', 'Radeon RX 9060 XT 16 GB (PowerColor Reaper)', 'AMD', 24873, 71, 16, 180, null, null, null, null, null, null, null, null, null, 40),
 ('gpu:5060ti', 'gpu', 'GeForce RTX 5060 Ti 16 GB (MSI Shadow 2X OC)', 'NVIDIA', 32058, 74, 16, 180, null, null, null, null, null, null, null, null, null, 50),
-('gpu:9070', 'gpu', 'Radeon RX 9070 16 GB (Gigabyte Gaming OC)', 'AMD', 36809, 92, 16, 220, null, null, null, null, null, null, null, null, null, 60),
+('gpu:9070', 'gpu', 'Radeon RX 9070 16 GB (Gigabyte Gaming OC)', 'AMD', 36809, 109, 16, 220, null, null, null, null, null, null, null, null, null, 60),
 ('gpu:5070', 'gpu', 'GeForce RTX 5070 12 GB (Inno3D Twin X2 OC)', 'NVIDIA', 37239, 100, 12, 250, null, null, null, null, null, null, null, null, null, 70),
-('gpu:9070xt', 'gpu', 'Radeon RX 9070 XT 16 GB (Gigabyte Gaming OC)', 'AMD', 39749, 112, 16, 304, null, null, null, null, null, null, null, null, null, 80),
-('gpu:5070ti', 'gpu', 'GeForce RTX 5070 Ti 16 GB (Palit GamingPro)', 'NVIDIA', 61080, 126, 16, 300, null, null, null, null, null, null, null, null, null, 90),
-('gpu:5080', 'gpu', 'GeForce RTX 5080 16 GB (Inno3D X3)', 'NVIDIA', 75999, 152, 16, 360, null, null, null, null, null, null, null, null, null, 100),
-('gpu:5090', 'gpu', 'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)', 'NVIDIA', 241999, 205, 32, 575, null, null, null, null, null, null, null, null, null, 110),
+('gpu:9070xt', 'gpu', 'Radeon RX 9070 XT 16 GB (Gigabyte Gaming OC)', 'AMD', 39749, 117, 16, 304, null, null, null, null, null, null, null, null, null, 80),
+('gpu:5070ti', 'gpu', 'GeForce RTX 5070 Ti 16 GB (Palit GamingPro)', 'NVIDIA', 61080, 121, 16, 300, null, null, null, null, null, null, null, null, null, 90),
+('gpu:5080', 'gpu', 'GeForce RTX 5080 16 GB (Inno3D X3)', 'NVIDIA', 75999, 131, 16, 360, null, null, null, null, null, null, null, null, null, 100),
+('gpu:5090', 'gpu', 'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)', 'NVIDIA', 241999, 168, 32, 575, null, null, null, null, null, null, null, null, null, 110),
 ('cpu:8500g', 'cpu', 'Ryzen 5 8500G', null, 7299, null, null, 65, 'AM5', 55, 52, true, null, null, null, null, null, 120),
 ('cpu:7500f', 'cpu', 'Ryzen 5 7500F', null, 6699, null, null, 65, 'AM5', 74, 68, false, null, null, null, null, null, 130),
 ('cpu:7600', 'cpu', 'Ryzen 5 7600', null, 7169, null, null, 65, 'AM5', 78, 71, true, null, null, null, null, null, 140),
