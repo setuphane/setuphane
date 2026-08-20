@@ -898,41 +898,76 @@ const posForRatio = ratio => Math.max(4, Math.min(96, 50 + (ratio - 1.25) * 55))
    ziyaretçi "iyi" konumun neresi olduğunu bilemez). */
 const BN_SAFE_LO = posForRatio(.98),
   BN_SAFE_HI = posForRatio(1.55);
-function balance(c, g) {
-  const ratio = c.g * 1.32 / g.idx;
-  const pos = posForRatio(ratio);
-  if (ratio >= .98 && ratio <= 1.55) return {
+/* Darboğaz değerlendirmesi.
+   İKİ AYRI SORU var, karıştırılmamalı:
+
+   1) "Paranı iyi böldün mü?" — kurulumun kendi dengesi. Bu HER ZAMAN 1080p
+      referansıyla ölçülüyor ve çözünürlükle değişmiyor. Çözünürlüğü orana
+      katsaydık 4K seçen herkese "işlemciye fazla harcamışsın" derdik, ki bu
+      yanlış tavsiye olurdu: 1080p'ye düştüğü an o işlemciye ihtiyacı olacak.
+
+   2) "Senin ayarında bu fark hissediliyor mu?" — burada çözünürlük belirleyici.
+      Yüksek çözünürlükte yük ekran kartına geçtiği için işlemci sınırlaması
+      ortadan kalkar. Eskiden rozet bunu hiç dikkate almıyordu: 4K seçmiş
+      kullanıcıya "%18 kayıp" yazarken hemen altındaki "sınırı koyan parça"
+      satırı doğru şekilde "ekran kartı" diyordu — sayfa kendisiyle çelişiyordu.
+
+   res verilmezse 1080p varsayılır (kurulum karşılaştırma ekranı böyle kullanıyor). */
+function balance(c, g, res) {
+  const oran = c.g * 1.32 / g.idx; /* 1) kurulum dengesi */
+  const mul = res && res.mul || 1;
+  const oranSecili = c.g * 1.32 / (g.idx * mul); /* 2) seçilen çözünürlük */
+  const pos = posForRatio(oran);
+  if (oran >= .98 && oran <= 1.55) return {
     k: 'ok',
     sev: 'none',
     loss: 0,
     pos,
     unit: '',
+    kisa: 'Darboğaz yok',
     t: 'Darboğaz yok',
     d: 'İşlemci ve ekran kartı birbirini bekletmiyor. Verdiğin paranın tamamı ekrana yansıyor.'
   };
-  if (ratio < .98) {
-    const loss = Math.round((1 - ratio) * 100);
+  if (oran < .98) {
+    const loss = Math.round((1 - oran) * 100);
     const enIyisi = c.g >= MAX_CPU_G; /* daha güçlü işlemci yoksa bu bir hata değil */
+
+    /* Seçilen çözünürlükte işlemci artık sınırlamıyorsa kullanıcıya kayıp
+       göstermek yanlış olur — onun ayarında kaybettiği bir şey yok. */
+    if (oranSecili >= .98) return {
+      k: 'ok',
+      sev: 'none',
+      loss: 0,
+      pos,
+      unit: '',
+      kisa: 'Bu çözünürlükte dengeli',
+      t: 'Seçtiğin çözünürlükte dengeli',
+      d: `1080p'de bu ekran kartını tam besleyecek işlemci üretilmiyor, ama sen daha yüksek çözünürlük seçtin: orada yük ekran kartına geçiyor ve işlemci sınırlamıyor. Aynı sistemi 1080p'de kullanırsan ekran kartının bir kısmı boşta kalır.`
+    };
     return {
       k: 'cpu',
       sev: enIyisi ? 'minor' : loss < 12 ? 'minor' : 'real',
       loss,
       pos,
-      unit: 'KAYIP',
+      /* "Kayıp" kelimesi daha güçlüsü yokken haksız: kullanıcı yanlış bir şey
+         yapmadı, o ekran kartının 1080p tavanı mevcut işlemcilerin üstünde. */
+      unit: enIyisi ? 'BOŞTA' : 'KAYIP',
+      kisa: enIyisi ? `1080p'de %${loss} boşta` : `%${loss} kayıp`,
       t: enIyisi ? 'Bundan güçlü işlemci yok' : loss < 12 ? 'Neredeyse dengeli' : 'İşlemci yetişemiyor',
-      d: enIyisi ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır — yüksek çözünürlükte oynayacaksan sorun değil.` : loss < 12 ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss} — oyunda bunu fark etmezsin.` : `Ekran kartı hazır bekliyor ama işlemci sipariş yetiştiremiyor. Yaklaşık %${loss} performans boşa gidiyor.`
+      d: enIyisi ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor — listedeki en güçlü işlemci sende. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır; yüksek çözünürlükte oynayacaksan sorun değil.` : loss < 12 ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss} — oyunda bunu fark etmezsin.` : `Ekran kartı hazır bekliyor ama işlemci sipariş yetiştiremiyor. Yaklaşık %${loss} performans boşa gidiyor.`
     };
   }
 
-  /* ratio > 1.55 — ekran kartı sınırlıyor. Bu KAYIP değil, yedek güç. */
-  const bos = Math.round((ratio - 1.55) / ratio * 100);
-  const asiri = ratio > 2.2;
+  /* oran > 1.55 — ekran kartı sınırlıyor. Bu KAYIP değil, yedek güç. */
+  const bos = Math.round((oran - 1.55) / oran * 100);
+  const asiri = oran > 2.2;
   return {
     k: 'gpu',
     sev: asiri ? 'real' : 'minor',
     loss: bos,
     pos,
     unit: 'İŞLEMCİDE YEDEK GÜÇ',
+    kisa: `Ekran kartı sınırlıyor (%${bos} yedek)`,
     t: asiri ? 'İşlemciye fazla harcanmış' : 'Ekran kartı sınırlıyor',
     d: asiri ? `İşlemci bu ekran kartına göre çok güçlü. Aradaki paranın ekran kartına gitmesi oyunda çok daha fazla kazandırırdı.` : `Oyunda sınırı ekran kartı koyuyor — bu normaldir. İşlemcinin %${bos} kadar yedek gücü var, yani ileride ekran kartını yükseltirsen işlemciyi değiştirmen gerekmez.`
   };
@@ -2959,14 +2994,17 @@ function activeFps(a, game, res) {
 function BottleneckBadge({
   c,
   g,
+  res,
   compact = false
 }) {
-  const b = balance(c, g),
+  const b = balance(c, g, res),
     col = bnColor(b);
   /* toUpperCase() YOK: JS "işlemci"yi "IŞLEMCI" yapıyor, doğrusu "İŞLEMCİ".
      .lbl zaten CSS'te uppercase uyguluyor ve lang="tr" sayesinde tarayıcı
      Türkçe kurallarını doğru işletiyor. */
-  const head = b.sev === 'none' ? 'Darboğaz yok' : `${b.t} · %${b.loss} ${b.unit}`;
+  /* Yuzde yalnizca anlamliysa gosteriliyor: 'Darboğaz yok' ya da
+     'Seçtiğin çözünürlükte dengeli' durumunda kayip/bosta sayisi yok. */
+  const head = b.loss > 0 ? `${b.t} · %${b.loss} ${b.unit}` : b.t;
   if (compact) return /*#__PURE__*/React.createElement("span", {
     className: "inline-flex items-center gap-2"
   }, /*#__PURE__*/React.createElement("span", {
@@ -2978,7 +3016,7 @@ function BottleneckBadge({
     style: {
       color: col
     }
-  }, b.sev === 'none' ? 'Darboğaz yok' : b.k === 'gpu' ? `Ekran kartı sınırlıyor (%${b.loss} yedek)` : `%${b.loss} kayıp`));
+  }, b.kisa));
   return /*#__PURE__*/React.createElement("div", {
     className: "flex items-start gap-4 p-4 border",
     style: {
@@ -3000,7 +3038,7 @@ function BottleneckBadge({
     }
   }, head), /*#__PURE__*/React.createElement("p", {
     className: "text-[.88rem] leading-relaxed text-ink/80"
-  }, b.sev === 'none' ? 'İşlemci ve ekran kartı birbirini bekletmiyor — sistemi zaten buna göre seçtik.' : b.d)));
+  }, b.d)));
 }
 
 /* ═══════════════════ MOD SEÇİMİ ═══════════════════ */
@@ -3167,6 +3205,7 @@ function AmdIntelCompare({
     }, /*#__PURE__*/React.createElement(BottleneckBadge, {
       c: b.c,
       g: b.g,
+      res: res,
       compact: true
     }))) : /*#__PURE__*/React.createElement("p", {
       className: "text-[.85rem] text-dim leading-relaxed"
@@ -3464,7 +3503,8 @@ function Builder({
   setProf,
   sys,
   pick,
-  setPick
+  setPick,
+  res
 }) {
   const {
     fmt
@@ -3548,7 +3588,8 @@ function Builder({
     className: "mb-7"
   }, /*#__PURE__*/React.createElement(BottleneckBadge, {
     c: sys.c,
-    g: sys.g.id === 'igpu' ? GPUS[1] : sys.g
+    g: sys.g.id === 'igpu' ? GPUS[1] : sys.g,
+    res: res
   })), budget - sys.total >= 3000 && /*#__PURE__*/React.createElement("p", {
     className: "mb-7 text-[.88rem] text-dim leading-relaxed max-w-[52ch]"
   }, "B\xFCt\xE7enden ", /*#__PURE__*/React.createElement("span", {
@@ -4131,6 +4172,7 @@ function Panel({
   }, "Laptopta par\xE7a de\u011Fi\u015Ftirilemez \u2014 darbo\u011Faz\u0131 sonradan d\xFCzeltemezsin.") : /*#__PURE__*/React.createElement(BottleneckBadge, {
     c: sys.c,
     g: sys.g.id === 'igpu' ? GPUS[1] : sys.g,
+    res: res,
     compact: true
   }))), !isLap && /*#__PURE__*/React.createElement("div", {
     className: "mt-7 pt-6 border-t border-line"
@@ -4197,7 +4239,7 @@ function MobileDock({
   if (!act) return null;
   const f = activeFps(act, game, res);
   const save = sys ? Math.round(sys.total * PREBUILT_MARGIN) + ASSEMBLY : 0;
-  const bn = !isLap && sys ? balance(sys.c, sys.g.id === 'igpu' ? GPUS[1] : sys.g) : null;
+  const bn = !isLap && sys ? balance(sys.c, sys.g.id === 'igpu' ? GPUS[1] : sys.g, res) : null;
   return /*#__PURE__*/React.createElement("div", {
     className: 'dock lg:hidden ' + (hide ? 'hide' : '')
   }, /*#__PURE__*/React.createElement("div", {
@@ -10137,6 +10179,7 @@ function App() {
     setBudget: setBudget,
     prof: prof,
     setProf: setProf,
+    res: res,
     sys: sys,
     pick: pick,
     setPick: setPick

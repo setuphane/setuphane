@@ -499,31 +499,61 @@ const posForRatio = ratio => Math.max(4,Math.min(96, 50+(ratio-1.25)*55));
    vurgulamak için (aksi halde tek başına bir elmas işareti çizgide gezinir,
    ziyaretçi "iyi" konumun neresi olduğunu bilemez). */
 const BN_SAFE_LO=posForRatio(.98), BN_SAFE_HI=posForRatio(1.55);
-function balance(c,g){
-  const ratio=(c.g*1.32)/g.idx;
-  const pos=posForRatio(ratio);
+/* Darboğaz değerlendirmesi.
+   İKİ AYRI SORU var, karıştırılmamalı:
 
-  if(ratio>=.98 && ratio<=1.55)
-    return {k:'ok',sev:'none',loss:0,pos,unit:'',t:'Darboğaz yok',
+   1) "Paranı iyi böldün mü?" — kurulumun kendi dengesi. Bu HER ZAMAN 1080p
+      referansıyla ölçülüyor ve çözünürlükle değişmiyor. Çözünürlüğü orana
+      katsaydık 4K seçen herkese "işlemciye fazla harcamışsın" derdik, ki bu
+      yanlış tavsiye olurdu: 1080p'ye düştüğü an o işlemciye ihtiyacı olacak.
+
+   2) "Senin ayarında bu fark hissediliyor mu?" — burada çözünürlük belirleyici.
+      Yüksek çözünürlükte yük ekran kartına geçtiği için işlemci sınırlaması
+      ortadan kalkar. Eskiden rozet bunu hiç dikkate almıyordu: 4K seçmiş
+      kullanıcıya "%18 kayıp" yazarken hemen altındaki "sınırı koyan parça"
+      satırı doğru şekilde "ekran kartı" diyordu — sayfa kendisiyle çelişiyordu.
+
+   res verilmezse 1080p varsayılır (kurulum karşılaştırma ekranı böyle kullanıyor). */
+function balance(c,g,res){
+  const oran=(c.g*1.32)/g.idx;                    /* 1) kurulum dengesi */
+  const mul=(res&&res.mul)||1;
+  const oranSecili=(c.g*1.32)/(g.idx*mul);        /* 2) seçilen çözünürlük */
+  const pos=posForRatio(oran);
+
+  if(oran>=.98 && oran<=1.55)
+    return {k:'ok',sev:'none',loss:0,pos,unit:'',kisa:'Darboğaz yok',t:'Darboğaz yok',
       d:'İşlemci ve ekran kartı birbirini bekletmiyor. Verdiğin paranın tamamı ekrana yansıyor.'};
 
-  if(ratio<.98){
-    const loss=Math.round((1-ratio)*100);
+  if(oran<.98){
+    const loss=Math.round((1-oran)*100);
     const enIyisi = c.g>=MAX_CPU_G;   /* daha güçlü işlemci yoksa bu bir hata değil */
+
+    /* Seçilen çözünürlükte işlemci artık sınırlamıyorsa kullanıcıya kayıp
+       göstermek yanlış olur — onun ayarında kaybettiği bir şey yok. */
+    if(oranSecili>=.98)
+      return {k:'ok',sev:'none',loss:0,pos,unit:'',
+        kisa:'Bu çözünürlükte dengeli', t:'Seçtiğin çözünürlükte dengeli',
+        d:`1080p'de bu ekran kartını tam besleyecek işlemci üretilmiyor, ama sen daha yüksek çözünürlük seçtin: orada yük ekran kartına geçiyor ve işlemci sınırlamıyor. Aynı sistemi 1080p'de kullanırsan ekran kartının bir kısmı boşta kalır.`};
+
     return {k:'cpu',sev: enIyisi ? 'minor' : (loss<12 ? 'minor' : 'real'),
-      loss,pos,unit:'KAYIP',
+      loss,pos,
+      /* "Kayıp" kelimesi daha güçlüsü yokken haksız: kullanıcı yanlış bir şey
+         yapmadı, o ekran kartının 1080p tavanı mevcut işlemcilerin üstünde. */
+      unit: enIyisi ? 'BOŞTA' : 'KAYIP',
+      kisa: enIyisi ? `1080p'de %${loss} boşta` : `%${loss} kayıp`,
       t: enIyisi ? 'Bundan güçlü işlemci yok' : loss<12 ? 'Neredeyse dengeli' : 'İşlemci yetişemiyor',
       d: enIyisi
-        ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır — yüksek çözünürlükte oynayacaksan sorun değil.`
+        ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor — listedeki en güçlü işlemci sende. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır; yüksek çözünürlükte oynayacaksan sorun değil.`
         : loss<12
           ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss} — oyunda bunu fark etmezsin.`
           : `Ekran kartı hazır bekliyor ama işlemci sipariş yetiştiremiyor. Yaklaşık %${loss} performans boşa gidiyor.`};
   }
 
-  /* ratio > 1.55 — ekran kartı sınırlıyor. Bu KAYIP değil, yedek güç. */
-  const bos=Math.round((ratio-1.55)/ratio*100);
-  const asiri = ratio>2.2;
+  /* oran > 1.55 — ekran kartı sınırlıyor. Bu KAYIP değil, yedek güç. */
+  const bos=Math.round((oran-1.55)/oran*100);
+  const asiri = oran>2.2;
   return {k:'gpu',sev: asiri ? 'real' : 'minor', loss:bos, pos, unit:'İŞLEMCİDE YEDEK GÜÇ',
+    kisa:`Ekran kartı sınırlıyor (%${bos} yedek)`,
     t: asiri ? 'İşlemciye fazla harcanmış' : 'Ekran kartı sınırlıyor',
     d: asiri
       ? `İşlemci bu ekran kartına göre çok güçlü. Aradaki paranın ekran kartına gitmesi oyunda çok daha fazla kazandırırdı.`
@@ -1336,20 +1366,19 @@ function activeFps(a,game,res){
 }
 
 /* ═══════════════════ DARBOĞAZ ROZETİ ═══════════════════ */
-function BottleneckBadge({c,g,compact=false}){
-  const b=balance(c,g), col=bnColor(b);
+function BottleneckBadge({c,g,res,compact=false}){
+  const b=balance(c,g,res), col=bnColor(b);
   /* toUpperCase() YOK: JS "işlemci"yi "IŞLEMCI" yapıyor, doğrusu "İŞLEMCİ".
      .lbl zaten CSS'te uppercase uyguluyor ve lang="tr" sayesinde tarayıcı
      Türkçe kurallarını doğru işletiyor. */
-  const head = b.sev==='none' ? 'Darboğaz yok'
-             : `${b.t} · %${b.loss} ${b.unit}`;
+  /* Yuzde yalnizca anlamliysa gosteriliyor: 'Darboğaz yok' ya da
+     'Seçtiğin çözünürlükte dengeli' durumunda kayip/bosta sayisi yok. */
+  const head = b.loss>0 ? `${b.t} · %${b.loss} ${b.unit}` : b.t;
   if(compact) return (
     <span className="inline-flex items-center gap-2">
       <span className="w-1.5 h-1.5 rotate-45 shrink-0" style={{background:col}}/>
       <span style={{color:col}}>
-        {b.sev==='none' ? 'Darboğaz yok'
-         : b.k==='gpu' ? `Ekran kartı sınırlıyor (%${b.loss} yedek)`
-         : `%${b.loss} kayıp`}
+        {b.kisa}
       </span>
     </span>
   );
@@ -1359,9 +1388,7 @@ function BottleneckBadge({c,g,compact=false}){
       <div className="min-w-0">
         <div className="lbl mb-2" style={{color:col}}>{head}</div>
         <p className="text-[.88rem] leading-relaxed text-ink/80">
-          {b.sev==='none'
-            ? 'İşlemci ve ekran kartı birbirini bekletmiyor — sistemi zaten buna göre seçtik.'
-            : b.d}
+          {b.d}
         </p>
       </div>
     </div>
@@ -1457,7 +1484,7 @@ function AmdIntelCompare({budget,prof,game,res}){
             <div className="flex justify-between gap-3"><span className="text-dim">Toplam</span><span className="num text-ink/85">{fmt(b.total)}</span></div>
           </div>
           <div className="mt-4 pt-4 border-t border-line text-[.8rem]">
-            <BottleneckBadge c={b.c} g={b.g} compact/>
+            <BottleneckBadge c={b.c} g={b.g} res={res} compact/>
           </div>
         </>
       ) : (
@@ -1707,7 +1734,7 @@ function BudgetSlider({id,label,budget,setBudget}){
   );
 }
 
-function Builder({budget,setBudget,prof,setProf,sys,pick,setPick}){
+function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res}){
   const {fmt}=useCur();
   const rows = sys ? [
     ['gpu','Ekran kartı',sys.g.n,sys.g.p],
@@ -1761,7 +1788,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick}){
               </div>
             ) : (
               <>
-                <div className="mb-7"><BottleneckBadge c={sys.c} g={sys.g.id==='igpu'?GPUS[1]:sys.g}/></div>
+                <div className="mb-7"><BottleneckBadge c={sys.c} g={sys.g.id==='igpu'?GPUS[1]:sys.g} res={res}/></div>
                 {budget-sys.total>=3000 && (
                   <p className="mb-7 text-[.88rem] text-dim leading-relaxed max-w-[52ch]">
                     Bütçenden <span className="num text-cy">{fmt(budget-sys.total)}</span> kullanılmadı —
@@ -2202,7 +2229,7 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
             <div className="text-[.85rem]">
               {isLap
                 ? <span className="text-dim leading-relaxed">Laptopta parça değiştirilemez — darboğazı sonradan düzeltemezsin.</span>
-                : <BottleneckBadge c={sys.c} g={sys.g.id==='igpu'?GPUS[1]:sys.g} compact/>}
+                : <BottleneckBadge c={sys.c} g={sys.g.id==='igpu'?GPUS[1]:sys.g} res={res} compact/>}
             </div>
           </div>
 
@@ -2270,7 +2297,7 @@ function MobileDock({sys,act,prof,game,res}){
 
   const f=activeFps(act,game,res);
   const save=sys?Math.round(sys.total*PREBUILT_MARGIN)+ASSEMBLY:0;
-  const bn=(!isLap && sys)?balance(sys.c, sys.g.id==='igpu'?GPUS[1]:sys.g):null;
+  const bn=(!isLap && sys)?balance(sys.c, sys.g.id==='igpu'?GPUS[1]:sys.g, res):null;
 
   return (
     <div className={'dock lg:hidden '+(hide?'hide':'')}>
@@ -6716,7 +6743,7 @@ function App(){
               <Reveal delay={140}>
                 {mode==='topla'
                   ? <>
-                      <Builder budget={budget} setBudget={setBudget} prof={prof} setProf={setProf}
+                      <Builder budget={budget} setBudget={setBudget} prof={prof} setProf={setProf} res={res}
                                sys={sys} pick={pick} setPick={setPick}/>
                       <AmdIntelCompare budget={budget} prof={prof} game={game} res={res}/>
                     </>
