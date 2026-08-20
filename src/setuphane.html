@@ -852,22 +852,28 @@ function parcalariGetir(){
         const grup=k=>r.filter(x=>x.kat===k);
         const kimlik=x=>String(x.anahtar||'').split(':')[1]||x.id;
         const koy=(dizi,yeni)=>{ if(yeni.length) dizi.splice(0,dizi.length,...yeni); };
-        koy(GPUS, grup('gpu').map(x=>({id:kimlik(x), n:x.ad, b:x.marka||'—',
-          idx:x.idx||0, vram:x.vram||0, tdp:x.tdp||0, p:x.fiyat})));
+        /* Fiziksel/ölçüm alanları (radyatör boyu, çözünürlük katsayıları)
+           veritabanında TUTULMUYOR: bunlar fiyat gibi değişen şeyler değil
+           ve panelden yanlışlıkla boş bırakılmaları sessiz hataya yol açar
+           — 360'lık radyatörü 280'lik kasaya takmak ya da 4K katsayısını
+           kaybedip yanlış FPS göstermek gibi. Koddaki değeri koruyoruz;
+           veritabanı yalnızca ad, fiyat ve temel özellikleri güncelliyor. */
+        const koru = (eski, yeniler, anahtar, alanlar) => yeniler.map(y => {
+          const e = eski.find(o => anahtar(o) === anahtar(y));
+          if (!e) return y;
+          const c = {...y};
+          for (const a of alanlar) if (e[a] != null) c[a] = e[a];
+          return c;
+        });
+        koy(GPUS, koru(GPUS.slice(), grup('gpu').map(x=>({id:kimlik(x), n:x.ad, b:x.marka||'—',
+          idx:x.idx||0, vram:x.vram||0, tdp:x.tdp||0, p:x.fiyat})),
+          o=>o.id, ['r1440','r2160']));
         koy(CPUS, grup('cpu').map(x=>({id:kimlik(x), n:x.ad, plat:x.plat,
           g:x.oyun||0, m:x.coklu_is||0, tdp:x.tdp||0, p:x.fiyat, ig:!!x.dahili_grafik})));
         koy(RAMS, grup('ram').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
         koy(SSDS, grup('ssd').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
         koy(PSUS, grup('psu').map(x=>({id:kimlik(x), n:x.ad, w:x.watt||0, p:x.fiyat})));
-        /* rad (radyatör boyu / kasanın radyatör kapasitesi) veritabanında
-           TUTULMUYOR: fiziksel bir özellik, fiyat gibi değişmiyor ve panelden
-           yanlışlıkla boş bırakılması 360'lık radyatörü 280'lik kasaya takan
-           bir öneri üretirdi. Koddaki değeri koruyoruz; veritabanı yalnızca
-           ad ve fiyatı güncelliyor. */
-        const radKoru = (eski, yeniler, anahtar) => yeniler.map(y => {
-          const e = eski.find(o => anahtar(o) === anahtar(y));
-          return e ? {...y, rad: e.rad} : y;
-        });
+        const radKoru = (eski, yeniler, anahtar) => koru(eski, yeniler, anahtar, ['rad']);
         koy(COOLERS, radKoru(COOLERS.slice(),
           grup('sogutucu').map(x=>({id:kimlik(x), n:x.ad, cap:x.sogutma_kap||0, p:x.fiyat})),
           o=>o.id));
