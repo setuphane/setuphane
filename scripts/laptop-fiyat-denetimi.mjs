@@ -14,8 +14,12 @@ const MIN_SATICI = 3;
 const buyuk = t => t.toUpperCase().replace(/İ/g, 'I');
 /* Uretici kodu: en az 6 karakter, harf+rakam karisik, nokta/tire olabilir. */
 const kodlar = ad => (buyuk(ad).match(/\b[A-Z0-9][A-Z0-9.\-]{5,}\b/g) || [])
-  .filter(k => /[0-9]/.test(k) && /[A-Z]/.test(k))
-  .filter(k => !/^(RTX|GTX|RYZEN|DDR|SSD|NVME)/.test(k));
+  .filter(k => !/^(RTX|GTX|RYZEN|DDR|SSD|NVME)/.test(k))
+  /* En az IKI rakam, ve butun rakamlar sonda olmasin. Bu suzgec olmadan
+     "SLAYER5" gibi seri adlari uretici kodu sanilip 5080'lik modelimizi
+     5070'lik bir laptopla esliyor, sonra da "%50 pahaliyiz" diyorduk. */
+  .filter(k => (k.match(/[0-9]/g) || []).length >= 2)
+  .filter(k => !/^[A-Z]+[0-9]+$/.test(k) || k.length >= 9);
 
 const tl = n => n.toLocaleString('tr-TR') + ' TL';
 const epeyKod = epey.map(x => ({ ...x, kod: buyuk(x.ad) }));
@@ -34,17 +38,35 @@ const kartAnahtari = t => {
 };
 
 for (const l of LAPTOPS) {
-  const ks = kodlar(l.name);
   const bizimKart = kartAnahtari(l.gpu) || kartAnahtari(l.name);
+  const bizimNo = bizimKart ? bizimKart.match(/\d{4}/) : null;
+  const kartUyar = x => {
+    const ek = kartAnahtari(x.ad);
+    if (ek) return ek === bizimKart;
+    if (!bizimNo) return true;
+    const nolar = buyuk(x.ad).match(/\b[3-9]\d{3}\b/g) || [];
+    return !nolar.length || nolar.includes(bizimNo[0]);
+  };
+
+  /* Kodlari uzundan kisaya deniyoruz. Kritik kural: bir kod COK SAYIDA
+     ilanla eslesiyorsa o bir uretici kodu degil, seri adidir ("15IAX9"
+     yirmiden fazla LOQ modeline uyuyor). Boyle bir kodla eslesmeyi kabul
+     edersek bambaska bir cihazin fiyatini kendi modelimize yazariz —
+     bu, hic fiyat gostermemekten cok daha kotu. */
   let aday = [];
-  for (const k of ks) {
-    aday = epeyKod.filter(x => x.kod.includes(k));
+  for (const k of kodlar(l.name).sort((a, b) => b.length - a.length)) {
+    const bulunan = epeyKod.filter(x => x.kod.includes(k));
+    if (!bulunan.length || bulunan.length > 4) continue;
+    aday = bulunan.filter(kartUyar);
     if (aday.length) break;
   }
-  if (bizimKart) aday = aday.filter(x => {
-    const ek = kartAnahtari(x.ad);
-    return !ek || ek === bizimKart;
-  });
+  /* Varyant kontrolu: ayni uretici kodunu paylasan C1 / V2 C5 gibi
+     surumler farkli cihazlardir (biri 1 TB, oteki 2 TB). Ilanda gecen
+     her varyant etiketi bizim adimizda da gecmeli; gecmiyorsa bu bizim
+     modelimiz degildir ve fiyatini almak yanlis olur. */
+  const bizimAd = ' ' + buyuk(l.name) + ' ';
+  aday = aday.filter(x => (buyuk(x.ad).match(/\b[CV]\d+(\.\d+)?\b/g) || [])
+    .every(v => bizimAd.includes(' ' + v + ' ')));
   const yeterli = aday.filter(x => x.satici >= MIN_SATICI);
   if (!yeterli.length) {
     kayip++;
