@@ -817,7 +817,15 @@ const pickPsu = (g, c) => enUcuzUygun(PSUS, p => p.w >= (g.tdp + c.tdp + 90) * 1
    gerçekten doğru olduğu için altta duruyor: sessiz, arızalanacak
    pompası yok ve beş yıl sonra da aynı işi görüyor. */
 const pickCooler = (c, budget, cs) => {
-  const sigar = k => !k.rad || cs && k.rad <= cs.rad;
+  /* Radyatör boyu bilinmiyorsa ADINDAN çıkar. Veritabanından gelen bir
+     soğutucu satırında rad alanı olmayabilir; o durumda "radyatörü yok"
+     saymak, 360'lık bir soğutucuyu 240'lık kasaya takmak demekti. Sessiz
+     hataların en tehlikeli türü bu: hiçbir yerde uyarı vermiyor. */
+  const radBoyu = k => k.rad != null ? k.rad : String(k.n).match(/\b(120|140|240|280|360|420)\s*mm\b/) ? +RegExp.$1 : 0;
+  const sigar = k => {
+    const r = radBoyu(k);
+    return !r || cs && cs.rad != null && r <= cs.rad;
+  };
   const yeter = k => k.cap >= c.tdp * 1.15 && sigar(k);
   const hedef = budget >= 120000 ? 'aio360p' : budget >= 80000 ? 'aio360' : 'air';
   const istenen = COOLERS.find(k => k.id === hedef);
