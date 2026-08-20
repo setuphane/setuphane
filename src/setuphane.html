@@ -417,7 +417,10 @@ const PROFILES=[
  /* Math.min(92,...): oyunda 64 GB'ın 32 GB'a gerçek üstünlüğü yok. Tavan
     koymazsak artan bütçeyi işe yaramayan RAM'e harcıyordu. */
  {id:'oyun',n:'Oyun oynayacağım',sub:'Akıcılık her şeyden önemli',needGpu:true,minRam:16,minSsd:1000,
-  score:(g,c,r,s)=> (.66*Math.min(g.idx,c.g*1.32) + .22*c.g + .12*Math.min(92,ramS(r))) * balPenalty(g,c)},
+  /* Küçük ama gerçek bir SSD terimi: oyunda 64 GB RAM işe yaramaz, ama
+     2 TB disk yarar — 2026 oyunları tek başına 150-200 GB. Terim olmayınca
+     yüksek bütçede artan para hiçbir şeye gitmiyor, 1 TB'de kalıyorduk. */
+  score:(g,c,r,s)=> (.62*Math.min(g.idx,c.g*1.32) + .20*c.g + .12*Math.min(92,ramS(r)) + .06*ssdS(s)) * balPenalty(g,c)},
  {id:'yayin',n:'Yayın / video çekeceğim',sub:'Aynı anda oyun + kayıt',needGpu:true,minRam:32,minSsd:1000,
   score:(g,c,r,s)=> (.42*Math.min(g.idx,c.g*1.32) + .38*c.m + .12*ramS(r) + .08*ssdS(s)) * balPenalty(g,c)},
  {id:'tasarim',n:'Video / tasarım işi yapacağım',sub:'Render ve kurgu hızı',needGpu:true,minRam:32,minSsd:1000,

@@ -729,7 +729,10 @@ const PROFILES = [
   needGpu: true,
   minRam: 16,
   minSsd: 1000,
-  score: (g, c, r, s) => (.66 * Math.min(g.idx, c.g * 1.32) + .22 * c.g + .12 * Math.min(92, ramS(r))) * balPenalty(g, c)
+  /* Küçük ama gerçek bir SSD terimi: oyunda 64 GB RAM işe yaramaz, ama
+     2 TB disk yarar — 2026 oyunları tek başına 150-200 GB. Terim olmayınca
+     yüksek bütçede artan para hiçbir şeye gitmiyor, 1 TB'de kalıyorduk. */
+  score: (g, c, r, s) => (.62 * Math.min(g.idx, c.g * 1.32) + .20 * c.g + .12 * Math.min(92, ramS(r)) + .06 * ssdS(s)) * balPenalty(g, c)
 }, {
   id: 'yayin',
   n: 'Yayın / video çekeceğim',
@@ -7767,7 +7770,7 @@ function useUrunler() {
 }
 function AksesuarBosKart() {
   return /*#__PURE__*/React.createElement("div", {
-    className: "aspect-[4/3] border border-dashed border-line/70 grid place-items-center gap-2.5 text-dim/70 transition-colors duration-300 hover:border-cy/40 hover:text-cy/70"
+    className: "aspect-[4/3] border border-dashed border-line/70 grid place-items-center gap-2.5\r text-dim/70 transition-colors duration-300 hover:border-cy/40 hover:text-cy/70"
   }, /*#__PURE__*/React.createElement("svg", {
     width: "20",
     height: "20",
@@ -7802,7 +7805,7 @@ function AksesuarUrunKart({
     target: "_blank",
     rel: "sponsored noopener noreferrer",
     onClick: tik,
-    className: "group block aspect-[4/3] border border-line/70 relative overflow-hidden transition-colors duration-300 hover:border-cy/50"
+    className: "group block aspect-[4/3] border border-line/70 relative overflow-hidden\r transition-colors duration-300 hover:border-cy/50"
   }, /*#__PURE__*/React.createElement("img", {
     src: gorselYolu(u.gorsel),
     "data-asil": u.gorsel,
@@ -8122,7 +8125,7 @@ function OnerHub() {
     value: butce,
     onChange: e => setButce(e.target.value),
     placeholder: "\xF6r. 1500",
-    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50 focus:border-cy transition-colors"
+    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50\r focus:border-cy transition-colors"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "oner-istek",
     className: "lbl text-dim mb-3 block"
@@ -8132,10 +8135,10 @@ function OnerHub() {
     value: istek,
     onChange: e => setIstek(e.target.value),
     placeholder: "\xF6r. masam da\u011F\u0131n\u0131k, kablo toparlamak istiyorum",
-    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50 focus:border-cy transition-colors"
+    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50\r focus:border-cy transition-colors"
   })), /*#__PURE__*/React.createElement("button", {
     type: "submit",
-    className: "sm:col-span-2 border border-cy text-cy px-6 py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300 w-fit"
+    className: "sm:col-span-2 border border-cy text-cy px-6 py-3.5 lbl hover:bg-cy hover:text-bg\r transition-colors duration-300 w-fit"
   }, "\xD6NER\u0130 AL"))), sonuc && /*#__PURE__*/React.createElement(Reveal, {
     delay: 120
   }, /*#__PURE__*/React.createElement("div", {
