@@ -95,8 +95,14 @@ const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 const cikti = [];
 for (const s of secilen) {
   let h = '';
-  try { h = execFileSync('curl', ['-sS', '--compressed', '-L', '-A', UA, s.url], { encoding: 'utf8', maxBuffer: 6e7 }); }
-  catch (e) { console.error('  ! ' + s.ad + ' sayfasi alinamadi'); }
+  /* Tek denemede biraktigimizda bir sayfa gecici olarak alinamayip gorsel
+     bos kaliyordu. Ucuncuye kadar tekrar deniyoruz; eksik gorselle
+     yayina cikmak istemiyoruz. */
+  for (let deneme = 1; deneme <= 3 && !h; deneme++) {
+    try { h = execFileSync('curl', ['-sS', '--compressed', '-L', '--max-time', '30', '-A', UA, s.url],
+      { encoding: 'utf8', maxBuffer: 6e7 }); }
+    catch (e) { if (deneme === 3) console.error('  ! ' + s.ad + ' sayfasi alinamadi'); }
+  }
   /* Sayfadaki ilk resmi almak yanlisti: oneri kartlarindaki gorseli de
      yakalayabiliyordu. og:image bu urune ait KANONIK gorsel.
      (OEM paketlerde ayni kasa fotografinin paylasilmasi normaldir.) */
@@ -106,7 +112,12 @@ for (const s of secilen) {
   const fy = (h.match(/"price"\s*:\s*"?(\d+)/) || [])[1];
   const uyar = fy && Math.abs(+fy - s.price) > 1 ? `  !! liste ${s.price} / sayfa ${fy}` : '';
   console.error(`  ${s.ad.padEnd(20)} gorsel:${gorsel ? 'var' : 'YOK'}${uyar}`);
-  cikti.push({ ad: s.ad, fiyat: s.price, cpu: s.cpu, kart: s.kart, vram: s.vram,
+  /* Islemci ve kart adini BIZIM anahtarimizdan degil, ilanin kendi
+     yazimindan aliyoruz: ziyaretci magazada arayinca ayni metni gorsun. */
+  const parca = s.name.split('|').map(x=>x.trim());
+  const cpuAd  = parca.find(x=>/ryzen|intel|core i|id-/i.test(x)) || s.cpu;
+  const kartAd = parca.find(x=>/rtx|rx |arc/i.test(x)) || s.kart;
+  cikti.push({ ad: s.ad, fiyat: s.price, cpu: cpuAd, kart: kartAd, vram: s.vram,
                ram: s.ram, ssd: s.ssd, idx: s.kartIdx, cpuIdx: s.cpuIdx,
                url: s.url, gorsel, magaza: 'İncehesap' });
 }
