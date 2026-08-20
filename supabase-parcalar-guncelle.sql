@@ -1,6 +1,5 @@
 -- Katalog eslestirme: tablo yapisina DOKUNMAZ, sadece satirlari yeniler.
 -- 20.08.2026 - fiyatlar Epey uzerinden 3+ satici kuraliyla dogrulandi.
--- Supabase > SQL Editor > yapistir > Run.
 delete from parcalar;
 insert into parcalar (anahtar, kat, ad, marka, fiyat, idx, vram, tdp, plat, oyun, coklu_is,
                       dahili_grafik, watt, kapasite, sogutma_kap, kademe, butce_ust, sira) values
@@ -40,14 +39,15 @@ insert into parcalar (anahtar, kat, ad, marka, fiyat, idx, vram, tdp, plat, oyun
 ('psu:1200', 'psu', '1200 W 80+ Gold (NZXT C1200)', null, 9190, null, null, null, null, null, null, null, 1200, null, null, null, null, 340),
 ('sogutucu:stock', 'sogutucu', 'Kutudan çıkan soğutucu', null, 0, null, null, null, null, null, null, null, null, null, 65, null, null, 350),
 ('sogutucu:air', 'sogutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)', null, 1185, null, null, null, null, null, null, null, null, null, 180, null, null, 360),
-('sogutucu:aio', 'sogutucu', '240 mm sıvı soğutma (Thermalright Frozen Magic 240)', null, 2841, null, null, null, null, null, null, null, null, null, 260, null, null, 370),
-('anakart:AM5-0', 'anakart', 'MSI Pro A620AM-G Evo WiFi (A620)', null, 4849, null, null, null, 'AM5', null, null, null, null, null, null, 1, null, 380),
-('anakart:AM5-1', 'anakart', 'MSI B650M Gaming WiFi (B650)', null, 7631, null, null, null, 'AM5', null, null, null, null, null, null, 2, null, 390),
-('anakart:AM5-2', 'anakart', 'Asus B650E Max Gaming WiFi W (B650E)', null, 10693, null, null, null, 'AM5', null, null, null, null, null, null, 3, null, 400),
-('anakart:LGA1851-0', 'anakart', 'MSI Pro B860M-E (B860)', null, 5660, null, null, null, 'LGA1851', null, null, null, null, null, null, 2, null, 410),
-('anakart:LGA1851-1', 'anakart', 'MSI Pro Z890-S WiFi6E (Z890)', null, 9799, null, null, null, 'LGA1851', null, null, null, null, null, null, 3, null, 420),
-('kasa:0', 'kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', null, 2231, null, null, null, null, null, null, null, null, null, null, null, 35000, 430),
-('kasa:1', 'kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', null, 3256, null, null, null, null, null, null, null, null, null, null, null, 70000, 440),
-('kasa:2', 'kasa', 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)', null, 6270, null, null, null, null, null, null, null, null, null, null, null, null, 450);
+('sogutucu:aio360', 'sogutucu', '360 mm sıvı soğutma (Thermalright Frozen Magic 360 ARGB)', null, 3409, null, null, null, null, null, null, null, null, null, 280, null, null, 370),
+('sogutucu:aio360p', 'sogutucu', '360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)', null, 4578, null, null, null, null, null, null, null, null, null, 300, null, null, 380),
+('anakart:AM5-0', 'anakart', 'MSI Pro A620AM-G Evo WiFi (A620)', null, 4849, null, null, null, 'AM5', null, null, null, null, null, null, 1, null, 390),
+('anakart:AM5-1', 'anakart', 'MSI B650M Gaming WiFi (B650)', null, 7631, null, null, null, 'AM5', null, null, null, null, null, null, 2, null, 400),
+('anakart:AM5-2', 'anakart', 'Asus B650E Max Gaming WiFi W (B650E)', null, 10693, null, null, null, 'AM5', null, null, null, null, null, null, 3, null, 410),
+('anakart:LGA1851-0', 'anakart', 'MSI Pro B860M-E (B860)', null, 5660, null, null, null, 'LGA1851', null, null, null, null, null, null, 2, null, 420),
+('anakart:LGA1851-1', 'anakart', 'MSI Pro Z890-S WiFi6E (Z890)', null, 9799, null, null, null, 'LGA1851', null, null, null, null, null, null, 3, null, 430),
+('kasa:0', 'kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', null, 2231, null, null, null, null, null, null, null, null, null, null, null, 35000, 440),
+('kasa:1', 'kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', null, 3256, null, null, null, null, null, null, null, null, null, null, null, 70000, 450),
+('kasa:2', 'kasa', 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)', null, 6270, null, null, null, null, null, null, null, null, null, null, null, null, 460);
 
 notify pgrst, 'reload schema';

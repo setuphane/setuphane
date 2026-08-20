@@ -48,6 +48,13 @@ const KURALLAR = [
     const gerek = Math.round((b.g.tdp + b.c.tdp + 100) * 1.2);
     return b.psu.w < gerek ? `${b.psu.w} W yetersiz, en az ${gerek} W gerekiyor (${b.g.n} + ${b.c.n})` : null;
   }],
+  ['radyator-kasa', b => {
+    // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.
+    // Bunu butce bandinin kasayla denk gelmesine birakamayiz.
+    if (b.cl.rad && b.cs.rad && b.cl.rad > b.cs.rad)
+      return `${b.cl.rad} mm radyator ${b.cs.n} kasasina sigmaz (en fazla ${b.cs.rad} mm)`;
+    return null;
+  }],
   ['sogutucu', b => {
     if (b.cl.cap < b.c.tdp) return `${b.cl.n} (${b.cl.cap} W) ${b.c.n} icin yetersiz (${b.c.tdp} W)`;
     if (b.cl.id === 'stock' && b.c.tdp > 95) return `${b.c.n} (${b.c.tdp} W) kutu sogutucusuyla veriliyor`;

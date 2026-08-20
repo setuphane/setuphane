@@ -601,29 +601,49 @@ const COOLERS = [{
   id: 'stock',
   n: 'Kutudan çıkan soğutucu',
   cap: 65,
+  rad: 0,
   p: 0
 }, {
   id: 'air',
   n: 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',
   cap: 180,
+  rad: 0,
   p: 1185
+},
+/* En ucuz 360'ları bilerek almıyoruz: isimsiz sıvı soğutucularda pompa
+   arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
+   5+ satıcısı var (Epey, 20.08.2026). */
+{
+  id: 'aio360',
+  n: '360 mm sıvı soğutma (Thermalright Frozen Magic 360 ARGB)',
+  cap: 280,
+  rad: 360,
+  p: 3409
 }, {
-  id: 'aio',
-  n: '240 mm sıvı soğutma (Thermalright Frozen Magic 240)',
-  cap: 260,
-  p: 2841
+  id: 'aio360p',
+  n: '360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)',
+  cap: 300,
+  rad: 360,
+  p: 4578
 }];
-const CASES = [{
+const CASES = [
+/* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
+   doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
+   280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
+{
   n: 'Hava akışlı standart kasa (MSI MAG Forge M100A)',
   p: 2231,
+  rad: 240,
   upTo: 35000
 }, {
   n: 'Mesh ön panelli kasa (NZXT H3 Flow)',
   p: 3256,
+  rad: 280,
   upTo: 70000
 }, {
   n: 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',
   p: 6270,
+  rad: 360,
   upTo: Infinity
 }];
 const GAMES = [{
@@ -783,7 +803,27 @@ const enUcuzUygun = (liste, yeter) => {
   return uygun.length ? uygun.reduce((a, b) => b.p < a.p ? b : a) : liste[liste.length - 1];
 };
 const pickPsu = (g, c) => enUcuzUygun(PSUS, p => p.w >= (g.tdp + c.tdp + 90) * 1.35);
-const pickCooler = c => enUcuzUygun(COOLERS, k => k.cap >= c.tdp * 1.15);
+/* Soğutucu seçimi iki kurala birden uymak zorunda:
+
+   1) SERT KURAL — radyatör kasaya sığacak. Bunu bütçe bandının kasayla
+      denk gelmesine bırakamayız; kasa bantları panelden değişirse site
+      sessizce kurulamayacak bir sistem önermeye başlar.
+   2) DENGE — 55 binlik sistemde en ucuz yeterli soğutucu doğru tercih,
+      160 binlik sistemde değil. Orada 1.400 ₺ fark hiçbir şey ifade
+      etmezken sıcaklık ve görüntü ciddi fark ediyor. Bu yüzden bütçe
+      arttıkça soğutucu sınıfı da yükseliyor.
+
+   Hava soğutma "ucuz çözüm" olduğu için değil, 65 W'lık bir işlemcide
+   gerçekten doğru olduğu için altta duruyor: sessiz, arızalanacak
+   pompası yok ve beş yıl sonra da aynı işi görüyor. */
+const pickCooler = (c, budget, cs) => {
+  const sigar = k => !k.rad || cs && k.rad <= cs.rad;
+  const yeter = k => k.cap >= c.tdp * 1.15 && sigar(k);
+  const hedef = budget >= 120000 ? 'aio360p' : budget >= 80000 ? 'aio360' : 'air';
+  const istenen = COOLERS.find(k => k.id === hedef);
+  if (istenen && yeter(istenen)) return istenen;
+  return enUcuzUygun(COOLERS.filter(sigar), yeter);
+};
 const pickCase = b => CASES.find(k => b <= k.upTo) || CASES[CASES.length - 1];
 
 /* pick: {cpu:'AMD'|'Intel'|'', gpu:'NVIDIA'|'AMD'|''} — boş = fark etmez */
@@ -811,10 +851,10 @@ function kurDene(budget, prof, pick, esikliMi) {
       if (pick.cpu && cpuBrand(c) !== pick.cpu) continue;
       if (g.id === 'igpu' && !c.ig) continue;
       if (g.p + c.p > budget) continue;
+      const cs = pickCase(budget);
       const mb = pickBoard(c, budget, g),
         psu = pickPsu(g, c),
-        cl = pickCooler(c),
-        cs = pickCase(budget);
+        cl = pickCooler(c, budget, cs);
       const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p;
       for (const r of RAMS) {
         if (r.gb < minRam) continue;
@@ -1849,12 +1889,24 @@ function parcalariGetir() {
         w: x.watt || 0,
         p: x.fiyat
       })));
-      koy(COOLERS, grup('sogutucu').map(x => ({
+      /* rad (radyatör boyu / kasanın radyatör kapasitesi) veritabanında
+         TUTULMUYOR: fiziksel bir özellik, fiyat gibi değişmiyor ve panelden
+         yanlışlıkla boş bırakılması 360'lık radyatörü 280'lik kasaya takan
+         bir öneri üretirdi. Koddaki değeri koruyoruz; veritabanı yalnızca
+         ad ve fiyatı güncelliyor. */
+      const radKoru = (eski, yeniler, anahtar) => yeniler.map(y => {
+        const e = eski.find(o => anahtar(o) === anahtar(y));
+        return e ? {
+          ...y,
+          rad: e.rad
+        } : y;
+      });
+      koy(COOLERS, radKoru(COOLERS.slice(), grup('sogutucu').map(x => ({
         id: kimlik(x),
         n: x.ad,
         cap: x.sogutma_kap || 0,
         p: x.fiyat
-      })));
+      })), o => o.id));
       /* Anakartlar platforma göre gruplu; platformsuz satır yok sayılıyor
          çünkü uyumsuz bir anakart doğrudan çalışmayan sistem demek. */
       const ana = grup('anakart').filter(x => x.plat);
@@ -1869,11 +1921,11 @@ function parcalariGetir() {
         Object.assign(BOARDS, yeni);
       }
       /* butce_ust boşsa "sınırsız": en üst kademe kasa her bütçeye uyar. */
-      koy(CASES, grup('kasa').map(x => ({
+      koy(CASES, radKoru(CASES.slice(), grup('kasa').map(x => ({
         n: x.ad,
         p: x.fiyat,
         upTo: x.butce_ust == null ? Infinity : x.butce_ust
-      })));
+      })), o => o.n));
       const en = r.map(x => x.guncelleme).filter(Boolean).sort().pop();
       if (en) PARCA_FIYAT_TARIHI = String(en).slice(0, 10);
       return true;
