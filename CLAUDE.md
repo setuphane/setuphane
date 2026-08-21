@@ -63,3 +63,75 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+# SETUP HANE — projeye özel kurallar
+
+## BİRİNCİ KURAL
+
+1. **Kötü veya yanlış kombinasyon sitenin sonudur.** Birbiriyle uyumsuz
+   parçalar önerilemez. Her değişiklikten sonra `scripts/kombinasyon-denetimi.mjs`
+   11.611 kombinasyonda **sıfır ihlal** vermeli.
+2. **Fiyat dışındaki her şey bire bir örtüşmeli.** Fiyat bizden bağımsız
+   değişebilir ve bunu ziyaretçiye açıklayabiliriz; başka hiçbir veri için
+   böyle bir mazeret yok.
+3. **Oyun bazlı FPS değerleri hatasız çalışmalı.** Sitenin en değerli çıktısı.
+
+**Neden:** Site hiçbir şey satmıyor, tek varlığı güvenilirlik. Yanlış fiyat
+"güncellenmemiş" diye affedilir; yanlış kombinasyon veya yanlış FPS
+"bu site uyduruyor" dedirtir ve o noktadan sonra fiyata da güvenilmez.
+
+## Veri kuralları
+
+- **Ölçümü olmayan parça listeye girmez.** Uydurma puanla ürün sergilemek,
+  o ürünü hiç göstermemekten kötüdür. (RTX 5050/5060 Laptop bu yüzden çıkarıldı.)
+- **Fiyat: en az 3 satıcısı olan en ucuz ilan.** Tek/iki satıcılı ilan ya
+  stok dışı ya fahiş.
+- **Ad ile fiyat aynı modele ait olmalı.** Parantezdeki isim, fiyatın geldiği
+  modelin ta kendisi.
+- **Performans değerleri ölçümden gelir:** masaüstü kart/işlemci TechPowerUp,
+  laptop kartları NotebookCheck oyun testleri. Kaynak sitede yazılı.
+- **Yanlış pozitife dayanarak asla veri düzeltme.** Eşleştirici hatası, hiç
+  düzeltmemekten kötüdür.
+
+## Mimari — bilinmesi şart olanlar
+
+- `src/setuphane.html` tek kaynak; `node scripts/build.mjs` onu derleyip
+  `index.html` üretir. **Doğrudan index.html düzenleme.**
+- **`<head>` iki dosyada da elle tutuluyor** (src ve index). Meta değişikliği
+  ikisinde de yapılmalı.
+- **Metin üç yerde yaşıyor:** `<head>`, `ROTA_META` (çalışma zamanında
+  document.title'ı yeniden yazar) ve bileşenin kendisi. Üçü birden
+  değişmezse tutarsızlık görünmez kalır.
+- **Supabase canlı kaynak, koddaki diziler yedek.** Site veritabanı çökse de
+  çalışır.
+- **Fiziksel/ölçüm alanları veritabanında TUTULMAZ** (`rad`, `gpuMax`,
+  `form`, `x4`, `r1440`, `r2160`). Panelden boş bırakılmaları sessiz hataya
+  yol açar; `koru()` yardımcısı bunları koddan taşır.
+
+## Her değişiklikten sonra sırayla
+
+```
+node scripts/kontrol.mjs              # veri bütünlüğü
+node scripts/kombinasyon-denetimi.mjs # sert uyumluluk, 11.611 kombinasyon
+node scripts/gun-sonu-testi.mjs       # ziyaretçinin gördüğü tutarlılık
+node scripts/build.mjs                # derle
+```
+Sonra **canlıda doğrula**. Kodda doğru olması yetmiyor — veritabanından
+gelen veri kodu ezebiliyor.
+
+## Tuzaklar (hepsi bizzat yaşandı)
+
+- **Kabuk ters bölüyü yiyor.** Heredoc/`-e` içinde `\b`, `\d`, `\s` bozulur.
+  Regex'li düzenlemeleri dosyaya yazıp indeks tabanlı yap, `RegExp` kur.
+- **Dosyalar CRLF.** Çok satırlı birebir eşleştirme başarısız olur; `indexOf`
+  ile çapa kullan.
+- **`git checkout <dosya>` commit'lenmemiş işi siler.** Önce doğrula ve
+  commit'le, sonra test et.
+- **Babel Türkçe karakterleri kaçırır** (`SATIŞ YOK`). index.html'de
+  düz metin araması yanıltıcı olur.
+- **Gizli bölümde `innerText` boş döner.** Panel var mı diye bakarken
+  `textContent` kullan.
+- **Tarayıcı eski belgeyi önbellekten sunabilir.** Şüphelenince `fetch` ile
+  sunucudan doğrula.
