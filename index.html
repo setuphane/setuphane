@@ -2085,7 +2085,7 @@ function parcalariGetir() {
         tdp: x.tdp || 0,
         p: x.fiyat
       })), o => o.id, ['r1440', 'r2160']));
-      koy(CPUS, grup('cpu').map(x => ({
+      koy(CPUS, koru(CPUS.slice(), grup('cpu').map(x => ({
         id: kimlik(x),
         n: x.ad,
         plat: x.plat,
@@ -2094,7 +2094,7 @@ function parcalariGetir() {
         tdp: x.tdp || 0,
         p: x.fiyat,
         ig: !!x.dahili_grafik
-      })));
+      })), o => o.id, ['x4']));
       koy(RAMS, grup('ram').map(x => ({
         id: kimlik(x),
         n: x.ad,

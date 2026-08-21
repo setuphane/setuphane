@@ -896,8 +896,9 @@ function parcalariGetir(){
         koy(GPUS, koru(GPUS.slice(), grup('gpu').map(x=>({id:kimlik(x), n:x.ad, b:x.marka||'—',
           idx:x.idx||0, vram:x.vram||0, tdp:x.tdp||0, p:x.fiyat})),
           o=>o.id, ['r1440','r2160']));
-        koy(CPUS, grup('cpu').map(x=>({id:kimlik(x), n:x.ad, plat:x.plat,
-          g:x.oyun||0, m:x.coklu_is||0, tdp:x.tdp||0, p:x.fiyat, ig:!!x.dahili_grafik})));
+        koy(CPUS, koru(CPUS.slice(), grup('cpu').map(x=>({id:kimlik(x), n:x.ad, plat:x.plat,
+          g:x.oyun||0, m:x.coklu_is||0, tdp:x.tdp||0, p:x.fiyat, ig:!!x.dahili_grafik})),
+          o=>o.id, ['x4']));
         koy(RAMS, grup('ram').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
         koy(SSDS, grup('ssd').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
         koy(PSUS, grup('psu').map(x=>({id:kimlik(x), n:x.ad, w:x.watt||0, p:x.fiyat})));
