@@ -670,9 +670,16 @@ function tatliNokta(budget, prof, pick, game, res){
   if(!ucuz) return null;
 
   const tasarruf = tam.total - ucuz.total;
+  const ucuzFps = fps(ucuz.g, ucuz.c, game, res);
   /* Küçük farkı yazmak gürültü olur; ziyaretçiyi yalnızca gerçekten
-     anlamlı bir para söz konusuysa uyarıyoruz. */
-  if(tasarruf < 5000 || tasarruf/tam.total < 0.08) return null;
+     anlamlı bir para söz konusuysa uyarıyoruz.
+     TEK İSTİSNA: ucuz sistem sadece ucuz değil aynı zamanda DAHA HIZLIYSA
+     eşiğe bakmıyoruz. Bu durum bütçe arttıkça motorun güçlü işlemciyi
+     bırakıp güçlü karta geçmesinden doğuyor: ağır oyunda kazanç, işlemciye
+     bağlı hafif oyunda kayıp. Ziyaretçinin daha ucuza daha hızlı bir sistem
+     olduğunu bilmemesi kabul edilemez — miktarı ne olursa olsun. */
+  const dahaHizli = ucuzFps > hedefFps*1.02;
+  if(!dahaHizli && (tasarruf < 5000 || tasarruf/tam.total < 0.08)) return null;
 
   /* Fazladan para nereye gidiyor? Ziyaretçi "kaybettiğim ne" değil
      "aldığım ne" sorusunun cevabını da görmeli. */
@@ -684,7 +691,7 @@ function tatliNokta(budget, prof, pick, game, res){
   if(tam.s.gb !== ucuz.s.gb) fark.push('Disk: ' + (ucuz.s.gb>=1000?ucuz.s.gb/1000+' TB':ucuz.s.gb+' GB') +
                                         ' → ' + (tam.s.gb>=1000?tam.s.gb/1000+' TB':tam.s.gb+' GB'));
   ekle('Anakart', tam.mb, ucuz.mb);
-  return { ucuz, tasarruf, hedefFps, ucuzFps: fps(ucuz.g, ucuz.c, game, res), fark };
+  return { ucuz, tasarruf, hedefFps, ucuzFps, dahaHizli, fark };
 }
 function resKat(g,res){
   if(!g || !res) return 1;
@@ -2391,13 +2398,30 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
                   diyebiliyoruz — sitenin en ayırt edici cümlesi bu. */}
               {tatli && (
                 <div className="mt-10 p-5 sm:p-6 border border-cy/40 bg-cy/[.05]">
-                  <Label className="mb-3 text-cy">O KADAR HARCAMANA GEREK YOK</Label>
-                  <p className="text-[.98rem] leading-relaxed text-ink/90 max-w-[62ch]">
-                    Seçtiğin oyun ve çözünürlükte{' '}
-                    <span className="num text-cy">{fmt(tatli.ucuz.total)}</span>'lik bir sistem de
-                    aynı <span className="num text-cy">{tatli.ucuzFps} FPS</span>'i veriyor.
-                    Fazladan <span className="num text-cy">{fmt(tatli.tasarruf)}</span> sana kare kazandırmıyor.
-                  </p>
+                  <Label className="mb-3 text-cy">
+                    {tatli.dahaHizli ? "DAHA UCUZU DAHA HIZLI" : "O KADAR HARCAMANA GEREK YOK"}
+                  </Label>
+                  {tatli.dahaHizli ? (
+                    /* Bütçe arttıkça motor güçlü işlemciyi bırakıp güçlü karta
+                       geçebiliyor: ağır oyunda kazanç, işlemciye bağlı hafif
+                       oyunda kayıp. Bunu gizlemiyoruz. */
+                    <p className="text-[.98rem] leading-relaxed text-ink/90 max-w-[62ch]">
+                      Seçtiğin oyun ve çözünürlükte{' '}
+                      <span className="num text-cy">{fmt(tatli.ucuz.total)}</span>'lik bir sistem hem
+                      <span className="num text-cy"> {fmt(tatli.tasarruf)}</span> daha ucuz hem de
+                      <span className="num text-cy"> {tatli.ucuzFps} FPS</span> ile daha hızlı
+                      (şu anki sistem <span className="num">{tatli.hedefFps} FPS</span>).
+                      Sebebi: bu bütçede daha güçlü ekran kartı seçiliyor ama işlemci geriliyor —
+                      bu oyun işlemciye yaslandığı için sonuç düşüyor.
+                    </p>
+                  ) : (
+                    <p className="text-[.98rem] leading-relaxed text-ink/90 max-w-[62ch]">
+                      Seçtiğin oyun ve çözünürlükte{' '}
+                      <span className="num text-cy">{fmt(tatli.ucuz.total)}</span>'lik bir sistem de
+                      aynı <span className="num text-cy">{tatli.ucuzFps} FPS</span>'i veriyor.
+                      Fazladan <span className="num text-cy">{fmt(tatli.tasarruf)}</span> sana kare kazandırmıyor.
+                    </p>
+                  )}
                   {tatli.fark.length>0 && (
                     <>
                       <div className="lbl text-dim mt-5 mb-2">FAZLADAN PARA ŞURAYA GİDİYOR</div>

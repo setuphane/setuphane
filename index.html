@@ -1078,9 +1078,16 @@ function tatliNokta(budget, prof, pick, game, res) {
   }
   if (!ucuz) return null;
   const tasarruf = tam.total - ucuz.total;
+  const ucuzFps = fps(ucuz.g, ucuz.c, game, res);
   /* Küçük farkı yazmak gürültü olur; ziyaretçiyi yalnızca gerçekten
-     anlamlı bir para söz konusuysa uyarıyoruz. */
-  if (tasarruf < 5000 || tasarruf / tam.total < 0.08) return null;
+     anlamlı bir para söz konusuysa uyarıyoruz.
+     TEK İSTİSNA: ucuz sistem sadece ucuz değil aynı zamanda DAHA HIZLIYSA
+     eşiğe bakmıyoruz. Bu durum bütçe arttıkça motorun güçlü işlemciyi
+     bırakıp güçlü karta geçmesinden doğuyor: ağır oyunda kazanç, işlemciye
+     bağlı hafif oyunda kayıp. Ziyaretçinin daha ucuza daha hızlı bir sistem
+     olduğunu bilmemesi kabul edilemez — miktarı ne olursa olsun. */
+  const dahaHizli = ucuzFps > hedefFps * 1.02;
+  if (!dahaHizli && (tasarruf < 5000 || tasarruf / tam.total < 0.08)) return null;
 
   /* Fazladan para nereye gidiyor? Ziyaretçi "kaybettiğim ne" değil
      "aldığım ne" sorusunun cevabını da görmeli. */
@@ -1097,7 +1104,8 @@ function tatliNokta(budget, prof, pick, game, res) {
     ucuz,
     tasarruf,
     hedefFps,
-    ucuzFps: fps(ucuz.g, ucuz.c, game, res),
+    ucuzFps,
+    dahaHizli,
     fark
   };
 }
@@ -4307,7 +4315,22 @@ function GameTest({
     className: "mt-10 p-5 sm:p-6 border border-cy/40 bg-cy/[.05]"
   }, /*#__PURE__*/React.createElement(Label, {
     className: "mb-3 text-cy"
-  }, "O KADAR HARCAMANA GEREK YOK"), /*#__PURE__*/React.createElement("p", {
+  }, tatli.dahaHizli ? "DAHA UCUZU DAHA HIZLI" : "O KADAR HARCAMANA GEREK YOK"), tatli.dahaHizli ?
+  /*#__PURE__*/
+  /* Bütçe arttıkça motor güçlü işlemciyi bırakıp güçlü karta
+     geçebiliyor: ağır oyunda kazanç, işlemciye bağlı hafif
+     oyunda kayıp. Bunu gizlemiyoruz. */
+  React.createElement("p", {
+    className: "text-[.98rem] leading-relaxed text-ink/90 max-w-[62ch]"
+  }, "Se\xE7ti\u011Fin oyun ve \xE7\xF6z\xFCn\xFCrl\xFCkte", ' ', /*#__PURE__*/React.createElement("span", {
+    className: "num text-cy"
+  }, fmt(tatli.ucuz.total)), "'lik bir sistem hem", /*#__PURE__*/React.createElement("span", {
+    className: "num text-cy"
+  }, " ", fmt(tatli.tasarruf)), " daha ucuz hem de", /*#__PURE__*/React.createElement("span", {
+    className: "num text-cy"
+  }, " ", tatli.ucuzFps, " FPS"), " ile daha h\u0131zl\u0131 (\u015Fu anki sistem ", /*#__PURE__*/React.createElement("span", {
+    className: "num"
+  }, tatli.hedefFps, " FPS"), "). Sebebi: bu b\xFCt\xE7ede daha g\xFC\xE7l\xFC ekran kart\u0131 se\xE7iliyor ama i\u015Flemci geriliyor \u2014 bu oyun i\u015Flemciye yasland\u0131\u011F\u0131 i\xE7in sonu\xE7 d\xFC\u015F\xFCyor.") : /*#__PURE__*/React.createElement("p", {
     className: "text-[.98rem] leading-relaxed text-ink/90 max-w-[62ch]"
   }, "Se\xE7ti\u011Fin oyun ve \xE7\xF6z\xFCn\xFCrl\xFCkte", ' ', /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
