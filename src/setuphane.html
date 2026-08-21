@@ -612,6 +612,51 @@ function enAzButce(prof,pick){
    4K'da geriye düşüyor. Değerler TechPowerUp'ın üç çözünürlük tablosundan.
    Bilinmiyorsa 1 — laptop ve hazır sistemlerde henüz ölçüm yok, orada
    çarpan uygulanmıyor (uydurma sayı koymaktansa nötr bırakıyoruz). */
+/* ═══ TATLI NOKTA — "en pahalı sistem" ile "en iyi sistem" aynı şey değil ═══
+   Seçilen oyun ve çözünürlükte, bütçenin ALTINDAKİ bir sistem aynı kareyi
+   veriyorsa ziyaretçinin bunu bilmeye hakkı var. Hiçbir şey satmadığımız
+   için bunu söyleyebilecek tek yer biziz.
+
+   İkili arama yerine tarama yapıyoruz: FPS bütçeye göre her zaman kesin
+   artan değil (bazı bütçelerde motor işlemciye kayabiliyor), ikili arama
+   orada yanlış dala saplanırdı. 34 adım, her biri bir buildSystem — kullanıcı
+   oyun/çözünürlük değiştirdiğinde bile göze görünmeyecek kadar hızlı. */
+function tatliNokta(budget, prof, pick, game, res){
+  const tam = buildSystem(budget, prof, pick);
+  if(!tam) return null;
+  const hedefFps = fps(tam.g, tam.c, game, res);
+  if(!hedefFps) return null;
+
+  const ADIM = 34;
+  let ucuz = null;
+  for(let i=0; i<=ADIM; i++){
+    const b = Math.round(BUD_MIN * Math.pow(budget/BUD_MIN, i/ADIM));
+    if(b >= tam.total) break;
+    const x = buildSystem(b, prof, pick);
+    if(!x) continue;
+    /* %3 tolerans: 68 ile 67 FPS arasındaki fark ekranda hissedilmez,
+       ama arada 30 bin lira olabilir. */
+    if(fps(x.g, x.c, game, res) >= hedefFps*0.97){ ucuz = x; break; }
+  }
+  if(!ucuz) return null;
+
+  const tasarruf = tam.total - ucuz.total;
+  /* Küçük farkı yazmak gürültü olur; ziyaretçiyi yalnızca gerçekten
+     anlamlı bir para söz konusuysa uyarıyoruz. */
+  if(tasarruf < 5000 || tasarruf/tam.total < 0.08) return null;
+
+  /* Fazladan para nereye gidiyor? Ziyaretçi "kaybettiğim ne" değil
+     "aldığım ne" sorusunun cevabını da görmeli. */
+  const fark = [];
+  const ekle = (ad, a, b) => { if(a && b && a.n !== b.n) fark.push(ad + ': ' + b.n + ' → ' + a.n); };
+  ekle('İşlemci', tam.c, ucuz.c);
+  ekle('Ekran kartı', tam.g, ucuz.g);
+  if(tam.r.gb !== ucuz.r.gb) fark.push('Bellek: ' + ucuz.r.gb + ' GB → ' + tam.r.gb + ' GB');
+  if(tam.s.gb !== ucuz.s.gb) fark.push('Disk: ' + (ucuz.s.gb>=1000?ucuz.s.gb/1000+' TB':ucuz.s.gb+' GB') +
+                                        ' → ' + (tam.s.gb>=1000?tam.s.gb/1000+' TB':tam.s.gb+' GB'));
+  ekle('Anakart', tam.mb, ucuz.mb);
+  return { ucuz, tasarruf, hedefFps, ucuzFps: fps(ucuz.g, ucuz.c, game, res), fark };
+}
 function resKat(g,res){
   if(!g || !res) return 1;
   if(res.id==='1440') return g.r1440 || 1;
@@ -2191,12 +2236,26 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res}){
 }
 
 /* ═══════════════════ MODÜL 02 — OYUN TESTİ ═══════════════════ */
-function GameTest({act,gid,setGid,rid,setRid}){
+function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
   const {fmt}=useCur();
   const game=GAMES.find(g=>g.id===gid), res=RES.find(r=>r.id===rid);
   const f = activeFps(act,game,res);
   const v = fpsVerdict(f);
   const shown=useCount(f,900);
+  /* Yalnızca kendi topladığımız sistemde anlamlı: hazır laptop/masaüstünde
+     ziyaretçi zaten belirli bir ürünü seçiyor.
+     Hesap ~85 ms sürüyor (34 kez bütün kombinasyonlar kuruluyor); bütçe
+     çubuğunu sürüklerken her adımda çalıştırınca çubuk takılıyordu. Bu
+     yüzden kullanıcı durduktan 260 ms sonra hesaplanıyor. */
+  const [tatli,setTatli]=useState(null);
+  useEffect(()=>{
+    if(mode!=='topla'){ setTatli(null); return; }
+    const z=setTimeout(()=>{
+      try{ setTatli(tatliNokta(budget,prof,pick,game,res)); }
+      catch(e){ setTatli(null); }
+    },260);
+    return ()=>clearTimeout(z);
+  },[mode,budget,prof,pick && pick.cpu,pick && pick.gpu,gid,rid]);
   const bar=useCount(fpsBar(f),900);
   const cpuLimited = act && act.cIdx ? act.cIdx*game.ck < act.gIdx*res.mul*game.k : false;
 
@@ -2297,6 +2356,34 @@ function GameTest({act,gid,setGid,rid,setRid}){
                   <dd className="num text-[.92rem] text-ink/85">{fmt(act.total/Math.max(1,f))}</dd>
                 </div>
               </dl>
+              {/* ═══ TATLI NOKTA ═══
+                  "En pahalı sistem" ile "en iyi sistem" aynı şey değil.
+                  Bir şey satmadığımız için "o kadar harcamana gerek yok"
+                  diyebiliyoruz — sitenin en ayırt edici cümlesi bu. */}
+              {tatli && (
+                <div className="mt-10 p-5 sm:p-6 border border-cy/40 bg-cy/[.05]">
+                  <Label className="mb-3 text-cy">O KADAR HARCAMANA GEREK YOK</Label>
+                  <p className="text-[.98rem] leading-relaxed text-ink/90 max-w-[62ch]">
+                    Seçtiğin oyun ve çözünürlükte{' '}
+                    <span className="num text-cy">{fmt(tatli.ucuz.total)}</span>'lik bir sistem de
+                    aynı <span className="num text-cy">{tatli.ucuzFps} FPS</span>'i veriyor.
+                    Fazladan <span className="num text-cy">{fmt(tatli.tasarruf)}</span> sana kare kazandırmıyor.
+                  </p>
+                  {tatli.fark.length>0 && (
+                    <>
+                      <div className="lbl text-dim mt-5 mb-2">FAZLADAN PARA ŞURAYA GİDİYOR</div>
+                      <ul className="text-[.88rem] text-ink/75 leading-relaxed space-y-1">
+                        {tatli.fark.map((x,i)=><li key={i}>· {x}</li>)}
+                      </ul>
+                    </>
+                  )}
+                  <p className="text-[.85rem] text-dim mt-5 leading-relaxed max-w-[62ch]">
+                    Bunlar çöp değil — daha fazla bellek ve disk ileride işine yarar, güçlü işlemci
+                    daha ağır oyunlarda ve daha yüksek çözünürlükte fark eder. Ama <span className="text-ink/90">bu oyunda,
+                    bu çözünürlükte</span> ekrana yansıyan bir karşılığı yok. Kararı sen ver.
+                  </p>
+                </div>
+              )}
             </div>
           ) : <p className="mt-10 text-dim text-sm">Önce yukarıdan bir sistem seç.</p>}
         </Card>
@@ -7143,7 +7230,8 @@ function App(){
               </Reveal>
             </section>
 
-            <GameTest act={act} gid={gid} setGid={setGid} rid={rid} setRid={setRid}/>
+            <GameTest act={act} gid={gid} setGid={setGid} rid={rid} setRid={setRid}
+                      budget={budget} prof={prof} pick={pick} mode={mode}/>
             <BalanceTest sys={sys}/>
             <Glossary/>
             <Kesfet/>
