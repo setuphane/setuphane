@@ -497,7 +497,20 @@ function pickBoard(c,budget,g,cs){
      mantiksiz duruyor: guclu kart daha iyi PCIe ve daha saglam guc
      dagitimi hak ediyor. Kart 35 bin ustuyse kademe en az 2. */
   const kartAgir = g && g.id!=="igpu" && g.p>=35000;
-  const want = c.p>=20000 ? 3 : (c.p>=13000 || c.tdp>=120 || kartAgir) ? 2 : (budget>90000 ? 2 : 1);
+  /* Anakart kademesi işlemcinin FİYATINA değil, ÇEKTİĞİ GÜCE göre seçilir.
+     Eski kural "işlemci 20.000 ₺ üstüyse en üst kademe" diyordu ve bu kaba
+     bir ölçüttü: 9800X3D 21.440 ₺ olduğu için otomatik olarak 10.693 ₺'lik
+     B650E seçiliyordu. Oysa 9800X3D 120 W'lık tek CCD'li bir işlemci;
+     7.631 ₺'lik B650M onu rahat besler ve aradaki 3.062 ₺ doğrudan ekran
+     kartından kesiliyordu.
+
+     Intel'de "125 W" taban değer, gerçek turbo çekişi bunun iki katına
+     çıkabiliyor — bu yüzden Intel tarafında TDP değil çoklu iş gücü (m)
+     ölçüt alınıyor: 265K ve 285K güçlü güç katmanı ister, 245K istemez. */
+  const cokGuc = c.tdp>=170 || (c.plat==='LGA1851' && c.m>=120);
+  const want = cokGuc ? 3
+             : (c.tdp>=120 || c.p>=13000 || kartAgir) ? 2
+             : (budget>90000 ? 2 : 1);
   const ok=list.filter(b=>b.t<=want);
   return ok.length ? ok[ok.length-1] : list[0];
 }
