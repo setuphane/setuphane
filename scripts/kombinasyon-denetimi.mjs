@@ -71,6 +71,13 @@ const KURALLAR = [
   }],
   ['dahili-grafik', b => (b.g.id === 'igpu' && !b.c.ig) ? `${b.c.n} dahili grafige sahip degil` : null],
   ['butce', (b, butce) => b.total > butce ? `toplam ${b.total} > butce ${butce}` : null],
+  ['anakart-kasa', b => {
+    // Sert uyumluluk: ATX anakart micro-ATX kasaya girmez.
+    const sira = {'ITX':1,'mATX':2,'ATX':3};
+    if (b.mb.form && b.cs.formMax && sira[b.mb.form] > sira[b.cs.formMax])
+      return `${b.mb.n} (${b.mb.form}) ${b.cs.n} kasasina sigmaz (en fazla ${b.cs.formMax})`;
+    return null;
+  }],
   ['kart-kasa', b => {
     // Sert uyumluluk: kart kasaya sigmazsa sistem hic kurulamaz.
     if (b.g.boy && b.cs.gpuMax && b.g.boy > b.cs.gpuMax)

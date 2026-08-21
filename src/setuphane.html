@@ -391,15 +391,20 @@ const PSUS=[
    setinde onlarca model var, burada her kademenin en ucuz gerçek örneği
    seçildi. pickBoard() hâlâ tek bir board döndürür (t eşiğine göre),
    sadece isim/fiyat artık soyut değil. */
+/* form: anakart boyutu, Epey teknik sayfalarından doğrulandı (21.08.2026).
+   ATX bir anakart micro-ATX kasaya GİRMEZ; kasa seçimiyle birlikte
+   denetleniyor. Bu kural konulmadan önce motor 68-69 bin TL ofis
+   sisteminde ATX anakartı micro-ATX kasaya koyuyordu — kâğıt üstünde
+   ucuz, gerçekte kurulamayan bir sistem. */
 const BOARDS={
  AM5:[
-  {n:'MSI Pro A620AM-G Evo WiFi (A620)',      p:4849, t:1},
-  {n:'MSI B650M Gaming WiFi (B650)',          p:7631, t:2},
-  {n:'Asus B650E Max Gaming WiFi W (B650E)',  p:10693,t:3},
+  {n:'MSI Pro A620AM-G Evo WiFi (A620)',      p:4849, t:1, form:'mATX'},
+  {n:'MSI B650M Gaming WiFi (B650)',          p:7631, t:2, form:'mATX'},
+  {n:'Asus B650E Max Gaming WiFi W (B650E)',  p:10693,t:3, form:'ATX'},
  ],
  LGA1851:[
-  {n:'MSI Pro B860M-E (B860)',                p:5660, t:2},
-  {n:'MSI Pro Z890-S WiFi6E (Z890)',          p:9799, t:3},
+  {n:'MSI Pro B860M-E (B860)',                p:5660, t:2, form:'mATX'},
+  {n:'MSI Pro Z890-S WiFi6E (Z890)',          p:9799, t:3, form:'ATX'},
  ]
 };
 const COOLERS=[
@@ -415,9 +420,9 @@ const CASES=[
  /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
     doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
     280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
- {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2231,rad:240,gpuMax:300,upTo:35000},
- {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3256,rad:280,gpuMax:352,upTo:70000},
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',p:6270,rad:360,gpuMax:430,upTo:Infinity},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2231,rad:240,gpuMax:300,formMax:'mATX',upTo:35000},
+ {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3256,rad:280,gpuMax:352,formMax:'mATX',upTo:70000},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',p:6270,rad:360,gpuMax:430,formMax:'ATX',upTo:Infinity},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -475,12 +480,19 @@ const PROFILES=[
 ];
 
 /* ═══════════════════ hesap motoru ═══════════════════ */
-function pickBoard(c,budget,g){
-  const list=BOARDS[c.plat];
+function pickBoard(c,budget,g,cs){
+  /* SERT KURAL — kasaya sığmayan anakart hiç değerlendirilmiyor. ATX bir
+     anakart micro-ATX kasaya girmez. Bu filtre konulmadan önce motor
+     68-69 bin TL'lik ofis sisteminde ATX anakartı micro-ATX kasaya
+     koyuyordu: kâğıt üstünde ucuz, gerçekte kurulamayan bir sistem.
+     Veri yoksa kural uygulanmıyor (uydurma boyla reddetmiyoruz). */
+  const sira={'ITX':1,'mATX':2,'ATX':3};
+  const sigar=b=>(!b.form || !cs || !cs.formMax) ? true : sira[b.form]<=sira[cs.formMax];
+  const list=(BOARDS[c.plat]||[]).filter(sigar);
+  if(!list.length) return null;
   /* Anakart kademesi ISLEMCIYE gore secilir, butceye gore degil.
      65 W bir Ryzen 5 icin A620 fazlasiyla yeterli; onu B650a zorlamak
-     bosuna 2.800 TL yakiyor ve o para ekran kartindan kesiliyordu.
-     Butce esigi 40 binken B650 4.069 TL idi; artik 7.631 TL. */
+     bosuna 2.800 TL yakiyor ve o para ekran kartindan kesiliyordu. */
   /* Ust segment bir ekran karti takilacaksa en dusuk kademe anakart
      mantiksiz duruyor: guclu kart daha iyi PCIe ve daha saglam guc
      dagitimi hak ediyor. Kart 35 bin ustuyse kademe en az 2. */
@@ -560,7 +572,9 @@ function kurDene(budget,prof,pick,esikliMi){
          uygulanmıyor: uydurma bir boyla sistemi reddetmek de en az kabul
          etmek kadar yanlış olur. Eksik ölçümler denetimde raporlanıyor. */
       if(g.boy && cs.gpuMax && g.boy > cs.gpuMax) continue;
-      const mb=pickBoard(c,budget,g), psu=pickPsu(g,c), cl=pickCooler(c,budget,cs);
+      const mb=pickBoard(c,budget,g,cs);
+      if(!mb) continue;   // bu kasaya uyan anakart yok
+      const psu=pickPsu(g,c), cl=pickCooler(c,budget,cs);
       const base=g.p+c.p+mb.p+psu.p+cl.p+cs.p;
       for(const r of RAMS){
         if(r.gb<minRam) continue;
