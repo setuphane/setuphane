@@ -327,18 +327,40 @@ const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
    marka magentasıyla karışıyor (AMD #ED1C24), bu yüzden açılmış hâlleri: */
 const BRAND={ AMD:'#FF3D45', Intel:'#3BA9F0', NVIDIA:'#76B900' };
 const brandDot = b => BRAND[b] || null;
+/* ═══ İşlemci güç değerleri — ÖLÇÜME DAYANIR ═══
+   Kaynak: TechPowerUp "Relative Performance", iki inceleme köprülendi
+   (Ryzen 7 9850X3D ve Core Ultra 5 245K), ortak işlemciler üzerinden
+   aynı ölçeğe getirildi. 20.08.2026'da alındı.
+     g : Oyun gücü — 720p ölçümü. Bilerek 720p, çünkü orada ekran kartı
+         devreden çıkıyor ve geriye sadece işlemcinin gücü kalıyor.
+     m : Çoklu iş / uygulama gücü (render, kurgu, derleme).
+   Çapa: 9800X3D için g=125, m=108 — mevcut oyun katsayıları geçerli kalsın.
+
+   Önceki değerler tahmindi ve iki sistematik hata içeriyordu:
+   1) Orta ve alt segment ezilmişti (8500G %27, 7500F %20, 7600 %18 eksik).
+      Gerçek hayatta ucuz ve pahalı işlemci arasındaki oyun farkı bizim
+      gösterdiğimizin çok altında; yani ziyaretçiye gereğinden pahalı
+      işlemci aldırıyorduk.
+   2) Daha kötüsü: 9950X3D'yi oyunda 9800X3D'nin ÜSTÜNDE gösteriyorduk
+      (128 vs 125). Gerçek tam tersi (118 vs 125) — iki CCD'li X3D oyunda
+      tek CCD'linin gerisinde kalıyor. Yüksek bütçede yanlış işlemci
+      öneriyorduk.
+
+   7500F iki tabloda da yok. Değerleri 7600'den türetildi: aynı silikon,
+   dahili grafiği kapalı ve 100 MHz düşük saatli — ölçülmüş fark %1-2.
+   Bu tek çıkarım, kaynağı belli olsun diye burada yazılı. */
 const CPUS=[
- {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:55,  m:52,  tdp:65,  p:7299,  ig:true},
- {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:74,  m:68,  tdp:65,  p:6699,  ig:false},
- {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:78,  m:71,  tdp:65,  p:7169,  ig:true},
- {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:88,  m:96,  tdp:125, p:10799, ig:true},
- {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:92,  m:80,  tdp:65,  p:9481,  ig:true},
- {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:94,  m:104, tdp:65,  p:12399, ig:true},
- {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:95,  m:124, tdp:125, p:16981, ig:true},
- {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:108, m:88,  tdp:120, p:15080, ig:true},
+ {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:75,  m:64,  tdp:65,  p:7299,  ig:true, x4:true},
+ {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:93,  m:77,  tdp:65,  p:6699,  ig:false},
+ {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:95,  m:78,  tdp:65,  p:7169,  ig:true},
+ {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:96,  m:101, tdp:125, p:10799, ig:true},
+ {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:101, m:87,  tdp:65,  p:9481,  ig:true},
+ {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:100, m:120, tdp:125, p:16981, ig:true},
+ {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:104, m:98,  tdp:65,  p:12399, ig:true},
+ {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:104, m:130, tdp:125, p:29119, ig:true},
+ {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:112, m:89,  tdp:120, p:15080, ig:true},
+ {id:'9950x3d',n:'Ryzen 9 9950X3D',   plat:'AM5',     g:118, m:139, tdp:170, p:33518, ig:true},
  {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:21440, ig:true},
- {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:96,  m:150, tdp:125, p:29119, ig:true},
- {id:'9950x3d',n:'Ryzen 9 9950X3D',   plat:'AM5',     g:128, m:165, tdp:170, p:33518, ig:true},
 ];
 /* RAM fiyatları: 2026'da yapay zeka veri merkezlerinin (HBM) bellek talebi
    yüzünden küresel bir DDR5 arz krizi var — üreticiler üretimi yüksek
@@ -525,6 +547,12 @@ function kurDene(budget,prof,pick,esikliMi){
     for(const c of CPUS){
       if(pick.cpu && cpuBrand(c)!==pick.cpu) continue;
       if(g.id==='igpu' && !c.ig) continue;
+      /* SERT KURAL — ayrı ekran kartı takılan sisteme x4 işlemci konmaz.
+         Ryzen 5 8500G'nin ekran kartı yuvası yalnızca 4 hatlı (PCIe x4);
+         üstüne takılan kart ölçülebilir şekilde yavaşlıyor. Kâğıt üstünde
+         uygun görünen ama gerçekte zarar veren bir eşleşme — tam olarak
+         kaçınmamız gereken tür. Dahili grafikle kullanılırsa sorun yok. */
+      if(g.id!=='igpu' && c.x4) continue;
       if(g.p+c.p>budget) continue;
       const cs=pickCase(budget);
       const mb=pickBoard(c,budget,g), psu=pickPsu(g,c), cl=pickCooler(c,budget,cs);
@@ -2159,13 +2187,13 @@ function GameTest({act,gid,setGid,rid,setRid}){
         {/* Kaynağı göstermek, sayıları hesaplamak kadar önemli: hiçbir şey
             satmayan bir sitede ziyaretçinin tek dayanağı bu satır. */}
         <p className="mt-4 text-[.8rem] text-dim/70 max-w-[54ch] leading-relaxed">
-          Ekran kartı güç değerleri{' '}
+          Ekran kartı ve işlemci güç değerleri{' '}
           <a href="https://www.techpowerup.com/review/sapphire-radeon-rx-9070-gre-pulse/32.html"
              target="_blank" rel="noopener noreferrer" className="text-dim hover:text-cy underline underline-offset-2">
-            TechPowerUp göreli performans ölçümlerine
+            TechPowerUp ölçümlerine
           </a>{' '}
-          dayanıyor (üç çözünürlük ayrı ayrı, 20.08.2026). İşlemci değerleri henüz
-          aynı şekilde kaynaklandırılmadı — o çalışma sürüyor.
+          dayanıyor — ekran kartları üç çözünürlük için ayrı ayrı, işlemciler
+          720p oyun ve uygulama testlerinden (20.08.2026). Tahmin değil, ölçüm.
         </p>
       </Reveal>
 

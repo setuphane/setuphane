@@ -37,7 +37,7 @@ const kur = new Function(...Object.keys(ortam),
   'return {buildSystem, PROFILES, pickBoard, pickPsu, pickCooler, pickCase, cpuBrand:c=>c.plat==="AM5"?"AMD":"Intel"};'
 )(...Object.values(ortam));
 
-const { buildSystem, PROFILES } = kur;
+const { buildSystem, PROFILES, cpuBrand } = kur;
 
 // ── Kurallar ───────────────────────────────────────────────────────────
 // Her kural bir sistem alir, sorun varsa metin doner.
@@ -71,12 +71,38 @@ const KURALLAR = [
   }],
   ['dahili-grafik', b => (b.g.id === 'igpu' && !b.c.ig) ? `${b.c.n} dahili grafige sahip degil` : null],
   ['butce', (b, butce) => b.total > butce ? `toplam ${b.total} > butce ${butce}` : null],
-  ['agir-darbogaz', b => {
+  ['pcie-x4', b => {
+    // Ayri ekran karti takilan sisteme x4 hatli islemci konamaz: kart
+    // olculebilir sekilde yavaslar. Kagit ustunde uygun gorunen ama
+    // gercekte zarar veren esleşme.
+    if (b.g.id !== 'igpu' && b.c.x4)
+      return `${b.c.n} ekran karti yuvasi x4; ${b.g.n} ile birlikte kullanilamaz`;
+    return null;
+  }],
+  ['agir-darbogaz', (b, butce, prof, kur) => {
     if (b.g.id === 'igpu') return null;
     const r = (b.c.g * 1.32) / b.g.idx;
     if (r < 0.75) return `islemci ekran kartini besleyemiyor (oran ${r.toFixed(2)}) — ${b.c.n} + ${b.g.n}`;
-    if (r > 2.6) return `islemciye asiri harcanmis (oran ${r.toFixed(2)}) — ${b.c.n} + ${b.g.n}`;
-    return null;
+    /* Esik profile gore degisir, cunku "asiri islemci" ancak OYUNDA israftir.
+       Yayin (oyun + kayit) ve tasarimda (render) islemci gercekten is
+       yapiyor; orada guclu islemci israf degil, isin ta kendisi. Bu ayrimi
+       yapmazsak dogru sistemleri hata diye isaretler, gercek hatalari da
+       gurultunun icinde kaybederiz. */
+    const esik = prof.id === 'oyun' ? 2.6 : 3.5;
+    if (r <= esik) return null;
+    /* Dengesizlik ancak O BUTCEDE dengeli bir alternatif varsa kusurdur.
+       Marka kisiti ve butce birlikte eli bagliyorsa motor elinden geleni
+       yapmistir; onu hata saymak gercek hatalarin arasinda gurultu yaratir.
+       Test: sistemin geri kalani sabitken, islemci+kart icin ayrilabilecek
+       para ile orani 2.6 altina indiren bir ikili kuruluyor mu? */
+    const kalan = butce - b.total;
+    const kese = b.c.p + b.g.p + kalan;
+    const cpular = CPUS.filter(c => !kur.pc || cpuBrand(c) === kur.pc);
+    const kartlar = GPUS.filter(g => g.id !== 'igpu' && (!kur.pg || g.b === kur.pg));
+    const varMi = cpular.some(c => kartlar.some(g =>
+      c.p + g.p <= kese && (c.g * 1.32) / g.idx <= esik && g.idx >= b.g.idx));
+    if (!varMi) return null;
+    return `islemciye asiri harcanmis (oran ${r.toFixed(2)}) — ${b.c.n} + ${b.g.n}`;
   }],
   // 8 GB kart ancak DAHA IYISI O BUTCEYE SIGIYORSA kusurdur. Sigmiyorsa
   // motor elinden geleni yapmistir; onu hata saymak yanlis olur.
