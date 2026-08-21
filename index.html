@@ -563,20 +563,31 @@ const CPUS = [{
    artış gösterdi. Bu geçici bir dalgalanma değil: SK Hynix arz sıkıntısının
    2028'e kadar süreceğini öngörüyor. Eski fiyatlar (16/32/64 GB için
    2.400/4.300/8.600₺) bu krizden önceydi ve artık gerçekçi değil. */
+/* tip/hiz: bellek türü ve hızı. Bugün kataloğun tamamı DDR5-6000, yani
+   şu an hiçbir fark yaratmıyor — ama modelde OLMAMASI sessiz bir riskti:
+   panele DDR5-5600 ya da DDR4 bir bellek girdiği gün site ikisini eşit
+   sayar ve uyarı vermeden yanlış öneri verirdi. Özellikle Ryzen'de bellek
+   hızı oyun FPS'ini gerçekten etkiler. */
 const RAMS = [{
   id: '16',
   n: '16 GB DDR5-6000 (XPG Lancer Blade)',
   gb: 16,
+  tip: 'DDR5',
+  hiz: 6000,
   p: 11999
 }, {
   id: '32',
   n: '32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',
   gb: 32,
+  tip: 'DDR5',
+  hiz: 6000,
   p: 25599
 }, {
   id: '64',
   n: '64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',
   gb: 64,
+  tip: 'DDR5',
+  hiz: 6000,
   p: 52849
 }];
 const SSDS = [{
@@ -641,28 +652,38 @@ const BOARDS = {
     n: 'MSI Pro A620AM-G Evo WiFi (A620)',
     p: 4849,
     t: 1,
-    form: 'mATX'
+    form: 'mATX',
+    ram: 'DDR5',
+    ramHiz: 7200
   }, {
     n: 'MSI B650M Gaming WiFi (B650)',
     p: 7631,
     t: 2,
-    form: 'mATX'
+    form: 'mATX',
+    ram: 'DDR5',
+    ramHiz: 7800
   }, {
     n: 'Asus B650E Max Gaming WiFi W (B650E)',
     p: 10693,
     t: 3,
-    form: 'ATX'
+    form: 'ATX',
+    ram: 'DDR5',
+    ramHiz: 8000
   }],
   LGA1851: [{
     n: 'MSI Pro B860M-E (B860)',
     p: 5660,
     t: 2,
-    form: 'mATX'
+    form: 'mATX',
+    ram: 'DDR5',
+    ramHiz: 9066
   }, {
     n: 'MSI Pro Z890-S WiFi6E (Z890)',
     p: 9799,
     t: 3,
-    form: 'ATX'
+    form: 'ATX',
+    ram: 'DDR5',
+    ramHiz: 8800
   }]
 };
 const COOLERS = [{
@@ -789,7 +810,13 @@ const RES = [{
   mul: .38,
   cmp: 'Sinema netliği. Aynı görüntü için yaklaşık üç kat fazla güç ister.'
 }];
-const ramS = r => r.gb >= 64 ? 100 : r.gb >= 32 ? 92 : 68;
+/* Bellek puanı: kapasite + HIZ. Hız bugün fark yaratmıyor (hepsi
+   DDR5-6000) ama modelde olması şart. Ölçek 6000 MT/s temelli; her
+   400 MT/s yaklaşık %1 puan. Küçük tutuldu — bellek hızının katkısı
+   kapasitenin yanında ikincil, ama sıfır değil.
+   Yardımcı bilerek satır içinde: denetim aracı kodu buradan itibaren
+   alıyor, dışarıda tanımlanan yardımcı denetimde tanımsız kalıyordu. */
+const ramS = r => (r.gb >= 64 ? 100 : r.gb >= 32 ? 92 : 68) * (r.hiz ? Math.max(.92, Math.min(1.06, 1 + (r.hiz - 6000) / 40000)) : 1);
 const ssdS = s => s.gb >= 2000 ? 100 : s.gb >= 1000 ? 90 : 66;
 
 /* Denge cezası — oyun odaklı profillerde ZORUNLU.
@@ -882,7 +909,7 @@ function pickBoard(c, budget, g, cs) {
      B650E seçiliyordu. Oysa 9800X3D 120 W'lık tek CCD'li bir işlemci;
      7.631 ₺'lik B650M onu rahat besler ve aradaki 3.062 ₺ doğrudan ekran
      kartından kesiliyordu.
-      Intel'de "125 W" taban değer, gerçek turbo çekişi bunun iki katına
+       Intel'de "125 W" taban değer, gerçek turbo çekişi bunun iki katına
      çıkabiliyor — bu yüzden Intel tarafında TDP değil çoklu iş gücü (m)
      ölçüt alınıyor: 265K ve 285K güçlü güç katmanı ister, 245K istemez. */
   const cokGuc = c.tdp >= 170 || c.plat === 'LGA1851' && c.m >= 120;
@@ -972,6 +999,10 @@ function kurDene(budget, prof, pick, esikliMi) {
       const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p;
       for (const r of RAMS) {
         if (r.gb < minRam) continue;
+        /* SERT KURAL — bellek türü anakartla uyuşmalı. DDR4 bir bellek
+           DDR5 anakarta fiziksel olarak girmez; yuvanın çentiği farklı.
+           Veri yoksa kural uygulanmıyor. */
+        if (r.tip && mb.ram && r.tip !== mb.ram) continue;
         for (const s of SSDS) {
           if (s.gb < prof.minSsd) continue;
           const total = base + r.p + s.p;

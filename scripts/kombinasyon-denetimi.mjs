@@ -90,6 +90,8 @@ const KURALLAR = [
     // girdiginde sessizce kirilmayalim diye var.
     const mbTip = b.mb.ram || 'DDR5';
     const ramTip = b.r.tip || 'DDR5';
+    if (b.r.hiz && b.mb.ramHiz && b.r.hiz > b.mb.ramHiz)
+      return `${b.r.n} ${b.r.hiz} MT/s, ${b.mb.n} en fazla ${b.mb.ramHiz} MT/s destekliyor`;
     if (mbTip !== ramTip)
       return `${b.mb.n} ${mbTip} istiyor, secilen bellek ${ramTip} (${b.r.n})`;
     return null;

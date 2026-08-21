@@ -368,10 +368,15 @@ const CPUS=[
    artış gösterdi. Bu geçici bir dalgalanma değil: SK Hynix arz sıkıntısının
    2028'e kadar süreceğini öngörüyor. Eski fiyatlar (16/32/64 GB için
    2.400/4.300/8.600₺) bu krizden önceydi ve artık gerçekçi değil. */
+/* tip/hiz: bellek türü ve hızı. Bugün kataloğun tamamı DDR5-6000, yani
+   şu an hiçbir fark yaratmıyor — ama modelde OLMAMASI sessiz bir riskti:
+   panele DDR5-5600 ya da DDR4 bir bellek girdiği gün site ikisini eşit
+   sayar ve uyarı vermeden yanlış öneri verirdi. Özellikle Ryzen'de bellek
+   hızı oyun FPS'ini gerçekten etkiler. */
 const RAMS=[
- {id:'16',n:'16 GB DDR5-6000 (XPG Lancer Blade)',            gb:16,p:11999},
- {id:'32',n:'32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',gb:32,p:25599},
- {id:'64',n:'64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',         gb:64,p:52849},
+ {id:'16',n:'16 GB DDR5-6000 (XPG Lancer Blade)',            gb:16,tip:'DDR5',hiz:6000,p:11999},
+ {id:'32',n:'32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',gb:32,tip:'DDR5',hiz:6000,p:25599},
+ {id:'64',n:'64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',   gb:64,tip:'DDR5',hiz:6000,p:52849},
 ];
 const SSDS=[
  {id:'500',n:'500 GB NVMe Gen4 (WD Blue SN5100)', gb:500, p:4549},
@@ -398,13 +403,13 @@ const PSUS=[
    ucuz, gerçekte kurulamayan bir sistem. */
 const BOARDS={
  AM5:[
-  {n:'MSI Pro A620AM-G Evo WiFi (A620)',      p:4849, t:1, form:'mATX'},
-  {n:'MSI B650M Gaming WiFi (B650)',          p:7631, t:2, form:'mATX'},
-  {n:'Asus B650E Max Gaming WiFi W (B650E)',  p:10693,t:3, form:'ATX'},
+  {n:'MSI Pro A620AM-G Evo WiFi (A620)',      p:4849, t:1, form:'mATX', ram:'DDR5', ramHiz:7200},
+  {n:'MSI B650M Gaming WiFi (B650)',          p:7631, t:2, form:'mATX', ram:'DDR5', ramHiz:7800},
+  {n:'Asus B650E Max Gaming WiFi W (B650E)',  p:10693,t:3, form:'ATX',  ram:'DDR5', ramHiz:8000},
  ],
  LGA1851:[
-  {n:'MSI Pro B860M-E (B860)',                p:5660, t:2, form:'mATX'},
-  {n:'MSI Pro Z890-S WiFi6E (Z890)',          p:9799, t:3, form:'ATX'},
+  {n:'MSI Pro B860M-E (B860)',                p:5660, t:2, form:'mATX', ram:'DDR5', ramHiz:9066},
+  {n:'MSI Pro Z890-S WiFi6E (Z890)',          p:9799, t:3, form:'ATX',  ram:'DDR5', ramHiz:8800},
  ]
 };
 const COOLERS=[
@@ -438,7 +443,14 @@ const RES=[
  {id:'1440',n:'1440p',full:'2K — 2560×1440',     mul:.66, cmp:'Gözle görülür daha net görüntü. Aynı sistemde performans yaklaşık üçte bir düşer.'},
  {id:'2160',n:'4K',   full:'4K — 3840×2160',     mul:.38, cmp:'Sinema netliği. Aynı görüntü için yaklaşık üç kat fazla güç ister.'},
 ];
-const ramS = r => r.gb>=64?100 : r.gb>=32?92 : 68;
+/* Bellek puanı: kapasite + HIZ. Hız bugün fark yaratmıyor (hepsi
+   DDR5-6000) ama modelde olması şart. Ölçek 6000 MT/s temelli; her
+   400 MT/s yaklaşık %1 puan. Küçük tutuldu — bellek hızının katkısı
+   kapasitenin yanında ikincil, ama sıfır değil.
+   Yardımcı bilerek satır içinde: denetim aracı kodu buradan itibaren
+   alıyor, dışarıda tanımlanan yardımcı denetimde tanımsız kalıyordu. */
+const ramS = r => (r.gb>=64?100 : r.gb>=32?92 : 68) *
+  (r.hiz ? Math.max(.92, Math.min(1.06, 1 + (r.hiz-6000)/40000)) : 1);
 const ssdS = s => s.gb>=2000?100 : s.gb>=1000?90 : 66;
 
 /* Denge cezası — oyun odaklı profillerde ZORUNLU.
@@ -591,6 +603,10 @@ function kurDene(budget,prof,pick,esikliMi){
       const base=g.p+c.p+mb.p+psu.p+cl.p+cs.p;
       for(const r of RAMS){
         if(r.gb<minRam) continue;
+        /* SERT KURAL — bellek türü anakartla uyuşmalı. DDR4 bir bellek
+           DDR5 anakarta fiziksel olarak girmez; yuvanın çentiği farklı.
+           Veri yoksa kural uygulanmıyor. */
+        if(r.tip && mb.ram && r.tip!==mb.ram) continue;
         for(const s of SSDS){
           if(s.gb<prof.minSsd) continue;
           const total=base+r.p+s.p;
