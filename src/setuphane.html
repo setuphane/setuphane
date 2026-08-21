@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SETUP HANE — Bütçene göre doğru bilgisayarı kuralım</title>
-<meta name="description" content="Ne kadar paran varsa yaz, o paraya alınabilecek en iyi bilgisayarı parça parça göster. Bilgisayardan hiç anlamayanlar için. SETUP HANE topluluğu.">
+<title>SETUP HANE — Bütçene göre hangi parça neden, birlikte bakalım</title>
+<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz. SETUP HANE topluluğu.">
 <meta name="theme-color" content="#07070B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SETUP HANE — Bütçene göre doğru bilgisayar">
-<meta property="og:description" content="Bütçeni yaz, ne alman gerektiğini saniyesinde gör. Parça isimlerini bilmene gerek yok.">
+<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, komisyon yok — karar senin.">
 <meta name="google-site-verification" content="xjJr_ENpCktifjswCPQF-lTrk-CSHy2Y3fguFi_aBWI">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://www.setuphane.com/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="SETUP HANE — Bütçeni yaz, doğru bilgisayarı biz kuralım">
+<meta property="og:image:alt" content="SETUP HANE — Bütçeni söyle, hangi parça neden, birlikte bakalım">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.setuphane.com/og.jpg">
 <!-- vercel.json'daki yakala-hepsini yönlendirmesi, tanımsız /favicon.ico isteğini
@@ -1489,22 +1489,24 @@ function Hero(){
       </Reveal>
 
       <Reveal delay={80}>
-        <Label className="mb-6">TOPLULUK ARACI · ÜCRETSİZ · {new Date().getFullYear()}</Label>
+        <Label className="mb-6">TOPLULUK ARACI · SATIŞ YOK · {new Date().getFullYear()}</Label>
         <h1 className="h-xl text-[clamp(2.6rem,10.2vw,8rem)] max-w-[16ch]">
-          Bütçeni yaz.<br/><span className="em">Doğru</span> bilgisayarı<br/>biz kuralım.
+          Bütçeni söyle.<br/>Hangi parça <span className="em">neden</span>,<br/>birlikte bakalım.
         </h1>
       </Reveal>
 
       <Reveal delay={170}>
         <div className="mt-10 lg:mt-14 max-w-[54ch]">
           <p className="text-[1.05rem] sm:text-[1.22rem] leading-[1.65] text-ink/85">
-            Elindeki parayı gir, ne yapacağını seç. O paraya alınabilecek
-            <span className="text-cy"> en iyi bilgisayarı parça parça</span> önüne koyalım —
-            ve her parçanın ne işe yaradığını, hiç bilmeyen birine anlatır gibi yazalım.
+            Elindeki parayı ve ne yapacağını söyle. O paraya kurulabilecek
+            <span className="text-cy"> en dengeli sistemi parça parça</span> göstereyim —
+            her parçanın neden seçildiğini yazarak. Beğenmediğini değiştir;
+            bu bir reçete değil, başlangıç noktası.
           </p>
-          <p className="mt-5 text-sm text-dim leading-relaxed">
-            Hiçbir şey satmıyoruz. Listeyi alıp Cimri'de, Akakçe'de ya da mahalledeki bilgisayarcıda
-            aratabilirsin — amaç zaten aynı parayla en iyisini almanı sağlamak.
+          <p className="mt-5 text-[.95rem] text-ink/70 leading-relaxed">
+            Hiçbir şey satmıyoruz, komisyon almıyoruz, kimseye yönlendirmiyoruz.
+            Kullandığımız bütün performans değerleri bağımsız ölçümlerden geliyor ve
+            kaynağı sayfada yazılı. Listeyi alıp istediğin yerden alırsın — ya da hiç almazsın.
           </p>
         </div>
       </Reveal>
@@ -1513,7 +1515,7 @@ function Hero(){
         <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4">
           <a href="#builder"
              className="group inline-flex items-center gap-4 border border-cy text-cy px-7 py-4 hover:bg-cy hover:text-bg transition-colors duration-300">
-            <span className="lbl">SİSTEMİ KUR</span>
+            <span className="lbl">HESABI GÖRELİM</span>
             <svg width="22" height="8" viewBox="0 0 22 8" fill="none" aria-hidden="true"
                  className="transition-transform duration-500 group-hover:translate-x-1.5">
               <path d="M0 4h20M17 1l3 3-3 3" stroke="currentColor" strokeWidth="1.1"/>
@@ -1531,9 +1533,9 @@ function Hero(){
 /* ═══════════════════ NASIL ÇALIŞIR ═══════════════════ */
 function How(){
   const steps=[
-    {n:'01',t:'Bütçeni ve amacını söyle',d:'Kaç liran var, bu bilgisayarla ne yapacaksın? Tek çubuk ve dört seçenek, hepsi bu.'},
-    {n:'02',t:'Sistem kendiliğinden kurulsun',d:'O bütçedeki bütün parça kombinasyonları tek tek denenir, en yüksek performansı veren birleşim seçilir.'},
-    {n:'03',t:'Listeyi al, gidip aynen aldır',d:'Parça listesini kopyala. Fiyat araştırırken elinde referans olur; kimse seni fazladan konuşturamaz.'},
+    {n:'01',t:'Bütçeni ve ne yapacağını söyle',d:'Kaç liran var, bu bilgisayarla ne yapacaksın? Tek çubuk ve dört seçenek, hepsi bu.'},
+    {n:'02',t:'Bütün kombinasyonları deneyelim',d:'O bütçedeki her birleşim tek tek kuruluyor, birbiriyle uyumsuz olanlar eleniyor, en dengelisi kalıyor. Neyin neden seçildiği yazıyor.'},
+    {n:'03',t:'Listeyi al, kararı sen ver',d:'İstediğin yerde araştır, beğenmediğin parçayı değiştir. Elinde referans olsun; kimse seni fazladan konuşturamasın.'},
   ];
   return (
     <section id="nasil" className="py-20 lg:py-28 scroll-mt-24">
@@ -3396,7 +3398,7 @@ window.addEventListener('unhandledrejection', e=>{
 
 const FORUM_KEY='sh_forum_v1', USER_KEY='sh_user_v1';
 const KATEGORILER=[
-  {id:'tavsiye', n:'Sistem tavsiyesi', d:'Bütçeni yaz, ne alsam de'},
+  {id:'tavsiye', n:'Sistem tavsiyesi', d:'Bütçeni yaz, birlikte bakalım'},
   {id:'sorun',   n:'Sorun / arıza',    d:'Açılmıyor, donuyor, ses geliyor'},
   {id:'firsat',  n:'Fiyat avı',        d:'İndirim gördüysen buraya'},
   {id:'kurulum', n:'Kurulum gösterisi',d:'Masanı göster'},
