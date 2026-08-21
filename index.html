@@ -417,7 +417,8 @@ const GPUS = [{
   r2160: 1.36,
   vram: 32,
   tdp: 575,
-  p: 241999
+  p: 241999,
+  boy: 304
 }];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat === 'AM5' ? 'AMD' : 'Intel';
@@ -691,16 +692,19 @@ const CASES = [
   n: 'Hava akışlı standart kasa (MSI MAG Forge M100A)',
   p: 2231,
   rad: 240,
+  gpuMax: 300,
   upTo: 35000
 }, {
   n: 'Mesh ön panelli kasa (NZXT H3 Flow)',
   p: 3256,
   rad: 280,
+  gpuMax: 352,
   upTo: 70000
 }, {
   n: 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',
   p: 6270,
   rad: 360,
+  gpuMax: 430,
   upTo: Infinity
 }];
 const GAMES = [{
@@ -923,6 +927,10 @@ function kurDene(budget, prof, pick, esikliMi) {
       if (g.id !== 'igpu' && c.x4) continue;
       if (g.p + c.p > budget) continue;
       const cs = pickCase(budget);
+      /* SERT KURAL — kart kasaya sığacak. Uzunluğu ölçülmemiş kartta kural
+         uygulanmıyor: uydurma bir boyla sistemi reddetmek de en az kabul
+         etmek kadar yanlış olur. Eksik ölçümler denetimde raporlanıyor. */
+      if (g.boy && cs.gpuMax && g.boy > cs.gpuMax) continue;
       const mb = pickBoard(c, budget, g),
         psu = pickPsu(g, c),
         cl = pickCooler(c, budget, cs);

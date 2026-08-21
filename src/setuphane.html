@@ -315,7 +315,7 @@ const GPUS=[
  {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (Gigabyte Gaming OC)',  b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:39749},
  {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (Palit GamingPro)',   b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:61080},
  {id:'5080',   n:'GeForce RTX 5080 16 GB (Inno3D X3)',            b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:75999},
- {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',     b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:241999},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',     b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:241999, boy:304},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -415,9 +415,9 @@ const CASES=[
  /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
     doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
     280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
- {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2231,rad:240,upTo:35000},
- {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3256,rad:280,upTo:70000},
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',p:6270,rad:360,upTo:Infinity},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2231,rad:240,gpuMax:300,upTo:35000},
+ {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3256,rad:280,gpuMax:352,upTo:70000},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',p:6270,rad:360,gpuMax:430,upTo:Infinity},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -553,8 +553,13 @@ function kurDene(budget,prof,pick,esikliMi){
          uygun görünen ama gerçekte zarar veren bir eşleşme — tam olarak
          kaçınmamız gereken tür. Dahili grafikle kullanılırsa sorun yok. */
       if(g.id!=='igpu' && c.x4) continue;
+
       if(g.p+c.p>budget) continue;
       const cs=pickCase(budget);
+      /* SERT KURAL — kart kasaya sığacak. Uzunluğu ölçülmemiş kartta kural
+         uygulanmıyor: uydurma bir boyla sistemi reddetmek de en az kabul
+         etmek kadar yanlış olur. Eksik ölçümler denetimde raporlanıyor. */
+      if(g.boy && cs.gpuMax && g.boy > cs.gpuMax) continue;
       const mb=pickBoard(c,budget,g), psu=pickPsu(g,c), cl=pickCooler(c,budget,cs);
       const base=g.p+c.p+mb.p+psu.p+cl.p+cs.p;
       for(const r of RAMS){

@@ -71,6 +71,22 @@ const KURALLAR = [
   }],
   ['dahili-grafik', b => (b.g.id === 'igpu' && !b.c.ig) ? `${b.c.n} dahili grafige sahip degil` : null],
   ['butce', (b, butce) => b.total > butce ? `toplam ${b.total} > butce ${butce}` : null],
+  ['kart-kasa', b => {
+    // Sert uyumluluk: kart kasaya sigmazsa sistem hic kurulamaz.
+    if (b.g.boy && b.cs.gpuMax && b.g.boy > b.cs.gpuMax)
+      return `${b.g.n} (${b.g.boy} mm) ${b.cs.n} kasasina sigmaz (en fazla ${b.cs.gpuMax} mm)`;
+    return null;
+  }],
+  ['ram-anakart', b => {
+    // Sert uyumluluk: anakartin destekledigi bellek tipi ile RAM ayni olmali.
+    // Bugun katalogun tamami DDR5; kural gelecekte bir DDR4 anakart/RAM
+    // girdiginde sessizce kirilmayalim diye var.
+    const mbTip = b.mb.ram || 'DDR5';
+    const ramTip = b.r.tip || 'DDR5';
+    if (mbTip !== ramTip)
+      return `${b.mb.n} ${mbTip} istiyor, secilen bellek ${ramTip} (${b.r.n})`;
+    return null;
+  }],
   ['pcie-x4', b => {
     // Ayri ekran karti takilan sisteme x4 hatli islemci konamaz: kart
     // olculebilir sekilde yavaslar. Kagit ustunde uygun gorunen ama
@@ -173,3 +189,12 @@ for (const [k, v] of Object.entries(hepsi)) {
   console.log(`  ${k.padEnd(9)} ${v.length - yok.length}/${v.length} kullaniliyor` + (yok.length ? `  —  kullanilmayan: ${yok.join(', ')}` : ''));
 }
 if (bosButce.length) console.log(`\n── SISTEM KURULAMAYAN DURUMLAR (${bosButce.length}) ──\n  ` + bosButce.slice(0, 8).join('\n  '));
+// ── Eksik olcumler ─────────────────────────────────────────────────────
+// Sert kurallar ancak veri varsa calisir. Verisi olmayan parcayi sessizce
+// gecmek, kuralin hic olmamasi kadar tehlikeli — burada gorunur kaliyor.
+const eksikBoy = GPUS.filter(g => g.id !== 'igpu' && !g.boy);
+if (eksikBoy.length) {
+  console.log(`\n── UZUNLUGU OLCULMEMIS KARTLAR (${eksikBoy.length}) ──`);
+  console.log('   Bu kartlarda "kasaya sigar mi" kurali uygulanamiyor.');
+  eksikBoy.forEach(g => console.log('  ' + g.n));
+}
