@@ -337,7 +337,7 @@ const GPUS = [{
   r2160: 0.86,
   vram: 8,
   tdp: 145,
-  p: 18382
+  p: 20613
 }, {
   id: '9060xt',
   n: 'Radeon RX 9060 XT 16 GB (PowerColor Reaper)',
@@ -350,14 +350,14 @@ const GPUS = [{
   p: 24873
 }, {
   id: '5060ti',
-  n: 'GeForce RTX 5060 Ti 16 GB (MSI Shadow 2X OC)',
+  n: 'GeForce RTX 5060 Ti 16 GB (MSI Shadow 2X OC Plus)',
   b: 'NVIDIA',
   idx: 74,
   r1440: 0.99,
   r2160: 0.99,
   vram: 16,
   tdp: 180,
-  p: 32058
+  p: 39595
 }, {
   id: '9070',
   n: 'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',
@@ -377,7 +377,7 @@ const GPUS = [{
   r2160: 1.02,
   vram: 12,
   tdp: 250,
-  p: 37239
+  p: 37829
 }, {
   id: '9070xt',
   n: 'Radeon RX 9070 XT 16 GB (Gigabyte Gaming OC)',
@@ -390,14 +390,14 @@ const GPUS = [{
   p: 39749
 }, {
   id: '5070ti',
-  n: 'GeForce RTX 5070 Ti 16 GB (Palit GamingPro)',
+  n: 'GeForce RTX 5070 Ti 16 GB (Gigabyte WindForce SFF)',
   b: 'NVIDIA',
   idx: 121,
   r1440: 1.04,
   r2160: 1.09,
   vram: 16,
   tdp: 300,
-  p: 61080
+  p: 62777
 }, {
   id: '5080',
   n: 'GeForce RTX 5080 16 GB (Inno3D X3)',
@@ -407,7 +407,7 @@ const GPUS = [{
   r2160: 1.14,
   vram: 16,
   tdp: 360,
-  p: 75999
+  p: 78140
 }, {
   id: '5090',
   n: 'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',
@@ -417,7 +417,7 @@ const GPUS = [{
   r2160: 1.36,
   vram: 32,
   tdp: 575,
-  p: 241999,
+  p: 263209,
   boy: 304
 }];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
@@ -574,7 +574,7 @@ const RAMS = [{
   gb: 16,
   tip: 'DDR5',
   hiz: 6000,
-  p: 11999
+  p: 12739
 }, {
   id: '32',
   n: '32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',
@@ -594,12 +594,12 @@ const SSDS = [{
   id: '500',
   n: '500 GB NVMe Gen4 (WD Blue SN5100)',
   gb: 500,
-  p: 4549
+  p: 4699
 }, {
   id: '1t',
   n: '1 TB NVMe Gen4 (WD Blue SN5100)',
   gb: 1000,
-  p: 7438
+  p: 7643
 }, {
   id: '2t',
   n: '2 TB NVMe Gen4 (WD Blue SN5100)',
@@ -728,16 +728,20 @@ const CASES = [
   upTo: 35000
 }, {
   n: 'Mesh ön panelli kasa (NZXT H3 Flow)',
-  p: 3256,
+  p: 3999,
   rad: 280,
   gpuMax: 352,
   formMax: 'mATX',
   upTo: 70000
-}, {
-  n: 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4000D RS ARGB)',
-  p: 6270,
+},
+/* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
+  RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
+  (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
+{
+  n: 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',
+  p: 8819,
   rad: 360,
-  gpuMax: 430,
+  gpuMax: 460,
   formMax: 'ATX',
   upTo: Infinity
 }];

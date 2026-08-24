@@ -12,3 +12,5 @@ node_modules/
 Thumbs.db
 .oem.json
 .oem-secilen.json
+.epey-veri/
+.supabase-guncelle.sql
