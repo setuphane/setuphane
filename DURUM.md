@@ -15,7 +15,7 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 | 55 aksesuar linki | 55/55 canlı (21.08'de) |
 | 9 OEM hazır sistem (İncehesap) + karşılaştırma | canlıda |
 | Sert kurallar | soket, watt, radyatör-kasa, PCIe x4, kart-kasa, anakart-kasa, bellek türü, VRAM, RAM, disk |
-| Denetim | 11.611 kombinasyon, **uyumsuzluk yok** (24.08'de tekrar doğrulandı) |
+| Denetim | 11.367 kombinasyon, **uyumsuzluk yok** (24.08'de kasa/soğutucu eşiği düzeltmesinden sonra tekrar doğrulandı) |
 
 Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 55 satır — kodla eşitli
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi).
@@ -40,6 +40,59 @@ güvenilmedi, bkz. commit 286bdcf mesajı). Gerçek değişenler:
 kuralları eski katalog id'lerine göreydi (360mm cooler, 750W/1200W PSU hiç
 kontrol edilmiyordu) — script henüz düzeltilmedi, bir sonraki tazelemede
 elle doğrulamaya devam edilmeli ya da script güncellenmeli.
+
+### 24.08.2026 — "kendim toplayacağım" motor denetimi: kasa/soğutucu/anakart eşiği düzeltildi
+
+Kullanıcı talimatı: "gereksiz kombinasyonları, eşleşmeyen/uyumsuz parçaları,
+artan fiyata göre gerçek iyileştirme olup olmadığını kontrol et." Motor
+kodu (`kurDene`) satır satır okunup, bütçe arttıkça skorun düştüğü noktalar
+400 bütçe adımı × 4 profil × marka kısıtlarında tarandı.
+
+**Bulunan hata:** Kasa (`pickCase`), soğutucu (`pickCooler`) ve anakart
+kademesi (`pickBoard`'daki `budget>90000?2:1` terimi) SABİT bütçe eşiğiyle
+zorlanıyordu (35.000/70.000 kasa, 80.000/120.000 soğutucu, 90.000 anakart).
+Eşiğin hemen üstünde kademe ZORUNLU sıçrıyordu ve bu sıçrama bazen RAM/SSD
+bütçesinden kesecek kadar büyüktü — **bütçe arttığı halde toplam sistem
+skoru düşüyordu.** Ölçülen kapsam: 27 skor-düşüşü, 20'si doğrudan bu üç
+eşikten kaynaklanıyordu (7 kasa, 13 soğutucu — anakart eşiği CPU/GPU
+seçimini değiştirerek dolaylı etki ediyordu).
+
+**Uygulanan düzeltme:** Kasa ve soğutucu artık `kurDene()`'nin arama
+döngüsüne girdi — fiziksel uyum (radyatör-kasa, soğutma yeterliliği,
+kart-kasa) SERT KURAL olarak kaldı, ama kademe TERCİHİ artık skora göre:
+motor her uyumlu kademeyi dener, en yüksek skoru veren kazanır. Skor eşitse
+(kasa/soğutucu skora hiç girmiyor, yalnızca fiyata) daha kaliteli/pahalı
+kademe kazanır — **ama sadece skor hiç düşmüyorsa**, yani bütçe zaten daha
+iyi RAM/SSD/GPU/CPU'ya harcanamıyorsa. Anakart kademesindeki `budget>90000`
+terimi tamamen kaldırıldı (zaten CPU gücüne göre kademe yükseliyordu, bütçe
+terimi gereksizdi — 65 W'lık ucuz bir CPU'yu 90 bin üstü bütçede bile B650M'e
+zorlamanın teknik gerekçesi yoktu).
+
+**Sonuç (400 bütçe adımı × 4 profil × marka taraması, önce/sonra):**
+- Skor düşüşü: 27 → 5 (kalan 5'i tamamen farklı, ÖNCEDEN VAR OLAN bir
+  mekanizmadan geliyor — aşağıya bkz.)
+- Kasa/soğutucu kademesi kaynaklı düşüş: 20 → 0
+- `gun-sonu-testi.mjs` görünür FPS düşüşü: 159 → 137
+- En düşük kurulabilir bütçe (oyun): 54.334 → 52.545 ₺ (artık en ucuz kasa
+  gerçekten kullanılabiliyor — eskiden 35.000 ₺ eşiği hiçbir zaman
+  tetiklenmiyordu çünkü çalışan en ucuz sistem zaten 35.000'i aşıyordu)
+- `kombinasyon-denetimi.mjs`: 11.367 sistem, **uyumsuzluk yok**
+- Yüksek bütçede davranış korundu: 220.000 ₺'lik örnek sistemde kasa/soğutucu
+  seçimi öncekiyle birebir aynı (kalan bütçe zaten hiçbir skor artışı
+  sağlamıyor, motor otomatik en kaliteli seçeneğe geçiyor)
+
+**Kalan 5 düşüş — YENİ bir hata DEĞİL, önceden var olan ve kasıtlı bir
+tasarım:** `kurDene`'de VRAM≥12GB (bütçe≥60.000) ve RAM≥32GB (bütçe≥120.000)
+zorunluluğu var (kod içindeki gerekçe: "8 GB kart 60 bin ustu sistemde kotu
+oneri", "16 GB RAM amiral gemisi karti bogar"). Bu eşiklerin hemen üstünde,
+motor ham skoru daha yüksek ama VRAM/RAM'i yetersiz bir sistemi REDDEDİP
+skoru daha düşük ama gerçekte daha sağlıklı bir sistemi seçiyor. Aynı
+düşüşler değişikliklerden ÖNCEKİ kodda da birebir aynı sayıda (27 içinde,
+"kasa aynı" olarak) vardı — doğrulandı, bu turda dokunulmadı. Bu, yukarıdaki
+"Açık karar" (tek skor sabitinin her oyunu temsil edememesi) ile aynı kökten:
+tek bir sayısal skorun gerçek dünya yeterliliğinin tamamını yakalayamaması.
+Kullanıcı kararı gerekirse ayrı ele alınmalı, bu turun kapsamı dışında
+tutuldu çünkü halihazırda belgelenmiş ve gerekçeli.
 
 ## Açık karar — kullanıcıya soruldu, cevap bekliyor
 

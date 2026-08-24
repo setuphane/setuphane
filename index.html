@@ -917,7 +917,7 @@ function pickBoard(c, budget, g, cs) {
      çıkabiliyor — bu yüzden Intel tarafında TDP değil çoklu iş gücü (m)
      ölçüt alınıyor: 265K ve 285K güçlü güç katmanı ister, 245K istemez. */
   const cokGuc = c.tdp >= 170 || c.plat === 'LGA1851' && c.m >= 120;
-  const want = cokGuc ? 3 : c.tdp >= 120 || c.p >= 13000 || kartAgir ? 2 : budget > 90000 ? 2 : 1;
+  const want = cokGuc ? 3 : c.tdp >= 120 || c.p >= 13000 || kartAgir ? 2 : 1;
   const ok = list.filter(b => b.t <= want);
   return ok.length ? ok[ok.length - 1] : list[0];
 }
@@ -929,36 +929,30 @@ const enUcuzUygun = (liste, yeter) => {
   return uygun.length ? uygun.reduce((a, b) => b.p < a.p ? b : a) : liste[liste.length - 1];
 };
 const pickPsu = (g, c) => enUcuzUygun(PSUS, p => p.w >= (g.tdp + c.tdp + 90) * 1.35);
-/* Soğutucu seçimi iki kurala birden uymak zorunda:
-
-   1) SERT KURAL — radyatör kasaya sığacak. Bunu bütçe bandının kasayla
-      denk gelmesine bırakamayız; kasa bantları panelden değişirse site
-      sessizce kurulamayacak bir sistem önermeye başlar.
-   2) DENGE — 55 binlik sistemde en ucuz yeterli soğutucu doğru tercih,
-      160 binlik sistemde değil. Orada 1.400 ₺ fark hiçbir şey ifade
-      etmezken sıcaklık ve görüntü ciddi fark ediyor. Bu yüzden bütçe
-      arttıkça soğutucu sınıfı da yükseliyor.
-
-   Hava soğutma "ucuz çözüm" olduğu için değil, 65 W'lık bir işlemcide
-   gerçekten doğru olduğu için altta duruyor: sessiz, arızalanacak
-   pompası yok ve beş yıl sonra da aynı işi görüyor. */
-const pickCooler = (c, budget, cs) => {
-  /* Radyatör boyu bilinmiyorsa ADINDAN çıkar. Veritabanından gelen bir
-     soğutucu satırında rad alanı olmayabilir; o durumda "radyatörü yok"
-     saymak, 360'lık bir soğutucuyu 240'lık kasaya takmak demekti. Sessiz
-     hataların en tehlikeli türü bu: hiçbir yerde uyarı vermiyor. */
-  const radBoyu = k => k.rad != null ? k.rad : String(k.n).match(/\b(120|140|240|280|360|420)\s*mm\b/) ? +RegExp.$1 : 0;
-  const sigar = k => {
-    const r = radBoyu(k);
-    return !r || cs && cs.rad != null && r <= cs.rad;
-  };
-  const yeter = k => k.cap >= c.tdp * 1.15 && sigar(k);
-  const hedef = budget >= 120000 ? 'aio360p' : budget >= 80000 ? 'aio360' : 'air';
-  const istenen = COOLERS.find(k => k.id === hedef);
-  if (istenen && yeter(istenen)) return istenen;
-  return enUcuzUygun(COOLERS.filter(sigar), yeter);
+/* Kasa ve soğutucu kademesi ESKİDEN sabit bütçe eşiğiyle (upTo / 80-120 bin)
+   zorlanıyordu. Sorun: eşiğin hemen üstünde kademe ZORUNLU atlıyordu ve bu
+   sıçrama bazen RAM/SSD'den kesecek kadar büyüktü — bütçe artmasına rağmen
+   TOPLAM sistem skoru düşüyordu (24.08.2026 derin denetimde bulundu, 20
+   bütçe/profil kombinasyonunda ölçüldü). Artık kurDene() kasa ve soğutucunun
+   HER fiziksel uyumlu kademesini dener; hangisi en yüksek skoru veriyorsa o
+   kazanır. Skor eşitse (kasa/soğutucu skora hiç girmiyor, yalnızca fiyata
+   giriyor) daha kaliteli/pahalı kademe kazanır — ama SADECE skor hiç
+   düşmüyorsa, yani bütçe zaten daha iyi RAM/SSD/GPU/CPU için harcanamıyorsa.
+   Böylece "paranın tamamı işe yarasın" ilkesiyle "yüksek bütçede otomatik
+   kaliteli kasa/soğutucu" beklentisi ÇELİŞMEDEN bir arada yaşıyor. Aşağıdaki
+   iki yardımcı yalnızca FİZİKSEL uyumu (radyatör-kasa, soğutma yeterliliği)
+   kontrol ediyor — kademe SEÇİMİ artık kurDene()'nin skor döngüsünde. */
+const radBoyu = k => k.rad != null ? k.rad : String(k.n).match(/\b(120|140|240|280|360|420)\s*mm\b/) ? +RegExp.$1 : 0;
+/* SERT KURAL — radyatör kasaya sığacak. Bunu bütçe bandının kasayla denk
+   gelmesine bırakamayız; kasa değişirse site sessizce kurulamayacak bir
+   sistem önermeye başlar. */
+const cSigar = (k, cs) => {
+  const r = radBoyu(k);
+  return !r || cs && cs.rad != null && r <= cs.rad;
 };
-const pickCase = b => CASES.find(k => b <= k.upTo) || CASES[CASES.length - 1];
+/* SERT KURAL — soğutucu işlemciyi gerçekten soğutabilecek kapasitede
+   olmalı. Bu asla "kademe tercihi" değil, güvenlik alt sınırı. */
+const cYeter = (k, c) => k.cap >= c.tdp * 1.15;
 
 /* pick: {cpu:'AMD'|'Intel'|'', gpu:'NVIDIA'|'AMD'|''} — boş = fark etmez */
 function buildSystem(budget, prof, pick) {
@@ -991,39 +985,54 @@ function kurDene(budget, prof, pick, esikliMi) {
          kaçınmamız gereken tür. Dahili grafikle kullanılırsa sorun yok. */
       if (g.id !== 'igpu' && c.x4) continue;
       if (g.p + c.p > budget) continue;
-      const cs = pickCase(budget);
-      /* SERT KURAL — kart kasaya sığacak. Uzunluğu ölçülmemiş kartta kural
-         uygulanmıyor: uydurma bir boyla sistemi reddetmek de en az kabul
-         etmek kadar yanlış olur. Eksik ölçümler denetimde raporlanıyor. */
-      if (g.boy && cs.gpuMax && g.boy > cs.gpuMax) continue;
-      const mb = pickBoard(c, budget, g, cs);
-      if (!mb) continue; // bu kasaya uyan anakart yok
-      const psu = pickPsu(g, c),
-        cl = pickCooler(c, budget, cs);
-      const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p;
-      for (const r of RAMS) {
-        if (r.gb < minRam) continue;
-        /* SERT KURAL — bellek türü anakartla uyuşmalı. DDR4 bir bellek
-           DDR5 anakarta fiziksel olarak girmez; yuvanın çentiği farklı.
-           Veri yoksa kural uygulanmıyor. */
-        if (r.tip && mb.ram && r.tip !== mb.ram) continue;
-        for (const s of SSDS) {
-          if (s.gb < prof.minSsd) continue;
-          const total = base + r.p + s.p;
-          if (total > budget) continue;
-          const score = prof.score(g, c, r, s);
-          if (!best || score > best.score + 1e-9 || Math.abs(score - best.score) < 1e-9 && total < best.total) best = {
-            g,
-            c,
-            r,
-            s,
-            mb,
-            psu,
-            cl,
-            cs,
-            total,
-            score
-          };
+
+      /* Kasa VE soğutucu kademesi artık burada, skora göre aranıyor (bkz.
+         pickPsu üstündeki not). Fiziksel uyum (kart-kasa, radyatör-kasa,
+         soğutma yeterliliği) SERT KURAL olarak kalıyor; kademe TERCİHİ
+         skor karşılaştırmasına bırakılıyor. */
+      for (const cs of CASES) {
+        /* SERT KURAL — kart kasaya sığacak. Uzunluğu ölçülmemiş kartta kural
+           uygulanmıyor: uydurma bir boyla sistemi reddetmek de en az kabul
+           etmek kadar yanlış olur. Eksik ölçümler denetimde raporlanıyor. */
+        if (g.boy && cs.gpuMax && g.boy > cs.gpuMax) continue;
+        const mb = pickBoard(c, budget, g, cs);
+        if (!mb) continue; // bu kasaya uyan anakart yok
+        const psu = pickPsu(g, c);
+        for (const cl of COOLERS) {
+          if (!cYeter(cl, c) || !cSigar(cl, cs)) continue;
+          const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p;
+          for (const r of RAMS) {
+            if (r.gb < minRam) continue;
+            /* SERT KURAL — bellek türü anakartla uyuşmalı. DDR4 bir bellek
+               DDR5 anakarta fiziksel olarak girmez; yuvanın çentiği farklı.
+               Veri yoksa kural uygulanmıyor. */
+            if (r.tip && mb.ram && r.tip !== mb.ram) continue;
+            for (const s of SSDS) {
+              if (s.gb < prof.minSsd) continue;
+              const total = base + r.p + s.p;
+              if (total > budget) continue;
+              const score = prof.score(g, c, r, s);
+              /* Kasa+soğutucu skora hiç girmiyor (yalnızca fiyata), o yüzden
+                 AYNI g/c/r/s için farklı kademeler HER ZAMAN tam eşit skor
+                 verir — bu durumda daha kaliteli/pahalı kademe kazanır.
+                 Skor GERÇEKTEN düşükse (kademe başka bir yerden — RAM/SSD/
+                 GPU/CPU'dan — kesmiş demektir) o kombinasyon zaten elenir. */
+              const kalite = cs.p + cl.p;
+              if (!best || score > best.score + 1e-9 || Math.abs(score - best.score) < 1e-9 && (kalite > best.kalite || kalite === best.kalite && total < best.total)) best = {
+                g,
+                c,
+                r,
+                s,
+                mb,
+                psu,
+                cl,
+                cs,
+                total,
+                score,
+                kalite
+              };
+            }
+          }
         }
       }
     }

@@ -34,7 +34,7 @@ const kur = new Function(...Object.keys(ortam),
   parca('const ramS =', 'const PROFILES=') +
   parca('const PROFILES=', '/* ═══════════════════ hesap motoru') +
   parca('function pickBoard(', 'function fps(') +
-  'return {buildSystem, PROFILES, pickBoard, pickPsu, pickCooler, pickCase, cpuBrand:c=>c.plat==="AM5"?"AMD":"Intel"};'
+  'return {buildSystem, PROFILES, pickBoard, pickPsu, cpuBrand:c=>c.plat==="AM5"?"AMD":"Intel"};'
 )(...Object.values(ortam));
 
 const { buildSystem, PROFILES, cpuBrand } = kur;
