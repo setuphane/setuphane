@@ -12,14 +12,34 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 | Çözünürlük katsayıları, kart bazlı (r1440/r2160) | ölçüme bağlandı |
 | 45 laptop fiyatı + satıcı sayısı (Cimri) | doğrulandı (21.08, bu turda dokunulmadı) |
 | Laptop kart gücü (NotebookCheck oyun testleri) | ölçüme bağlandı |
-| 135 aksesuar ürünü, 12 kategori | canlıda (24.08'de 80 yeni ürün + 2 yeni kategori eklendi) |
+| 93 aksesuar ürünü, 11 kategori | canlıda (24.08: 80 yeni ürün + Mouse/Klavye eklendi, Bilek+Dekor birleşti) |
 | 9 OEM hazır sistem (İncehesap) + karşılaştırma | canlıda |
 | Sert kurallar | soket, watt, radyatör-kasa, PCIe x4, kart-kasa, anakart-kasa, bellek türü, VRAM, RAM, disk |
 | Denetim | 11.367 kombinasyon, **uyumsuzluk yok** (24.08'de kasa/soğutucu eşiği düzeltmesinden sonra tekrar doğrulandı) |
 
-Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 92 satır — kodla eşitli
+Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitli
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
-gün 12'den 92'ye çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+
+### 24.08.2026 — Kategori birleştirme, yeni mouse, /öner bütçe filtresi düzeltildi
+
+- **Bilek & Kol Destekleri + Dekor & Kişiselleştirme → "Konfor & Dekor"**
+  tek kategoride birleştirildi (kullanıcı isteği: ikisi de neredeyse boştu).
+  Kod yedeğindeki 5 Wraith bilek desteği ürünü de `dekor` anahtarı altına
+  taşındı, canlıdaki tek `bilek` satırı `dekor`'a migrate edildi. `/öner`in
+  örnek verisindeki (`ONERI_URUNLER`) ilgili satır da güncellendi.
+- **Rampage'den yeni mouse eklendi**: BLITZ ULTIMATE 8K Kablosuz Oyuncu
+  Mouse — Rampage de Shopify store'u, `.json` uzantısıyla temiz ürün verisi
+  (isim/görsel/fiyat) veriyor.
+- **`/öner` bütçe filtresi düzeltildi** — bkz. `oneriUret()` yorum bloğu.
+  Kök neden: gerçek ürünler ("gercek:true") bütçeden bağımsız HER ZAMAN
+  uyumlu sayılıyordu; katalog 5 üründen 93'e çıkınca filtre fiilen devre
+  dışı kaldı. Çözüm: `urunler` tablosuna `mintl`/`maxtl` kolonu eklendi,
+  Ulugames/Rampage'in kendi Shopify fiyat verisinden 93/93 ürüne
+  dolduruldu (fiyat hiçbir yerde GÖSTERİLMİYOR, yalnızca filtrede
+  kullanılıyor — "bayat fiyat" riski yok). Panel formuna opsiyonel
+  "Bütçe Aralığı" alanı eklendi; boş bırakılırsa ürün eskisi gibi
+  bütçeden bağımsız önerilebilir kalır (güvenli varsayılan).
 
 ### 24.08.2026 — Ulugames kataloğu genişletildi: 80 yeni ürün, 2 yeni kategori
 
