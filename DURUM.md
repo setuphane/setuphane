@@ -168,7 +168,7 @@ kararı bekleniyor.
 | `node scripts/ornek-sistemler.mjs [profil]` | örnek sistemleri insan gözüyle oku |
 | `node scripts/fiyat-denetimi.mjs` | parça fiyatlarını Epey ile karşılaştır |
 | `node scripts/laptop-fiyat-denetimi.mjs` | laptop fiyatlarını karşılaştır |
-| `node scripts/link-denetimi.mjs` | aksesuar linkleri canlı mı |
+| `node scripts/link-denetimi.mjs` | aksesuar linkleri canlı mı (kod yedeği + canlı db, 129 link, 24.08'de düzeltildi) |
 | `node scripts/veri-sql.mjs > supabase-parcalar.sql` | parça SQL'i üret |
 | `node scripts/laptop-sql.mjs > supabase-laptoplar-guncelle.sql` | laptop SQL'i üret |
 
