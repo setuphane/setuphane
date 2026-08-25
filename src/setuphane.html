@@ -5537,13 +5537,14 @@ let _urunSozu=null;
 function urunleriGetir(){
   if(!uzakVar()) return Promise.resolve(null);
   if(!_urunSozu){
-    _urunSozu=sb('urunler?select=kat,ad,kaynak,gorsel,link,anahtar&aktif=eq.true&order=kat.asc,sira.asc')
+    _urunSozu=sb('urunler?select=kat,ad,kaynak,gorsel,link,anahtar,mintl,maxtl&aktif=eq.true&order=kat.asc,sira.asc')
       .then(satirlar=>{
         if(!Array.isArray(satirlar)||!satirlar.length) return null;
         const g={};
         for(const s of satirlar) (g[s.kat]=g[s.kat]||[]).push({
           ad:s.ad, kaynak:s.kaynak, gorsel:s.gorsel, link:s.link,
-          anahtar:Array.isArray(s.anahtar)?s.anahtar:[]
+          anahtar:Array.isArray(s.anahtar)?s.anahtar:[],
+          minTL:s.mintl, maxTL:s.maxtl
         });
         return g;
       })
@@ -5770,10 +5771,16 @@ function oneriUret(butce, istek, urunler){
   const metinVar=metin.length>0;
   const kullaniciKelimeleri=kelimelere(ham);
 
-  /* Gerçek ürünlerde fiyat aralığı yok (Ulugames'te değişebilir diye elle
-     girilmiyor) — bütçe filtresi onları elemiyor, sadece kelime eşleşmesi
-     belirleyici. Skor sıralamasında da gerçek ürünler küçük bir öncelik alır
-     (bunlar gösterildiğinde asıl önerilmesi gereken şey onlar). */
+  /* Gerçek ürünlerin çoğunda artık fiyat ARALIĞI var (panelden girilir,
+     mağazanın kendi varyant fiyatlarından — 24.08.2026'da 91/93 ürüne
+     Ulugames/Rampage'in kendi verisinden dolduruldu). Fiyatın KENDİSİ
+     hiçbir yerde gösterilmiyor, yalnızca bu filtrede kullanılıyor — yanlış
+     fiyat riski yok, o yüzden "bayat veri" endişesi burada geçerli değil.
+     Eskiden gerçek ürünler bütçeden bağımsız HER ZAMAN uyumlu sayılıyordu;
+     kod tek kategoriyken (mousepad) sorun değildi ama katalog büyüyünce
+     bütçe filtresi fiilen devre dışı kaldı (300 ₺ girilse 8.000 ₺'lik bir
+     klavye önerilebiliyordu). Fiyat aralığı BİLİNMİYORSA (mintl/maxtl null)
+     eski güvenli davranışa dönülüyor: ürün elenmez. */
   return oneriKaynaklari(urunler)
     .map(u=>{
       let skor=u.gercek?1:0, eslesenVar=false;
@@ -5783,7 +5790,8 @@ function oneriUret(butce, istek, urunler){
           if(kullaniciKelimeleri.some(uk=>benzerKelime(uk,kt))){ skor+=2; eslesenVar=true; }
         }
       }
-      const butceUyumlu = u.gercek ? true : (butce>0 && butce>=u.minTL && butce<=u.maxTL);
+      const butceBiliniyor = u.minTL!=null && u.maxTL!=null;
+      const butceUyumlu = butceBiliniyor ? (butce>0 && butce>=u.minTL && butce<=u.maxTL) : true;
       if(butceUyumlu) skor+=1;
       return {...u, skor, eslesti:eslesenVar, butceUyumlu};
     })
@@ -6094,7 +6102,7 @@ function Footer(){
    oturum jetonu koruma sağlıyor. Sayfayı bilen biri açabilir ama
    giriş yapmadan tek bir satır bile değiştiremez. */
 const PANEL_KEY='sh_panel_v1';
-const PANEL_BOS_URUN={kat:'mousepad', ad:'', kaynak:'Ulugames', gorsel:'', link:'', anahtar:'', sira:0, aktif:true};
+const PANEL_BOS_URUN={kat:'mousepad', ad:'', kaynak:'Ulugames', gorsel:'', link:'', anahtar:'', mintl:'', maxtl:'', sira:0, aktif:true};
 
 function panelOturumOku(){
   try{
@@ -6210,6 +6218,20 @@ function PanelUrunForm({deger,setDeger,onKaydet,onIptal,mesgul}){
           Virgülle ayır. ÖNER sayfası kullanıcının yazdığını bu kelimelerle eşleştiriyor.
         </p>
       </div>
+      <div>
+        <label className="lbl text-dim mb-2 block">BÜTÇE ARALIĞI (₺) — opsiyonel</label>
+        <div className="grid grid-cols-2 gap-3">
+          <input type="number" min="0" placeholder="En ucuz varyant" value={deger.mintl}
+                 onChange={e=>alan('mintl',e.target.value)} className={PANEL_INPUT}/>
+          <input type="number" min="0" placeholder="En pahalı varyant" value={deger.maxtl}
+                 onChange={e=>alan('maxtl',e.target.value)} className={PANEL_INPUT}/>
+        </div>
+        <p className="text-[.75rem] text-dim/70 mt-2 leading-relaxed">
+          Ziyaretçiye hiçbir yerde gösterilmez — yalnızca ÖNER sayfasındaki
+          bütçe filtresi için. Boş bırakılırsa ürün bütçeden bağımsız
+          önerilebilir (eski davranış).
+        </p>
+      </div>
       <div className="grid sm:grid-cols-2 gap-4 items-end">
         <div>
           <label htmlFor="pu-sira" className="lbl text-dim mb-2 block">SIRA</label>
@@ -6315,6 +6337,8 @@ function PanelAksesuar({oturum, yakala}){
       const g={ kat:duzen.kat, ad:duzen.ad.trim(), kaynak:duzen.kaynak.trim(),
         gorsel:duzen.gorsel.trim(), link:duzen.link.trim(),
         anahtar:String(duzen.anahtar||'').split(',').map(s=>s.trim()).filter(Boolean),
+        mintl:(duzen.mintl===''||duzen.mintl==null)?null:Number(duzen.mintl),
+        maxtl:(duzen.maxtl===''||duzen.maxtl==null)?null:Number(duzen.maxtl),
         sira:Number(duzen.sira)||0, aktif:!!duzen.aktif };
       if(duzen.id) await sb('urunler?id=eq.'+duzen.id,{method:'PATCH',body:g,token:oturum.token});
       else         await sb('urunler',{method:'POST',body:g,token:oturum.token});

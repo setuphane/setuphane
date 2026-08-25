@@ -8355,7 +8355,7 @@ let _urunSozu = null;
 function urunleriGetir() {
   if (!uzakVar()) return Promise.resolve(null);
   if (!_urunSozu) {
-    _urunSozu = sb('urunler?select=kat,ad,kaynak,gorsel,link,anahtar&aktif=eq.true&order=kat.asc,sira.asc').then(satirlar => {
+    _urunSozu = sb('urunler?select=kat,ad,kaynak,gorsel,link,anahtar,mintl,maxtl&aktif=eq.true&order=kat.asc,sira.asc').then(satirlar => {
       if (!Array.isArray(satirlar) || !satirlar.length) return null;
       const g = {};
       for (const s of satirlar) (g[s.kat] = g[s.kat] || []).push({
@@ -8363,7 +8363,9 @@ function urunleriGetir() {
         kaynak: s.kaynak,
         gorsel: s.gorsel,
         link: s.link,
-        anahtar: Array.isArray(s.anahtar) ? s.anahtar : []
+        anahtar: Array.isArray(s.anahtar) ? s.anahtar : [],
+        minTL: s.mintl,
+        maxTL: s.maxtl
       });
       return g;
     }).catch(() => null);
@@ -8670,10 +8672,16 @@ function oneriUret(butce, istek, urunler) {
   const metinVar = metin.length > 0;
   const kullaniciKelimeleri = kelimelere(ham);
 
-  /* Gerçek ürünlerde fiyat aralığı yok (Ulugames'te değişebilir diye elle
-     girilmiyor) — bütçe filtresi onları elemiyor, sadece kelime eşleşmesi
-     belirleyici. Skor sıralamasında da gerçek ürünler küçük bir öncelik alır
-     (bunlar gösterildiğinde asıl önerilmesi gereken şey onlar). */
+  /* Gerçek ürünlerin çoğunda artık fiyat ARALIĞI var (panelden girilir,
+     mağazanın kendi varyant fiyatlarından — 24.08.2026'da 91/93 ürüne
+     Ulugames/Rampage'in kendi verisinden dolduruldu). Fiyatın KENDİSİ
+     hiçbir yerde gösterilmiyor, yalnızca bu filtrede kullanılıyor — yanlış
+     fiyat riski yok, o yüzden "bayat veri" endişesi burada geçerli değil.
+     Eskiden gerçek ürünler bütçeden bağımsız HER ZAMAN uyumlu sayılıyordu;
+     kod tek kategoriyken (mousepad) sorun değildi ama katalog büyüyünce
+     bütçe filtresi fiilen devre dışı kaldı (300 ₺ girilse 8.000 ₺'lik bir
+     klavye önerilebiliyordu). Fiyat aralığı BİLİNMİYORSA (mintl/maxtl null)
+     eski güvenli davranışa dönülüyor: ürün elenmez. */
   return oneriKaynaklari(urunler).map(u => {
     let skor = u.gercek ? 1 : 0,
       eslesenVar = false;
@@ -8690,7 +8698,8 @@ function oneriUret(butce, istek, urunler) {
         }
       }
     }
-    const butceUyumlu = u.gercek ? true : butce > 0 && butce >= u.minTL && butce <= u.maxTL;
+    const butceBiliniyor = u.minTL != null && u.maxTL != null;
+    const butceUyumlu = butceBiliniyor ? butce > 0 && butce >= u.minTL && butce <= u.maxTL : true;
     if (butceUyumlu) skor += 1;
     return {
       ...u,
@@ -9021,6 +9030,8 @@ const PANEL_BOS_URUN = {
   gorsel: '',
   link: '',
   anahtar: '',
+  mintl: '',
+  maxtl: '',
   sira: 0,
   aktif: true
 };
@@ -9212,7 +9223,27 @@ function PanelUrunForm({
     className: PANEL_INPUT
   }), /*#__PURE__*/React.createElement("p", {
     className: "text-[.75rem] text-dim/70 mt-2 leading-relaxed"
-  }, "Virg\xFClle ay\u0131r. \xD6NER sayfas\u0131 kullan\u0131c\u0131n\u0131n yazd\u0131\u011F\u0131n\u0131 bu kelimelerle e\u015Fle\u015Ftiriyor.")), /*#__PURE__*/React.createElement("div", {
+  }, "Virg\xFClle ay\u0131r. \xD6NER sayfas\u0131 kullan\u0131c\u0131n\u0131n yazd\u0131\u011F\u0131n\u0131 bu kelimelerle e\u015Fle\u015Ftiriyor.")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "lbl text-dim mb-2 block"
+  }, "B\xDCT\xC7E ARALI\u011EI (\u20BA) \u2014 opsiyonel"), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-3"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    min: "0",
+    placeholder: "En ucuz varyant",
+    value: deger.mintl,
+    onChange: e => alan('mintl', e.target.value),
+    className: PANEL_INPUT
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "number",
+    min: "0",
+    placeholder: "En pahal\u0131 varyant",
+    value: deger.maxtl,
+    onChange: e => alan('maxtl', e.target.value),
+    className: PANEL_INPUT
+  })), /*#__PURE__*/React.createElement("p", {
+    className: "text-[.75rem] text-dim/70 mt-2 leading-relaxed"
+  }, "Ziyaret\xE7iye hi\xE7bir yerde g\xF6sterilmez \u2014 yaln\u0131zca \xD6NER sayfas\u0131ndaki b\xFCt\xE7e filtresi i\xE7in. Bo\u015F b\u0131rak\u0131l\u0131rsa \xFCr\xFCn b\xFCt\xE7eden ba\u011F\u0131ms\u0131z \xF6nerilebilir (eski davran\u0131\u015F).")), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 gap-4 items-end"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "pu-sira",
@@ -9355,6 +9386,8 @@ function PanelAksesuar({
         gorsel: duzen.gorsel.trim(),
         link: duzen.link.trim(),
         anahtar: String(duzen.anahtar || '').split(',').map(s => s.trim()).filter(Boolean),
+        mintl: duzen.mintl === '' || duzen.mintl == null ? null : Number(duzen.mintl),
+        maxtl: duzen.maxtl === '' || duzen.maxtl == null ? null : Number(duzen.maxtl),
         sira: Number(duzen.sira) || 0,
         aktif: !!duzen.aktif
       };
