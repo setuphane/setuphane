@@ -5795,7 +5795,15 @@ function oneriUret(butce, istek, urunler){
       if(butceUyumlu) skor+=1;
       return {...u, skor, eslesti:eslesenVar, butceUyumlu};
     })
-    .filter(u=> metinVar ? u.eslesti : u.butceUyumlu)
+    /* Ikisi de girildiyse ikisi de saglanmali. Onceki halde metin girilince
+       butce TAMAMEN atlaniyordu ("rampage" + 1500 TL yazan biri, fiyati
+       3.699 TL olan bir urunu goruyordu) — kelime eslesmesi zorunlu olsun
+       isteniyordu ama bu, butceyi sifirlamak anlamina gelmemeliydi. */
+    .filter(u=>{
+      const metinTamam = !metinVar || u.eslesti;
+      const butceTamam = butce<=0 || u.butceUyumlu;
+      return metinTamam && butceTamam;
+    })
     .sort((a,b)=>b.skor-a.skor)
     .slice(0,5);
 }
