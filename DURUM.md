@@ -12,13 +12,43 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 | Çözünürlük katsayıları, kart bazlı (r1440/r2160) | ölçüme bağlandı |
 | 45 laptop fiyatı + satıcı sayısı (Cimri) | doğrulandı (21.08, bu turda dokunulmadı) |
 | Laptop kart gücü (NotebookCheck oyun testleri) | ölçüme bağlandı |
-| 55 aksesuar linki | 55/55 canlı (21.08'de) |
+| 135 aksesuar ürünü, 12 kategori | canlıda (24.08'de 80 yeni ürün + 2 yeni kategori eklendi) |
 | 9 OEM hazır sistem (İncehesap) + karşılaştırma | canlıda |
 | Sert kurallar | soket, watt, radyatör-kasa, PCIe x4, kart-kasa, anakart-kasa, bellek türü, VRAM, RAM, disk |
 | Denetim | 11.367 kombinasyon, **uyumsuzluk yok** (24.08'de kasa/soğutucu eşiği düzeltmesinden sonra tekrar doğrulandı) |
 
-Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 55 satır — kodla eşitli
-(11 kalem 24.08'de REST API'den doğrulanarak güncellendi).
+Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 92 satır — kodla eşitli
+(11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
+gün 12'den 92'ye çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+
+### 24.08.2026 — Ulugames kataloğu genişletildi: 80 yeni ürün, 2 yeni kategori
+
+Kullanıcı Ulugames affiliate panelindeki (business.ulugames.com.tr) tüm
+outlet-dışı ürünleri istedi. Panelde 103 ürün bulundu; 12'si outlet, 11'i
+zaten katalogda — geriye 80 net yeni ürün kaldı.
+
+**Kategori sorunu:** Ürünlerin çoğu (38 mouse, 32 klavye) mevcut 10
+kategoriden hiçbirine tam oturmuyordu ("Mouse Aksesuarları" sadece
+skate/grip, "Tuş Takımı" sadece keycap/switch içindi). Kullanıcı onayıyla
+`AKSESUAR_KATEGORILERI`'ye **Mouse** ve **Klavye** eklendi.
+
+**Veri kaynağı:** Ulugames'in kendi Shopify mağazası `ulugames.com.tr/products.json`
+adresinde TÜM kataloğu (103 ürün, id/handle/tip/tag/görsel) herkese açık
+JSON olarak yayınlıyor — affiliate panelindeki kart id'leri bu JSON'daki
+`id` alanıyla birebir eşleşiyor. Tahmini/uydurma veri yok: isim, görsel,
+kategori ipucu (product_type) hep buradan geldi. 80/80 link `curl` ile
+tek tek doğrulandı (hepsi 200).
+
+**Bulunan ve düzeltilen hata:** Kategori tespiti "kablosuz" kelimesini
+"kablo" alt-dizesiyle karıştırıp bir klavyeyi (Attack Shark X98 Pro) yanlış
+kategoriye düşürüyordu — word-boundary'siz regex. `\bkablo\b` ile
+düzeltildi, tüm 80 satır tekrar kontrol edildi.
+
+**Veritabanı adımı:** `urunler.kat` sütununda sabit bir CHECK constraint
+vardı (10 eski kategoriyle sınırlı) — kullanıcı onayıyla `mouse` ve
+`klavye` eklenecek şekilde genişletildi, sonra 80 satır INSERT edildi.
+Sonuç REST API'den doğrulandı: 92 satır, kategori dağılımı beklenenle
+birebir (mouse 38, klavye 32, sesgoruntu 6, kablo 4, bilek 1, + 11 eski).
 
 ### 24.08.2026 fiyat tazeleme — neler değişti
 
