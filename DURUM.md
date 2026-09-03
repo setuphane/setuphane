@@ -1,4 +1,4 @@
-# Durum — 24.08.2026
+# Durum — 03.09.2026
 
 Çalışmaya devam eden herkes (ve yeni bir Claude oturumu) için özet.
 Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
@@ -7,19 +7,97 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 
 | Alan | Durum |
 |---|---|
-| 45 parça fiyatı (Epey, 3+ satıcı kuralı) | doğrulandı, **kod ve veritabanı senkron** (24.08) |
+| 41 parça fiyatı (Epey, 3+ satıcı kuralı) | doğrulandı, **kod ve veritabanı senkron** (03.09) |
 | Masaüstü kart ve işlemci gücü (TechPowerUp) | ölçüme bağlandı |
 | Çözünürlük katsayıları, kart bazlı (r1440/r2160) | ölçüme bağlandı |
 | 45 laptop fiyatı + satıcı sayısı (Cimri) | doğrulandı (21.08, bu turda dokunulmadı) |
 | Laptop kart gücü (NotebookCheck oyun testleri) | ölçüme bağlandı |
 | 93 aksesuar ürünü, 11 kategori | canlıda (24.08: 80 yeni ürün + Mouse/Klavye eklendi, Bilek+Dekor birleşti) |
 | 9 OEM hazır sistem (İncehesap) + karşılaştırma | canlıda |
-| Sert kurallar | soket, watt, radyatör-kasa, PCIe x4, kart-kasa, anakart-kasa, bellek türü, VRAM, RAM, disk |
-| Denetim | 11.367 kombinasyon, **uyumsuzluk yok** (24.08'de kasa/soğutucu eşiği düzeltmesinden sonra tekrar doğrulandı) |
+| Sert kurallar | soket, watt, radyatör-kasa, PCIe x4, **kart-kasa (artık gerçekten ölçülü)**, anakart-kasa, bellek türü, VRAM, RAM, disk |
+| Denetim | 11.363 kombinasyon, **uyumsuzluk yok** (03.09: kart uzunlukları eklenince 4 kombinasyon elendi) |
 
 Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitli
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+
+### 03.09.2026 — Kart uzunlukları, RAM eşiği, oyun-farkında optimizer, fiyat tazeleme
+
+**Kart uzunlukları ölçüldü — "kasaya sığar mı" kuralı artık gerçekten çalışıyor.**
+10 kartın hiçbirinde `boy` yoktu; sert kural sessizce uygulanmıyordu. Yeni araç
+`scripts/epey-boy.mjs`, Epey'in **"Derinlik"** alanından her kartın KENDİ ürün
+sayfasından ölçüyü çeker. Değerler (mm): 7600 241 · 5060 208 · 9060xt 202 ·
+5060ti 245 · 9070 288 · 5070 282 · 9070xt 290 · 5070ti 304 · 5080 304 · 5090 348.
+
+> **Tuzak:** "Eagle OC" jetonları "Eagle **Max** OC" ilanına da uyuyor ve 281 mm
+> getiriyordu; bizim modelimizin gerçek ölçüsü **208 mm**. Araç artık en sade
+> adayı seçiyor ve birden fazla aday kalırsa uyarıyor. Varyant eşleşmesine dikkat.
+
+**32 GB kuralı bütçeden karta taşındı.** Eskiden bütçe 120 bini geçince 32 GB
+zorunluydu; o sınırda RAM 12.739 → 25.599 zıplayınca kart bir kademe düşüyor ve
+ziyaretçinin gördüğü FPS AZALIYORDU. Kuralın gerçek gerekçesi bütçe değil kartın
+kendisi. Artık `idx>=110` olan kart 32 GB istiyor. Ölçüldü:
+
+| Seçenek | Düşüş | 120k üstü 16 GB kalan |
+|---|---|---|
+| bütçeye bağlı (eski) | 9 | 0/441 |
+| eşik tamamen kaldırılsa | 3 | **107/441** (kötü) |
+| **karta bağlı (seçilen)** | **1** | **0/441** |
+
+Eşiği tamamen kaldırmak yanlış olurdu: 140 bin ₺'lik RTX 5080 sistemine 16 GB
+düşüyordu.
+
+**Optimizer artık seçilen oyunu ve çözünürlüğü hesaba katıyor** (`effPerf`).
+Puanlamadaki sabit `min(g.idx, c.g*1.32)` ortalama bir oyun varsayıyordu; CS2
+1080p'de işlemci `c.g*1.06`'da, Cyberpunk'ta `c.g*1.74`'te sınırlıyor. Sabit
+katsayı yüzünden bütçe artınca motor işlemciyi düşürüp karta para aktarıyor ve
+FPS düşüyordu. Artık puanladığımız şey ile gösterdiğimiz şey aynı.
+`buildSystem(budget,prof,pick,game,res)` — oyun/çözünürlük **verilmezse eski
+davranış korunur**, denetim araçları bozulmasın diye.
+
+**Beraberlik bozucu:** puanca %2 içinde kalan adaylar arasından oyun FPS'i yüksek
+olan seçiliyor. Optimizer %0.3-1.6'lık puan kazancı için görünür FPS'ten %7-9
+feda ediyordu. Bant bilerek %2'de: genişletmek, tasarım profilini seçene kasten
+daha yavaş render makinesi önermek olurdu.
+
+Sonuç — gün sonu testi performans düşüşü **137 → 32**: oyun **0**, yayın 16,
+tasarım 16 (kalanlar gerçek ödünleşme, >%2 puan farkı). Hız etkisi yok
+(buildSystem 0.6 ms/çağrı).
+
+**Fiyat tazeleme (03.09).** 15 kalem güncellendi; en büyükleri RTX 5090
+263.209 → 290.409, RTX 5060 Ti 39.595 → 35.805, Ryzen 7 9700X 12.399 → 14.569.
+RX 9070 (36.809) ve 650 W (2.629) doğrulandı, **değiştirilmedi**.
+RTX 5090'da `boy:304` kaldırıldı (MSI Ventus ölçüsüydü), yerine Asus TUF'un
+gerçek ölçüsü 348 mm kondu.
+
+**İki denetim aracı bozuktu, düzeltildi:**
+
+- `link-denetimi.mjs` Windows'ta `-o /dev/null` kullanıyordu; curl yazma hatası
+  verip **130 linkin 130'unu da kırık** sanıyordu. Gerçek kırık link görünmezdi.
+  `os.devNull`'a geçildi → gerçek sonuç: 130 link, 0 sorun.
+- `fiyat-denetimi.mjs` kapasiteyi yalnızca "16 GB" yazımıyla arıyordu; gerçek
+  ilanlarda kapasite ürün kodunda geçiyor (`GV-R9070GAMING OC-16GD`). Doğru
+  ilanlar elenince **"RX 9070 piyasada bizden %42 pahalı"** gibi YANLIŞ alarm
+  veriyordu — ona uyup fiyat yükseltmek, ziyaretçiye bulamayacağı fiyat
+  göstermek olurdu. PSU kuralı da adında "Gold" arıyordu, Epey adları yazmıyor.
+  Ayrıca araç artık **bizim tam modelimizin** güncel fiyatını da basıyor.
+  Dikkat isteyen kalem 17 → 7.
+
+**Şeffaflık:** oyun/çözünürlük seçimi artık sistem önerisini de değiştirdiği için
+FPS modülüne tek cümlelik not eklendi.
+
+### Açık kalanlar
+
+- **Fiyat tazelemesi = SQL çalıştırmak.** Panelin "içeri aktar" butonu düz
+  `INSERT` yapıyor ve `anahtar` benzersiz; tablo doluyken hata verir. Tazeleme
+  sonrası `supabase-parcalar-guncelle.sql` Supabase SQL Editor'de çalıştırılmalı,
+  yoksa **canlı fiyatlar değişmez** (veritabanı kodu ezer).
+- 5 kalemin fiyatı doğrulanamadı (16 GB RAM, 3 WD SSD, hava soğutucu) — Epey
+  kategorisinde 3+ satıcılı karşılıkları yok, elle bakılmalı.
+- Ekran/monitör önerisi modülü geri alındı (kullanıcı isteği); çalışan mantık
+  `7896eeb` commit'inde duruyor.
+- Yapılmayı bekleyen: "elimde sistem var, neyi yükselteyim" akışı, ikinci el
+  alım rehberi, paylaşım linkinin dinamik önizleme kartı.
 
 ### 24.08.2026 — Kategori birleştirme, yeni mouse, /öner bütçe filtresi düzeltildi
 
