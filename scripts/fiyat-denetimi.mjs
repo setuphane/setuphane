@@ -18,18 +18,24 @@ const MIN_SATICI = 3;
    ama "(TMD532GB6000U36)" kodundaki "32" yuzunden ilan eleniyordu.
    Ayni sekilde 16 GB'lik bir kartin yerine 8 GB'lik surumu gecmesin diye
    kapasite de zorunlu kosul. */
+/* Kapasite ilan adinda "16 GB" diye yazilmayabilir; cogu kez urun kodunda
+   gecer ("GV-R9070GAMING OC-16GD"). Eski kalip bunlari eliyordu; geriye
+   pahali ilanlar kalinca arac "piyasa bizden %42 pahali" diye YANLIS alarm
+   veriyordu. O alarma uyup fiyat yukseltmek, ziyaretciye bulamayacagi
+   fiyat gostermek olurdu. */
+const kap = n => new RegExp("(?<![0-9])" + n + "\\s?g[bd]?\\b");
 const KURAL = {
   GPUS: ['ekran-karti', {
     '7600':   [[/\brx 7600\b/], [/\bxt\b/, /7600s/]],
-    '5060':   [[/\brtx 5060\b/, /\b8\s?gb?\b/], [/\bti\b/]],
-    '9060xt': [[/\brx 9060 xt\b/, /\b16\s?gb?\b/], []],
-    '5060ti': [[/\brtx 5060 ti\b/, /\b16\s?gb?\b/], []],
-    '9070':   [[/\brx 9070\b/, /\b16\s?gb?\b/], [/\bxt\b/, /\bgre\b/]],
-    '5070':   [[/\brtx 5070\b/, /\b12\s?gb?\b/], [/\bti\b/]],
-    '9070xt': [[/\brx 9070 xt\b/, /\b16\s?gb?\b/], []],
-    '5070ti': [[/\brtx 5070 ti\b/, /\b16\s?gb?\b/], []],
-    '5080':   [[/\brtx 5080\b/, /\b16\s?gb?\b/], []],
-    '5090':   [[/\brtx 5090\b/, /\b32\s?gb?\b/], []],
+    '5060':   [[/\brtx 5060\b/, kap(8)], [/\bti\b/]],
+    '9060xt': [[/\brx 9060 xt\b/, kap(16)], []],
+    '5060ti': [[/\brtx 5060 ti\b/, kap(16)], []],
+    '9070':   [[/\brx 9070\b/], [/\bxt\b/, /\bgre\b/]],
+    '5070':   [[/\brtx 5070\b/], [/\bti\b/]],
+    '9070xt': [[/\brx 9070 xt\b/], []],
+    '5070ti': [[/\brtx 5070 ti\b/], []],
+    '5080':   [[/\brtx 5080\b/], []],
+    '5090':   [[/\brtx 5090\b/], []],
   }],
   CPUS: ['islemci', {
     '8500g':   [[/ryzen 5 8500g\b/], []],
@@ -56,10 +62,10 @@ const KURAL = {
   }],
   PSUS: ['power-supply-psu', {
     '550': [[/\b550\s?w\b/], []], '650': [[/\b650\s?w\b/], []],
-    '800': [[/\b8[05]0\s?w\b/, /gold|platinum/], []],
-    '850': [[/\b850\s?w\b/, /gold|platinum/], []],
-    '1000':[[/\b1000\s?w\b/, /gold|platinum/], []],
-    '1300':[[/\b1[23]00\s?w\b/, /gold|platinum/], []],
+    '800': [[/\b8[05]0\s?w\b/], []],
+    '850': [[/\b850\s?w\b/], []],
+    '1000':[[/\b1000\s?w\b/], []],
+    '1300':[[/\b1[23]00\s?w\b/], []],
   }],
   COOLERS: ['islemci-sogutucu', {
     'air': [[/\bhava\b/], [/sivi/]],
@@ -98,6 +104,17 @@ for (const [ad, [kategori, kurallar]] of Object.entries(KURAL)) {
     if (isaret !== 'ok') uyari++;
     console.log(`  ${isaret.padEnd(6)} bizde ${tl(p.p).padStart(12)}   Epey ${tl(enUcuz.fiyat).padStart(12)}  (%${(fark * 100).toFixed(0)})`);
     console.log(`         bizim : ${p.n}`);
+    /* "Sinifin en ucuzu" tek basina yaniltici olabiliyor; asil soru BIZIM
+       listeledigimiz modelin bugun kaca satildigi. */
+    const par = (p.n.match(/\(([^)]+)\)/) || [])[1];
+    if (par) {
+      const jeton = sadelestir(par).split(/\s+/).filter(w => w.length > 2);
+      const bizimki = eslesen.filter(x => jeton.every(w => x.k.includes(w)))
+                          .sort((a, b) => a.fiyat - b.fiyat)[0];
+      console.log(bizimki
+        ? `         >> bu model Epey'de ${tl(bizimki.fiyat)} [${bizimki.satici} satici]`
+        : "         >> bu model Epey listesinde yok");
+    }
     console.log(`         Epey  : ${enUcuz.ad}  [${enUcuz.satici} satici]`);
   }
 }

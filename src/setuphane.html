@@ -306,16 +306,16 @@ const GPUS=[
  {id:'igpu',   n:'Dahili grafik (ayrı kart yok)', b:'—',      idx:12,  vram:0,  tdp:0,   p:0},
  /* Parantezdeki isim, fiyatın geldiği modelin ta kendisi (Epey, 20.08.2026,
     en az 3 satıcısı olan en ucuz ilan). */
- {id:'7600',   n:'Radeon RX 7600 8 GB (Sapphire Pulse)',          b:'AMD',    idx:48,  r1440:0.96, r2160:0.82, vram:8,  tdp:165, p:16629},
- {id:'5060',   n:'GeForce RTX 5060 8 GB (Zotac Twin Edge)',       b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:20613},
- {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (PowerColor Reaper)',   b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:180, p:24873},
- {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (MSI Shadow 2X OC Plus)',b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:39595},
+ {id:'7600',   n:'Radeon RX 7600 8 GB (XFX Speedster SWFT 210)',  b:'AMD',    idx:48,  r1440:0.96, r2160:0.82, vram:8,  tdp:165, p:16449},
+ {id:'5060',   n:'GeForce RTX 5060 8 GB (Gigabyte Eagle OC)',     b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:20039},
+ {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:180, p:26299},
+ {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (PNY 16GB OC)',        b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:35805},
  {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:36809},
- {id:'5070',   n:'GeForce RTX 5070 12 GB (Inno3D Twin X2 OC)',    b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:37829},
- {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (Gigabyte Gaming OC)',  b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:39749},
- {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (Gigabyte WindForce SFF)',b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:62777},
- {id:'5080',   n:'GeForce RTX 5080 16 GB (Inno3D X3)',            b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:78140},
- {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',     b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:263209, boy:304},
+ {id:'5070',   n:'GeForce RTX 5070 12 GB (Gigabyte Windforce OC SFF)',b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:39899},
+ {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (ASRock Challenger)',   b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:42769},
+ {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (Gigabyte WindForce OC SFF)',b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:64964},
+ {id:'5080',   n:'GeForce RTX 5080 16 GB (Zotac Solid Core OC)',   b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:79569},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB (Asus TUF Gaming OC)',    b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:290409},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -350,13 +350,13 @@ const brandDot = b => BRAND[b] || null;
    dahili grafiği kapalı ve 100 MHz düşük saatli — ölçülmüş fark %1-2.
    Bu tek çıkarım, kaynağı belli olsun diye burada yazılı. */
 const CPUS=[
- {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:75,  m:64,  tdp:65,  p:7299,  ig:true, x4:true},
+ {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:75,  m:64,  tdp:65,  p:7878,  ig:true, x4:true},
  {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:93,  m:77,  tdp:65,  p:6699,  ig:false},
  {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:95,  m:78,  tdp:65,  p:7169,  ig:true},
  {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:96,  m:101, tdp:125, p:10799, ig:true},
  {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:101, m:87,  tdp:65,  p:9481,  ig:true},
  {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:100, m:120, tdp:125, p:16981, ig:true},
- {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:104, m:98,  tdp:65,  p:12399, ig:true},
+ {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:104, m:98,  tdp:65,  p:14569, ig:true},
  {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:104, m:130, tdp:125, p:29119, ig:true},
  {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:112, m:89,  tdp:120, p:15080, ig:true},
  {id:'9950x3d',n:'Ryzen 9 9950X3D',   plat:'AM5',     g:118, m:139, tdp:170, p:33518, ig:true},
@@ -384,11 +384,11 @@ const SSDS=[
  {id:'2t', n:'2 TB NVMe Gen4 (WD Blue SN5100)',   gb:2000,p:15639},
 ];
 const PSUS=[
- {id:'550', n:'550 W 80+ (MSI MAG A550BNL)',            w:550, p:2068},
+ {id:'550', n:'550 W 80+ (MSI MAG A550BNL)',            w:550, p:2349},
  {id:'650', n:'650 W 80+ (MSI MAG A650BNL)',            w:650, p:2629},
  {id:'750', n:'750 W 80+ (MSI MAG A750BN)',             w:750, p:3539},
- {id:'850', n:'850 W 80+ Gold (MSI MAG A850GN)',        w:850, p:5829},
- {id:'1000',n:'1000 W 80+ Gold (MSI MAG A1000GL)',      w:1000,p:8259},
+ {id:'850', n:'850 W 80+ Gold (MSI MAG A850GN)',        w:850, p:5789},
+ {id:'1000',n:'1000 W 80+ Gold (MSI MAG A1000GL)',      w:1000,p:8299},
  {id:'1200',n:'1200 W 80+ Gold (NZXT C1200)',           w:1200,p:9190},
 ];
 /* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
@@ -414,7 +414,7 @@ const BOARDS={
 };
 const COOLERS=[
  {id:'stock', n:'Kutudan çıkan soğutucu',                                          cap:65, rad:0,  p:0},
- {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',cap:180,rad:0,  p:1185},
+ {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',cap:180,rad:0,  p:1152},
  /* En ucuz 360'ları bilerek almıyoruz: isimsiz sıvı soğutucularda pompa
     arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
     5+ satıcısı var (Epey, 20.08.2026). */
@@ -833,7 +833,7 @@ const PREBUILT_MARGIN=.22, ASSEMBLY=3500;
    hangi gerçek üründen fiyat alındığı yazıyor, kopyala-yapıştırda kullanıcı
    ne aratacağını bilsin diye. Tek istisna: COOLERS içindeki "tower" kademesi
    bu geçişte doğrulanmadı, eski tahmini fiyatta kaldı. */
-const FIYAT_TARIHI='2026-08-13';
+const FIYAT_TARIHI='2026-09-03';
 function fiyatYasi(){
   /* Panelden fiyat girildiyse tarih oradan gelir; kullanıcıya gösterilen
      "şu tarihte güncellendi" bilgisi böyle kendiliğinden doğru kalıyor. */

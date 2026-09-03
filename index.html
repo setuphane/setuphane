@@ -320,44 +320,44 @@ const GPUS = [{
    en az 3 satıcısı olan en ucuz ilan). */
 {
   id: '7600',
-  n: 'Radeon RX 7600 8 GB (Sapphire Pulse)',
+  n: 'Radeon RX 7600 8 GB (XFX Speedster SWFT 210)',
   b: 'AMD',
   idx: 48,
   r1440: 0.96,
   r2160: 0.82,
   vram: 8,
   tdp: 165,
-  p: 16629
+  p: 16449
 }, {
   id: '5060',
-  n: 'GeForce RTX 5060 8 GB (Zotac Twin Edge)',
+  n: 'GeForce RTX 5060 8 GB (Gigabyte Eagle OC)',
   b: 'NVIDIA',
   idx: 67,
   r1440: 0.96,
   r2160: 0.86,
   vram: 8,
   tdp: 145,
-  p: 20613
+  p: 20039
 }, {
   id: '9060xt',
-  n: 'Radeon RX 9060 XT 16 GB (PowerColor Reaper)',
+  n: 'Radeon RX 9060 XT 16 GB (Asus Dual)',
   b: 'AMD',
   idx: 71,
   r1440: 0.99,
   r2160: 0.97,
   vram: 16,
   tdp: 180,
-  p: 24873
+  p: 26299
 }, {
   id: '5060ti',
-  n: 'GeForce RTX 5060 Ti 16 GB (MSI Shadow 2X OC Plus)',
+  n: 'GeForce RTX 5060 Ti 16 GB (PNY 16GB OC)',
   b: 'NVIDIA',
   idx: 74,
   r1440: 0.99,
   r2160: 0.99,
   vram: 16,
   tdp: 180,
-  p: 39595
+  p: 35805
 }, {
   id: '9070',
   n: 'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',
@@ -370,55 +370,54 @@ const GPUS = [{
   p: 36809
 }, {
   id: '5070',
-  n: 'GeForce RTX 5070 12 GB (Inno3D Twin X2 OC)',
+  n: 'GeForce RTX 5070 12 GB (Gigabyte Windforce OC SFF)',
   b: 'NVIDIA',
   idx: 100,
   r1440: 1.01,
   r2160: 1.02,
   vram: 12,
   tdp: 250,
-  p: 37829
+  p: 39899
 }, {
   id: '9070xt',
-  n: 'Radeon RX 9070 XT 16 GB (Gigabyte Gaming OC)',
+  n: 'Radeon RX 9070 XT 16 GB (ASRock Challenger)',
   b: 'AMD',
   idx: 117,
   r1440: 1.02,
   r2160: 1.06,
   vram: 16,
   tdp: 304,
-  p: 39749
+  p: 42769
 }, {
   id: '5070ti',
-  n: 'GeForce RTX 5070 Ti 16 GB (Gigabyte WindForce SFF)',
+  n: 'GeForce RTX 5070 Ti 16 GB (Gigabyte WindForce OC SFF)',
   b: 'NVIDIA',
   idx: 121,
   r1440: 1.04,
   r2160: 1.09,
   vram: 16,
   tdp: 300,
-  p: 62777
+  p: 64964
 }, {
   id: '5080',
-  n: 'GeForce RTX 5080 16 GB (Inno3D X3)',
+  n: 'GeForce RTX 5080 16 GB (Zotac Solid Core OC)',
   b: 'NVIDIA',
   idx: 131,
   r1440: 1.06,
   r2160: 1.14,
   vram: 16,
   tdp: 360,
-  p: 78140
+  p: 79569
 }, {
   id: '5090',
-  n: 'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',
+  n: 'GeForce RTX 5090 32 GB (Asus TUF Gaming OC)',
   b: 'NVIDIA',
   idx: 168,
   r1440: 1.16,
   r2160: 1.36,
   vram: 32,
   tdp: 575,
-  p: 263209,
-  boy: 304
+  p: 290409
 }];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat === 'AM5' ? 'AMD' : 'Intel';
@@ -463,7 +462,7 @@ const CPUS = [{
   g: 75,
   m: 64,
   tdp: 65,
-  p: 7299,
+  p: 7878,
   ig: true,
   x4: true
 }, {
@@ -518,7 +517,7 @@ const CPUS = [{
   g: 104,
   m: 98,
   tdp: 65,
-  p: 12399,
+  p: 14569,
   ig: true
 }, {
   id: '285k',
@@ -610,7 +609,7 @@ const PSUS = [{
   id: '550',
   n: '550 W 80+ (MSI MAG A550BNL)',
   w: 550,
-  p: 2068
+  p: 2349
 }, {
   id: '650',
   n: '650 W 80+ (MSI MAG A650BNL)',
@@ -625,12 +624,12 @@ const PSUS = [{
   id: '850',
   n: '850 W 80+ Gold (MSI MAG A850GN)',
   w: 850,
-  p: 5829
+  p: 5789
 }, {
   id: '1000',
   n: '1000 W 80+ Gold (MSI MAG A1000GL)',
   w: 1000,
-  p: 8259
+  p: 8299
 }, {
   id: '1200',
   n: '1200 W 80+ Gold (NZXT C1200)',
@@ -697,7 +696,7 @@ const COOLERS = [{
   n: 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',
   cap: 180,
   rad: 0,
-  p: 1185
+  p: 1152
 },
 /* En ucuz 360'ları bilerek almıyoruz: isimsiz sıvı soğutucularda pompa
    arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
@@ -1280,7 +1279,7 @@ const PREBUILT_MARGIN = .22,
    hangi gerçek üründen fiyat alındığı yazıyor, kopyala-yapıştırda kullanıcı
    ne aratacağını bilsin diye. Tek istisna: COOLERS içindeki "tower" kademesi
    bu geçişte doğrulanmadı, eski tahmini fiyatta kaldı. */
-const FIYAT_TARIHI = '2026-08-13';
+const FIYAT_TARIHI = '2026-09-03';
 function fiyatYasi() {
   /* Panelden fiyat girildiyse tarih oradan gelir; kullanıcıya gösterilen
      "şu tarihte güncellendi" bilgisi böyle kendiliğinden doğru kalıyor. */
