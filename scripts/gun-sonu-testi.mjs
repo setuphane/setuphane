@@ -42,7 +42,9 @@ for (const prof of PROFILES) {
       for (const res of RES) {
         let oncekiF = 0, oncekiB = 0;
         for (const b of butceler) {
-          const x = buildSystem(b, prof, {cpu:pc, gpu:pg});
+          /* Oyun ve cozunurluk artik oneriyi de belirliyor: test de
+             ziyaretcinin gordugu kosulu birebir kurmali. */
+          const x = buildSystem(b, prof, {cpu:pc, gpu:pg}, oyun, res);
           if (!x) continue;
           const f = fps(x.g, x.c, oyun, res);
           if (f < oncekiF - 0.5) {
@@ -104,7 +106,10 @@ for (const prof of PROFILES) {
         const t = tatliNokta(b, prof, {cpu:'',gpu:''}, oyun, res);
         if (!t) continue;
         tatliSayi++;
-        const tam = buildSystem(b, prof, {cpu:'',gpu:''});
+        /* tatliNokta icerde oyun/cozunurlukle kuruyor; karsilastirma
+           sistemi de ayni sekilde kurulmali, yoksa iki farkli sistem
+           kiyaslanir ve tasarruf tutmaz. */
+        const tam = buildSystem(b, prof, {cpu:'',gpu:''}, oyun, res);
         const tamF = fps(tam.g, tam.c, oyun, res);
         if (t.ucuz.total >= tam.total) { tatliSorun++; not('tatli-daha-pahali', tl(b)+': onerilen '+tl(t.ucuz.total)); }
         if (t.ucuzFps < tamF*0.97)     { tatliSorun++; not('tatli-daha-yavas', tl(b)+': '+t.ucuzFps+' < '+tamF); }

@@ -461,10 +461,32 @@ const ssdS = s => s.gb>=2000?100 : s.gb>=1000?90 : 66;
    kullanamayacağı güçlü bir işlemciyi ödüllendiriyor ve optimizer kendi
    darboğazlı sistemini öneriyordu. Site darboğazı ölçüp gösterdiğine göre
    önerdiği sistemde de ondan kaçınmak zorunda. */
-function balPenalty(g,c,esik){
+/* Seçilen oyun ve çözünürlükte, sistemin GERÇEKTEN verebileceği performans.
+   Ölçek g.idx ile aynı kalsın diye oyun ve çözünürlük katsayısına bölünüyor
+   (eff = FPS / (game.k × res.mul)); sıralama FPS ile birebir aynı, ama
+   RAM/SSD terimlerinin ağırlığı çözünürlük değişince kaymıyor.
+
+   NEDEN: eskiden sabit bir katsayı vardı — min(g.idx, c.g×1.32). O katsayı
+   "ortalama bir oyun" varsayıyordu; CS2 1080p'de işlemci çok daha erken
+   sınırlıyor (c.g×1.06), Cyberpunk'ta ise çok daha geç (c.g×1.74). Sabit
+   katsayı yüzünden motor, bütçe artınca işlemciyi düşürüp karta para
+   aktarıyor ve ziyaretçinin ekranında FPS DÜŞÜYORDU (gün sonu testinde
+   137 durum). Artık puanladığımız şey ile gösterdiğimiz şey aynı.
+
+   Oyun/çözünürlük verilmezse eski davranış aynen korunur — denetim
+   araçları ve oyun seçimi olmayan çağrılar bozulmasın diye. */
+function effPerf(g,c,game,res){
+  if(!game || !res) return Math.min(g.idx, c.g*1.32);
+  const vramPen=(g.vram && g.vram<game.vram)?.82:1;
+  return Math.min(g.idx*resKat(g,res)*vramPen, c.g*game.ck/(game.k*res.mul));
+}
+function balPenalty(g,c,esik,game,res){
   if(g.id==='igpu') return 1;
   esik = esik || 1.55;
-  const r=(c.g*1.32)/g.idx;
+  /* Oran da aynı ölçüden gelmeli: "işlemci fazla güçlü mü" sorusunun cevabı
+     oyuna göre değişir. Oyun verilmezse eski sabit katsayı. */
+  const r=(game&&res) ? (c.g*game.ck/(game.k*res.mul))/(g.idx*resKat(g,res))
+                      : (c.g*1.32)/g.idx;
   /* SADECE "işlemci fazla güçlü" yönünde ceza var.
      Ters yön (işlemci yetişemiyor) zaten puanın içindeki
      eff = min(gpu, cpu×1.32) ile cezalanıyor; ikinci kez vurunca çift sayım
@@ -482,9 +504,9 @@ const PROFILES=[
   /* Küçük ama gerçek bir SSD terimi: oyunda 64 GB RAM işe yaramaz, ama
      2 TB disk yarar — 2026 oyunları tek başına 150-200 GB. Terim olmayınca
      yüksek bütçede artan para hiçbir şeye gitmiyor, 1 TB'de kalıyorduk. */
-  score:(g,c,r,s)=> (.62*Math.min(g.idx,c.g*1.32) + .20*c.g + .12*Math.min(92,ramS(r)) + .06*ssdS(s)) * balPenalty(g,c)},
+  score:(g,c,r,s,E,game,res)=> (.62*E + .20*c.g + .12*Math.min(92,ramS(r)) + .06*ssdS(s)) * balPenalty(g,c,null,game,res)},
  {id:'yayin',n:'Yayın / video çekeceğim',sub:'Aynı anda oyun + kayıt',needGpu:true,minRam:32,minSsd:1000,
-  score:(g,c,r,s)=> (.42*Math.min(g.idx,c.g*1.32) + .38*c.m + .12*ramS(r) + .08*ssdS(s)) * balPenalty(g,c)},
+  score:(g,c,r,s,E,game,res)=> (.42*E + .38*c.m + .12*ramS(r) + .08*ssdS(s)) * balPenalty(g,c,null,game,res)},
  {id:'tasarim',n:'Video / tasarım işi yapacağım',sub:'Render ve kurgu hızı',needGpu:true,minRam:32,minSsd:1000,
   /* Tasarimda islemci agirligi dogru ama sinirsiz degil: ekran kartina
      gore asiri kacan eslesmeler (9950X3D + RTX 5060 gibi) cezalandiriliyor.
@@ -561,12 +583,12 @@ const cSigar  = (k,cs) => { const r=radBoyu(k); return !r || (cs && cs.rad!=null
 const cYeter  = (k,c) => k.cap >= c.tdp*1.15;
 
 /* pick: {cpu:'AMD'|'Intel'|'', gpu:'NVIDIA'|'AMD'|''} — boş = fark etmez */
-function buildSystem(budget,prof,pick){
+function buildSystem(budget,prof,pick,game,res){
   /* Once kaliteli esiklerle dene, sonuc cikmazsa esikleri kaldirip tekrar
      dene. Kural yuzunden ziyaretciye "sistem kurulamadi" demiyoruz. */
-  return kurDene(budget,prof,pick,true) || kurDene(budget,prof,pick,false);
+  return kurDene(budget,prof,pick,true,game,res) || kurDene(budget,prof,pick,false,game,res);
 }
-function kurDene(budget,prof,pick,esikliMi){
+function kurDene(budget,prof,pick,esikliMi,game,res){
   pick = pick || {cpu:'',gpu:''};
   /* 8 GB kart 60 bin ustu bir sistemde kotu oneri: 2026 oyunlari 1440p'de
      bu siniri asiyor ve kart yeni haliyle bile takiliyor.
@@ -616,7 +638,7 @@ function kurDene(budget,prof,pick,esikliMi){
               if(s.gb<prof.minSsd) continue;
               const total=base+r.p+s.p;
               if(total>budget) continue;
-              const score=prof.score(g,c,r,s);
+              const score=prof.score(g,c,r,s,effPerf(g,c,game,res),game,res);
               /* Kasa+soğutucu skora hiç girmiyor (yalnızca fiyata), o yüzden
                  AYNI g/c/r/s için farklı kademeler HER ZAMAN tam eşit skor
                  verir — bu durumda daha kaliteli/pahalı kademe kazanır.
@@ -666,7 +688,7 @@ function enAzButce(prof,pick){
    orada yanlış dala saplanırdı. 34 adım, her biri bir buildSystem — kullanıcı
    oyun/çözünürlük değiştirdiğinde bile göze görünmeyecek kadar hızlı. */
 function tatliNokta(budget, prof, pick, game, res){
-  const tam = buildSystem(budget, prof, pick);
+  const tam = buildSystem(budget, prof, pick, game, res);
   if(!tam) return null;
   const hedefFps = fps(tam.g, tam.c, game, res);
   if(!hedefFps) return null;
@@ -676,7 +698,7 @@ function tatliNokta(budget, prof, pick, game, res){
   for(let i=0; i<=ADIM; i++){
     const b = Math.round(BUD_MIN * Math.pow(budget/BUD_MIN, i/ADIM));
     if(b >= tam.total) break;
-    const x = buildSystem(b, prof, pick);
+    const x = buildSystem(b, prof, pick, game, res);
     if(!x) continue;
     /* %3 tolerans: 68 ile 67 FPS arasındaki fark ekranda hissedilmez,
        ama arada 30 bin lira olabilir. */
@@ -1782,8 +1804,8 @@ function BrandRow({label,value,options,onPick}){
 
 function AmdIntelCompare({budget,prof,game,res}){
   const {fmt}=useCur();
-  const a=useMemo(()=>buildSystem(budget,prof,{cpu:'AMD',gpu:''}),[budget,prof]);
-  const i=useMemo(()=>buildSystem(budget,prof,{cpu:'Intel',gpu:''}),[budget,prof]);
+  const a=useMemo(()=>buildSystem(budget,prof,{cpu:'AMD',gpu:''},game,res),[budget,prof,game,res]);
+  const i=useMemo(()=>buildSystem(budget,prof,{cpu:'Intel',gpu:''},game,res),[budget,prof,game,res]);
   const fa=a?fps(a.g,a.c,game,res):0, fi=i?fps(i.g,i.c,game,res):0;
   const faA=useCount(fa), fiA=useCount(fi);
   if(!a && !i) return null;
@@ -7160,8 +7182,11 @@ function App(){
   const [oem,setOem]=useState(null);                // seçili hazır masaüstü
   const [gid,setGid]=useState(ps?ps.gid:'cs2');
   const [rid,setRid]=useState(ps?ps.rid:'1080');
-  const sys=useMemo(()=>buildSystem(budget,prof,pick),[budget,prof,pick]);
+  /* game/res de bağımlılık: oyun ya da çözünürlük değişince öneri yeniden
+     hesaplanır. Amaç tam olarak bu — CS2 1080p işlemciye, Cyberpunk 4K karta
+     yaslanır; öneri de ona göre değişmeli. */
   const game=GAMES.find(g=>g.id===gid), res=RES.find(r=>r.id===rid);
+  const sys=useMemo(()=>buildSystem(budget,prof,pick,game,res),[budget,prof,pick,game,res]);
   const act=asActive(mode,sys,lap,oem);
 
   /* Sekme yönlendirmesi. Sayfa bağlantıları '#/...' ile, bölüm çıpaları

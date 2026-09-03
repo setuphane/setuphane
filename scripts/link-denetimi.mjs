@@ -10,6 +10,7 @@
    cogunu atlamis olurdu. */
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { devNull } from 'node:os';
 
 const s = readFileSync(new URL('../src/setuphane.html', import.meta.url), 'utf8');
 const i = s.indexOf('const AKSESUAR_URUNLERI={'), j = s.indexOf('\n};', i);
@@ -49,7 +50,7 @@ console.log(`${urunler.length} benzersiz aksesuar linki denetleniyor `
 const bekle = ms => new Promise(r => setTimeout(r, ms));
 const kontrolEt = link => {
   try {
-    return execFileSync('curl', ['-sS', '-o', '/dev/null', '-w', '%{http_code}', '-L',
+    return execFileSync('curl', ['-sS', '-o', devNull, '-w', '%{http_code}', '-L',
       '--max-time', '25', '-A', UA, link], { encoding: 'utf8' }).trim();
   } catch (e) { return 'HATA'; }
 };
