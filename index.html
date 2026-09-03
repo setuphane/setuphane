@@ -327,7 +327,8 @@ const GPUS = [{
   r2160: 0.82,
   vram: 8,
   tdp: 165,
-  p: 16449
+  p: 16449,
+  boy: 241
 }, {
   id: '5060',
   n: 'GeForce RTX 5060 8 GB (Gigabyte Eagle OC)',
@@ -337,7 +338,8 @@ const GPUS = [{
   r2160: 0.86,
   vram: 8,
   tdp: 145,
-  p: 20039
+  p: 20039,
+  boy: 208
 }, {
   id: '9060xt',
   n: 'Radeon RX 9060 XT 16 GB (Asus Dual)',
@@ -347,7 +349,8 @@ const GPUS = [{
   r2160: 0.97,
   vram: 16,
   tdp: 180,
-  p: 26299
+  p: 26299,
+  boy: 202
 }, {
   id: '5060ti',
   n: 'GeForce RTX 5060 Ti 16 GB (PNY 16GB OC)',
@@ -357,7 +360,8 @@ const GPUS = [{
   r2160: 0.99,
   vram: 16,
   tdp: 180,
-  p: 35805
+  p: 35805,
+  boy: 245
 }, {
   id: '9070',
   n: 'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',
@@ -367,7 +371,8 @@ const GPUS = [{
   r2160: 1.04,
   vram: 16,
   tdp: 220,
-  p: 36809
+  p: 36809,
+  boy: 288
 }, {
   id: '5070',
   n: 'GeForce RTX 5070 12 GB (Gigabyte Windforce OC SFF)',
@@ -377,7 +382,8 @@ const GPUS = [{
   r2160: 1.02,
   vram: 12,
   tdp: 250,
-  p: 39899
+  p: 39899,
+  boy: 282
 }, {
   id: '9070xt',
   n: 'Radeon RX 9070 XT 16 GB (ASRock Challenger)',
@@ -387,7 +393,8 @@ const GPUS = [{
   r2160: 1.06,
   vram: 16,
   tdp: 304,
-  p: 42769
+  p: 42769,
+  boy: 290
 }, {
   id: '5070ti',
   n: 'GeForce RTX 5070 Ti 16 GB (Gigabyte WindForce OC SFF)',
@@ -397,7 +404,8 @@ const GPUS = [{
   r2160: 1.09,
   vram: 16,
   tdp: 300,
-  p: 64964
+  p: 64964,
+  boy: 304
 }, {
   id: '5080',
   n: 'GeForce RTX 5080 16 GB (Zotac Solid Core OC)',
@@ -407,7 +415,8 @@ const GPUS = [{
   r2160: 1.14,
   vram: 16,
   tdp: 360,
-  p: 79569
+  p: 79569,
+  boy: 304
 }, {
   id: '5090',
   n: 'GeForce RTX 5090 32 GB (Asus TUF Gaming OC)',
@@ -417,7 +426,8 @@ const GPUS = [{
   r2160: 1.36,
   vram: 32,
   tdp: 575,
-  p: 290409
+  p: 290409,
+  boy: 348
 }];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat === 'AM5' ? 'AMD' : 'Intel';
@@ -989,8 +999,20 @@ function kurDene(budget, prof, pick, esikliMi, game, res) {
      bu siniri asiyor ve kart yeni haliyle bile takiliyor.
      16 GB RAM de 120 bin ustu sistemde amiral gemisi karti bogar. */
   const minVram = esikliMi && prof.needGpu && budget >= 60000 ? 12 : 0;
-  const minRam = Math.max(prof.minRam, esikliMi && budget >= 120000 ? 32 : 0);
+  /* 32 GB kurali BUTCEDEN cikarildi, KARTA baglandi (asagidaki RAM dongusu).
+     Eskiden butce 120 bini gecince 32 GB zorunluydu; bu sinirda RAM 12.739 ->
+     25.599 zipliyor, para bulmak icin kart bir kademe dusuyor ve ziyaretcinin
+     gordugu FPS AZALIYORDU (bütçeyi artirdiginda sistem kotulesiyordu).
+     Kuralin gercek gerekcesi zaten butce degil kartin kendisi: guclu bir karti
+     16 GB sistem bellegi boguyor. Karta baglayinca ayni koruma kaliyor ama
+     butce ucurumu kalkiyor — olculdu: gun sonu dususu 9 -> 1, 120 bin ustu
+     441 senaryonun hicbirinde 16 GB'a dusmuyor. */
+  const minRam = prof.minRam;
   let best = null;
+  /* Puanca en iyiye %2 kadar yakin adaylar; sonunda aralarindan oyun FPS'i
+     en yuksek olan seciliyor (asagidaki beraberlik bozucu). */
+  const BERABERLIK = 0.98;
+  let enIyiler = [];
   for (const g of GPUS) {
     if (prof.needGpu && g.id === 'igpu') continue;
     if (g.id !== 'igpu' && g.vram && g.vram < minVram) continue;
@@ -1023,6 +1045,12 @@ function kurDene(budget, prof, pick, esikliMi, game, res) {
           const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p;
           for (const r of RAMS) {
             if (r.gb < minRam) continue;
+            /* SERT KURAL — ust segment kart (idx>=110: RX 9070 ve ustu,
+               RTX 5070 Ti ve ustu) 16 GB sistem bellegiyle eslesmez.
+               Butceye degil karta bagli oldugu icin bütçe artisi hicbir
+               secenegi ELINDEN ALMIYOR; sadece guclu karti secen sistem
+               32 GB'i da karsilamak zorunda. */
+            if (esikliMi && g.idx >= 110 && r.gb < 32) continue;
             /* SERT KURAL — bellek türü anakartla uyuşmalı. DDR4 bir bellek
                DDR5 anakarta fiziksel olarak girmez; yuvanın çentiği farklı.
                Veri yoksa kural uygulanmıyor. */
@@ -1038,7 +1066,7 @@ function kurDene(budget, prof, pick, esikliMi, game, res) {
                  Skor GERÇEKTEN düşükse (kademe başka bir yerden — RAM/SSD/
                  GPU/CPU'dan — kesmiş demektir) o kombinasyon zaten elenir. */
               const kalite = cs.p + cl.p;
-              if (!best || score > best.score + 1e-9 || Math.abs(score - best.score) < 1e-9 && (kalite > best.kalite || kalite === best.kalite && total < best.total)) best = {
+              const aday = {
                 g,
                 c,
                 r,
@@ -1051,11 +1079,36 @@ function kurDene(budget, prof, pick, esikliMi, game, res) {
                 score,
                 kalite
               };
+              if (!best || score > best.score + 1e-9 || Math.abs(score - best.score) < 1e-9 && (kalite > best.kalite || kalite === best.kalite && total < best.total)) best = aday;
+              /* BERABERLIK BOZUCU — puanca neredeyse esit adaylar arasindan
+                 oyun FPS'i yuksek olani sec. Optimizer %0.3-1.6'lik puan
+                 kazanci icin ziyaretcinin gordugu FPS'ten %7-9 feda ediyordu
+                 (tasarim ve yayin profillerinde 84 yerde). Bu gercek bir
+                 tercih degil, kil payi fark. Oncelikler DEGISMIYOR: gercekten
+                 daha iyi sistem (>%2 puan) yine kazanir. */
+              if (game && res) {
+                if (!enIyiler.length || score > enIyiler[0].score) {
+                  enIyiler = enIyiler.filter(x => x.score >= score * BERABERLIK);
+                  enIyiler.unshift(aday);
+                } else if (score >= enIyiler[0].score * BERABERLIK) enIyiler.push(aday);
+              }
             }
           }
         }
       }
     }
+  }
+  if (game && res && enIyiler.length > 1) {
+    const puan = x => fps(x.g, x.c, game, res);
+    /* Esit FPS'te daha ucuzu tercih et — bedava kazanc. */
+    const kazanan = enIyiler.reduce((a, b) => {
+      const fa = puan(a),
+        fb = puan(b);
+      if (fb > fa) return b;
+      if (fb === fa && b.total < a.total) return b;
+      return a;
+    });
+    if (puan(kazanan) > puan(best)) best = kazanan;
   }
   return best;
 }
@@ -4283,7 +4336,11 @@ function GameTest({
     value: r.id
   }, r.full))))), /*#__PURE__*/React.createElement("p", {
     className: "text-[.82rem] text-dim mt-3 leading-relaxed"
-  }, res.cmp), act ? /*#__PURE__*/React.createElement("div", {
+  }, res.cmp), /*#__PURE__*/React.createElement("p", {
+    className: "text-[.82rem] text-dim mt-1.5 leading-relaxed"
+  }, "Bu se\xE7im yukar\u0131daki ", /*#__PURE__*/React.createElement("span", {
+    className: "text-ink/80"
+  }, "sistem \xF6nerisini de"), " de\u011Fi\u015Ftirir \u2014 rekabet\xE7i oyunlar i\u015Flemciye, a\u011F\u0131r oyunlar ekran kart\u0131na yaslan\u0131r."), act ? /*#__PURE__*/React.createElement("div", {
     className: "mt-10"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-end gap-4 flex-wrap"
