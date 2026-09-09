@@ -320,26 +320,26 @@ const GPUS = [{
    en az 3 satıcısı olan en ucuz ilan). */
 {
   id: '7600',
-  n: 'Radeon RX 7600 8 GB (XFX Speedster SWFT 210)',
+  n: 'Radeon RX 7600 8 GB (Sapphire Pulse)',
   b: 'AMD',
   idx: 48,
   r1440: 0.96,
   r2160: 0.82,
   vram: 8,
   tdp: 165,
-  p: 16449,
-  boy: 241
+  p: 17289,
+  boy: 240
 }, {
   id: '5060',
-  n: 'GeForce RTX 5060 8 GB (Gigabyte Eagle OC)',
+  n: 'GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)',
   b: 'NVIDIA',
   idx: 67,
   r1440: 0.96,
   r2160: 0.86,
   vram: 8,
   tdp: 145,
-  p: 20039,
-  boy: 208
+  p: 19700,
+  boy: 197
 }, {
   id: '9060xt',
   n: 'Radeon RX 9060 XT 16 GB (Asus Dual)',
@@ -353,15 +353,15 @@ const GPUS = [{
   boy: 202
 }, {
   id: '5060ti',
-  n: 'GeForce RTX 5060 Ti 16 GB (PNY 16GB OC)',
+  n: 'GeForce RTX 5060 Ti 16 GB (Zotac Twin Edge OC)',
   b: 'NVIDIA',
   idx: 74,
   r1440: 0.99,
   r2160: 0.99,
   vram: 16,
   tdp: 180,
-  p: 35805,
-  boy: 245
+  p: 35999,
+  boy: 221
 }, {
   id: '9070',
   n: 'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',
@@ -375,59 +375,59 @@ const GPUS = [{
   boy: 288
 }, {
   id: '5070',
-  n: 'GeForce RTX 5070 12 GB (Gigabyte Windforce OC SFF)',
+  n: 'GeForce RTX 5070 12 GB (Gainward Phoenix)',
   b: 'NVIDIA',
   idx: 100,
   r1440: 1.01,
   r2160: 1.02,
   vram: 12,
   tdp: 250,
-  p: 39899,
-  boy: 282
+  p: 41258,
+  boy: 332
 }, {
   id: '9070xt',
-  n: 'Radeon RX 9070 XT 16 GB (ASRock Challenger)',
+  n: 'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)',
   b: 'AMD',
   idx: 117,
   r1440: 1.02,
   r2160: 1.06,
   vram: 16,
   tdp: 304,
-  p: 42769,
-  boy: 290
+  p: 41570,
+  boy: 325
 }, {
   id: '5070ti',
-  n: 'GeForce RTX 5070 Ti 16 GB (Gigabyte WindForce OC SFF)',
+  n: 'GeForce RTX 5070 Ti 16 GB (PNY Triple OC)',
   b: 'NVIDIA',
   idx: 121,
   r1440: 1.04,
   r2160: 1.09,
   vram: 16,
   tdp: 300,
-  p: 64964,
-  boy: 304
+  p: 58093,
+  boy: 300
 }, {
   id: '5080',
-  n: 'GeForce RTX 5080 16 GB (Zotac Solid Core OC)',
+  n: 'GeForce RTX 5080 16 GB (MSI Shadow 3X OC)',
   b: 'NVIDIA',
   idx: 131,
   r1440: 1.06,
   r2160: 1.14,
   vram: 16,
   tdp: 360,
-  p: 79569,
-  boy: 304
+  p: 83105,
+  boy: 303
 }, {
   id: '5090',
-  n: 'GeForce RTX 5090 32 GB (Asus TUF Gaming OC)',
+  n: 'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',
   b: 'NVIDIA',
   idx: 168,
   r1440: 1.16,
   r2160: 1.36,
   vram: 32,
   tdp: 575,
-  p: 290409,
-  boy: 348
+  p: 318181,
+  boy: 325
 }];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat === 'AM5' ? 'AMD' : 'Intel';
@@ -472,7 +472,7 @@ const CPUS = [{
   g: 75,
   m: 64,
   tdp: 65,
-  p: 7878,
+  p: 7941,
   ig: true,
   x4: true
 }, {
@@ -482,7 +482,7 @@ const CPUS = [{
   g: 93,
   m: 77,
   tdp: 65,
-  p: 6699,
+  p: 6709,
   ig: false
 }, {
   id: '7600',
@@ -491,7 +491,7 @@ const CPUS = [{
   g: 95,
   m: 78,
   tdp: 65,
-  p: 7169,
+  p: 7119,
   ig: true
 }, {
   id: '245k',
@@ -500,7 +500,7 @@ const CPUS = [{
   g: 96,
   m: 101,
   tdp: 125,
-  p: 10799,
+  p: 10729,
   ig: true
 }, {
   id: '9600x',
@@ -509,7 +509,7 @@ const CPUS = [{
   g: 101,
   m: 87,
   tdp: 65,
-  p: 9481,
+  p: 9416,
   ig: true
 }, {
   id: '265k',
@@ -518,7 +518,7 @@ const CPUS = [{
   g: 100,
   m: 120,
   tdp: 125,
-  p: 16981,
+  p: 16409,
   ig: true
 }, {
   id: '9700x',
@@ -527,7 +527,7 @@ const CPUS = [{
   g: 104,
   m: 98,
   tdp: 65,
-  p: 14569,
+  p: 14188,
   ig: true
 }, {
   id: '285k',
@@ -536,7 +536,7 @@ const CPUS = [{
   g: 104,
   m: 130,
   tdp: 125,
-  p: 29119,
+  p: 27899,
   ig: true
 }, {
   id: '7800x3d',
@@ -545,7 +545,7 @@ const CPUS = [{
   g: 112,
   m: 89,
   tdp: 120,
-  p: 15080,
+  p: 15280,
   ig: true
 }, {
   id: '9950x3d',
@@ -554,7 +554,7 @@ const CPUS = [{
   g: 118,
   m: 139,
   tdp: 170,
-  p: 33518,
+  p: 34332,
   ig: true
 }, {
   id: '9800x3d',
@@ -563,7 +563,7 @@ const CPUS = [{
   g: 125,
   m: 108,
   tdp: 120,
-  p: 21440,
+  p: 21999,
   ig: true
 }];
 /* RAM fiyatları: 2026'da yapay zeka veri merkezlerinin (HBM) bellek talebi
@@ -583,58 +583,58 @@ const RAMS = [{
   gb: 16,
   tip: 'DDR5',
   hiz: 6000,
-  p: 12739
+  p: 12999
 }, {
   id: '32',
   n: '32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',
   gb: 32,
   tip: 'DDR5',
   hiz: 6000,
-  p: 25599
+  p: 26599
 }, {
   id: '64',
   n: '64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',
   gb: 64,
   tip: 'DDR5',
   hiz: 6000,
-  p: 52849
+  p: 53939
 }];
 const SSDS = [{
   id: '500',
   n: '500 GB NVMe Gen4 (WD Blue SN5100)',
   gb: 500,
-  p: 4699
+  p: 4945
 }, {
   id: '1t',
   n: '1 TB NVMe Gen4 (WD Blue SN5100)',
   gb: 1000,
-  p: 7643
+  p: 8281
 }, {
   id: '2t',
   n: '2 TB NVMe Gen4 (WD Blue SN5100)',
   gb: 2000,
-  p: 15639
+  p: 16430
 }];
 const PSUS = [{
   id: '550',
   n: '550 W 80+ (MSI MAG A550BNL)',
   w: 550,
-  p: 2349
+  p: 1799
 }, {
   id: '650',
   n: '650 W 80+ (MSI MAG A650BNL)',
   w: 650,
-  p: 2629
+  p: 2820
 }, {
   id: '750',
   n: '750 W 80+ (MSI MAG A750BN)',
   w: 750,
-  p: 3539
+  p: 3299
 }, {
   id: '850',
   n: '850 W 80+ Gold (MSI MAG A850GN)',
   w: 850,
-  p: 5789
+  p: 5111
 }, {
   id: '1000',
   n: '1000 W 80+ Gold (MSI MAG A1000GL)',
@@ -642,9 +642,9 @@ const PSUS = [{
   p: 8299
 }, {
   id: '1200',
-  n: '1200 W 80+ Gold (NZXT C1200)',
+  n: '1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)',
   w: 1200,
-  p: 9190
+  p: 7979
 }];
 /* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
    modeller (Akakçe, Ağustos 2026, en ucuz liste fiyatı) — her yonga
@@ -659,21 +659,21 @@ const PSUS = [{
 const BOARDS = {
   AM5: [{
     n: 'MSI Pro A620AM-G Evo WiFi (A620)',
-    p: 4849,
+    p: 4879,
     t: 1,
     form: 'mATX',
     ram: 'DDR5',
     ramHiz: 7200
   }, {
-    n: 'MSI B650M Gaming WiFi (B650)',
-    p: 7631,
+    n: 'Gigabyte B650M Gaming WiFi6E (B650)',
+    p: 6642,
     t: 2,
     form: 'mATX',
     ram: 'DDR5',
-    ramHiz: 7800
+    ramHiz: 6400
   }, {
     n: 'Asus B650E Max Gaming WiFi W (B650E)',
-    p: 10693,
+    p: 8571,
     t: 3,
     form: 'ATX',
     ram: 'DDR5',
@@ -681,14 +681,14 @@ const BOARDS = {
   }],
   LGA1851: [{
     n: 'MSI Pro B860M-E (B860)',
-    p: 5660,
+    p: 6029,
     t: 2,
     form: 'mATX',
     ram: 'DDR5',
     ramHiz: 9066
   }, {
     n: 'MSI Pro Z890-S WiFi6E (Z890)',
-    p: 9799,
+    p: 10639,
     t: 3,
     form: 'ATX',
     ram: 'DDR5',
@@ -706,7 +706,7 @@ const COOLERS = [{
   n: 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',
   cap: 180,
   rad: 0,
-  p: 1152
+  p: 1279
 },
 /* En ucuz 360'ları bilerek almıyoruz: isimsiz sıvı soğutucularda pompa
    arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
@@ -716,13 +716,13 @@ const COOLERS = [{
   n: '360 mm sıvı soğutma (Thermalright Frozen Magic 360 ARGB)',
   cap: 280,
   rad: 360,
-  p: 3409
+  p: 3517
 }, {
   id: 'aio360p',
   n: '360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)',
   cap: 300,
   rad: 360,
-  p: 4578
+  p: 4700
 }];
 const CASES = [
 /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
@@ -730,14 +730,14 @@ const CASES = [
    280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
 {
   n: 'Hava akışlı standart kasa (MSI MAG Forge M100A)',
-  p: 2231,
+  p: 2184,
   rad: 240,
   gpuMax: 300,
   formMax: 'mATX',
   upTo: 35000
 }, {
   n: 'Mesh ön panelli kasa (NZXT H3 Flow)',
-  p: 3999,
+  p: 3599,
   rad: 280,
   gpuMax: 352,
   formMax: 'mATX',
@@ -748,7 +748,7 @@ const CASES = [
   (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
 {
   n: 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',
-  p: 8819,
+  p: 8671,
   rad: 360,
   gpuMax: 460,
   formMax: 'ATX',
