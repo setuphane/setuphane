@@ -7,7 +7,7 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 
 | Alan | Durum |
 |---|---|
-| 41 parça fiyatı (Epey, 3+ satıcı kuralı) | doğrulandı, **kod ve veritabanı senkron** (03.09) |
+| 46 parça fiyatı (Epey, 3+ satıcı kuralı) | doğrulandı, **kod ve veritabanı senkron** (09.09, 46/46 REST'ten teyitli) |
 | Masaüstü kart ve işlemci gücü (TechPowerUp) | ölçüme bağlandı |
 | Çözünürlük katsayıları, kart bazlı (r1440/r2160) | ölçüme bağlandı |
 | 45 laptop fiyatı + satıcı sayısı (Cimri) | doğrulandı (21.08, bu turda dokunulmadı) |
@@ -15,11 +15,58 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 | 93 aksesuar ürünü, 11 kategori | canlıda (24.08: 80 yeni ürün + Mouse/Klavye eklendi, Bilek+Dekor birleşti) |
 | 9 OEM hazır sistem (İncehesap) + karşılaştırma | canlıda |
 | Sert kurallar | soket, watt, radyatör-kasa, PCIe x4, **kart-kasa (artık gerçekten ölçülü)**, anakart-kasa, bellek türü, VRAM, RAM, disk |
-| Denetim | 11.363 kombinasyon, **uyumsuzluk yok** (03.09: kart uzunlukları eklenince 4 kombinasyon elendi) |
+| Denetim | 11.303 kombinasyon, **uyumsuzluk yok** (09.09: yeni kart uzunlukları elemeyi biraz daha sıkılaştırdı) |
 
 Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitli
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+
+### 09.09.2026 — Fiyat tazeleme: 41 kalem, 10 model değişikliği
+
+Epey'den taze veri çekildi. **Tarama derinliği tuzağı:** varsayılan sayfa
+sayısıyla RAM kategorisinde 300 üründen yalnızca 1'i 16 GB'tı (en ucuz ilan
+11.999 ₺) — 16 GB segmenti hiç kapsanmıyordu ve "Epey'de karşılık yok"
+sanılıyordu. 30 sayfaya çıkarınca 285 adet 16 GB ilanı geldi. Anakart ve
+kasa kategorilerinde de aynı sebeple derin tarama gerekti. **Kural: bir parça
+"Epey'de yok" görünüyorsa önce tarama derinliğini kontrol et.**
+
+Model değişenler (eski modelimiz ya 3 satıcının altına düştü ya da artık
+sınıfın en ucuzu değildi — kullanıcı kararı: kural harfiyen uygulansın):
+
+| Parça | Eski | Yeni | Fiyat |
+|---|---|---|---|
+| RX 7600 | XFX Speedster | Sapphire Pulse | 17.289 |
+| RTX 5060 | Gigabyte Eagle OC | MSI Ventus 2X OC White | 19.700 |
+| RTX 5060 Ti | PNY 16GB OC (listede yok) | Zotac Twin Edge OC 16GB | 35.999 |
+| RTX 5070 | Gigabyte Windforce SFF | Gainward Phoenix | 41.258 |
+| RX 9070 XT | ASRock Challenger | XFX Swift Triple Fan | 41.570 |
+| RTX 5070 Ti | Gigabyte WindForce SFF | PNY Triple OC | 58.093 |
+| RTX 5080 | Zotac Solid Core (2 satıcı) | MSI Shadow 3X OC | 83.105 |
+| RTX 5090 | Asus TUF Gaming OC | MSI Ventus 3X OC | 318.181 |
+| Anakart B650M | MSI B650M Gaming WiFi | Gigabyte B650M Gaming WiFi6E | 6.642 |
+| PSU 1200 W | NZXT C1200 (Epey'de yok) | Zalman Watttera ZM1200-EBTII | 7.979 |
+
+> MSI B650M Gaming WiFi'nin tek kalan ilanı **67.110 ₺** idi (saçma fiyat,
+> 1 satıcı). Zalman'ın 80+ Gold olduğu ilan sayfasından doğrulandı — etiket
+> "80+ Gold" dediği için varsayımla geçilmedi.
+
+**Model değişen 8 kartın uzunluğu yeniden ölçüldü.** `epey-boy.mjs` "en sade
+ad"ı seçiyor ve RTX 5060 Ti'de **8 GB** varyantının ölçüsünü getirdi; ölçüler
+ürün KODU ile tekil eşleşme yapılarak (ör. `ZT-B50620H-10M`) doğrulandı.
+Büyük değişimler: RTX 5070 282→332, RX 9070 XT 290→325, RTX 5090 348→325 mm.
+
+**YANLIŞ ALARM yakalandı:** Epey'de iki Asus RTX 5080 ilanı 46.5k ₺
+görünüyor — 5070 Ti'nin (58k) altında, imkânsız. Gerçek 5080 tabanı 82k+.
+Araca uyup fiyatı düşürmek ziyaretçiye bulamayacağı fiyat göstermek olurdu.
+
+**Veritabanı adımı — yöntem değişti:** `veri-sql.mjs` tabloyu `drop` edip
+baştan kuruyor (production'da yıkıcı). Bunun yerine `anahtar` üzerinden
+yalnızca ad+fiyat güncelleyen UPDATE üretildi; 46/46 satır REST API'den
+tek tek doğrulandı.
+
+Test: 11.303 kombinasyon **uyumsuzluk yok**; gün sonu testi **oyun
+profilinde FPS düşüşü 0** (yayın 18, tasarım 28 — >%2 puan farklı gerçek
+ödünleşmeler, 03.09'daki 16/16'dan fiyat hareketiyle arttı).
 
 ### 09.09.2026 — Logo hizalaması: monitör kemerle örtüşmüyordu
 
