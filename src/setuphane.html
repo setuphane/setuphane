@@ -1281,25 +1281,30 @@ function NeonScene({className='',w=1}){
       </defs>
       {/* kemer — altta açık, ~220° */}
       <path d="M59.8 140.8A96 96 0 1 1 240.2 140.8" {...s(arc,w*3.6)}/>
-      {/* monitör */}
-      <rect x="88" y="46" width="94" height="66" rx="5" {...s(CY)}/>
-      <path d="M103 102 129 62M118 102 143 62M140 98 161 68" {...s(MG,w*2.1)} opacity=".85"/>
-      <path d="M110 86 116 78" {...s(CY,w*1.9)} opacity=".8"/>
+      {/* monitör — kemer (ve masa) merkezi x=150; monitör x=135'te duruyordu,
+         yani 15px sola kaykıydı. +15 kaydırılıp kemerle hizalandı. Kasa aynı
+         miktarda kaydırılamazdı: kasanın sağ üst köşesi kemer merkezine
+         (150,108) 92.7'den yakın kalmak zorunda (üst yorum) — +15 ile bu
+         sınır aşılıp neon tüpü deliyordu (tıpkı önceki hatada olduğu gibi).
+         Kasa yalnızca +4 kaydırıldı (köşe mesafesi 91.6, sınır içinde). */}
+      <rect x="103" y="46" width="94" height="66" rx="5" {...s(CY)}/>
+      <path d="M118 102 144 62M133 102 158 62M155 98 176 68" {...s(MG,w*2.1)} opacity=".85"/>
+      <path d="M125 86 131 78" {...s(CY,w*1.9)} opacity=".8"/>
       {/* monitör ayağı */}
-      <path d="M135 112v14M118 134l6-8h22l6 8z" {...s(CY)}/>
+      <path d="M150 112v14M133 134l6-8h22l6 8z" {...s(CY)}/>
       {/* kasa */}
-      <rect x="194" y="60" width="30" height="66" rx="4" {...s(MG)}/>
-      <path d="M200 71h18M200 78h18M200 85h18" {...s(MG,w*1.9)} opacity=".85"/>
-      <circle cx="209" cy="106" r="5" {...s(MG,w*2.2)}/>
+      <rect x="198" y="60" width="30" height="66" rx="4" {...s(MG)}/>
+      <path d="M204 71h18M204 78h18M204 85h18" {...s(MG,w*1.9)} opacity=".85"/>
+      <circle cx="213" cy="106" r="5" {...s(MG,w*2.2)}/>
       {/* masa — kemerin açık ağzından taşar, referansta da öyle */}
       <path d="M58 182 96 146h108l38 36z" {...s(arc,w*2.5)} opacity=".9"/>
       {/* klavye */}
-      <path d="M86 176 112 154h66l24 22z" {...s(CY)}/>
-      <path d="M97 169h94M105 162h78" {...s(CY,w*1.6)} opacity=".8"/>
-      <path d="M124 176h40" {...s(CY,w*1.6)} opacity=".8"/>
+      <path d="M101 176 127 154h66l24 22z" {...s(CY)}/>
+      <path d="M112 169h94M120 162h78" {...s(CY,w*1.6)} opacity=".8"/>
+      <path d="M139 176h40" {...s(CY,w*1.6)} opacity=".8"/>
       {/* mouse */}
-      <rect x="210" y="164" width="12" height="14" rx="6" {...s(MG,w*2.2)}/>
-      <path d="M216 164v4" {...s(MG,w*1.7)}/>
+      <rect x="225" y="164" width="12" height="14" rx="6" {...s(MG,w*2.2)}/>
+      <path d="M231 164v4" {...s(MG,w*1.7)}/>
     </svg>
   );
 }
