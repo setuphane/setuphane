@@ -1,4 +1,4 @@
-# Durum — 03.09.2026
+# Durum — 09.09.2026
 
 Çalışmaya devam eden herkes (ve yeni bir Claude oturumu) için özet.
 Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
@@ -20,6 +20,28 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitli
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+
+### 09.09.2026 — Logo hizalaması: monitör kemerle örtüşmüyordu
+
+Kullanıcı bağımsız olarak fark etti ("kemer pc hep kaymış") — Google'da
+favicon önce şüphelenildi ama favicon.svg zaten doğruydu (arch/monitör
+ikisi de x=16 merkezli). Asıl sorun `NeonScene` bileşeninde (header +
+hero arkaplan + tüm logo kullanımları): kemer ve masa x=150 merkezliyken
+monitör x=135'teydi — 17.08.2026'da "düzeltildi" denen ama koda hiç
+yansımamış eski hata.
+
+`getBBox()` ile ölçülüp monitör +15 kaydırıldı (şimdi 150, kemer/masayla
+birebir). Kasa aynı miktarda kaydırılamadı — kemerden taşmaması için
+köşesi merkeze 92.7 birimden yakın kalmalı, +15 bunu 101.1'e çıkarıp
+neon tüpü deliyordu; kasa yalnızca +4 kaydırıldı (91.6, sınır içinde).
+Klavye/mouse kemerin açık alt ağzının altında olduğu için bu sınıra tabi
+değiller, monitörle birlikte +15 kaydı.
+
+**Not:** Bu turda uzak depoda bu oturumun bilmediği 4 commit vardı (aynı
+gün başka bir oturumdan — kart uzunlukları, RAM eşiği, oyun-farkında
+optimizer, fiyat tazeleme, aşağıdaki bölüm). Çakışmasız `git merge` ile
+birleştirildi, tam test seti (kontrol/kombinasyon-denetimi/gün-sonu)
+merge sonrası tekrar çalıştırılıp doğrulandı.
 
 ### 03.09.2026 — Kart uzunlukları, RAM eşiği, oyun-farkında optimizer, fiyat tazeleme
 
