@@ -875,7 +875,7 @@ const PREBUILT_MARGIN=.22, ASSEMBLY=3500;
    hangi gerçek üründen fiyat alındığı yazıyor, kopyala-yapıştırda kullanıcı
    ne aratacağını bilsin diye. Tek istisna: COOLERS içindeki "tower" kademesi
    bu geçişte doğrulanmadı, eski tahmini fiyatta kaldı. */
-const FIYAT_TARIHI='2026-09-03';
+const FIYAT_TARIHI='2026-09-09';
 function fiyatYasi(){
   /* Panelden fiyat girildiyse tarih oradan gelir; kullanıcıya gösterilen
      "şu tarihte güncellendi" bilgisi böyle kendiliğinden doğru kalıyor. */
@@ -1078,13 +1078,21 @@ function parcalariGetir(){
           for (const a of alanlar) if (e[a] != null) c[a] = e[a];
           return c;
         });
+        /* 21.09.2026 HATA: burada yalnızca r1440/r2160, kasada yalnızca 'rad'
+           korunuyordu. Kartın boyu, kasanın gpuMax/formMax'ı, anakartın form
+           ve RAM tipi siliniyor, motor da "ölçü yok" diye kontrolü atlıyordu:
+           canlıda ~1.165 sistemde kasaya sığmayan kart ya da ATX anakart
+           öneriliyordu. Koddaki veriyle test geçtiği için görünmüyordu.
+           Artık motorun okuduğu TÜM ölçü alanları korunuyor; kombinasyon
+           denetimi de bu yolu ayrıca sınıyor (CANLI geçişi). */
         koy(GPUS, koru(GPUS.slice(), grup('gpu').map(x=>({id:kimlik(x), n:x.ad, b:x.marka||'—',
           idx:x.idx||0, vram:x.vram||0, tdp:x.tdp||0, p:x.fiyat})),
-          o=>o.id, ['r1440','r2160']));
+          o=>o.id, ['r1440','r2160','boy']));
         koy(CPUS, koru(CPUS.slice(), grup('cpu').map(x=>({id:kimlik(x), n:x.ad, plat:x.plat,
           g:x.oyun||0, m:x.coklu_is||0, tdp:x.tdp||0, p:x.fiyat, ig:!!x.dahili_grafik})),
           o=>o.id, ['x4']));
-        koy(RAMS, grup('ram').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
+        koy(RAMS, koru(RAMS.slice(), grup('ram').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})),
+          o=>o.id, ['tip','hiz']));
         koy(SSDS, grup('ssd').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
         koy(PSUS, grup('psu').map(x=>({id:kimlik(x), n:x.ad, w:x.watt||0, p:x.fiyat})));
         const radKoru = (eski, yeniler, anahtar) => koru(eski, yeniler, anahtar, ['rad']);
@@ -1096,13 +1104,30 @@ function parcalariGetir(){
         const ana=grup('anakart').filter(x=>x.plat);
         if(ana.length){
           const yeni={};
-          for(const x of ana) (yeni[x.plat]=yeni[x.plat]||[]).push({n:x.ad, p:x.fiyat, t:x.kademe||1});
+          /* Ölçüler anahtardan ('anakart:AM5-1' → BOARDS.AM5[1]) geri alınıyor;
+             model adı değişse de aynı yuvadaki kartın form/RAM bilgisi kalır. */
+          for(const x of ana){
+            const m=String(x.anahtar||'').match(/^anakart:(.+)-(\d+)$/);
+            const e=(m && BOARDS[m[1]] && BOARDS[m[1]][+m[2]])
+                  || (BOARDS[x.plat]||[]).find(o=>o.n===x.ad) || {};
+            const b={n:x.ad, p:x.fiyat, t:x.kademe||1};
+            for(const a of ['form','ram','ramHiz']) if(e[a]!=null) b[a]=e[a];
+            (yeni[x.plat]=yeni[x.plat]||[]).push(b);
+          }
           for(const k of Object.keys(BOARDS)) delete BOARDS[k];
           Object.assign(BOARDS, yeni);
         }
         /* butce_ust boşsa "sınırsız": en üst kademe kasa her bütçeye uyar. */
-        koy(CASES, radKoru(CASES.slice(), grup('kasa').map(x=>({n:x.ad, p:x.fiyat,
-          upTo:(x.butce_ust==null?Infinity:x.butce_ust)})), o=>o.n));
+        {
+          const eskiKasa=CASES.slice();
+          koy(CASES, grup('kasa').map(x=>{
+            const m=String(x.anahtar||'').match(/^kasa:(\d+)$/);
+            const e=(m && eskiKasa[+m[1]]) || eskiKasa.find(o=>o.n===x.ad) || {};
+            const k={n:x.ad, p:x.fiyat, upTo:(x.butce_ust==null?Infinity:x.butce_ust)};
+            for(const a of ['rad','gpuMax','formMax']) if(e[a]!=null) k[a]=e[a];
+            return k;
+          }));
+        }
         const en=r.map(x=>x.guncelleme).filter(Boolean).sort().pop();
         if(en) PARCA_FIYAT_TARIHI=String(en).slice(0,10);
         return true;
@@ -1608,14 +1633,9 @@ function Nav({route}){
                 className={'lbl px-3 py-2 border transition-colors '+(mode==='USD'?'border-cy text-cy':'border-line text-dim hover:text-ink')}>$ USD</button>
             </div>
 
-            {/* Dil seçimi: altyapı hazır, çeviri metinleri henüz eklenmedi.
-                Şimdilik yalnızca <html lang> ve tercih kaydediliyor. */}
-            <div className="flex items-center gap-2" role="group" aria-label="Dil / Language">
-              <button onClick={()=>setLang('tr')} aria-pressed={lang==='tr'}
-                className={'lbl px-2.5 py-1 border text-[9px] transition-colors '+(lang==='tr'?'border-cy text-cy':'border-line text-dim hover:text-ink')}>TR</button>
-              <button onClick={()=>setLang('en')} aria-pressed={lang==='en'} title="English (soon)"
-                className={'lbl px-2.5 py-1 border text-[9px] transition-colors '+(lang==='en'?'border-cy text-cy':'border-line text-dim hover:text-ink')}>EN</button>
-            </div>
+            {/* TR/EN düğmeleri kaldırıldı: çeviri yokken EN'e basmak hiçbir şey
+                değiştirmiyordu ve telefonda başlığa ikinci bir satır ekliyordu.
+                LangProvider altyapısı duruyor; çeviri gelince buraya geri döner. */}
           </div>
         </div>
 
@@ -1686,6 +1706,12 @@ function Hero({budget,setBudget}){
                 {fmt(b)}
               </button>
             ))}
+          </div>
+          {/* Güven satırı: "bu fiyatlar eski mi?" sorusunu baştan cevaplar. */}
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-[.75rem] text-dim">
+            <span><span className="text-cy">●</span> Fiyatlar {fiyatYasi().metin}</span>
+            <span><span className="text-cy">●</span> En az 3 satıcılı ilan</span>
+            <span><span className="text-cy">●</span> Uyumsuz parça elenir</span>
           </div>
         </div>
       </Reveal>
@@ -2291,6 +2317,43 @@ function BudgetSlider({id,label,budget,setBudget}){
   );
 }
 
+/* Her parçanın altındaki tek satırlık gerekçe. Yalnızca motorun kendi
+   kullandığı ölçülerden türetiliyor (uydurma "en iyisi" iddiası yok);
+   bir ölçü eksikse o satır hiç yazılmıyor. */
+function parcaNeden(sys){
+  const {g,c,mb,r,psu,cl,cs}=sys, n={};
+  const ek=(k,t)=>{ if(t) n[k]=t; };
+  if(g.id!=='igpu' && g.vram) ek('gpu', g.vram+' GB görüntü belleği'+(g.tdp?' · '+g.tdp+' W tüketim':''));
+  if(c.plat) ek('cpu', c.plat+' soket'+(c.tdp?' · '+c.tdp+' W':'')+(c.ig?' · dahili grafikli':''));
+  if(c.plat) ek('mb', 'İşlemciyle aynı soket ('+c.plat+')'+(mb.form?' · '+mb.form:'')+(mb.ram?' · '+mb.ram:''));
+  if(mb.ram && r.tip) ek('ram', 'Anakart '+mb.ram+(mb.ramHiz?'-'+mb.ramHiz:'')+' destekliyor');
+  if(psu.w){
+    const cek=(g.tdp||0)+(c.tdp||0)+90;
+    ek('psu', 'Sistem en fazla ~'+cek+' W çeker · %'+Math.round((psu.w/cek-1)*100)+' güvenlik payı');
+  }
+  if(cl.cap && c.tdp) ek('cooler', 'İşlemci '+c.tdp+' W ısı üretir · soğutucu '+cl.cap+' W kaldırır'+
+    (cl.rad&&cs.rad?' · kasa '+cs.rad+' mm radyatör alır':''));
+  if(cs.gpuMax && g.boy) ek('case', 'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
+    (cs.formMax?' · '+cs.formMax+' anakart sığar':''));
+  return n;
+}
+/* Akakçe araması: parantez içindeki satılan model adı + ana model
+   (ör. "Gainward Phoenix RTX 5070 12 GB"). Yalnızca açıklayıcı ad varsa
+   ("Kule tipi hava soğutucu (…)") parantez içi tek başına yeterli. */
+function fiyatAramaUrl(ad){
+  const m=String(ad).match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  let q=ad;
+  if(m){
+    const dis=m[1].replace(/^(GeForce|Radeon)\s+/i,'');
+    const kap=dis.match(/^\d+\s*(GB|TB)/i);
+    q = !/\s/.test(m[2]) ? dis                         /* "(B650)" gibi yonga seti etiketi */
+      : /NVMe/i.test(dis) ? m[2]+' '+(kap?kap[0]:'')   /* SSD: model + kapasite */
+      : /\d/.test(dis) && !/W 80\+|soğut|kasa/i.test(dis) ? m[2]+' '+dis
+      : m[2];
+  }
+  return 'https://www.akakce.com/arama/?q='+encodeURIComponent(q.trim());
+}
+
 function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
   const {fmt,plain}=useCur();
   const [copied,copy]=useCopy(sys,prof,plain);
@@ -2305,6 +2368,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
     ['cooler','Soğutucu',sys.cl.n,sys.cl.p],
     ['case','Kasa',sys.cs.n,sys.cs.p],
   ] : [];
+  const neden = sys ? parcaNeden(sys) : {};
 
   return (
         <Card className="mt-6 p-5 sm:p-9">
@@ -2373,6 +2437,14 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
                       <div className="min-w-0 flex-1">
                         <div className="lbl text-dim/80 mb-1">{cat}</div>
                         <div className="text-[.92rem] sm:text-[1rem] leading-snug">{name}</div>
+                        {neden[k] && <div className="text-[.74rem] text-dim mt-1 leading-snug">{neden[k]}</div>}
+                        {price>0 && (
+                          <a href={fiyatAramaUrl(name)} target="_blank" rel="noopener noreferrer"
+                             onClick={()=>olay('fiyat_karsilastir',{parca:k})}
+                             className="inline-block mt-1.5 text-[.72rem] text-cy/85 hover:text-cy underline underline-offset-2">
+                            Fiyat karşılaştır ↗
+                          </a>
+                        )}
                       </div>
                       <div className="num text-[.85rem] sm:text-[.98rem] text-dim group-hover:text-ink transition-colors">
                         {price===0 ? 'dahil' : fmt(price)}
@@ -3563,21 +3635,20 @@ function CerezBandi(){
     <div className="fixed inset-x-0 bottom-0 z-[92] border-t border-cy/30"
          style={{background:'rgba(9,9,14,.96)',backdropFilter:'blur(20px)',paddingBottom:'env(safe-area-inset-bottom)'}}
          role="dialog" aria-label="Çerez tercihi">
-      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
-        <p className="text-[.85rem] text-ink/85 leading-relaxed flex-1">
-          <span className="text-cy">Ölçüm çerezi kullanalım mı?</span>{' '}
-          Ziyaret sayısını zaten çerezsiz sayıyoruz. Ek olarak Google Analytics açarsan
-          hangi sayfada ne kadar kaldığını da ölçebiliriz — bu çerez gerektiriyor.
-          Reddedersen site aynen çalışır, hiçbir şey kaybetmezsin.
+      {/* İnce şerit: eski band telefonda ilk ekranın üçte birini kaplıyordu. */}
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 py-2.5 flex items-center gap-3">
+        <p className="text-[.75rem] sm:text-[.82rem] text-ink/80 leading-snug flex-1">
+          Ziyaret istatistiği için çerez kullanabilir miyiz? Reddetsen de site aynen çalışır.{' '}
+          <a href="/gizlilik" className="text-cy underline underline-offset-2">Ayrıntı</a>
         </p>
-        <div className="flex gap-2 shrink-0">
-          <button onClick={()=>sec('ret')}
-            className="lbl px-4 py-2.5 border border-line text-dim hover:text-ink transition-colors">
-            SADECE GEREKLİ
+        <div className="flex gap-1.5 shrink-0">
+          <button onClick={()=>sec('ret')} style={{letterSpacing:'.12em'}}
+            className="lbl text-[9px] px-2.5 py-2 border border-line text-dim hover:text-ink transition-colors">
+            HAYIR
           </button>
-          <button onClick={()=>sec('kabul')}
-            className="lbl px-4 py-2.5 border border-cy text-cy hover:bg-cy hover:text-bg transition-colors">
-            KABUL EDİYORUM
+          <button onClick={()=>sec('kabul')} style={{letterSpacing:'.12em'}}
+            className="lbl text-[9px] px-2.5 py-2 border border-cy bg-cy text-bg transition-colors">
+            TAMAM
           </button>
         </div>
       </div>

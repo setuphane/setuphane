@@ -1,4 +1,4 @@
-# Durum — 09.09.2026
+# Durum — 21.09.2026
 
 Çalışmaya devam eden herkes (ve yeni bir Claude oturumu) için özet.
 Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
@@ -20,6 +20,38 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitli
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+
+### 21.09.2026 — CANLIDA UYUMLULUK KONTROLÜ DEVRE DIŞIYDI (düzeltildi)
+
+Site açılışta fiyatları Supabase'den alıp kod dizilerinin yerine koyuyor.
+Yükleyici (`parcalariGetir`) ölçü alanlarının çoğunu **koruMUYORDU**: kartın
+`boy`u, kasanın `gpuMax/formMax`ı, anakartın `form/ram/ramHiz`ı, RAM'in
+`tip/hiz`ı siliniyordu. Motor "ölçü yok" deyip kuralı atladığı için canlıda
+~**905 sistemde ATX anakart mATX kasaya**, ~**260 sistemde kasaya sığmayan
+kart** (ör. 332 mm RTX 5070 → 300 mm M100A) öneriliyordu. Kombinasyon
+denetimi kod dizileriyle çalıştığı için hep temiz geçiyordu.
+
+Düzeltme: yükleyici tüm ölçüleri koruyor; anakart ve kasa artık ada göre
+değil **anahtara göre** ('anakart:AM5-1', 'kasa:0') eşleniyor. Denetime
+kalıcı **CANLI VERİ YOLU** bölümü eklendi: sitenin gerçek yükleyicisini
+veritabanı satırlarının aynısıyla çalıştırıp tek bir ölçü kaybolsa bile
+hata veriyor (eski kodda 37 kayıp yakalıyor). Tarayıcıda canlı veriyle
+368 bütçe noktası tarandı: sorun 0. **Kural: veritabanından gelen her yeni
+alan/nesne için "ölçü korunuyor mu" sorusu sorulmalı.**
+
+### 21.09.2026 — Duyuru hazırlığı (mobil + profesyonellik)
+
+- Hero'da 5 hızlı bütçe düğmesi (55/75/100/150/250 bin — hepsi oyun profili
+  minimumunun, 52.524 ₺, üstünde; 30/45 bin ilk denemede "sistem çıkmıyor"a düşürüyordu)
+- Güven satırı: fiyat tarihi · 3+ satıcı · uyumsuz parça elenir
+- "Nasıl çalışır" hesabın altına; hesap bölümü telefonda 1.913 → ~990 px
+- Reveal ekrana girmeden tetikleniyor (hızlı kaydırmada boş ekran kalıyordu)
+- Parça listesi: her parçanın altında ölçüye dayalı gerekçe (`parcaNeden`)
+  + Akakçe "Fiyat karşılaştır" linki; TOPLAM + KOPYALA/PAYLAŞ (mobil)
+- Alt çubukta kapalıyken de KOPYALA; TR/EN düğmeleri kaldırıldı (çeviri yok)
+- Çerez bandı ince şerit
+- `middleware.js` (Vercel Edge): /sistem:… linklerinde önizleme kartı
+  başlığı "75.000 ₺ oyun bilgisayarı" gibi linke özel
 
 ### 09.09.2026 — Fiyat tazeleme: 41 kalem, 10 model değişikliği
 
@@ -313,6 +345,10 @@ Kalıcı çözüm öneri davranışını bütün sitede değiştireceği için k
 kararı bekleniyor.
 
 ## Yapılacaklar
+
+- **"Elimde sistem var, neyi yükselteyim"**: eski kartlar (GTX 1060, RTX 3060…)
+  için ölçülü performans verisi yok; uydurma idx ile FPS göstermek BİRİNCİ
+  KURAL ihlali olur. Önce TechPowerUp göreli performans tablosu toplanmalı.
 
 - **9 ekran kartının uzunluğu ölçülmedi.** Kart-kasa kuralı yalnızca
   RTX 5090'da (304 mm, TechPowerUp) uygulanabiliyor. TechPowerUp'ın arama ve

@@ -207,3 +207,57 @@ if (eksikBoy.length) {
   console.log('   Bu kartlarda "kasaya sigar mi" kurali uygulanamiyor.');
   eksikBoy.forEach(g => console.log('  ' + g.n));
 }
+
+// ── CANLI veri yolu ────────────────────────────────────────────────────
+// Site acilista fiyatlari Supabase'den alip bu dizilerin YERINE koyuyor.
+// Veritabaninda olcu alanlari (kart boyu, kasa gpuMax/formMax, anakart
+// formu, RAM tipi...) tutulmadigi icin yukleyici onlari koddan korumak
+// zorunda. 21.09.2026'da korumadigi ortaya cikti: yukarodaki tarama kodla
+// temiz gecerken canlida ~1.165 sistemde kasaya sigmayan parca oneriliyordu.
+// Burada sitenin GERCEK yukleyicisi, veritabani satirlarinin aynisiyla
+// calistiriliyor ve hicbir olcu alaninin kaybolmadigi dogrulaniyor.
+{
+  const OLCU = {
+    GPUS: ['boy', 'r1440', 'r2160'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
+    COOLERS: ['rad', 'cap'], CASES: ['rad', 'gpuMax', 'formMax'],
+  };
+  const once = {
+    GPUS: structuredClone(GPUS), CPUS: structuredClone(CPUS), RAMS: structuredClone(RAMS),
+    COOLERS: structuredClone(COOLERS), CASES: structuredClone(CASES), BOARDS: structuredClone(BOARDS),
+  };
+  // Veritabani satirlari: yalnizca tabloda gercekten var olan kolonlar.
+  const r = []; let sira = 0;
+  const ekle = o => r.push({ sira: (sira += 10), guncelleme: '2026-01-01', ...o });
+  GPUS.forEach(g => ekle({ anahtar: 'gpu:' + g.id, kat: 'gpu', ad: g.n, marka: g.b, fiyat: g.p, idx: g.idx, vram: g.vram, tdp: g.tdp }));
+  CPUS.forEach(c => ekle({ anahtar: 'cpu:' + c.id, kat: 'cpu', ad: c.n, fiyat: c.p, plat: c.plat, oyun: c.g, coklu_is: c.m, tdp: c.tdp, dahili_grafik: c.ig }));
+  RAMS.forEach(x => ekle({ anahtar: 'ram:' + x.id, kat: 'ram', ad: x.n, fiyat: x.p, kapasite: x.gb }));
+  SSDS.forEach(x => ekle({ anahtar: 'ssd:' + x.id, kat: 'ssd', ad: x.n, fiyat: x.p, kapasite: x.gb }));
+  PSUS.forEach(x => ekle({ anahtar: 'psu:' + x.id, kat: 'psu', ad: x.n, fiyat: x.p, watt: x.w }));
+  COOLERS.forEach(x => ekle({ anahtar: 'sogutucu:' + x.id, kat: 'sogutucu', ad: x.n, fiyat: x.p, sogutma_kap: x.cap }));
+  Object.keys(BOARDS).forEach(pl => BOARDS[pl].forEach((x, i) =>
+    ekle({ anahtar: 'anakart:' + pl + '-' + i, kat: 'anakart', ad: x.n, fiyat: x.p, plat: pl, kademe: x.t })));
+  CASES.forEach((x, i) => ekle({ anahtar: 'kasa:' + i, kat: 'kasa', ad: x.n, fiyat: x.p, butce_ust: isFinite(x.upTo) ? x.upTo : null }));
+
+  const bas = s.indexOf('const grup=k=>'), son = s.indexOf('const en=r.map', bas);
+  if (bas < 0 || son < 0) { console.log('\n!! CANLI: yukleyici kaynakta bulunamadi — denetim guncellenmeli'); process.exitCode = 1; }
+  else {
+    new Function('r', 'GPUS', 'CPUS', 'RAMS', 'SSDS', 'PSUS', 'COOLERS', 'CASES', 'BOARDS', s.slice(bas, son))
+      (r, GPUS, CPUS, RAMS, SSDS, PSUS, COOLERS, CASES, BOARDS);
+    const kayip = [];
+    for (const [ad, alanlar] of Object.entries(OLCU))
+      once[ad].forEach((o, i) => {
+        const y = { GPUS, CPUS, RAMS, COOLERS, CASES }[ad][i];
+        for (const a of alanlar) if (o[a] != null && (!y || y[a] !== o[a])) kayip.push(`${ad} ${o.n || o.id}: ${a} ${o[a]} -> ${y ? y[a] : 'YOK'}`);
+      });
+    for (const pl of Object.keys(once.BOARDS)) once.BOARDS[pl].forEach((o, i) => {
+      const y = (BOARDS[pl] || [])[i];
+      for (const a of ['form', 'ram', 'ramHiz']) if (o[a] != null && (!y || y[a] !== o[a])) kayip.push(`BOARDS ${o.n}: ${a} ${o[a]} -> ${y ? y[a] : 'YOK'}`);
+    });
+    console.log('\n── CANLI VERI YOLU (Supabase yukleyicisi) ──');
+    if (kayip.length) {
+      console.log(`  !! ${kayip.length} OLCU KAYBOLUYOR — canlida uyumluluk kurallari devre disi kalir:`);
+      kayip.slice(0, 20).forEach(k => console.log('     ' + k));
+      process.exitCode = 1;
+    } else console.log('  Yukleyici hicbir olcu alanini kaybettirmiyor.');
+  }
+}
