@@ -1,12 +1,12 @@
 # Günlük fiyat güncellemesi — scripts/fiyat-bot.mjs
-# Her gece 04:00 (Türkiye) çalışır; Actions sekmesinden elle de başlatılabilir.
+# ZAMANLAMA KAPALI: Epey GitHub sunucularını engelliyor (21.09.2026, 44/44 sayfa
+# engel sayfası). Günlük çalışma yerel bilgisayarda: scripts/fiyat-bot-yerel.cmd
+# (Windows Görev Zamanlayıcı). Bu iş akışı yalnızca elle denemek için duruyor.
 # Gizli anahtar GEREKMEZ: bot fiyatları depodaki fiyatlar.json dosyasına yazar,
 # bu iş akışı commit'ler, Vercel yayınlar. Site veritabanı ile dosyadan yeni olanı kullanır.
 name: Fiyat botu
 
 on:
-  schedule:
-    - cron: '0 1 * * *'   # 01:00 UTC = 04:00 TR
   workflow_dispatch:
     inputs:
       yaz:
