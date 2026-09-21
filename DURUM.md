@@ -21,6 +21,23 @@ Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitl
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
 
+### 21.09.2026 — Güç kaynağı: üretici önerisi + kablo uyumu (2.039 sistem)
+
+Kullanıcı bir listede fark etti: RX 9070 Gaming OC + 550 W. Motor yalnızca
+"kart+işlemci+90 W ×1.35" formülüne bakıyordu; Gigabyte bu kart için
+**750 W** öneriyor (resmi sayfadan doğrulandı). Eski motor **2.039 sistemde**
+üretici önerisinin altında kaynak veriyordu; 36'sında RTX 5070 Ti (3×8-pin
+adaptör) 2 kablolu 650 W'a verildiği için kart fiziksel olarak takılamıyordu.
+
+- GPUS: `psuMin` (kartın kendi üreticisinin önerisi, Epey "Önerilen Sistem
+  Gücü"), `pin8`, `p16`; PSUS: `pin8`, `k16` (MSI resmi teknik sayfaları)
+- `psuYeter` = formül VE psuMin VE kablo; yükleyici bu alanları koruyor,
+  tdp'de DB ile koddan büyük olan kullanılıyor
+- Denetimde BAĞIMSIZ tablolarla `uretici-psu` ve `psu-kablo` kuralları
+  (yeni kart eklenince oraya da eklenmeli, yoksa denetim hata verir)
+- Sonuç: kod 11.267 / canlı veriyle tarayıcıda 3.095 sistem, ihlal 0;
+  oyun profilinde FPS düşüşü 0, oyun minimumu değişmedi (52.545 ₺)
+
 ### 21.09.2026 — CANLIDA UYUMLULUK KONTROLÜ DEVRE DIŞIYDI (düzeltildi)
 
 Site açılışta fiyatları Supabase'den alıp kod dizilerinin yerine koyuyor.
