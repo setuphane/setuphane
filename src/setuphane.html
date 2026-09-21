@@ -161,7 +161,7 @@ body{
 .acc>.accIn{overflow:hidden;min-height:0}
 
 /* ── scroll ile belirme ──────────────────────────────────────────── */
-.rv{opacity:0;transform:translateY(30px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .55s var(--ease),transform .55s var(--ease)}
 .rv.in{opacity:1;transform:none}
 
 /* ── tipografi ───────────────────────────────────────────────────── */
@@ -1305,9 +1305,15 @@ function Reveal({children,delay=0,className='',as='div'}){
   useEffect(()=>{
     const el=ref.current; if(!el) return;
     if(reduced()){ el.classList.add('in'); return; }
+    /* Telefonda hızlı kaydırınca içerik ekrana girdikten sonra beliriyordu —
+       ziyaretçi bomboş bir ekran görüp "site kayboldu" sanıyordu. Artık
+       öğe ekrana girmeden %25 önce tetikleniyor, gecikme de kısa tutuluyor.
+       Zaten üstünde kalmış (atlanmış) öğeler anında görünür. */
     const io=new IntersectionObserver(([e])=>{
-      if(e.isIntersecting){ setTimeout(()=>el.classList.add('in'),delay); io.disconnect(); }
-    },{threshold:.1,rootMargin:'0px 0px -8% 0px'});
+      if(e.isIntersecting || e.boundingClientRect.bottom<0){
+        setTimeout(()=>el.classList.add('in'),Math.min(delay,120)); io.disconnect();
+      }
+    },{threshold:0,rootMargin:'0px 0px 25% 0px'});
     io.observe(el); return()=>io.disconnect();
   },[delay]);
   return React.createElement(as,{ref,className:'rv '+className},children);
@@ -1638,8 +1644,15 @@ function Nav({route}){
 }
 
 /* ═══════════════════ HERO ═══════════════════ */
-function Hero(){
-  const {mode,rate,live}=useCur();
+/* Hepsi oyun profilinin en düşük bütçesinin (enAzButce) üstünde olmalı —
+   altındaki bir düğme ziyaretçiyi "sistem çıkmıyor" ekranına düşürür. */
+const HIZLI_BUTCE=[55000,75000,100000,150000,250000];
+function Hero({budget,setBudget}){
+  const {mode,rate,live,fmt}=useCur();
+  const basla=b=>{
+    setBudget(b); olay('hizli_butce',{butce:b});
+    const el=document.getElementById('builder'); if(el) el.scrollIntoView({behavior:'smooth'});
+  };
   return (
     <section id="top" className="relative pt-[128px] sm:pt-[136px] lg:pt-[150px] pb-8 lg:pb-16">
       <div aria-hidden="true" className="pointer-events-none absolute right-[-8%] top-[6%] w-[560px] opacity-[.06] hidden xl:block">
@@ -1648,7 +1661,7 @@ function Hero(){
 
       <Reveal>
         {/* marka: sayfanın açılışındaki neon tabela */}
-        <div className="mb-11 sm:mb-14 w-[190px] sm:w-[240px] lg:w-[272px]">
+        <div className="mb-7 sm:mb-14 w-[150px] sm:w-[240px] lg:w-[272px]">
           <LogoLockup wordSize={34}/>
         </div>
       </Reveal>
@@ -1660,6 +1673,23 @@ function Hero(){
         </h1>
       </Reveal>
 
+      <Reveal delay={220}>
+        {/* Hızlı başlangıç: bütçeyi tek dokunuşla seçip doğrudan hesaba iner.
+            Telefonda sistem kurma bölümü sayfanın çok aşağısında kalıyordu. */}
+        <div className="mt-9 lg:mt-12">
+          <div className="lbl text-dim mb-3">BÜTÇENİ SEÇ, HEMEN BAŞLA</div>
+          <div className="flex flex-wrap gap-2">
+            {HIZLI_BUTCE.map(b=>(
+              <button key={b} onClick={()=>basla(b)}
+                className={'num px-4 py-3 border text-[.9rem] transition-colors '+
+                  (b===budget?'border-cy text-cy bg-cy/[.07]':'border-line text-ink/85 hover:border-cy hover:text-cy')}>
+                {fmt(b)}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+
       <Reveal delay={170}>
         <div className="mt-10 lg:mt-14 max-w-[54ch]">
           <p className="text-[1.05rem] sm:text-[1.22rem] leading-[1.65] text-ink/85">
@@ -1668,7 +1698,7 @@ function Hero(){
             her parçanın neden seçildiğini yazarak. Beğenmediğini değiştir;
             bu bir reçete değil, başlangıç noktası.
           </p>
-          <p className="mt-5 text-[.95rem] text-ink/70 leading-relaxed">
+          <p className="hidden sm:block mt-5 text-[.95rem] text-ink/70 leading-relaxed">
             Hiçbir şey satmıyoruz, komisyon almıyoruz, kimseye yönlendirmiyoruz.
             Kullandığımız bütün performans değerleri bağımsız ölçümlerden geliyor ve
             kaynağı sayfada yazılı. Listeyi alıp istediğin yerden alırsın — ya da hiç almazsın.
@@ -1677,7 +1707,7 @@ function Hero(){
       </Reveal>
 
       <Reveal delay={260}>
-        <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4">
+        <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
           <a href="#builder"
              className="group inline-flex items-center gap-4 border border-cy text-cy px-7 py-4 hover:bg-cy hover:text-bg transition-colors duration-300">
             <span className="lbl">HESABI GÖRELİM</span>
@@ -2261,8 +2291,10 @@ function BudgetSlider({id,label,budget,setBudget}){
   );
 }
 
-function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res}){
-  const {fmt}=useCur();
+function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
+  const {fmt,plain}=useCur();
+  const [copied,copy]=useCopy(sys,prof,plain);
+  const [paylasildi,paylas]=usePaylas(budget,prof,pick,gid,rid);
   const rows = sys ? [
     ['gpu','Ekran kartı',sys.g.n,sys.g.p],
     ['cpu','İşlemci',sys.c.n,sys.c.p],
@@ -2348,6 +2380,22 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res}){
                     </li>
                   ))}
                 </ul>
+                <div className="flex justify-between items-baseline pt-4 mt-1 border-t border-line">
+                  <span className="lbl text-dim">TOPLAM</span>
+                  <span className="num text-[1.35rem] font-light text-cy">{fmt(sys.total)}</span>
+                </div>
+                {/* Masaüstünde sağ panelde var; telefonda liste bitince
+                    ziyaretçi ne yapacağını bilmiyordu. */}
+                <div className="lg:hidden mt-5 grid grid-cols-2 gap-2.5">
+                  <button onClick={copy}
+                    className="border border-cy bg-cy text-bg py-3.5 lbl active:opacity-80 transition-opacity">
+                    {copied?'KOPYALANDI ✓':'LİSTEYİ KOPYALA'}
+                  </button>
+                  <button onClick={paylas}
+                    className="border border-cy text-cy py-3.5 lbl active:bg-cy active:text-bg transition-colors">
+                    {paylasildi?'LİNK KOPYALANDI ✓':'PAYLAŞ'}
+                  </button>
+                </div>
               </>
             )}
           </div>
@@ -2903,7 +2951,7 @@ function MobileDock({sys,act,prof,game,res}){
   useEffect(()=>{
     const f=()=>{
       const el=document.getElementById('builder'); if(!el) return;
-      setHide(window.scrollY < el.offsetTop - window.innerHeight*.55);
+      setHide(window.scrollY < el.offsetTop - window.innerHeight*.9);
     };
     f(); window.addEventListener('scroll',f,{passive:true});
     window.addEventListener('resize',f);
@@ -2971,7 +3019,16 @@ function MobileDock({sys,act,prof,game,res}){
         <span className="flex-1 min-w-0">
           <span className="lbl text-dim block mb-1.5">{isLap?'SEÇTİĞİN LAPTOP':'SENİN SİSTEMİN'} · {f} FPS</span>
           <span className="num text-[1.5rem] font-light text-cy block leading-none">{fmt(total)}</span>
+          <span className="text-[.7rem] text-dim block mt-1.5">{open?'kapatmak için dokun':'parçaları görmek için dokun'}</span>
         </span>
+        {!isLap && (
+          <span role="button" tabIndex={0} aria-label="Listeyi kopyala"
+            onClick={e=>{e.stopPropagation(); copy();}}
+            onKeyDown={e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.stopPropagation(); copy(); } }}
+            className="shrink-0 lbl px-3 py-2.5 border border-cy bg-cy text-bg text-[9px]" style={{letterSpacing:'.12em'}}>
+            {copied?'KOPYALANDI ✓':'KOPYALA'}
+          </span>
+        )}
         <span className={'shrink-0 w-9 h-9 grid place-items-center border border-cy/50 transition-transform duration-500 '+(open?'rotate-180':'')}>
           <svg width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 6l5-5 5 5" stroke="#2DE2E6" strokeWidth="1.2" fill="none"/></svg>
         </span>
@@ -7374,11 +7431,9 @@ function App(){
 
       {route==='ana' && (
       <main id="main" className="max-w-[1500px] mx-auto px-5 sm:px-8 lg:px-12">
-        <Hero/>
+        <Hero budget={budget} setBudget={setBudget}/>
         <div className="grid lg:grid-cols-[minmax(0,1fr)_330px] xl:grid-cols-[minmax(0,1fr)_390px] gap-x-14 xl:gap-x-20">
           <div className="min-w-0">
-            <How/>
-
             <section id="builder" className="py-16 lg:py-24 scroll-mt-24">
               <Reveal>
                 <Label className="mb-4">MODÜL 01 — CANLI HESAP</Label>
@@ -7398,7 +7453,7 @@ function App(){
                 {mode==='topla'
                   ? <>
                       <Builder budget={budget} setBudget={setBudget} prof={prof} setProf={setProf} res={res}
-                               sys={sys} pick={pick} setPick={setPick}/>
+                               sys={sys} pick={pick} setPick={setPick} gid={gid} rid={rid}/>
                       <AmdIntelCompare budget={budget} prof={prof} game={game} res={res}/>
                     </>
                   : mode==='oem'
@@ -7412,6 +7467,7 @@ function App(){
             <GameTest act={act} gid={gid} setGid={setGid} rid={rid} setRid={setRid}
                       budget={budget} prof={prof} pick={pick} mode={mode}/>
             <BalanceTest sys={sys}/>
+            <How/>
             <Glossary/>
             <Kesfet/>
             <Trust/>
