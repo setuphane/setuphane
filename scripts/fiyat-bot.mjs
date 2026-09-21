@@ -32,7 +32,7 @@ const bekle = ms => new Promise(r => setTimeout(r, ms));
 
 /* Node'un fetch'i Epey'de 403 alıyor (TLS parmak izi); curl alıyor. */
 function cek(url) {
-  return execFileSync('curl', ['-sS', '--compressed', '-A', UA, '-H', 'accept-language: tr-TR,tr;q=0.9',
+  return execFileSync(process.env.CURL || 'curl', ['-sS', '--compressed', '-A', UA, '-H', 'accept-language: tr-TR,tr;q=0.9',
     '--max-time', '40', url], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
 }
 

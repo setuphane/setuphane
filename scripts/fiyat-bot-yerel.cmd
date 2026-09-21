@@ -1,10 +1,11 @@
 @echo off
-rem Gunluk fiyat botu — Windows Gorev Zamanlayicisi bunu calistirir.
+rem Gunluk fiyat botu ? Windows Gorev Zamanlayicisi bunu calistirir.
 rem Epey, GitHub'in sunucularini engelliyor (21.09.2026: 44 sayfanin hepsi
 rem engel sayfasi dondu); bu yuzden bot bu bilgisayarda calisiyor.
 rem Akis: guncel kodu cek -> botu calistir -> fiyatlar.json'u gonder -> Vercel yayinlar.
 rem Kayit: .fiyat-bot.log (son calisma), elle bakilacaklar orada "MODEL DEGISMELI" / "HATA" altinda.
 cd /d C:\dev\setuphane
+set CURL=C:\Program Files\Git\mingw64\bin\curl.exe
 set LOG=C:\dev\setuphane\.fiyat-bot.log
 echo ==== %date% %time% ==== > "%LOG%"
 "C:\Program Files\Git\cmd\git.exe" pull -q --no-rebase >> "%LOG%" 2>&1
