@@ -9,9 +9,9 @@
 //
 // Güvenlik frenleri (BİRİNCİ KURAL — yanlış fiyat = ziyaretçiye yanlış sistem):
 //   1. 3'ten az site  -> yazılmaz, "model değişmeli" raporu.
-//   2. Günlük değişim > %15 -> hemen yazılmaz. Aynı seviye (±%3) üst üste
-//      3 gün görülürse gerçek piyasa hareketi sayılıp yazılır. Tek günlük
-//      sapmalar böylece siteye hiç ulaşmaz.
+//   2. %15 üstü değişim: en ucuzun %5 yakınında en az 2 FARKLI site varsa
+//      (doğrulanmış) hemen yazılır. Yoksa (tek mağazada görülen sapma)
+//      aynı seviye (±%3) üst üste 3 gün görülünce yazılır.
 //   3. Sıralama: aynı markanın daha güçlü kartı daha zayıfından, büyük
 //      kapasite küçüğünden ucuz görünürse yazılmaz (09.09'daki 46 bin
 //      liralık RTX 5080 yanlış alarmı tam olarak buydu).
@@ -111,7 +111,16 @@ for (const [anahtar, link] of Object.entries(ESLESME)) {
   /* Model bilinçli olarak değiştirildiyse eski fiyatla kıyas anlamsız:
      %15 freni yeni model için uygulanmaz (3 site kuralı yine geçerli). */
   const oran = (yeni - eski.fiyat) / eski.fiyat;
-  if (!modelDegisti && Math.abs(oran) > ESIK) {
+  /* Büyük değişim, başka mağazalar doğruluyorsa BEKLETİLMEZ (21.09.2026,
+     kullanıcı: "fiyatlar çok geride kalmış"): en ucuz fiyatın %5 yakınında en
+     az 2 FARKLI site varsa fiyat gerçektir. Tek bir hatalı/absürt ilan
+     (09.09'daki 46 bin liralık RTX 5080) bunu geçemez ve 3 gün bekletilir.
+     "Sitedeki fiyat eski" tek başına gerekçe DEĞİL — o yol tek hatalı ilanı
+     doğrudan yazdırırdı. */
+  const enIyi = {};
+  for (const x of t) enIyi[x.site] = Math.min(enIyi[x.site] ?? Infinity, x.fiyat);
+  const dogrulayan = Object.values(enIyi).filter(f => f <= yeni * 1.05).length;
+  if (!modelDegisti && Math.abs(oran) > ESIK && dogrulayan < 2) {
     const d = durum[anahtar];
     const ayniSeviye = d && Math.abs(yeni - d.fiyat) / d.fiyat <= AYNI_SEVIYE;
     const gun = ayniSeviye ? d.gun + (d.son === bugun ? 0 : 1) : 1;

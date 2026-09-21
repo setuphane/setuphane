@@ -179,7 +179,27 @@
    "fiyat": 8730,
    "ad": "Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)",
    "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "gpu:5060": {
+   "fiyat": 25025,
+   "ad": "GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)",
+   "tarih": "2026-09-21T13:38:39.593Z"
+  },
+  "gpu:5070ti": {
+   "fiyat": 73991,
+   "ad": "GeForce RTX 5070 Ti 16 GB (PNY Triple OC)",
+   "tarih": "2026-09-21T13:38:39.593Z"
+  },
+  "gpu:5080": {
+   "fiyat": 100000,
+   "ad": "GeForce RTX 5080 16 GB (MSI Shadow 3X OC)",
+   "tarih": "2026-09-21T13:38:39.593Z"
+  },
+  "psu:550": {
+   "fiyat": 2080,
+   "ad": "550 W 80+ (MSI MAG A550BNL)",
+   "tarih": "2026-09-21T13:38:39.593Z"
   }
  },
- "guncelleme": "2026-09-21T13:00:24.051Z"
+ "guncelleme": "2026-09-21T13:38:39.593Z"
 }
