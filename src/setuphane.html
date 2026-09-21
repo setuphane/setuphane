@@ -311,7 +311,9 @@ const GPUS=[
  {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:180, p:26299, boy:202},
  {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Zotac Twin Edge OC)',  b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:35999, boy:221},
  {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:36809, boy:288},
- {id:'5070',   n:'GeForce RTX 5070 12 GB (Gainward Phoenix)',         b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:41258, boy:332},
+ /* 21.09.2026: Gainward Phoenix Epey'de 0 teklife düştü; yerine 3+ satıcılı en
+    ucuz 5070. Uzunluk ürün sayfasındaki "Derinlik"ten (VCG507012TFXXPB1-O). */
+ {id:'5070',   n:'GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)', b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:47393, boy:300},
  {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)', b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:41570, boy:325},
  {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (PNY Triple OC)',            b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:58093, boy:300},
  {id:'5080',   n:'GeForce RTX 5080 16 GB (MSI Shadow 3X OC)',       b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:83105, boy:303},
@@ -375,7 +377,11 @@ const CPUS=[
    hızı oyun FPS'ini gerçekten etkiler. */
 const RAMS=[
  {id:'16',n:'16 GB DDR5-6000 (XPG Lancer Blade)',            gb:16,tip:'DDR5',hiz:6000,p:12999},
- {id:'32',n:'32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',gb:32,tip:'DDR5',hiz:6000,p:26599},
+ /* 21.09.2026: "Patriot Viper Xtreme 5 DDR5-6000 CL30" diye bir ürün Epey'de
+    yok (seri 6400'den başlıyor) — ad ile fiyat aynı ürüne ait değildi. Yerine
+    3+ satıcılı en ucuz 2×16 kit. Daha ucuz Kingston KF560C40BB-32 TEK modül
+    olduğu için elendi (çift kanal kaybı). Kit bilgisi ürün sayfasından. */
+ {id:'32',n:'32 GB DDR5-6000 (2×16) (Apacer Panther)',gb:32,tip:'DDR5',hiz:6000,p:28109},
  {id:'64',n:'64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',   gb:64,tip:'DDR5',hiz:6000,p:53939},
 ];
 const SSDS=[
@@ -414,7 +420,7 @@ const BOARDS={
 };
 const COOLERS=[
  {id:'stock', n:'Kutudan çıkan soğutucu',                                          cap:65, rad:0,  p:0},
- {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',cap:180,rad:0,  p:1279},
+ {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)',cap:180,rad:0,  p:1279},
  /* En ucuz 360'ları bilerek almıyoruz: isimsiz sıvı soğutucularda pompa
     arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
     5+ satıcısı var (Epey, 20.08.2026). */

@@ -373,17 +373,20 @@ const GPUS = [{
   tdp: 220,
   p: 36809,
   boy: 288
-}, {
+},
+/* 21.09.2026: Gainward Phoenix Epey'de 0 teklife düştü; yerine 3+ satıcılı en
+   ucuz 5070. Uzunluk ürün sayfasındaki "Derinlik"ten (VCG507012TFXXPB1-O). */
+{
   id: '5070',
-  n: 'GeForce RTX 5070 12 GB (Gainward Phoenix)',
+  n: 'GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)',
   b: 'NVIDIA',
   idx: 100,
   r1440: 1.01,
   r2160: 1.02,
   vram: 12,
   tdp: 250,
-  p: 41258,
-  boy: 332
+  p: 47393,
+  boy: 300
 }, {
   id: '9070xt',
   n: 'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)',
@@ -584,13 +587,18 @@ const RAMS = [{
   tip: 'DDR5',
   hiz: 6000,
   p: 12999
-}, {
+},
+/* 21.09.2026: "Patriot Viper Xtreme 5 DDR5-6000 CL30" diye bir ürün Epey'de
+   yok (seri 6400'den başlıyor) — ad ile fiyat aynı ürüne ait değildi. Yerine
+   3+ satıcılı en ucuz 2×16 kit. Daha ucuz Kingston KF560C40BB-32 TEK modül
+   olduğu için elendi (çift kanal kaybı). Kit bilgisi ürün sayfasından. */
+{
   id: '32',
-  n: '32 GB DDR5-6000 CL30 (2×16) (Patriot Viper Xtreme 5)',
+  n: '32 GB DDR5-6000 (2×16) (Apacer Panther)',
   gb: 32,
   tip: 'DDR5',
   hiz: 6000,
-  p: 26599
+  p: 28109
 }, {
   id: '64',
   n: '64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',
@@ -703,7 +711,7 @@ const COOLERS = [{
   p: 0
 }, {
   id: 'air',
-  n: 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE)',
+  n: 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)',
   cap: 180,
   rad: 0,
   p: 1279

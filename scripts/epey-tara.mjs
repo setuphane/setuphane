@@ -17,16 +17,17 @@ export async function tara(slug, sayfa = 3) {
             { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }); }
     catch (e) { console.error(`  ! ${url} -> ${e.message}`); break; }
     if (h.length < 5000) { console.error(`  ! ${url} -> bos/engellendi`); break; }
-    // Her urun bloku: urunadi title -> ... -> fiyat cell -> "1.234,56 TL<span>N site, M fiyat</span>"
-    const bloklar = h.split('class="urunadi"').slice(1);
-    for (const b of bloklar) {
-      const ad = b.match(/title="([^"]+)"/);
+    // Her urun bloku: link + ad -> ... -> fiyat cell -> "1.234,56 TL<span>N site, M fiyat</span>"
+    const re = /href="([^"]+)" class="urunadi" title="([^"]+)"/g;
+    const eslesmeler = [...h.matchAll(re)];
+    eslesmeler.forEach((m, i) => {
+      const b = h.slice(m.index, i + 1 < eslesmeler.length ? eslesmeler[i + 1].index : undefined);
       const fy = b.match(/class="fiyat cell"[\s\S]{0,400}?>([\d.,]+)\s*TL<span>(\d+)\s*site/);
-      if (!ad || !fy) continue;
+      if (!fy) return;
       const fiyat = Math.round(parseFloat(fy[1].replace(/\./g, '').replace(',', '.')));
-      cikti.push({ ad: ad[1].replace(/\s*(Ekran Kartı|İşlemci|Anakart|Ram|SSD|Kasa|Power Supply)$/i, '').trim(),
-                   fiyat, satici: +fy[2] });
-    }
+      cikti.push({ ad: m[2].replace(/\s*(Ekran Kartı|İşlemci|Anakart|Ram|SSD|Kasa|Power Supply)$/i, '').trim(),
+                   fiyat, satici: +fy[2], link: m[1] });
+    });
     await new Promise(z => setTimeout(z, 700));   // sunucuyu yormayalim
   }
   return cikti;

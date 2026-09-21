@@ -1,0 +1,68 @@
+# Günlük fiyat güncellemesi — scripts/fiyat-bot.mjs
+# Her gece 04:00 (Türkiye) çalışır; Actions sekmesinden elle de başlatılabilir.
+# Gerekli gizli anahtarlar (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL          https://qxnsdpjyxcfmhanjxtgs.supabase.co
+#   SUPABASE_SERVICE_KEY  Supabase → Project Settings → API Keys → secret (sb_secret_…)
+name: Fiyat botu
+
+on:
+  schedule:
+    - cron: '0 1 * * *'   # 01:00 UTC = 04:00 TR
+  workflow_dispatch:
+    inputs:
+      yaz:
+        description: 'Veritabanına yazılsın mı? (hayır = yalnızca rapor)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write   # fiyat-durum.json (bekletilen fiyatların gün sayacı)
+  issues: write     # elle bakılması gerekenler için tek bir issue
+
+concurrency: fiyat-bot
+
+jobs:
+  guncelle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Fiyatları tara ve yaz
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          RAPOR_DOSYASI: rapor.md
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.yaz }}" != "true" ]; then
+            node scripts/fiyat-bot.mjs
+          else
+            node scripts/fiyat-bot.mjs --yaz
+          fi
+
+      - name: Bekletme sayacını kaydet
+        run: |
+          if ! git diff --quiet -- scripts/fiyat-durum.json; then
+            git config user.name  "fiyat-botu"
+            git config user.email "fiyat-botu@users.noreply.github.com"
+            git add scripts/fiyat-durum.json
+            git commit -m "fiyat-botu: bekletme sayacı [skip ci]"
+            git push
+          fi
+
+      - name: Elle bakılacaklar için issue aç / güncelle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BASLIK="Fiyat botu: elle bakılması gerekenler"
+          NO=$(gh issue list --state open --search "$BASLIK in:title" --json number -q '.[0].number')
+          if [ -s rapor.md ]; then
+            if [ -n "$NO" ]; then gh issue comment "$NO" --body-file rapor.md
+            else gh issue create --title "$BASLIK" --body-file rapor.md; fi
+          elif [ -n "$NO" ]; then
+            gh issue close "$NO" --comment "Sorun kalmadı, kapatıldı."
+          fi
