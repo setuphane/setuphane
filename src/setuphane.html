@@ -2458,7 +2458,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
                 </div>
                 {/* Masaüstünde sağ panelde var; telefonda liste bitince
                     ziyaretçi ne yapacağını bilmiyordu. */}
-                <div className="lg:hidden mt-5 grid grid-cols-2 gap-2.5">
+                <div className="mt-5 grid grid-cols-2 gap-2.5">
                   <button onClick={copy}
                     className="border border-cy bg-cy text-bg py-3.5 lbl active:opacity-80 transition-opacity">
                     {copied?'KOPYALANDI ✓':'LİSTEYİ KOPYALA'}
@@ -2941,6 +2941,21 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
 
           <div className="num text-[2.6rem] xl:text-[3rem] font-light leading-none text-ink">{fmt(totalA)}</div>
           <div className="lbl text-dim mt-3">{isLap?'EN UCUZ SATICI FİYATI':'TOPLAM PARÇA TUTARI'}</div>
+          {!isLap && (
+            <div className="mt-6 grid grid-cols-2 gap-2">
+              <button onClick={copy}
+                className="border border-cy bg-cy text-bg py-3 lbl text-[9px] hover:opacity-85 transition-opacity" style={{letterSpacing:'.14em'}}>
+                {copied?'KOPYALANDI ✓':'KOPYALA'}
+              </button>
+              {/* Paylaşım linki kurulan sistemi taşır; açan kişi aynı sistemi
+                  kurulmuş hâlde görür. Panelin dibindeydi, ekrana sığmayınca
+                  hiç görünmüyordu — toplamın hemen altına alındı. */}
+              <button onClick={paylas}
+                className="border border-cy text-cy py-3 lbl text-[9px] hover:bg-cy hover:text-bg transition-colors" style={{letterSpacing:'.14em'}}>
+                {kopya?'LİNK KOPYALANDI ✓':'PAYLAŞ'}
+              </button>
+            </div>
+          )}
 
           <div className="mt-7 pt-6 border-t border-line space-y-3.5">
             {(isLap
@@ -2983,20 +2998,6 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
             </div>
           )}
 
-          {!isLap && (
-            <>
-              <button onClick={copy}
-                className="mt-7 w-full border border-cy text-cy py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300">
-                {copied?'KOPYALANDI ✓':'LİSTEYİ KOPYALA'}
-              </button>
-              {/* Paylaşım linki kurulan sistemi taşır; açan kişi aynı sistemi
-                  kurulmuş hâlde görür. İkincil eylem olduğu için soluk çerçeve. */}
-              <button onClick={paylas}
-                className="mt-2.5 w-full border border-line text-dim py-3 lbl hover:border-ink/30 hover:text-ink transition-colors duration-300">
-                {kopya?'LİNK KOPYALANDI ✓':'SİSTEMİ PAYLAŞ'}
-              </button>
-            </>
-          )}
           {isLap && (
             <a href={act.lap.url} target="_blank" rel="noopener noreferrer" onClick={()=>laptopTik(act.lap)}
                className="mt-7 block text-center border border-cy text-cy py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300">
@@ -3015,8 +3016,9 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
   );
 }
 
-function MobileDock({sys,act,prof,game,res}){
+function MobileDock({sys,act,prof,game,res,budget,pick,gid,rid}){
   const {fmt,plain}=useCur();
+  const [paylasildi,paylas]=usePaylas(budget,prof,pick,gid,rid);
   const isLap=act && act.kind==='laptop';
   const [open,setOpen]=useState(false);
   const [hide,setHide]=useState(true);
@@ -3074,10 +3076,16 @@ function MobileDock({sys,act,prof,game,res}){
               </div>
             )}
             {!isLap
-              ? <button onClick={copy}
-                  className="w-full border border-cy text-cy py-3 lbl mt-1 active:bg-cy active:text-bg transition-colors">
-                  {copied?'KOPYALANDI ✓':'LİSTEYİ KOPYALA'}
-                </button>
+              ? <div className="grid grid-cols-2 gap-2 mt-1">
+                  <button onClick={copy}
+                    className="border border-cy bg-cy text-bg py-3 lbl active:opacity-80 transition-opacity">
+                    {copied?'KOPYALANDI ✓':'KOPYALA'}
+                  </button>
+                  <button onClick={paylas}
+                    className="border border-cy text-cy py-3 lbl active:bg-cy active:text-bg transition-colors">
+                    {paylasildi?'KOPYALANDI ✓':'PAYLAŞ'}
+                  </button>
+                </div>
               : <a href={act.lap.url} target="_blank" rel="noopener noreferrer" onClick={()=>laptopTik(act.lap)}
                    className="block text-center w-full border border-cy text-cy py-3 lbl mt-1 active:bg-cy active:text-bg transition-colors">
                   CİMRİ'DE GÖR
@@ -7550,7 +7558,8 @@ function App(){
       </main>
       )}
 
-      {route==='ana' && <MobileDock sys={sys} act={act} prof={prof} game={game} res={res}/>}
+      {route==='ana' && <MobileDock sys={sys} act={act} prof={prof} game={game} res={res}
+                                    budget={budget} pick={pick} gid={gid} rid={rid}/>}
       <CerezBandi/>
     </div>
   );
