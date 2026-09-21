@@ -2233,8 +2233,26 @@ let _fiyatSozu = null,
 function parcalariGetir() {
   if (!uzakVar()) return Promise.resolve(false);
   if (!_fiyatSozu) {
-    _fiyatSozu = sb('parcalar?select=*&aktif=eq.true&order=kat.asc,sira.asc').then(r => {
+    /* /fiyatlar.json: günlük fiyat botunun (scripts/fiyat-bot.mjs, GitHub
+       Actions) çıktısı. Bot veritabanına yazmıyor — gizli anahtar gerekmesin
+       diye depoya yazıyor. Her parça için hangisi daha YENİYSE o kullanılır:
+       panelden bottan sonra elle girilen fiyat botu ezer, tersi de geçerli. */
+    const botFiyat = fetch('/fiyatlar.json', {
+      cache: 'no-cache'
+    }).then(x => x.ok ? x.json() : {}).catch(() => ({}));
+    _fiyatSozu = Promise.all([sb('parcalar?select=*&aktif=eq.true&order=kat.asc,sira.asc'), botFiyat]).then(([r, bot]) => {
       if (!Array.isArray(r) || !r.length) return false;
+      const bf = bot && bot.parcalar || {};
+      r = r.map(x => {
+        const b = bf[x.anahtar];
+        if (!b || !(b.fiyat > 0) || x.guncelleme && String(x.guncelleme) >= b.tarih) return x;
+        return {
+          ...x,
+          fiyat: b.fiyat,
+          ad: b.ad || x.ad,
+          guncelleme: b.tarih
+        };
+      });
       const grup = k => r.filter(x => x.kat === k);
       const kimlik = x => String(x.anahtar || '').split(':')[1] || x.id;
       const koy = (dizi, yeni) => {

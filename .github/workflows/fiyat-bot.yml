@@ -1,8 +1,7 @@
 # Günlük fiyat güncellemesi — scripts/fiyat-bot.mjs
 # Her gece 04:00 (Türkiye) çalışır; Actions sekmesinden elle de başlatılabilir.
-# Gerekli gizli anahtarlar (Settings → Secrets and variables → Actions):
-#   SUPABASE_URL          https://qxnsdpjyxcfmhanjxtgs.supabase.co
-#   SUPABASE_SERVICE_KEY  Supabase → Project Settings → API Keys → secret (sb_secret_…)
+# Gizli anahtar GEREKMEZ: bot fiyatları depodaki fiyatlar.json dosyasına yazar,
+# bu iş akışı commit'ler, Vercel yayınlar. Site veritabanı ile dosyadan yeni olanı kullanır.
 name: Fiyat botu
 
 on:
@@ -11,12 +10,12 @@ on:
   workflow_dispatch:
     inputs:
       yaz:
-        description: 'Veritabanına yazılsın mı? (hayır = yalnızca rapor)'
+        description: 'Fiyatlar yazılsın mı? (hayır = yalnızca rapor)'
         type: boolean
         default: true
 
 permissions:
-  contents: write   # fiyat-durum.json (bekletilen fiyatların gün sayacı)
+  contents: write   # fiyatlar.json + fiyat-durum.json
   issues: write     # elle bakılması gerekenler için tek bir issue
 
 concurrency: fiyat-bot
@@ -34,8 +33,6 @@ jobs:
 
       - name: Fiyatları tara ve yaz
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           RAPOR_DOSYASI: rapor.md
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.yaz }}" != "true" ]; then
@@ -44,13 +41,13 @@ jobs:
             node scripts/fiyat-bot.mjs --yaz
           fi
 
-      - name: Bekletme sayacını kaydet
+      - name: Fiyatları ve bekletme sayacını kaydet
         run: |
-          if ! git diff --quiet -- scripts/fiyat-durum.json; then
-            git config user.name  "fiyat-botu"
-            git config user.email "fiyat-botu@users.noreply.github.com"
-            git add scripts/fiyat-durum.json
-            git commit -m "fiyat-botu: bekletme sayacı [skip ci]"
+          git config user.name  "fiyat-botu"
+          git config user.email "fiyat-botu@users.noreply.github.com"
+          git add fiyatlar.json scripts/fiyat-durum.json
+          if ! git diff --cached --quiet; then
+            git commit -m "fiyat-botu: günlük fiyat güncellemesi"
             git push
           fi
 

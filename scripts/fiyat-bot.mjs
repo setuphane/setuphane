@@ -17,7 +17,7 @@
 //      liralık RTX 5080 yanlış alarmı tam olarak buydu).
 //   4. Sayfa alınamazsa / yapısı değişmişse o parça atlanır, hiç yazılmaz.
 //
-// Ortam: SUPABASE_URL, SUPABASE_SERVICE_KEY (yalnızca --yaz için).
+// --yaz: sonuçları fiyatlar.json'a yazar (gizli anahtar gerekmez).
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
@@ -51,23 +51,21 @@ export function teklifleriOku(h) {
   return teklifler;
 }
 
-async function supabase(yol, opts = {}) {
-  const r = await fetch(process.env.SUPABASE_URL.replace(/\/$/, '') + '/rest/v1/' + yol, {
-    method: opts.method || 'GET',
-    headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: 'Bearer ' + process.env.SUPABASE_SERVICE_KEY,
-      'Content-Type': 'application/json', Prefer: 'return=representation' },
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
-  });
-  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
-  return r.json();
-}
-
-/* Mevcut fiyatlar: yazma modunda veritabanından, değilse herkese açık okuma. */
-const okuUrl = process.env.SUPABASE_URL || 'https://qxnsdpjyxcfmhanjxtgs.supabase.co';
-const okuAnahtar = process.env.SUPABASE_SERVICE_KEY || 'sb_publishable_skYOMRrisxDHTtnSJ-bprw_oovja6ss';
-const satirlar = await (await fetch(okuUrl + '/rest/v1/parcalar?select=anahtar,ad,fiyat,idx,marka,kapasite,watt&aktif=eq.true',
+/* Bot veritabanına YAZMAZ (gizli anahtar gerekmesin diye): sonuçları sitenin
+   kökündeki fiyatlar.json'a yazar, GitHub Actions dosyayı commit'ler, Vercel
+   yayınlar. Site her parça için veritabanı ile bu dosyadan hangisi yeniyse
+   onu kullanır. Okuma herkese açık anahtarla yapılır. */
+const FIYAT_YOLU = new URL('../fiyatlar.json', import.meta.url);
+const botDosya = existsSync(FIYAT_YOLU) ? JSON.parse(readFileSync(FIYAT_YOLU, 'utf8')) : { parcalar: {} };
+const okuAnahtar = 'sb_publishable_skYOMRrisxDHTtnSJ-bprw_oovja6ss';
+const satirlar = await (await fetch('https://qxnsdpjyxcfmhanjxtgs.supabase.co/rest/v1/parcalar?select=anahtar,ad,fiyat,idx,marka,kapasite,watt,guncelleme&aktif=eq.true',
   { headers: { apikey: okuAnahtar, Authorization: 'Bearer ' + okuAnahtar } })).json();
 if (!Array.isArray(satirlar)) { console.error('Veritabanı okunamadı', satirlar); process.exit(1); }
+/* Sitenin gördüğü fiyat = veritabanı ile bot dosyasından yeni olanı. */
+for (const s of satirlar) {
+  const b = botDosya.parcalar[s.anahtar];
+  if (b && b.fiyat > 0 && !(s.guncelleme && String(s.guncelleme) >= b.tarih)) { s.fiyat = b.fiyat; s.ad = b.ad || s.ad; }
+}
 const db = Object.fromEntries(satirlar.map(s => [s.anahtar, s]));
 
 /* Model adı insan kararıdır ve kodda (src/setuphane.html) kayıtlıdır. Model
@@ -159,10 +157,12 @@ for (const [baslik, l] of [['BEKLETİLEN (ani değişim / tutarsızlık)', sonuc
   if (l.length) { console.log(`\n${baslik} (${l.length}):`); l.forEach(x => console.log('  ' + x)); }
 
 if (YAZ && sonuc.yazilacak.length) {
+  const tarih = new Date().toISOString();
   for (const x of sonuc.yazilacak)
-    await supabase(`parcalar?anahtar=eq.${encodeURIComponent(x.anahtar)}`,
-      { method: 'PATCH', body: { fiyat: x.yeni, guncelleme: new Date().toISOString(), ...(x.yeniAd ? { ad: x.yeniAd } : {}) } });
-  console.log(`\n${sonuc.yazilacak.length} fiyat veritabanına yazıldı.`);
+    botDosya.parcalar[x.anahtar] = { fiyat: x.yeni, ad: x.yeniAd || x.ad, tarih };
+  botDosya.guncelleme = tarih;
+  writeFileSync(FIYAT_YOLU, JSON.stringify(botDosya, null, 1) + '\n');
+  console.log(`\n${sonuc.yazilacak.length} fiyat fiyatlar.json'a yazıldı.`);
 }
 writeFileSync(DURUM_YOLU, JSON.stringify(durum, null, 2) + '\n');
 

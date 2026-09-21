@@ -1,0 +1,185 @@
+{
+ "parcalar": {
+  "gpu:7600": {
+   "fiyat": 16816,
+   "ad": "Radeon RX 7600 8 GB (Sapphire Pulse)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "gpu:9060xt": {
+   "fiyat": 29600,
+   "ad": "Radeon RX 9060 XT 16 GB (Asus Dual)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "gpu:5060ti": {
+   "fiyat": 39199,
+   "ad": "GeForce RTX 5060 Ti 16 GB (Zotac Twin Edge OC)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "gpu:9070": {
+   "fiyat": 40999,
+   "ad": "Radeon RX 9070 16 GB (Gigabyte Gaming OC)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "gpu:5070": {
+   "fiyat": 48462,
+   "ad": "GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "gpu:9070xt": {
+   "fiyat": 44119,
+   "ad": "Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "gpu:5090": {
+   "fiyat": 335999,
+   "ad": "GeForce RTX 5090 32 GB (MSI Ventus 3X OC)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:8500g": {
+   "fiyat": 7926,
+   "ad": "Ryzen 5 8500G",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:7500f": {
+   "fiyat": 6719,
+   "ad": "Ryzen 5 7500F",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:7600": {
+   "fiyat": 7171,
+   "ad": "Ryzen 5 7600",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:245k": {
+   "fiyat": 10999,
+   "ad": "Core Ultra 5 245K",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:9600x": {
+   "fiyat": 8954,
+   "ad": "Ryzen 5 9600X",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:265k": {
+   "fiyat": 17619,
+   "ad": "Core Ultra 7 265K",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:9700x": {
+   "fiyat": 14228,
+   "ad": "Ryzen 7 9700X",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:7800x3d": {
+   "fiyat": 16059,
+   "ad": "Ryzen 7 7800X3D",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:9950x3d": {
+   "fiyat": 34176,
+   "ad": "Ryzen 9 9950X3D",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "cpu:9800x3d": {
+   "fiyat": 21949,
+   "ad": "Ryzen 7 9800X3D",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "ram:16": {
+   "fiyat": 12739,
+   "ad": "16 GB DDR5-6000 (XPG Lancer Blade)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "ram:32": {
+   "fiyat": 28109,
+   "ad": "32 GB DDR5-6000 (2×16) (Apacer Panther)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "ram:64": {
+   "fiyat": 55497,
+   "ad": "64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "ssd:500": {
+   "fiyat": 4899,
+   "ad": "500 GB NVMe Gen4 (WD Blue SN5100)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "ssd:1t": {
+   "fiyat": 8699,
+   "ad": "1 TB NVMe Gen4 (WD Blue SN5100)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "psu:650": {
+   "fiyat": 2674,
+   "ad": "650 W 80+ (MSI MAG A650BNL)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "psu:750": {
+   "fiyat": 3249,
+   "ad": "750 W 80+ (MSI MAG A750BN)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "psu:850": {
+   "fiyat": 5778,
+   "ad": "850 W 80+ Gold (MSI MAG A850GN)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "psu:1000": {
+   "fiyat": 8399,
+   "ad": "1000 W 80+ Gold (MSI MAG A1000GL)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "psu:1200": {
+   "fiyat": 8399,
+   "ad": "1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "sogutucu:air": {
+   "fiyat": 1314,
+   "ad": "Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "sogutucu:aio360p": {
+   "fiyat": 4989,
+   "ad": "360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "anakart:AM5-0": {
+   "fiyat": 4799,
+   "ad": "MSI Pro A620AM-G Evo WiFi (A620)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "anakart:AM5-1": {
+   "fiyat": 6533,
+   "ad": "Gigabyte B650M Gaming WiFi6E (B650)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "anakart:AM5-2": {
+   "fiyat": 9699,
+   "ad": "Asus B650E Max Gaming WiFi W (B650E)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "anakart:LGA1851-0": {
+   "fiyat": 5599,
+   "ad": "MSI Pro B860M-E (B860)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "anakart:LGA1851-1": {
+   "fiyat": 11199,
+   "ad": "MSI Pro Z890-S WiFi6E (Z890)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "kasa:0": {
+   "fiyat": 2099,
+   "ad": "Hava akışlı standart kasa (MSI MAG Forge M100A)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  },
+  "kasa:2": {
+   "fiyat": 8730,
+   "ad": "Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)",
+   "tarih": "2026-09-21T12:35:53.436Z"
+  }
+ },
+ "guncelleme": "2026-09-21T12:35:53.436Z"
+}
