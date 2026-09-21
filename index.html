@@ -317,7 +317,15 @@ const GPUS = [{
   p: 0
 },
 /* Parantezdeki isim, fiyatın geldiği modelin ta kendisi (Epey, 20.08.2026,
-   en az 3 satıcısı olan en ucuz ilan). */
+   en az 3 satıcısı olan en ucuz ilan).
+   psuMin: KARTIN KENDİ ÜRETİCİSİNİN önerdiği sistem gücü (W); pin8: 8-pin
+   kablo ihtiyacı (16-pin kartta kutudan çıkan adaptörün istediği sayı);
+   p16: kart 16-pin girişli, güç kaynağında yeterli güçte yerel 16-pin
+   varsa adaptöre gerek yok. Kaynak: Epey ürün sayfası "Önerilen Sistem
+   Gücü / Grafik Kartı Gücü / Güç Bağlantısı" (21.09.2026). tdp de satılan
+   modelin kendi değeri (ör. RX 7600 Sapphire Pulse 185 W, referans 165 W).
+   21.09 öncesi motor yalnızca tdp formülüne bakıyordu ve RX 9070 Gaming OC
+   (üretici: 750 W) için 550 W öneriyordu. */
 {
   id: '7600',
   n: 'Radeon RX 7600 8 GB (Sapphire Pulse)',
@@ -326,9 +334,11 @@ const GPUS = [{
   r1440: 0.96,
   r2160: 0.82,
   vram: 8,
-  tdp: 165,
+  tdp: 185,
   p: 17289,
-  boy: 240
+  boy: 240,
+  psuMin: 550,
+  pin8: 1
 }, {
   id: '5060',
   n: 'GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)',
@@ -339,7 +349,9 @@ const GPUS = [{
   vram: 8,
   tdp: 145,
   p: 19700,
-  boy: 197
+  boy: 197,
+  psuMin: 550,
+  pin8: 1
 }, {
   id: '9060xt',
   n: 'Radeon RX 9060 XT 16 GB (Asus Dual)',
@@ -348,9 +360,11 @@ const GPUS = [{
   r1440: 0.99,
   r2160: 0.97,
   vram: 16,
-  tdp: 180,
+  tdp: 160,
   p: 26299,
-  boy: 202
+  boy: 202,
+  psuMin: 550,
+  pin8: 1
 }, {
   id: '5060ti',
   n: 'GeForce RTX 5060 Ti 16 GB (Zotac Twin Edge OC)',
@@ -361,7 +375,9 @@ const GPUS = [{
   vram: 16,
   tdp: 180,
   p: 35999,
-  boy: 221
+  boy: 221,
+  psuMin: 600,
+  pin8: 1
 }, {
   id: '9070',
   n: 'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',
@@ -372,7 +388,9 @@ const GPUS = [{
   vram: 16,
   tdp: 220,
   p: 36809,
-  boy: 288
+  boy: 288,
+  psuMin: 750,
+  pin8: 2
 },
 /* 21.09.2026: Gainward Phoenix Epey'de 0 teklife düştü; yerine 3+ satıcılı en
    ucuz 5070. Uzunluk ürün sayfasındaki "Derinlik"ten (VCG507012TFXXPB1-O). */
@@ -386,7 +404,10 @@ const GPUS = [{
   vram: 12,
   tdp: 250,
   p: 47393,
-  boy: 300
+  boy: 300,
+  psuMin: 650,
+  pin8: 2,
+  p16: true
 }, {
   id: '9070xt',
   n: 'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)',
@@ -397,7 +418,9 @@ const GPUS = [{
   vram: 16,
   tdp: 304,
   p: 41570,
-  boy: 325
+  boy: 325,
+  psuMin: 800,
+  pin8: 2
 }, {
   id: '5070ti',
   n: 'GeForce RTX 5070 Ti 16 GB (PNY Triple OC)',
@@ -408,7 +431,10 @@ const GPUS = [{
   vram: 16,
   tdp: 300,
   p: 58093,
-  boy: 300
+  boy: 300,
+  psuMin: 750,
+  pin8: 3,
+  p16: true
 }, {
   id: '5080',
   n: 'GeForce RTX 5080 16 GB (MSI Shadow 3X OC)',
@@ -419,7 +445,10 @@ const GPUS = [{
   vram: 16,
   tdp: 360,
   p: 83105,
-  boy: 303
+  boy: 303,
+  psuMin: 850,
+  pin8: 3,
+  p16: true
 }, {
   id: '5090',
   n: 'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',
@@ -430,7 +459,10 @@ const GPUS = [{
   vram: 32,
   tdp: 575,
   p: 318181,
-  boy: 325
+  boy: 325,
+  psuMin: 1000,
+  pin8: 4,
+  p16: true
 }];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat === 'AM5' ? 'AMD' : 'Intel';
@@ -623,36 +655,53 @@ const SSDS = [{
   gb: 2000,
   p: 16430
 }];
-const PSUS = [{
+const PSUS = [
+/* pin8: PCIe 6+2 kablo sayısı, k16: yerel 16-pin kablonun taşıdığı güç (W,
+   yoksa 0). Kaynak: MSI teknik sayfaları, Zalman için satıcı teknik verisi
+   (21.09.2026). A850GN'nin 16-pin gücü yazılmıyor; ATX 3.x alt sınırı 450 W
+   varsayıldı (5090 zaten psuMin 1000 ile bu kaynağı seçemez). */
+{
   id: '550',
   n: '550 W 80+ (MSI MAG A550BNL)',
   w: 550,
-  p: 1799
+  p: 1799,
+  pin8: 2,
+  k16: 0
 }, {
   id: '650',
   n: '650 W 80+ (MSI MAG A650BNL)',
   w: 650,
-  p: 2820
+  p: 2820,
+  pin8: 2,
+  k16: 0
 }, {
   id: '750',
-  n: '750 W 80+ (MSI MAG A750BN)',
+  n: '750 W 80+ (MSI MAG A750BN PCIE5 II)',
   w: 750,
-  p: 3299
+  p: 3299,
+  pin8: 3,
+  k16: 450
 }, {
   id: '850',
-  n: '850 W 80+ Gold (MSI MAG A850GN)',
+  n: '850 W 80+ Gold (MSI MAG A850GN PCIE5)',
   w: 850,
-  p: 5111
+  p: 5111,
+  pin8: 2,
+  k16: 450
 }, {
   id: '1000',
-  n: '1000 W 80+ Gold (MSI MAG A1000GL)',
+  n: '1000 W 80+ Gold (MSI MAG A1000GL PCIE5 II)',
   w: 1000,
-  p: 8299
+  p: 8299,
+  pin8: 4,
+  k16: 600
 }, {
   id: '1200',
   n: '1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)',
   w: 1200,
-  p: 7979
+  p: 7979,
+  pin8: 8,
+  k16: 0
 }];
 /* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
    modeller (Akakçe, Ağustos 2026, en ucuz liste fiyatı) — her yonga
@@ -966,7 +1015,16 @@ const enUcuzUygun = (liste, yeter) => {
   const uygun = liste.filter(yeter);
   return uygun.length ? uygun.reduce((a, b) => b.p < a.p ? b : a) : liste[liste.length - 1];
 };
-const pickPsu = (g, c) => enUcuzUygun(PSUS, p => p.w >= (g.tdp + c.tdp + 90) * 1.35);
+/* Güç kaynağı üç şartı birden sağlamalı:
+   1) tüketim formülü (kart + işlemci + 90 W, %35 pay),
+   2) kartın KENDİ üreticisinin önerdiği sistem gücü (psuMin) — anlık güç
+      sıçramaları formülde yok, üretici önerisi bunları kapsıyor,
+   3) kablo: kartın istediği 8-pin sayısı ya da yeterli güçte yerel 16-pin.
+   Ölçüsü bilinmeyen kaynak/kart (panelden yeni eklenmiş) kablo şartını
+   geçemez değil, atlanır — ama psuMin yoksa formül yine uygulanır. */
+const psuBaglanti = (g, p) => !g.pin8 || p.pin8 == null || g.p16 && p.k16 >= g.tdp || p.pin8 >= g.pin8;
+const psuYeter = (g, c, p) => p.w >= (g.tdp + c.tdp + 90) * 1.35 && p.w >= (g.psuMin || 0) && psuBaglanti(g, p);
+const pickPsu = (g, c) => enUcuzUygun(PSUS, p => psuYeter(g, c, p));
 /* Kasa ve soğutucu kademesi ESKİDEN sabit bütçe eşiğiyle (upTo / 80-120 bin)
    zorlanıyordu. Sorun: eşiğin hemen üstünde kademe ZORUNLU atlıyordu ve bu
    sıçrama bazen RAM/SSD'den kesecek kadar büyüktü — bütçe artmasına rağmen
@@ -2280,7 +2338,8 @@ function parcalariGetir() {
          öneriliyordu. Koddaki veriyle test geçtiği için görünmüyordu.
          Artık motorun okuduğu TÜM ölçü alanları korunuyor; kombinasyon
          denetimi de bu yolu ayrıca sınıyor (CANLI geçişi). */
-      koy(GPUS, koru(GPUS.slice(), grup('gpu').map(x => ({
+      const gpuOnce = GPUS.slice();
+      koy(GPUS, koru(gpuOnce, grup('gpu').map(x => ({
         id: kimlik(x),
         n: x.ad,
         b: x.marka || '—',
@@ -2288,7 +2347,14 @@ function parcalariGetir() {
         vram: x.vram || 0,
         tdp: x.tdp || 0,
         p: x.fiyat
-      })), o => o.id, ['r1440', 'r2160', 'boy']));
+      })), o => o.id, ['r1440', 'r2160', 'boy', 'psuMin', 'pin8', 'p16']));
+      /* Güç tüketimi: veritabanındaki (çoğu zaman referans model) ile koddaki
+         (satılan modelin kendi değeri) arasından BÜYÜK olan — güç kaynağı
+         hesabında düşük tahmin kapanan bilgisayar demek. */
+      GPUS.forEach(g => {
+        const e = gpuOnce.find(o => o.id === g.id);
+        if (e && e.tdp > g.tdp) g.tdp = e.tdp;
+      });
       koy(CPUS, koru(CPUS.slice(), grup('cpu').map(x => ({
         id: kimlik(x),
         n: x.ad,
@@ -2311,12 +2377,12 @@ function parcalariGetir() {
         gb: x.kapasite || 0,
         p: x.fiyat
       })));
-      koy(PSUS, grup('psu').map(x => ({
+      koy(PSUS, koru(PSUS.slice(), grup('psu').map(x => ({
         id: kimlik(x),
         n: x.ad,
         w: x.watt || 0,
         p: x.fiyat
-      })));
+      })), o => o.id, ['pin8', 'k16']));
       const radKoru = (eski, yeniler, anahtar) => koru(eski, yeniler, anahtar, ['rad']);
       koy(COOLERS, radKoru(COOLERS.slice(), grup('sogutucu').map(x => ({
         id: kimlik(x),
@@ -4207,7 +4273,7 @@ function parcaNeden(sys) {
   if (mb.ram && r.tip) ek('ram', 'Anakart ' + mb.ram + (mb.ramHiz ? '-' + mb.ramHiz : '') + ' destekliyor');
   if (psu.w) {
     const cek = (g.tdp || 0) + (c.tdp || 0) + 90;
-    ek('psu', 'Sistem en fazla ~' + cek + ' W çeker · %' + Math.round((psu.w / cek - 1) * 100) + ' güvenlik payı');
+    ek('psu', 'Sistem en fazla ~' + cek + ' W çeker' + (g.psuMin ? ' · kart üreticisi en az ' + g.psuMin + ' W öneriyor' : ' · %' + Math.round((psu.w / cek - 1) * 100) + ' güvenlik payı'));
   }
   if (cl.cap && c.tdp) ek('cooler', 'İşlemci ' + c.tdp + ' W ısı üretir · soğutucu ' + cl.cap + ' W kaldırır' + (cl.rad && cs.rad ? ' · kasa ' + cs.rad + ' mm radyatör alır' : ''));
   if (cs.gpuMax && g.boy) ek('case', 'Kart ' + g.boy + ' mm · kasa ' + cs.gpuMax + ' mm\'ye kadar alır' + (cs.formMax ? ' · ' + cs.formMax + ' anakart sığar' : ''));

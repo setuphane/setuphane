@@ -41,12 +41,41 @@ const { buildSystem, PROFILES, cpuBrand } = kur;
 
 // ── Kurallar ───────────────────────────────────────────────────────────
 // Her kural bir sistem alir, sorun varsa metin doner.
+const URETICI_PSU = { '7600': 550, '5060': 550, '9060xt': 550, '5060ti': 600, '9070': 750,
+  '5070': 650, '9070xt': 800, '5070ti': 750, '5080': 850, '5090': 1000 };
+const KART_KABLO = { '7600': { pin8: 1 }, '5060': { pin8: 1 }, '9060xt': { pin8: 1 }, '5060ti': { pin8: 1 },
+  '9070': { pin8: 2 }, '9070xt': { pin8: 2 }, '5070': { pin8: 2, p16: true }, '5070ti': { pin8: 3, p16: true },
+  '5080': { pin8: 3, p16: true }, '5090': { pin8: 4, p16: true } };
+// MSI resmi teknik sayfalari + Zalman satici verisi (21.09.2026)
+const PSU_KABLO = { '550': { pin8: 2, k16: 0 }, '650': { pin8: 2, k16: 0 }, '750': { pin8: 3, k16: 450 },
+  '850': { pin8: 2, k16: 450 }, '1000': { pin8: 4, k16: 600 }, '1200': { pin8: 8, k16: 0 } };
+
 const KURALLAR = [
   ['guc-kaynagi', b => {
     // Kart + islemci disinda anakart/disk/fan ~100 W ceker; gecici sicramalar
     // icin %20 pay birakiyoruz. Bunun altinda sistem yuk altinda kapanir.
     const gerek = Math.round((b.g.tdp + b.c.tdp + 100) * 1.2);
     return b.psu.w < gerek ? `${b.psu.w} W yetersiz, en az ${gerek} W gerekiyor (${b.g.n} + ${b.c.n})` : null;
+  }],
+  // Uretici onerisi: BAGIMSIZ tablo (motordaki psuMin'den ayri tutuluyor ki
+  // motor verisi silinir/yanlis girilirse denetim yakalasin). Kaynak: kartin
+  // kendi ureticisinin "onerilen sistem gucu", Epey urun sayfasi 21.09.2026;
+  // Gigabyte RX 9070 Gaming OC resmi sayfada 750 W olarak dogrulandi.
+  // YENI KART EKLENINCE BURAYA DA EKLENMELI — yoksa denetim hata verir.
+  ['uretici-psu', b => {
+    if (b.g.id === 'igpu') return null;
+    const min = URETICI_PSU[b.g.id];
+    if (!min) return `${b.g.n}: uretici guc onerisi denetim tablosunda yok`;
+    return b.psu.w < min ? `${b.psu.w} W, ${b.g.n} icin uretici en az ${min} W istiyor` : null;
+  }],
+  // Kablo: kartin istedigi 8-pin sayisi (16-pin kartta kutudan cikan adaptorun
+  // istedigi) ya da karti tasiyacak guce sahip yerel 16-pin.
+  ['psu-kablo', b => {
+    if (b.g.id === 'igpu') return null;
+    const k = KART_KABLO[b.g.id], p = PSU_KABLO[b.psu.id];
+    if (!k || !p) return `kablo verisi eksik: ${b.g.id} / ${b.psu.id}`;
+    if (k.p16 && p.k16 >= b.g.tdp) return null;
+    return p.pin8 >= k.pin8 ? null : `${b.psu.n}: ${p.pin8} adet 8-pin var, ${b.g.n} ${k.pin8} istiyor${k.p16 ? ' (yerel 16-pin yok/yetersiz)' : ''}`;
   }],
   ['radyator-kasa', b => {
     // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.
@@ -218,12 +247,14 @@ if (eksikBoy.length) {
 // calistiriliyor ve hicbir olcu alaninin kaybolmadigi dogrulaniyor.
 {
   const OLCU = {
-    GPUS: ['boy', 'r1440', 'r2160'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
+    GPUS: ['boy', 'r1440', 'r2160', 'psuMin', 'pin8', 'p16'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
+    PSUS: ['pin8', 'k16'],
     COOLERS: ['rad', 'cap'], CASES: ['rad', 'gpuMax', 'formMax'],
   };
   const once = {
     GPUS: structuredClone(GPUS), CPUS: structuredClone(CPUS), RAMS: structuredClone(RAMS),
     COOLERS: structuredClone(COOLERS), CASES: structuredClone(CASES), BOARDS: structuredClone(BOARDS),
+    PSUS: structuredClone(PSUS),
   };
   // Veritabani satirlari: yalnizca tabloda gercekten var olan kolonlar.
   const r = []; let sira = 0;
@@ -246,7 +277,7 @@ if (eksikBoy.length) {
     const kayip = [];
     for (const [ad, alanlar] of Object.entries(OLCU))
       once[ad].forEach((o, i) => {
-        const y = { GPUS, CPUS, RAMS, COOLERS, CASES }[ad][i];
+        const y = { GPUS, CPUS, RAMS, COOLERS, CASES, PSUS }[ad][i];
         for (const a of alanlar) if (o[a] != null && (!y || y[a] !== o[a])) kayip.push(`${ad} ${o.n || o.id}: ${a} ${o[a]} -> ${y ? y[a] : 'YOK'}`);
       });
     for (const pl of Object.keys(once.BOARDS)) once.BOARDS[pl].forEach((o, i) => {
