@@ -56,7 +56,8 @@ const SOGUTUCU_OLCU = { air: { sinif: 'tek', h: 148 }, cift: { sinif: 'cift', h:
 const KASA_OLCU = {
   'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160 },
   'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170 },
-  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185 } };
+  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185 },
+  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180 } };
 
 const KURALLAR = [
   ['guc-kaynagi', b => {
@@ -296,7 +297,7 @@ if (eksikBoy.length) {
   // Canli veritabaninda HENUZ SATIRI OLMAYAN kod parcalari (panelden/SQL ile
   // eklenmemis). Yukleyici bunlari koddan geri eklemeli; eklemezse canlida
   // parca kaybolur. Burada bilerek disarida birakiliyor ki o yol sinansin.
-  const DBDE_YOK = new Set(['sogutucu:cift', 'ram:96', 'ssd:4t', 'gpu:5050', 'cpu:245kf', 'cpu:250kf', 'cpu:250k', 'cpu:270k', 'anakart:AM5-3']);
+  const DBDE_YOK = new Set(['sogutucu:cift', 'ram:96', 'ssd:4t', 'gpu:5050', 'cpu:245kf', 'cpu:250kf', 'cpu:250k', 'cpu:270k', 'anakart:AM5-3', 'kasa:3']);
   const ekle = o => { if (!DBDE_YOK.has(o.anahtar)) r.push({ sira: (sira += 10), guncelleme: '2026-01-01', ...o }); };
   GPUS.forEach(g => ekle({ anahtar: 'gpu:' + g.id, kat: 'gpu', ad: g.n, marka: g.b, fiyat: g.p, idx: g.idx, vram: g.vram, tdp: g.tdp }));
   CPUS.forEach(c => ekle({ anahtar: 'cpu:' + c.id, kat: 'cpu', ad: c.n, fiyat: c.p, plat: c.plat, oyun: c.g, coklu_is: c.m, tdp: c.tdp, dahili_grafik: c.ig }));

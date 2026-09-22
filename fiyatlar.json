@@ -11,9 +11,9 @@
    "tarih": "2026-09-22T10:29:01.408Z"
   },
   "gpu:5060ti": {
-   "fiyat": 40894,
+   "fiyat": 40231,
    "ad": "GeForce RTX 5060 Ti 16 GB (Asus Dual OC)",
-   "tarih": "2026-09-22T07:01:03.743Z"
+   "tarih": "2026-09-22T11:33:34.054Z"
   },
   "gpu:9070": {
    "fiyat": 40999,
@@ -244,7 +244,12 @@
    "fiyat": 22999,
    "ad": "MSI MPG X870E Edge Ti WiFi (X870E)",
    "tarih": "2026-09-22T10:29:01.408Z"
+  },
+  "kasa:3": {
+   "fiyat": 5192,
+   "ad": "Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)",
+   "tarih": "2026-09-22T11:33:34.054Z"
   }
  },
- "guncelleme": "2026-09-22T10:29:01.408Z"
+ "guncelleme": "2026-09-22T11:33:34.054Z"
 }

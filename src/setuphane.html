@@ -492,6 +492,10 @@ const CASES=[
    RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
    (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
  {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478]},
+ /* 22.09.2026 — orta fiyatlı ATX kasa (kullanıcı: üst sınıf ATX anakart daha çok
+    sisteme girebilsin). Epey: 5.192 TL, 8 satıcı; ATX, 4×140 mm fan dahil, üst
+    360 mm radyatör, kart en fazla 375 mm, soğutucu 180 mm, 219×456×456 mm. */
+ {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5192,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456]},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -697,15 +701,29 @@ function yukseltmeyeHazirla(s,budget,pick){
    kesilmez, YALNIZCA bütçenin ≥%10'u hâlâ boştaysa seçilir. Kasanın aldığı
    en büyük form (4500X ATX -> X870E Edge Ti; mATX kasa -> B850M Mortar)
    ve aynı sert kurallar (bellek türü, form). */
+/* 22.09.2026 (2) — kullanıcı: "gerekirse kasa ekleyelim, bu kartı donanıma
+   kazandıralım". Üst segment kartlı (idx ≥ 117: RX 9070 XT ve üstü) sistemde
+   artan bütçe yetiyorsa da seçilir; kasa mATX ise ve fark yetiyorsa aynı sert
+   kurallardan geçen en ucuz ATX kasaya geçilir (kart payı, soğutucu yüksekliği,
+   radyatör). Kart/işlemci/diğerleri DEĞİŞMEZ — yalnız artan para kullanılır. */
 function ustAnakart(s,budget){
-  if(!s || s.g.id==='igpu' || budget-s.total < budget*0.10) return s;   /* ofis/ekran kartsız sistemde üst sınıf oyuncu anakartı anlamsız */
+  if(!s || s.g.id==='igpu') return s;   /* ofis/ekran kartsız sistemde üst sınıf oyuncu anakartı anlamsız */
+  const bos=budget-s.total;
+  if(bos < budget*0.10 && s.g.idx < 117) return s;
   const sira={ITX:1,mATX:2,ATX:3};
-  const aday=(BOARDS[s.c.plat]||[]).filter(b=>b.ust && b.p>s.mb.p
-    && (!b.form || !s.cs.formMax || sira[b.form]<=sira[s.cs.formMax])
-    && (!s.r.tip || !b.ram || b.ram===s.r.tip)
-    && s.total - s.mb.p + b.p <= budget)
-    .sort((a,b)=>sira[b.form]-sira[a.form] || b.p-a.p)[0];
-  return aday ? {...s, mb:aday, total:s.total - s.mb.p + aday.p, ustMb:true} : s;
+  const kasaUyar=(k,b)=> (!b.form || !k.formMax || sira[b.form]<=sira[k.formMax])
+    && (!s.g.boy || !k.gpuMax || s.g.boy+KART_PAY<=k.gpuMax) && cSigar(s.cl,k)
+    && (!s.hazir || !s.hazir.boy || !k.gpuMax || s.hazir.boy+KART_PAY<=k.gpuMax);
+  let en=null;
+  for(const b of (BOARDS[s.c.plat]||[])){
+    if(!b.ust || b.p<=s.mb.p || (s.r.tip && b.ram && b.ram!==s.r.tip)) continue;
+    const cs = kasaUyar(s.cs,b) ? s.cs : CASES.filter(k=>kasaUyar(k,b)).sort((x,y)=>x.p-y.p)[0];
+    if(!cs) continue;
+    const ek=(b.p-s.mb.p)+(cs.p-s.cs.p);
+    if(ek>bos) continue;
+    if(!en || b.p>en.b.p) en={b,cs,ek};
+  }
+  return en ? {...s, mb:en.b, cs:en.cs, total:s.total+en.ek, ustMb:true} : s;
 }
 /* Bir üst ekran kartının seçildiği en düşük bütçe (ziyaretçiye "bu bütçede daha
    fazla FPS veren kart yok, üst kademe şuradan başlıyor" demek için). */
@@ -1406,6 +1424,8 @@ function parcalariGetir(){
             for(const a of ['rad','gpuMax','formMax','cpuH','dis']) if(e[a]!=null) k[a]=e[a];
             return k;
           }));
+          /* Veritabanında satırı olmayan kod kasası (22.09: Lancool 207) eklenir. */
+          eskiKasa.forEach((k,i)=>{ if(i>=CASES.length && !CASES.some(o=>o.n===k.n)){ const b=bf['kasa:'+i]; CASES.push(b&&b.fiyat>0?{...k,p:b.fiyat}:k); } });
         }
         const en=r.map(x=>x.guncelleme).filter(Boolean).sort().pop();
         if(en) PARCA_FIYAT_TARIHI=String(en).slice(0,10);
