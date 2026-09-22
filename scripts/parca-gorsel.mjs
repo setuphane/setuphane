@@ -25,8 +25,14 @@ for (const [anahtar, link] of Object.entries(eslesme)) {
   if (!HEPSI && existsSync(hedef) && statSync(hedef).size > 1000) { var_++; continue; }
   try {
     const h = execFileSync(CURL, ['-sS', '--compressed', '-A', UA, '--max-time', '30', link], { encoding: 'utf8', maxBuffer: 6e7 });
-    const og = (h.match(/property="og:image"[^>]*content="([^"]+)"|content="([^"]+)"[^>]*property="og:image"/) || []).slice(1).find(Boolean);
+    let og = (h.match(/property="og:image"[^>]*content="([^"]+)"|content="([^"]+)"[^>]*property="og:image"/) || []).slice(1).find(Boolean);
     if (!og) throw new Error('og:image yok');
+    /* 22.09.2026: bazı ürünlerde og:image kırık (Zalman 1200 W: z_/m_ .jpg 404),
+       galeri görselleri .png. O zaman galerinin ilk orta boyu alınır (tarayıcı
+       içeriğe bakar, .jpg adıyla da gösterir). */
+    const galeri = (h.match(/https?:\/\/resim\.epey\.com\/\d+\/m_[^"' )]+\.(?:png|jpg|webp)/) || [])[0];
+    const durum = u => execFileSync(CURL, ['-s', '-A', UA, '-r', '0-0', '-w', '%{http_code}', u], { encoding: 'latin1' }).slice(-3);
+    if (galeri && !/^20[06]$/.test(durum(og.replace(/\/(?:[a-z]_)?([^/]+)$/, '/m_$1')))) og = galeri;
     const kucuk = og.replace(/\/(?:[a-z]_)?([^/]+)$/, '/z_$1').replace('/z_z_', '/z_');
     execFileSync(CURL, ['-sS', '-A', UA, '--max-time', '30', '-o', hedef, kucuk]);
     if (!existsSync(hedef) || statSync(hedef).size < 1000)   // z_ yoksa orta boy (m_)

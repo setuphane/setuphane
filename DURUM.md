@@ -465,3 +465,15 @@ commit; `git log --oneline` ile bakıp `git revert <commit>` yeterli.
 - `yuva` alanı: kasanın boş fan yuvaları (varsayılan 2 ön/1 arka/3 üst). O11: alt 3 / üst 3 / yan 3 (önü cam).
 - **Yeni kural `girisVar`:** her sistemde en az bir GİRİŞ fanı. O11'e üstten 360 radyatör takılınca 3 fan da dışarı üflüyordu (eski motorda 3.714 sistem). Denetime `giris` alanı + kural eklendi; eski motorla 3.714, yeniyle 0.
 - Denetim: 11.282 sistem temiz, 6/6 kasa kullanılıyor. Gün sonu: oyun 0 düşüş; yayın 6 bulgu (değişiklikten önce de aynı 6).
+
+## 22.09.2026 (gece) — Genel tarama (A'dan Z'ye)
+Kontrol edilenler: 22 sayfa (başlık/canonical/kırık görsel/konsol), mobil taşma, Supabase RLS, fiyat botu (57 parçanın hepsi 3+ satıcı), OEM verisi (bugün), kombinasyon denetimi (temiz), FPS testi.
+Düzeltilenler:
+- PC fiyat notu ve alt bilgi "Cimri" diyordu → "Epey · en az 3 satıcı". llms.txt da güncellendi (Epey, TechPowerUp kuralı, 3D, OEM, paylaşım linkleri).
+- **Laptop fiyatları 19.08'den beri güncellenmedi** (bot yalnız parçaları izliyor, Cimri 403 veriyor, Epey eşleşmesi 17/45 ve güvenilmez). Otomatik düzeltme YAPILMADI; ziyaretçiye tarih + "X gün önce" uyarısı, panelin tazelik uyarısı artık en eski tabloya bakıyor (parçada bot dosyası da sayılıyor).
+- Laptop seçimi yedek listeden kalıyordu (panel eski fiyat/tarihsiz gösterebiliyordu) → veritabanı gelince güncel kayda bağlanıyor.
+- psu:1200 görseli (Epey og:image kırık) → galeri görseline düşme; 200/320 px'e küçültüldü.
+- Önbellek: /vendor 1 yıl (immutable), /urun 1 gün, favicon 1 hafta.
+- "En az X ₺ gerekiyor" mesajına "Bu bütçeyle kur →" butonu (olay: en_az_butce).
+- sitemap ana sayfa lastmod.
+Açık: laptop listesinin yenilenmesi (elle, panelden) — kullanıcı kararı.

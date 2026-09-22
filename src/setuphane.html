@@ -1343,12 +1343,12 @@ let _laptopSozu=null;
 function laptoplariGetir(){
   if(!uzakVar()) return Promise.resolve(null);
   if(!_laptopSozu){
-    _laptopSozu=sb('laptoplar?select=ad,marka,fiyat,gorsel,link,gpu,cpu,ram,ssd,inch,saticilar&aktif=eq.true&order=fiyat.asc')
+    _laptopSozu=sb('laptoplar?select=ad,marka,fiyat,gorsel,link,gpu,cpu,ram,ssd,inch,saticilar,guncelleme&aktif=eq.true&order=fiyat.asc')
       .then(r=>{
         if(!Array.isArray(r)||!r.length) return null;
         return r.map(x=>({name:x.ad, brand:x.marka, price:x.fiyat, image:x.gorsel, url:x.link,
           store:null, offers:x.saticilar||0, gpu:x.gpu, idx:GPU_IDX[x.gpu]||40,
-          cpu:x.cpu, ram:x.ram, ssd:x.ssd, inch:x.inch}));
+          cpu:x.cpu, ram:x.ram, ssd:x.ssd, inch:x.inch, tarih:x.guncelleme}));
       }).catch(()=>null);
   }
   return _laptopSozu;
@@ -2507,10 +2507,18 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
   const LAP=useLaptoplar();
   const list=useMemo(()=>LAP.filter(l=>l.price<=budget).sort((x,y)=>y.idx-x.idx || x.price-y.price),[budget,LAP]);
   const best=list[0]||null;
+  /* 22.09.2026: laptop fiyatları elle güncelleniyor (bot yalnız parçaları
+     izliyor); ziyaretçi fiyatın kaç günlük olduğunu görmeli. */
+  const lapTarih=useMemo(()=>LAP.map(l=>l.tarih).filter(Boolean).sort().pop()||null,[LAP]);
+  const lapGun=lapTarih?Math.floor((Date.now()-new Date(lapTarih).getTime())/86400000):null;
 
+  /* Seçim, liste yedekten veritabanına geçince de güncel kayda bağlanır —
+     yoksa panel yedek listedeki eski fiyatı gösteriyordu (22.09.2026). */
   useEffect(()=>{
-    if(!sel || sel.price>budget) setSel(best);
-  },[budget,best && best.name]);
+    const ayni=sel && LAP.find(l=>l.name===sel.name);
+    if(!ayni || ayni.price>budget) setSel(best);
+    else if(ayni!==sel) setSel(ayni);
+  },[budget,best && best.name,LAP]);
 
   const cur=(sel && sel.price<=budget) ? sel : best;
   /* Aynı paraya toplanacak masaüstü — laptop'un asıl bedeli burada görünüyor */
@@ -2617,7 +2625,7 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
         </>
       )}
       <p className="mt-6 text-[.72rem] text-dim leading-relaxed">
-        Laptop verisi Cimri.com'dan çekildi. FPS değerleri mobil ekran kartı sınıfına göre tahmindir;
+        Laptop verisi Cimri.com'dan çekildi{lapTarih?<> · fiyatlar {new Date(lapTarih).toLocaleDateString('tr-TR',{day:'numeric',month:'long'})} tarihli{lapGun>7?<span className="text-mg"> ({lapGun} gün önce) — almadan önce güncel fiyata bak</span>:null}</>:null}. FPS değerleri mobil ekran kartı sınıfına göre tahmindir;
         aynı isimli mobil kartlar masaüstü sürümünden belirgin şekilde yavaştır.
       </p>
     </Card>
@@ -3297,6 +3305,8 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                   return az ? (
                     <p className="text-sm text-ink/80 mt-3">
                       Bu amaç için en az <span className="num text-cy">{fmt(az)}</span> gerekiyor.
+                      {' '}<button type="button" onClick={()=>{ setBudget(Math.ceil(az/1000)*1000); olay('en_az_butce',{butce:az}); }}
+                        className="ml-1 underline decoration-cy/60 underline-offset-4 text-cy hover:text-ink">Bu bütçeyle kur →</button>
                     </p>
                   ) : null;
                 })()}
@@ -3901,9 +3911,12 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
             </a>
           )}
           <p className="mt-3 text-[.72rem] text-dim leading-relaxed">
-            Fiyatlar <span className="text-ink/80">{fiyatYasi().metin}</span> tarihinde
-            Cimri.com'dan çekildi.
-            {fiyatYasi().bayat && <span className="block mt-1 text-mg">{fiyatYasi().uyari}</span>}
+            {/* 22.09.2026: PC parçaları Epey'den (günlük bot), laptoplar Cimri'den
+                (elle) — kaynak ve tarih ayrı. Önce ikisi için de "Cimri" yazıyordu. */}
+            {isLap ? (act.lap.tarih ? <>Fiyat <span className="text-ink/80">{new Date(act.lap.tarih).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</span> tarihinde Cimri.com'dan çekildi.</> : <>Fiyat Cimri.com'dan çekildi.</>)
+              : <>Fiyatlar <span className="text-ink/80">{fiyatYasi().metin}</span> tarihli · Epey.com, en az 3 satıcıda satılan modelin en ucuz ilanı.</>}
+            {!isLap && fiyatYasi().bayat && <span className="block mt-1 text-mg">{fiyatYasi().uyari}</span>}
+            {isLap && act.lap.tarih && (Date.now()-new Date(act.lap.tarih).getTime())>7*86400000 && <span className="block mt-1 text-mg">Bir haftadan eski — alım öncesi güncel fiyata bak.</span>}
           </p>
         </Card>
         )}
@@ -7197,7 +7210,7 @@ function Footer(){
             ))}
           </nav>
           <div className="lbl text-dim/70 leading-loose sm:text-right">
-            <div>FİYATLAR: CİMRİ · {fiyatYasi().metin.toLocaleUpperCase('tr')}</div>
+            <div>FİYATLAR: EPEY · {fiyatYasi().metin.toLocaleUpperCase('tr')}</div>
             <div>FPS DEĞERLERİ TAHMİNDİR</div>
             {/* Analitik eklendiği için bu satır şart: site "izleme yok" diyordu,
                 artık ziyaret sayılıyor. Ne sayıldığını saklamak dürüst olmaz. */}
@@ -8168,9 +8181,14 @@ function PanelSayfa(){
     Promise.all([
       sb('parcalar?select=guncelleme&order=guncelleme.desc&limit=1').catch(()=>null),
       sb('laptoplar?select=guncelleme&order=guncelleme.desc&limit=1').catch(()=>null),
-    ]).then(([p,l])=>{
+      fetch('/fiyatlar.json',{cache:'no-cache'}).then(x=>x.ok?x.json():null).catch(()=>null),
+    ]).then(([p,l,bot])=>{
       if(iptal) return;
-      const t=[p&&p[0]&&p[0].guncelleme, l&&l[0]&&l[0].guncelleme].filter(Boolean).sort().pop();
+      /* Parça fiyatı = veritabanı ya da bot dosyasından yeni olanı. Sonra iki
+         kaynaktan en ESKİSİ: laptoplar botsuz, geride kalırsa görünsün (22.09). */
+      const botSon=bot&&bot.parcalar?Object.values(bot.parcalar).map(x=>x.tarih).filter(Boolean).sort().pop():null;
+      const parca=[p&&p[0]&&p[0].guncelleme, botSon].filter(Boolean).sort().pop();
+      const t=[parca, l&&l[0]&&l[0].guncelleme].filter(Boolean).sort()[0];
       if(!t){ setTazelik({bos:true}); return; }
       const gun=Math.floor((Date.now()-new Date(t).getTime())/86400000);
       setTazelik({gun, tarih:new Date(t).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})});

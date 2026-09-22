@@ -4,7 +4,8 @@
 
 ## Sayfalar
 
-- [Sistem Kur](https://www.setuphane.com/): Bütçe ve kullanım amacına göre canlı PC parça hesaplayıcı (AMD/Intel, NVIDIA/AMD karşılaştırması dahil), hazır laptop karşılaştırması.
+- [Sistem Kur](https://www.setuphane.com/): Bütçe ve kullanım amacına göre canlı PC parça hesaplayıcı (AMD/Intel, NVIDIA/AMD karşılaştırması dahil). Her sistem için parça seçim gerekçeleri, güç kaynağı/kasa/soğutma/fan uyumluluk kontrolleri, gerçek ürün görselleriyle 3D kasa görünümü, mağazaların hazır sistemleriyle "parça parça alsan" fiyat karşılaştırması ve hazır laptop karşılaştırması.
+- Paylaşım linkleri: https://www.setuphane.com/sistem:<bütçe>-<amaç>-... biçimindeki adresler belirli bir bütçe ve amaç için hesaplanan sistemi açar.
 - [Testler](https://www.setuphane.com/testler): FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri — 12 tarayıcı içi araç.
 - [Forum](https://www.setuphane.com/forum): Sistem tavsiyesi ve bilgisayar sorunları için kayıt gerektirmeyen topluluk forumu.
 - [Hakkımızda](https://www.setuphane.com/hakkimizda): SETUP HANE'nin ne olduğu, kim tarafından yapıldığı ve çalışma ilkeleri.
@@ -13,6 +14,7 @@
 
 ## Notlar
 
-- Fiyatlar Cimri kaynaklıdır ve periyodik olarak güncellenir; sitede gösterilen tarihten eskiyse doğrulamadan alıntılamayın.
+- PC parça fiyatları her gün Epey.com'dan alınır: en az 3 farklı satıcıda satılan modelin en ucuz fiyatı. Laptop fiyatları Cimri kaynaklıdır ve elle güncellenir; sitede gösterilen tarihten eskiyse doğrulamadan alıntılamayın.
+- FPS ve performans değerleri yalnızca bağımsız ölçümü (TechPowerUp) olan parçalar için verilir; ölçümü olmayan parça sisteme eklenmez.
 - Site tek geliştirici tarafından yürütülür, sahte istatistik veya kurumsal iddia içermez.
 - /aksesuarlar ve /oner sayfaları şu an geliştirme aşamasında (örnek/placeholder içerik) — özetlerken bunu belirtin.
