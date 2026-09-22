@@ -2779,6 +2779,22 @@ function parcaNeden(sys){
    derleme sırasında buraya gömülür (scripts/build.mjs). Eşlemesi olmayan
    parça (panelden yeni eklenmiş) için Akakçe araması yedek olarak kalır. */
 const EPEY_LINK = {};
+/* Gerçek ürün görseli (scripts/parca-gorsel.mjs -> urun/parca/<anahtar>.jpg,
+   üreticinin resmî görseli, Epey ürün sayfasından). Liste derlemede gömülür.
+   Görseli olmayan ya da yüklenemeyen parça eski çizim ikona döner. */
+const PARCA_GORSEL = [];
+function ParcaGorsel({k,sys,ad}){
+  const a=parcaAnahtari(k,sys), dosya=a && a.replace(/:/g,'-');
+  const [hata,setHata]=useState(false);
+  if(!dosya || hata || PARCA_GORSEL.indexOf(dosya)<0)
+    return <Shot kind={k} ratio="1/1" sm className="w-full h-full"/>;
+  return (
+    <span className="block w-full h-full rounded-md bg-white p-1 overflow-hidden">
+      <img src={'/urun/parca/'+dosya+'.jpg'} alt={ad} loading="lazy" decoding="async" width="64" height="64"
+           onError={()=>setHata(true)} className="w-full h-full object-contain"/>
+    </span>
+  );
+}
 function parcaAnahtari(k,sys){
   switch(k){
     case 'gpu': return 'gpu:'+sys.g.id;
@@ -2901,7 +2917,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                 <ul className="divide-y divide-line">
                   {rows.map(([k,cat,name,price])=>(
                     <li key={k} className="py-3.5 flex items-center gap-4 group">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 shrink-0"><Shot kind={k} ratio="1/1" sm className="w-full h-full"/></div>
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 shrink-0"><ParcaGorsel k={k} sys={sys} ad={name}/></div>
                       <div className="min-w-0 flex-1">
                         <div className="lbl text-dim/80 mb-1">{cat}</div>
                         <div className="text-[.92rem] sm:text-[1rem] leading-snug">{name}</div>

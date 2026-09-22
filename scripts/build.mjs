@@ -33,7 +33,15 @@ const { code: babelKod } = babel.transform(jsxMatch[1], {
 const epeyLink = JSON.parse(await readFile(path.join(root, 'scripts/epey-eslesme.json'), 'utf8'));
 const epeyYer = 'const EPEY_LINK = {};';
 if (!babelKod.includes(epeyYer)) throw new Error('EPEY_LINK yer tutucusu derlenmiş kodda bulunamadı');
-const code = babelKod.replace(epeyYer, 'const EPEY_LINK = ' + JSON.stringify(epeyLink) + ';');
+let code = babelKod.replace(epeyYer, 'const EPEY_LINK = ' + JSON.stringify(epeyLink) + ';');
+// 1c) Parçaların gerçek ürün görselleri (scripts/parca-gorsel.mjs -> urun/parca/).
+//     Hangi parçanın görseli varsa listesi gömülür; yoksa çizim ikon kalır.
+const { readdirSync, existsSync } = await import('node:fs');
+const gorselDizin = path.join(root, 'urun/parca');
+const gorseller = existsSync(gorselDizin) ? readdirSync(gorselDizin).filter(f => f.endsWith('.jpg')).map(f => f.slice(0, -4)) : [];
+const gorselYer = 'const PARCA_GORSEL = [];';
+if (!code.includes(gorselYer)) throw new Error('PARCA_GORSEL yer tutucusu derlenmiş kodda bulunamadı');
+code = code.replace(gorselYer, 'const PARCA_GORSEL = ' + JSON.stringify(gorseller) + ';');
 
 // 2) Tailwind CSS: kullanılan sınıfları src/setuphane.html içeriğinden tarar.
 const tmp = await mkdtemp(path.join(tmpdir(), 'sh-tw-'));
