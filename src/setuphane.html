@@ -496,6 +496,15 @@ const CASES=[
     sisteme girebilsin). Epey: 5.192 TL, 8 satıcı; ATX, 4×140 mm fan dahil, üst
     360 mm radyatör, kart en fazla 375 mm, soğutucu 180 mm, 219×456×456 mm. */
  {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5192,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456], fan:4, fanKap:8, duzen:{on:2,alt:2}},
+ /* 22.09.2026 — premium kasalar (kullanıcı isteği). Epey teknik sayfası:
+    Lancool III: 9.999 TL, 5 satıcı; 4×140 mm fan dahil (3 ön + 1 arka), fan
+    kapasitesi 10, radyatör 360, kart en fazla 435 mm, soğutucu 187 mm,
+    238×523×526 mm.
+    O11 Dynamic EVO RGB: 11.699 TL, 6 satıcı; FANSIZ gelir, fan kapasitesi 10,
+    radyatör 360, kart en fazla 455,7 mm, soğutucu 167 mm, 290×471×478 mm.
+    Önü cam: ön fan yuvası yok; yuvalar alt (giriş) + üst (egzoz) + yan (giriş). */
+ {n:'Premium hava akışlı kasa, 4 fanlı (Lian Li Lancool III)',p:9999,rad:360,gpuMax:435,formMax:'ATX',upTo:Infinity, cpuH:187, dis:[238,523,526], fan:4, fanKap:10, duzen:{on:3,arka:1}},
+ {n:'Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)',p:11699,rad:360,gpuMax:455,formMax:'ATX',upTo:Infinity, cpuH:167, dis:[290,471,478], fan:0, fanKap:10, duzen:{}, yuva:{alt:3,ust:3,yan:3}},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -672,11 +681,17 @@ const FAN_YER={on:'ön (giriş)', arka:'arka (egzoz)', ust:'üst (egzoz)', alt:'
    hepsi GİRİŞ olan kasalarda (4500X RS-R: 3 yan; Lancool 207: 2 ön + 2 alt)
    sıcak hava dışarı atılamaz — kullanıcı fark etti, 22.09.2026. */
 const egzozVar=(cs,rad)=>{ const d=(cs&&cs.duzen); return !d || !!(d.arka||d.ust||rad); };
+/* Giriş: ön/alt/yan fan. Fansız gelen O11 EVO'ya üstten 360 radyatör takılınca
+   üç fan da dışarı üfler, karta taze hava gelmez (22.09.2026). Radyatör giriş
+   sayılmaz: motor radyatörü üste (egzoz) yerleştiriyor. */
+const girisVar=cs=>{ const d=(cs&&cs.duzen); return !d || !!(d.on||d.alt||d.yan); };
+/* yuva: kasanın BOŞ fan yuvaları, doldurma sırasıyla. Verilmezse standart
+   kasa: 2 ön, 1 arka, 3 üst. O11 gibi önü cam kasada ön yuva yoktur. */
 const fanYerlesim=(cs,adet,rad)=>{  /* rad: üstte radyatör varsa üst dolu */
-  const d=(cs&&cs.duzen)||{}, yer=[];
-  if(adet>0 && !egzozVar(cs,rad)) yer.push('arka');     // önce egzoz
-  const bos={on:d.on?0:2, arka:(d.arka||yer.length)?0:1, ust:(d.ust||rad)?0:3};
-  for(const k of ['on','arka','ust']) while(bos[k]-- >0 && yer.length<adet) yer.push(k);
+  const d=(cs&&cs.duzen)||{}, yer=[], yuva=(cs&&cs.yuva)||{on:2,arka:1,ust:3}, bos={};
+  for(const k in yuva) bos[k]=(d[k]||(k==='ust'&&rad))?0:yuva[k];
+  if(adet>0 && !egzozVar(cs,rad)){ const e=bos.arka?'arka':'ust'; yer.push(e); bos[e]--; }   // önce egzoz
+  for(const k in bos) while(bos[k]-- >0 && yer.length<adet) yer.push(k);
   while(yer.length<adet) yer.push(rad?'on':'ust');
   return yer;
 };
@@ -687,7 +702,7 @@ const fanGerek = (g,c)=>{ const q=(g&&g.id!=='igpu'?g.tdp:0)+(c?c.tdp:0); return
 const fanEk = (g,c,cs,cl)=>{
   if(cs.fan==null) return 0;
   const rad=cl&&cl.rad?Math.round(cl.rad/120):0;
-  const ek=Math.max(fanGerek(g,c)-cs.fan-rad, egzozVar(cs,rad)?0:1, 0);
+  const ek=Math.max(fanGerek(g,c)-cs.fan-rad, (egzozVar(cs,rad)?0:1)+(girisVar(cs)?0:1), 0);
   if(ek && cs.fanKap!=null && cs.fan+rad+ek>cs.fanKap) return -1;
   return ek;
 };   /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
@@ -1471,7 +1486,7 @@ function parcalariGetir(){
             const m=String(x.anahtar||'').match(/^kasa:(\d+)$/);
             const e=(m && eskiKasa[+m[1]]) || eskiKasa.find(o=>o.n===x.ad) || {};
             const k={n:x.ad, p:x.fiyat, upTo:(x.butce_ust==null?Infinity:x.butce_ust)};
-            for(const a of ['rad','gpuMax','formMax','cpuH','dis','fan','fanKap','ters','duzen']) if(e[a]!=null) k[a]=e[a];
+            for(const a of ['rad','gpuMax','formMax','cpuH','dis','fan','fanKap','ters','duzen','yuva']) if(e[a]!=null) k[a]=e[a];
             return k;
           }));
           /* Veritabanında satırı olmayan kod kasası (22.09: Lancool 207) eklenir. */
@@ -2912,7 +2927,7 @@ function kasaSahnesi(T,OrbitControls,el,sys){
     {tur:'Kasanın hazır fanı · '+FAN_YER[yer],ad:cs.n,satir:[(cs.fan??'?')+' hazır fan'+(cs.ters&&yer==='yan'?' · ters yönlü ("reverse"): hava içeri, ışıklı yüz camdan görünür':''),'Sistem ~'+isi+' W ısı üretir · en az '+fanGerek(g,sys.c)+' fan gerekir']});
   if(sys.fan){ const yerler=fanYerlesim(cs,sys.fan.adet,!!cl.rad), sira={};
     yerler.forEach(yer=>{ const i=(sira[yer]=(sira[yer]||0)+1)-1; yerCiz(yer,i,0x2DE2E6,
-      {tur:'Eklenen kasa fanı · '+FAN_YER[yer],ad:sys.fan.n,satir:['Normal yönlü', egzozVar(cs,cl.rad)?'Kasanın '+cs.fan+' hazır fanı ~'+isi+' W ısı için yetmiyor':'Kasanın hazır fanlarının hepsi giriş; bu fan sıcak havayı dışarı atar']}); }); }
+      {tur:'Eklenen kasa fanı · '+FAN_YER[yer],ad:sys.fan.n,satir:['Normal yönlü', (yer==='arka'||yer==='ust')?(egzozVar(cs,cl.rad)?'Kasanın '+cs.fan+' hazır fanı ~'+isi+' W ısı için yetmiyor':'Kasada egzoz fanı yok; bu fan sıcak havayı dışarı atar'):(girisVar(cs)?'Kasanın '+cs.fan+' hazır fanı ~'+isi+' W ısı için yetmiyor':'Kasada giriş fanı yok; bu fan karta taze hava getirir')]}); }); }
   /* İşlemci soketi ve soğutucu */
   const sokY=mbUst-75, sokZ=arka+150;
   if(cl.rad){
@@ -3156,9 +3171,10 @@ function parcaNeden(sys){
   }
   if(cl.cap && c.tdp) ek('cooler', 'İşlemci '+c.tdp+' W ısı üretir · soğutucu '+cl.cap+' W kaldırır'+
     (cl.rad&&cs.rad?' · kasa '+cs.rad+' mm radyatör alır':''));
-  if(sys.fan) ek('fan', (egzozVar(cs,cl.rad)?'Kasanın '+cs.fan+' hazır fanı yetmiyor: sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, '+fanGerek(g,c)+' fan gerekir'
+  if(sys.fan) ek('fan', (!girisVar(cs)?'Kasada hazır giriş fanı yok'+(cl.rad?' (üstteki radyatör havayı dışarı atar)':'')+' — karta taze hava gelmeli; sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, en az '+fanGerek(g,c)+' fan gerekir'
+      : egzozVar(cs,cl.rad)?'Kasanın '+cs.fan+' hazır fanı yetmiyor: sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, '+fanGerek(g,c)+' fan gerekir'
       : 'Kasanın '+cs.fan+' hazır fanının hepsi hava içeri alıyor, egzoz yok — sıcak hava dışarı atılmalı')+' · takılacağı yer: '+fanYerMetni(cs,sys.fan.adet,!!cl.rad)+' · normal yönlü');
-  if(cs.gpuMax && g.boy) ek('case', (cs.fan!=null?cs.fan+' hazır fan'+(cs.duzen?' ('+Object.entries(cs.duzen).map(([k,n])=>n+' '+FAN_YER[k].split(' ')[0]).join(', ')+(cs.ters?', ters yönlü':'')+')':'')+' · ':'')+'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
+  if(cs.gpuMax && g.boy) ek('case', (cs.fan===0?'Fansız gelir, fanlar ayrıca eklenir · ':cs.fan!=null?cs.fan+' hazır fan'+(cs.duzen&&Object.keys(cs.duzen).length?' ('+Object.entries(cs.duzen).map(([k,n])=>n+' '+FAN_YER[k].split(' ')[0]).join(', ')+(cs.ters?', ters yönlü':'')+')':'')+' · ':'')+'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
     (cs.formMax?' · '+cs.formMax+' anakart sığar':''));
   return n;
 }

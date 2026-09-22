@@ -459,3 +459,9 @@ Cimri yalnızca tarayıcı içinden (sayfadaki schema.org AggregateOffer alanı)
 
 `git tag` → `yedek-anakart-ram-oncesi` (4c3b26e). Her önemli değişiklik ayrı
 commit; `git log --oneline` ile bakıp `git revert <commit>` yeterli.
+
+## 22.09.2026 (akşam) — Premium kasalar + giriş fanı kuralı
+- Yeni kasalar (Epey teknik sayfası, 3+ satıcı): **Lian Li Lancool III** (9.999 TL, 5 satıcı; 3 ön + 1 arka 140 mm fan, kart ≤435, soğutucu ≤187) ve **Lian Li O11 Dynamic EVO RGB** (11.699 TL, 6 satıcı; FANSIZ, kart ≤455, soğutucu ≤167). kasa:4 / kasa:5 — veritabanında satırı yok, yükleyici koddan ekliyor.
+- `yuva` alanı: kasanın boş fan yuvaları (varsayılan 2 ön/1 arka/3 üst). O11: alt 3 / üst 3 / yan 3 (önü cam).
+- **Yeni kural `girisVar`:** her sistemde en az bir GİRİŞ fanı. O11'e üstten 360 radyatör takılınca 3 fan da dışarı üflüyordu (eski motorda 3.714 sistem). Denetime `giris` alanı + kural eklendi; eski motorla 3.714, yeniyle 0.
+- Denetim: 11.282 sistem temiz, 6/6 kasa kullanılıyor. Gün sonu: oyun 0 düşüş; yayın 6 bulgu (değişiklikten önce de aynı 6).

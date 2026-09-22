@@ -54,10 +54,12 @@ const SOGUTUCU_OLCU = { air: { sinif: 'tek', h: 148 }, cift: { sinif: 'cift', h:
   aio360: { sinif: 'sivi' }, aio360p: { sinif: 'sivi' } };
 // cpuH: MSI / NZXT / Corsair teknik verisi; gpuMax: Epey (21.09.2026)
 const KASA_OLCU = {
-  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160, fan: 4, egzoz: 1 },
-  'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170, fan: 1, egzoz: 1 },
-  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185, fan: 3, egzoz: 0 },
-  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180, fan: 4, egzoz: 0 } };
+  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160, fan: 4, egzoz: 1, giris: 1 },
+  'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170, fan: 1, egzoz: 1, giris: 0 },
+  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185, fan: 3, egzoz: 0, giris: 1 },
+  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180, fan: 4, egzoz: 0, giris: 1 },
+  'Premium hava akışlı kasa, 4 fanlı (Lian Li Lancool III)': { gpuMax: 435, cpuH: 187, fan: 4, egzoz: 1, giris: 1 },
+  'Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)': { gpuMax: 455, cpuH: 167, fan: 0, egzoz: 0, giris: 0 } };
 
 const KURALLAR = [
   ['guc-kaynagi', b => {
@@ -121,7 +123,10 @@ const KURALLAR = [
     const var_ = k.fan + (b.cl.rad ? Math.round(b.cl.rad / 120) : 0) + (b.fan ? b.fan.adet : 0);
     if (var_ < gerek) return q + ' W isi, ' + var_ + ' fan var, ' + gerek + ' gerekiyor (' + b.cs.n + ')';
     // En az bir egzoz: kasanin arka/ust fani, ustteki radyator ya da eklenen fan
-    return (k.egzoz || b.cl.rad || b.fan) ? null : 'egzoz fani yok (' + b.cs.n + ')';
+    if (!(k.egzoz || b.cl.rad || b.fan)) return 'egzoz fani yok (' + b.cs.n + ')';
+    // En az bir giris: kasanin on/alt/yan fani ya da egzoz icin kullanilmayan eklenen fan
+    const egzozaGiden = (k.egzoz || b.cl.rad) ? 0 : 1;
+    return (k.giris || (b.fan && b.fan.adet - egzozaGiden >= 1)) ? null : 'giris fani yok (' + b.cs.n + ')';
   }],
   ['radyator-kasa', b => {
     // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.
@@ -295,7 +300,7 @@ if (eksikBoy.length) {
   const OLCU = {
     GPUS: ['boy', 'r1440', 'r2160', 'psuMin', 'pin8', 'p16', 'kal', 'yuk'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
     PSUS: ['pin8', 'k16'],
-    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis', 'fan', 'fanKap', 'ters', 'duzen'],
+    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis', 'fan', 'fanKap', 'ters', 'duzen', 'yuva'],
   };
   const once = {
     GPUS: structuredClone(GPUS), CPUS: structuredClone(CPUS), RAMS: structuredClone(RAMS),
@@ -307,7 +312,7 @@ if (eksikBoy.length) {
   // Canli veritabaninda HENUZ SATIRI OLMAYAN kod parcalari (panelden/SQL ile
   // eklenmemis). Yukleyici bunlari koddan geri eklemeli; eklemezse canlida
   // parca kaybolur. Burada bilerek disarida birakiliyor ki o yol sinansin.
-  const DBDE_YOK = new Set(['sogutucu:cift', 'ram:96', 'ssd:4t', 'gpu:5050', 'cpu:245kf', 'cpu:250kf', 'cpu:250k', 'cpu:270k', 'anakart:AM5-3', 'kasa:3']);
+  const DBDE_YOK = new Set(['sogutucu:cift', 'ram:96', 'ssd:4t', 'gpu:5050', 'cpu:245kf', 'cpu:250kf', 'cpu:250k', 'cpu:270k', 'anakart:AM5-3', 'kasa:3', 'kasa:4', 'kasa:5']);
   const ekle = o => { if (!DBDE_YOK.has(o.anahtar)) r.push({ sira: (sira += 10), guncelleme: '2026-01-01', ...o }); };
   GPUS.forEach(g => ekle({ anahtar: 'gpu:' + g.id, kat: 'gpu', ad: g.n, marka: g.b, fiyat: g.p, idx: g.idx, vram: g.vram, tdp: g.tdp }));
   CPUS.forEach(c => ekle({ anahtar: 'cpu:' + c.id, kat: 'cpu', ad: c.n, fiyat: c.p, plat: c.plat, oyun: c.g, coklu_is: c.m, tdp: c.tdp, dahili_grafik: c.ig }));
