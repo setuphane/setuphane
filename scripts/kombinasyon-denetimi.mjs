@@ -54,10 +54,10 @@ const SOGUTUCU_OLCU = { air: { sinif: 'tek', h: 148 }, cift: { sinif: 'cift', h:
   aio360: { sinif: 'sivi' }, aio360p: { sinif: 'sivi' } };
 // cpuH: MSI / NZXT / Corsair teknik verisi; gpuMax: Epey (21.09.2026)
 const KASA_OLCU = {
-  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160, fan: 4 },
-  'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170, fan: 1 },
-  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185, fan: 3 },
-  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180, fan: 4 } };
+  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160, fan: 4, egzoz: 1 },
+  'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170, fan: 1, egzoz: 1 },
+  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185, fan: 3, egzoz: 0 },
+  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180, fan: 4, egzoz: 0 } };
 
 const KURALLAR = [
   ['guc-kaynagi', b => {
@@ -119,7 +119,9 @@ const KURALLAR = [
     const k = KASA_OLCU[b.cs.n]; if (!k || k.fan == null) return b.cs.n + ': fan verisi denetim tablosunda yok';
     const q = (b.g.id !== 'igpu' ? b.g.tdp : 0) + b.c.tdp, gerek = q < 250 ? 2 : q <= 450 ? 3 : 4;
     const var_ = k.fan + (b.cl.rad ? Math.round(b.cl.rad / 120) : 0) + (b.fan ? b.fan.adet : 0);
-    return var_ < gerek ? q + ' W isi, ' + var_ + ' fan var, ' + gerek + ' gerekiyor (' + b.cs.n + ')' : null;
+    if (var_ < gerek) return q + ' W isi, ' + var_ + ' fan var, ' + gerek + ' gerekiyor (' + b.cs.n + ')';
+    // En az bir egzoz: kasanin arka/ust fani, ustteki radyator ya da eklenen fan
+    return (k.egzoz || b.cl.rad || b.fan) ? null : 'egzoz fani yok (' + b.cs.n + ')';
   }],
   ['radyator-kasa', b => {
     // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.
@@ -293,7 +295,7 @@ if (eksikBoy.length) {
   const OLCU = {
     GPUS: ['boy', 'r1440', 'r2160', 'psuMin', 'pin8', 'p16', 'kal', 'yuk'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
     PSUS: ['pin8', 'k16'],
-    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis', 'fan', 'fanKap', 'ters'],
+    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis', 'fan', 'fanKap', 'ters', 'duzen'],
   };
   const once = {
     GPUS: structuredClone(GPUS), CPUS: structuredClone(CPUS), RAMS: structuredClone(RAMS),
@@ -320,8 +322,8 @@ if (eksikBoy.length) {
   const bas = s.indexOf('const grup=k=>'), son = s.indexOf('const en=r.map', bas);
   if (bas < 0 || son < 0) { console.log('\n!! CANLI: yukleyici kaynakta bulunamadi — denetim guncellenmeli'); process.exitCode = 1; }
   else {
-    new Function('r', 'bf', 'GPUS', 'CPUS', 'RAMS', 'SSDS', 'PSUS', 'COOLERS', 'CASES', 'BOARDS', s.slice(bas, son))
-      (r, {}, GPUS, CPUS, RAMS, SSDS, PSUS, COOLERS, CASES, BOARDS);
+    new Function('r', 'bf', 'GPUS', 'CPUS', 'RAMS', 'SSDS', 'PSUS', 'COOLERS', 'CASES', 'BOARDS', 'FANS', s.slice(bas, son))
+      (r, {}, GPUS, CPUS, RAMS, SSDS, PSUS, COOLERS, CASES, BOARDS, dizi('FANS'));
     const kayip = [];
     for (const [ad, alanlar] of Object.entries(OLCU))
       once[ad].forEach((o, i) => {

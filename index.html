@@ -1257,13 +1257,21 @@ const FAN_YER = {
   alt: 'alt (giriş)',
   yan: 'yan (giriş)'
 };
+/* Egzoz: arka ya da üst fan; üstteki radyatör de egzozdur. Hazır fanlarının
+   hepsi GİRİŞ olan kasalarda (4500X RS-R: 3 yan; Lancool 207: 2 ön + 2 alt)
+   sıcak hava dışarı atılamaz — kullanıcı fark etti, 22.09.2026. */
+const egzozVar = (cs, rad) => {
+  const d = cs && cs.duzen;
+  return !d || !!(d.arka || d.ust || rad);
+};
 const fanYerlesim = (cs, adet, rad) => {
   /* rad: üstte radyatör varsa üst dolu */
   const d = cs && cs.duzen || {},
     yer = [];
+  if (adet > 0 && !egzozVar(cs, rad)) yer.push('arka'); // önce egzoz
   const bos = {
     on: d.on ? 0 : 2,
-    arka: d.arka ? 0 : 1,
+    arka: d.arka || yer.length ? 0 : 1,
     ust: d.ust || rad ? 0 : 3
   };
   for (const k of ['on', 'arka', 'ust']) while (bos[k]-- > 0 && yer.length < adet) yer.push(k);
@@ -1283,7 +1291,7 @@ const fanGerek = (g, c) => {
 const fanEk = (g, c, cs, cl) => {
   if (cs.fan == null) return 0;
   const rad = cl && cl.rad ? Math.round(cl.rad / 120) : 0;
-  const ek = Math.max(0, fanGerek(g, c) - cs.fan - rad);
+  const ek = Math.max(fanGerek(g, c) - cs.fan - rad, egzozVar(cs, rad) ? 0 : 1, 0);
   if (ek && cs.fanKap != null && cs.fan + rad + ek > cs.fanKap) return -1;
   return ek;
 }; /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
@@ -5625,7 +5633,7 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
       yerCiz(yer, i, 0x2DE2E6, {
         tur: 'Eklenen kasa fanı · ' + FAN_YER[yer],
         ad: sys.fan.n,
-        satir: ['Normal yönlü', 'Kasanın ' + cs.fan + ' hazır fanı ~' + isi + ' W ısı için yetmiyor']
+        satir: ['Normal yönlü', egzozVar(cs, cl.rad) ? 'Kasanın ' + cs.fan + ' hazır fanı ~' + isi + ' W ısı için yetmiyor' : 'Kasanın hazır fanlarının hepsi giriş; bu fan sıcak havayı dışarı atar']
       });
     });
   }
@@ -6000,7 +6008,7 @@ function parcaNeden(sys) {
     ek('psu', 'Sistem en fazla ~' + cek + ' W çeker' + (g.psuMin ? ' · kart üreticisi en az ' + g.psuMin + ' W öneriyor' : ' · %' + Math.round((psu.w / cek - 1) * 100) + ' güvenlik payı'));
   }
   if (cl.cap && c.tdp) ek('cooler', 'İşlemci ' + c.tdp + ' W ısı üretir · soğutucu ' + cl.cap + ' W kaldırır' + (cl.rad && cs.rad ? ' · kasa ' + cs.rad + ' mm radyatör alır' : ''));
-  if (sys.fan) ek('fan', 'Kasanın ' + cs.fan + ' hazır fanı yetmiyor: sistem ~' + ((g.tdp || 0) + (c.tdp || 0)) + ' W ısı üretir, ' + fanGerek(g, c) + ' fan gerekir · takılacağı yer: ' + fanYerMetni(cs, sys.fan.adet, !!cl.rad) + ' · normal yönlü');
+  if (sys.fan) ek('fan', (egzozVar(cs, cl.rad) ? 'Kasanın ' + cs.fan + ' hazır fanı yetmiyor: sistem ~' + ((g.tdp || 0) + (c.tdp || 0)) + ' W ısı üretir, ' + fanGerek(g, c) + ' fan gerekir' : 'Kasanın ' + cs.fan + ' hazır fanının hepsi hava içeri alıyor, egzoz yok — sıcak hava dışarı atılmalı') + ' · takılacağı yer: ' + fanYerMetni(cs, sys.fan.adet, !!cl.rad) + ' · normal yönlü');
   if (cs.gpuMax && g.boy) ek('case', (cs.fan != null ? cs.fan + ' hazır fan' + (cs.duzen ? ' (' + Object.entries(cs.duzen).map(([k, n]) => n + ' ' + FAN_YER[k].split(' ')[0]).join(', ') + (cs.ters ? ', ters yönlü' : '') + ')' : '') + ' · ' : '') + 'Kart ' + g.boy + ' mm · kasa ' + cs.gpuMax + ' mm\'ye kadar alır' + (cs.formMax ? ' · ' + cs.formMax + ' anakart sığar' : ''));
   return n;
 }
