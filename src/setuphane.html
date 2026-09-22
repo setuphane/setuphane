@@ -317,7 +317,7 @@ const GPUS=[
  {id:'7600',   n:'Radeon RX 7600 8 GB (Sapphire Pulse)',           b:'AMD',    idx:48,  r1440:0.96, r2160:0.82, vram:8,  tdp:185, p:17289, boy:240, psuMin:550,  pin8:1},
  {id:'5060',   n:'GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)', b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:19700, boy:197, psuMin:550,  pin8:1},
  {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:160, p:26299, boy:202, psuMin:550,  pin8:1},
- {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Zotac Twin Edge OC)',  b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:35999, boy:221, psuMin:600,  pin8:1},
+ {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',        b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:40595, boy:229, psuMin:550,  pin8:1},
  {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:36809, boy:288, psuMin:750,  pin8:2},
  /* 21.09.2026: Gainward Phoenix Epey'de 0 teklife düştü; yerine 3+ satıcılı en
     ucuz 5070. Uzunluk ürün sayfasındaki "Derinlik"ten (VCG507012TFXXPB1-O). */
@@ -431,24 +431,35 @@ const BOARDS={
  ]
 };
 const COOLERS=[
- {id:'stock', n:'Kutudan çıkan soğutucu',                                          cap:65, rad:0,  p:0},
- {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)',cap:180,rad:0,  p:1279},
+ /* sinif: stok | tek (tek kule) | cift (çift kule) | sivi. h: yükseklik (mm),
+    kasanın cpuH sınırına bakılır. 21.09.2026: 120 W ve üstü işlemcide tek
+    kule YASAK (kullanıcı: 142 bin TL'lik 9800X3D sisteminde giriş seviyesi
+    tek kule dengesizdi). Tek kule oyunda yeter ama uzun yükte 85-90 °C ve
+    gürültü; çift kule farkı ~1.400 TL. cap: üretici üst değerinin %80'i
+    (tek kule 225->180, çift kule 265->212) — ikisi de aynı temkinle. */
+ {id:'stock', n:'Kutudan çıkan soğutucu',                                          cap:65, rad:0,  p:0, sinif:'stok'},
+ {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)',cap:180,rad:0,  p:1279, sinif:'tek', h:148},
+ /* En ucuz gerçek çift kule + 120 mm fan, 3+ satıcı (Epey 21.09.2026: 2.714 TL,
+    6 satıcı). Daha ucuz "Dual" adlılar tek kule + çift fan (Ocypus A40 Dual)
+    ya da 90 mm fanlı (Peerless Assassin 90 SE) — elendi. 157 mm, 6 ısı borusu,
+    120-265 W (Thermalright). */
+ {id:'cift',  n:'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)',  cap:212,rad:0,  p:2714, sinif:'cift', h:157},
  /* En ucuz 360'ları bilerek almıyoruz: isimsiz sıvı soğutucularda pompa
     arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
     5+ satıcısı var (Epey, 20.08.2026). */
- {id:'aio360',n:'360 mm sıvı soğutma (Thermalright Frozen Magic 360 ARGB)',        cap:280,rad:360,p:3517},
- {id:'aio360p',n:'360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)',               cap:300,rad:360,p:4700},
+ {id:'aio360',n:'360 mm sıvı soğutma (Thermalright Frozen Magic 360 ARGB)',        cap:280,rad:360,p:3517, sinif:'sivi'},
+ {id:'aio360p',n:'360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)',               cap:300,rad:360,p:4700, sinif:'sivi'},
 ];
 const CASES=[
  /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
     doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
     280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
- {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000},
- {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160},
+ {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170},
  /* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
    RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
    (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -599,15 +610,20 @@ const pickPsu   = (g,c)=> enUcuzUygun(PSUS, p=>psuYeter(g,c,p));
    kaliteli kasa/soğutucu" beklentisi ÇELİŞMEDEN bir arada yaşıyor. Aşağıdaki
    iki yardımcı yalnızca FİZİKSEL uyumu (radyatör-kasa, soğutma yeterliliği)
    kontrol ediyor — kademe SEÇİMİ artık kurDene()'nin skor döngüsünde. */
+const KART_PAY = 15;   /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
 const radBoyu = k => k.rad != null ? k.rad
   : (String(k.n).match(/\b(120|140|240|280|360|420)\s*mm\b/) ? +RegExp.$1 : 0);
 /* SERT KURAL — radyatör kasaya sığacak. Bunu bütçe bandının kasayla denk
    gelmesine bırakamayız; kasa değişirse site sessizce kurulamayacak bir
    sistem önermeye başlar. */
-const cSigar  = (k,cs) => { const r=radBoyu(k); return !r || (cs && cs.rad!=null && r<=cs.rad); };
+const cSigar  = (k,cs) => { const r=radBoyu(k);
+  /* SERT KURAL — hava soğutucunun yüksekliği kasanın sınırını geçemez
+     (cpuH: üretici teknik sayfaları). Ölçü yoksa uygulanmaz. */
+  if(k.h && cs && cs.cpuH && k.h>cs.cpuH) return false;
+  return !r || (cs && cs.rad!=null && r<=cs.rad); };
 /* SERT KURAL — soğutucu işlemciyi gerçekten soğutabilecek kapasitede
    olmalı. Bu asla "kademe tercihi" değil, güvenlik alt sınırı. */
-const cYeter  = (k,c) => k.cap >= c.tdp*1.15;
+const cYeter  = (k,c) => k.cap >= c.tdp*1.15 && (c.tdp<120 || (k.sinif!=='tek' && k.sinif!=='stok'));
 
 /* pick: {cpu:'AMD'|'Intel'|'', gpu:'NVIDIA'|'AMD'|''} — boş = fark etmez */
 function buildSystem(budget,prof,pick,game,res){
@@ -659,7 +675,10 @@ function kurDene(budget,prof,pick,esikliMi,game,res){
         /* SERT KURAL — kart kasaya sığacak. Uzunluğu ölçülmemiş kartta kural
            uygulanmıyor: uydurma bir boyla sistemi reddetmek de en az kabul
            etmek kadar yanlış olur. Eksik ölçümler denetimde raporlanıyor. */
-        if(g.boy && cs.gpuMax && g.boy > cs.gpuMax) continue;
+        /* 21.09.2026: en az KART_PAY mm boşluk. 300 mm kart 300 mm sınırlı
+           kasaya "sığar" sayılıyordu — kablo/ön fan payı sıfır, 300 W'lık
+           kartın önünde hava boşluğu yok. */
+        if(g.boy && cs.gpuMax && g.boy + KART_PAY > cs.gpuMax) continue;
         const mb=pickBoard(c,budget,g,cs);
         if(!mb) continue;   // bu kasaya uyan anakart yok
         const psu=pickPsu(g,c);
@@ -1139,10 +1158,17 @@ function parcalariGetir(){
         koy(SSDS, grup('ssd').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
         koy(PSUS, koru(PSUS.slice(), grup('psu').map(x=>({id:kimlik(x), n:x.ad, w:x.watt||0, p:x.fiyat})),
           o=>o.id, ['pin8','k16']));
-        const radKoru = (eski, yeniler, anahtar) => koru(eski, yeniler, anahtar, ['rad']);
-        koy(COOLERS, radKoru(COOLERS.slice(),
+        /* Veritabanında henüz satırı olmayan kod parçası (ör. 21.09'da eklenen
+           çift kule) canlıda KAYBOLMASIN diye sona eklenir; fiyatı bot
+           dosyasından (fiyatlar.json) güncellenir. */
+        const kodSogutucu=COOLERS.slice();
+        const dbSogutucu=koru(kodSogutucu,
           grup('sogutucu').map(x=>({id:kimlik(x), n:x.ad, cap:x.sogutma_kap||0, p:x.fiyat})),
-          o=>o.id));
+          o=>o.id, ['rad','h','sinif']);
+        for(const k of kodSogutucu) if(!dbSogutucu.some(o=>o.id===k.id)){
+          const b=bf['sogutucu:'+k.id]; dbSogutucu.push(b&&b.fiyat>0?{...k,p:b.fiyat}:k);
+        }
+        koy(COOLERS, dbSogutucu);
         /* Anakartlar platforma göre gruplu; platformsuz satır yok sayılıyor
            çünkü uyumsuz bir anakart doğrudan çalışmayan sistem demek. */
         const ana=grup('anakart').filter(x=>x.plat);
@@ -1168,7 +1194,7 @@ function parcalariGetir(){
             const m=String(x.anahtar||'').match(/^kasa:(\d+)$/);
             const e=(m && eskiKasa[+m[1]]) || eskiKasa.find(o=>o.n===x.ad) || {};
             const k={n:x.ad, p:x.fiyat, upTo:(x.butce_ust==null?Infinity:x.butce_ust)};
-            for(const a of ['rad','gpuMax','formMax']) if(e[a]!=null) k[a]=e[a];
+            for(const a of ['rad','gpuMax','formMax','cpuH']) if(e[a]!=null) k[a]=e[a];
             return k;
           }));
         }

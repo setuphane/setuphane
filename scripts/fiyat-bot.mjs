@@ -90,8 +90,12 @@ const bugun = new Date().toISOString().slice(0, 10);
 const sonuc = { yazilacak: [], bekleyen: [], modelDegismeli: [], hata: [], ayni: 0 };
 
 for (const [anahtar, link] of Object.entries(ESLESME)) {
-  const eski = db[anahtar];
-  if (!eski) { sonuc.hata.push(`${anahtar}: veritabanında yok`); continue; }
+  /* Veritabanında satırı olmayan yeni kod parçası (ör. 21.09 çift kule):
+     site onu koddan ekliyor; bot fiyatını ilk kez frensiz yazar. */
+  const bd = botDosya.parcalar[anahtar];
+  const eski = db[anahtar] || (kodAdlari[anahtar]
+    ? { anahtar, ad: (bd && bd.ad) || kodAdlari[anahtar], fiyat: (bd && bd.fiyat) || 0 } : null);
+  if (!eski) { sonuc.hata.push(`${anahtar}: ne veritabanında ne kodda var`); continue; }
   let t;
   try { t = teklifleriOku(cek(link)); } catch (e) { sonuc.hata.push(`${anahtar}: sayfa alınamadı (${e.message.slice(0, 60)})`); continue; }
   await bekle(900);
@@ -105,7 +109,7 @@ for (const [anahtar, link] of Object.entries(ESLESME)) {
   }
   const yeni = Math.round(Math.min(...t.map(x => x.fiyat)));
   const kodAd = kodAdlari[anahtar];
-  const modelDegisti = !!kodAd && kodAd !== eski.ad;
+  const modelDegisti = (!!kodAd && kodAd !== eski.ad) || !eski.fiyat;
   if (yeni === eski.fiyat && !modelDegisti) { sonuc.ayni++; delete durum[anahtar]; continue; }
 
   /* Model bilinçli olarak değiştirildiyse eski fiyatla kıyas anlamsız:

@@ -1,4 +1,4 @@
-# Durum — 21.09.2026
+# Durum — 22.09.2026
 
 Çalışmaya devam eden herkes (ve yeni bir Claude oturumu) için özet.
 Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
@@ -20,6 +20,24 @@ Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
 Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitli
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+
+### 22.09.2026 — Denge kuralları: soğutucu sınıfı, kasa payı, soğutucu yüksekliği
+
+Kullanıcı: 142 bin TL'lik 9800X3D + 5070 Ti sisteminde 1.300 TL'lik tek kule
+dengesiz. İnceleyince kasa daha kötüydü: 300 mm kart 300 mm sınırlı M100A'da.
+- COOLERS `sinif` (stok/tek/cift/sivi) + `h`; **120 W+ işlemcide tek kule yok**.
+  Yeni: Thermalright Peerless Assassin 120 (çift kule, 157 mm, 2.714 TL, 6 satıcı;
+  daha ucuz "Dual" adlılar tek kule+çift fan ya da 90 mm fan — elendi)
+- **Kart ile kasa sınırı arasında en az 15 mm** (KART_PAY)
+- CASES `cpuH` (M100A 160, H3 Flow 170, 4500X 185 — üretici); soğutucu yüksekliği kontrolü
+- Denetimde bağımsız tablolarla `kart-kasa-pay`, `sogutucu-sinif`, `sogutucu-yukseklik`;
+  eski motorda 2.524 + 254 ihlal, yenide 0
+- Veritabanında satırı olmayan kod soğutucusu yükleyicide sona ekleniyor
+  (fiyatı fiyatlar.json'dan); bot da DB'de olmayan kod parçasını fiyatlıyor
+- RTX 5060 Ti: Zotac Twin Edge OC 2 satıcıya düştü -> Asus Dual OC 16GB
+  (40.595 TL, 10 satıcı, 229 mm, üretici 550 W)
+- Gün sonu: oyun FPS düşüşü 0; yayın 26 / tasarım 42 (güçlü işlemci artık çift
+  kule istediği için eşiklerde bilinçli ödünleşme)
 
 ### 21.09.2026 — Güç kaynağı: üretici önerisi + kablo uyumu (2.039 sistem)
 

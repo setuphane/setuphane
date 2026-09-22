@@ -41,7 +41,7 @@ const { buildSystem, PROFILES, cpuBrand } = kur;
 
 // ── Kurallar ───────────────────────────────────────────────────────────
 // Her kural bir sistem alir, sorun varsa metin doner.
-const URETICI_PSU = { '7600': 550, '5060': 550, '9060xt': 550, '5060ti': 600, '9070': 750,
+const URETICI_PSU = { '7600': 550, '5060': 550, '9060xt': 550, '5060ti': 550, '9070': 750,
   '5070': 650, '9070xt': 800, '5070ti': 750, '5080': 850, '5090': 1000 };
 const KART_KABLO = { '7600': { pin8: 1 }, '5060': { pin8: 1 }, '9060xt': { pin8: 1 }, '5060ti': { pin8: 1 },
   '9070': { pin8: 2 }, '9070xt': { pin8: 2 }, '5070': { pin8: 2, p16: true }, '5070ti': { pin8: 3, p16: true },
@@ -49,6 +49,14 @@ const KART_KABLO = { '7600': { pin8: 1 }, '5060': { pin8: 1 }, '9060xt': { pin8:
 // MSI resmi teknik sayfalari + Zalman satici verisi (21.09.2026)
 const PSU_KABLO = { '550': { pin8: 2, k16: 0 }, '650': { pin8: 2, k16: 0 }, '750': { pin8: 3, k16: 450 },
   '850': { pin8: 2, k16: 450 }, '1000': { pin8: 4, k16: 600 }, '1200': { pin8: 8, k16: 0 } };
+
+const SOGUTUCU_OLCU = { air: { sinif: 'tek', h: 148 }, cift: { sinif: 'cift', h: 157 },
+  aio360: { sinif: 'sivi' }, aio360p: { sinif: 'sivi' } };
+// cpuH: MSI / NZXT / Corsair teknik verisi; gpuMax: Epey (21.09.2026)
+const KASA_OLCU = {
+  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160 },
+  'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170 },
+  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185 } };
 
 const KURALLAR = [
   ['guc-kaynagi', b => {
@@ -76,6 +84,21 @@ const KURALLAR = [
     if (!k || !p) return `kablo verisi eksik: ${b.g.id} / ${b.psu.id}`;
     if (k.p16 && p.k16 >= b.g.tdp) return null;
     return p.pin8 >= k.pin8 ? null : `${b.psu.n}: ${p.pin8} adet 8-pin var, ${b.g.n} ${k.pin8} istiyor${k.p16 ? ' (yerel 16-pin yok/yetersiz)' : ''}`;
+  }],
+  // 21.09.2026 denge kurallari — BAGIMSIZ tablolar (ureticiler):
+  ['kart-kasa-pay', b => {
+    const max = KASA_OLCU[b.cs.n] && KASA_OLCU[b.cs.n].gpuMax;
+    if (!b.g.boy || !max) return null;
+    return b.g.boy + 15 > max ? `${b.g.n} ${b.g.boy} mm, ${b.cs.n} en fazla ${max} mm — 15 mm pay yok` : null;
+  }],
+  ['sogutucu-yukseklik', b => {
+    const h = SOGUTUCU_OLCU[b.cl.id] && SOGUTUCU_OLCU[b.cl.id].h, max = KASA_OLCU[b.cs.n] && KASA_OLCU[b.cs.n].cpuH;
+    if (b.cl.id !== 'stock' && !SOGUTUCU_OLCU[b.cl.id]) return `${b.cl.n}: denetim tablosunda yok`;
+    return h && max && h > max ? `${b.cl.n} ${h} mm, ${b.cs.n} en fazla ${max} mm` : null;
+  }],
+  ['sogutucu-sinif', b => {
+    const s = SOGUTUCU_OLCU[b.cl.id] ? SOGUTUCU_OLCU[b.cl.id].sinif : 'stok';
+    return b.c.tdp >= 120 && (s === 'tek' || s === 'stok') ? `${b.c.n} (${b.c.tdp} W) tek kule/kutu soğutucuyla` : null;
   }],
   ['radyator-kasa', b => {
     // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.
@@ -249,7 +272,7 @@ if (eksikBoy.length) {
   const OLCU = {
     GPUS: ['boy', 'r1440', 'r2160', 'psuMin', 'pin8', 'p16'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
     PSUS: ['pin8', 'k16'],
-    COOLERS: ['rad', 'cap'], CASES: ['rad', 'gpuMax', 'formMax'],
+    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH'],
   };
   const once = {
     GPUS: structuredClone(GPUS), CPUS: structuredClone(CPUS), RAMS: structuredClone(RAMS),
@@ -272,8 +295,8 @@ if (eksikBoy.length) {
   const bas = s.indexOf('const grup=k=>'), son = s.indexOf('const en=r.map', bas);
   if (bas < 0 || son < 0) { console.log('\n!! CANLI: yukleyici kaynakta bulunamadi — denetim guncellenmeli'); process.exitCode = 1; }
   else {
-    new Function('r', 'GPUS', 'CPUS', 'RAMS', 'SSDS', 'PSUS', 'COOLERS', 'CASES', 'BOARDS', s.slice(bas, son))
-      (r, GPUS, CPUS, RAMS, SSDS, PSUS, COOLERS, CASES, BOARDS);
+    new Function('r', 'bf', 'GPUS', 'CPUS', 'RAMS', 'SSDS', 'PSUS', 'COOLERS', 'CASES', 'BOARDS', s.slice(bas, son))
+      (r, {}, GPUS, CPUS, RAMS, SSDS, PSUS, COOLERS, CASES, BOARDS);
     const kayip = [];
     for (const [ad, alanlar] of Object.entries(OLCU))
       once[ad].forEach((o, i) => {

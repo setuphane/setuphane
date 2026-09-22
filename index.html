@@ -367,16 +367,16 @@ const GPUS = [{
   pin8: 1
 }, {
   id: '5060ti',
-  n: 'GeForce RTX 5060 Ti 16 GB (Zotac Twin Edge OC)',
+  n: 'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',
   b: 'NVIDIA',
   idx: 74,
   r1440: 0.99,
   r2160: 0.99,
   vram: 16,
   tdp: 180,
-  p: 35999,
-  boy: 221,
-  psuMin: 600,
+  p: 40595,
+  boy: 229,
+  psuMin: 550,
   pin8: 1
 }, {
   id: '9070',
@@ -752,18 +752,41 @@ const BOARDS = {
     ramHiz: 8800
   }]
 };
-const COOLERS = [{
+const COOLERS = [
+/* sinif: stok | tek (tek kule) | cift (çift kule) | sivi. h: yükseklik (mm),
+   kasanın cpuH sınırına bakılır. 21.09.2026: 120 W ve üstü işlemcide tek
+   kule YASAK (kullanıcı: 142 bin TL'lik 9800X3D sisteminde giriş seviyesi
+   tek kule dengesizdi). Tek kule oyunda yeter ama uzun yükte 85-90 °C ve
+   gürültü; çift kule farkı ~1.400 TL. cap: üretici üst değerinin %80'i
+   (tek kule 225->180, çift kule 265->212) — ikisi de aynı temkinle. */
+{
   id: 'stock',
   n: 'Kutudan çıkan soğutucu',
   cap: 65,
   rad: 0,
-  p: 0
+  p: 0,
+  sinif: 'stok'
 }, {
   id: 'air',
   n: 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)',
   cap: 180,
   rad: 0,
-  p: 1279
+  p: 1279,
+  sinif: 'tek',
+  h: 148
+},
+/* En ucuz gerçek çift kule + 120 mm fan, 3+ satıcı (Epey 21.09.2026: 2.714 TL,
+   6 satıcı). Daha ucuz "Dual" adlılar tek kule + çift fan (Ocypus A40 Dual)
+   ya da 90 mm fanlı (Peerless Assassin 90 SE) — elendi. 157 mm, 6 ısı borusu,
+   120-265 W (Thermalright). */
+{
+  id: 'cift',
+  n: 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)',
+  cap: 212,
+  rad: 0,
+  p: 2714,
+  sinif: 'cift',
+  h: 157
 },
 /* En ucuz 360'ları bilerek almıyoruz: isimsiz sıvı soğutucularda pompa
    arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
@@ -773,13 +796,15 @@ const COOLERS = [{
   n: '360 mm sıvı soğutma (Thermalright Frozen Magic 360 ARGB)',
   cap: 280,
   rad: 360,
-  p: 3517
+  p: 3517,
+  sinif: 'sivi'
 }, {
   id: 'aio360p',
   n: '360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)',
   cap: 300,
   rad: 360,
-  p: 4700
+  p: 4700,
+  sinif: 'sivi'
 }];
 const CASES = [
 /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
@@ -791,14 +816,16 @@ const CASES = [
   rad: 240,
   gpuMax: 300,
   formMax: 'mATX',
-  upTo: 35000
+  upTo: 35000,
+  cpuH: 160
 }, {
   n: 'Mesh ön panelli kasa (NZXT H3 Flow)',
   p: 3599,
   rad: 280,
   gpuMax: 352,
   formMax: 'mATX',
-  upTo: 70000
+  upTo: 70000,
+  cpuH: 170
 },
 /* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
   RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
@@ -809,7 +836,8 @@ const CASES = [
   rad: 360,
   gpuMax: 460,
   formMax: 'ATX',
-  upTo: Infinity
+  upTo: Infinity,
+  cpuH: 185
 }];
 const GAMES = [{
   id: 'valorant',
@@ -1038,17 +1066,21 @@ const pickPsu = (g, c) => enUcuzUygun(PSUS, p => psuYeter(g, c, p));
    kaliteli kasa/soğutucu" beklentisi ÇELİŞMEDEN bir arada yaşıyor. Aşağıdaki
    iki yardımcı yalnızca FİZİKSEL uyumu (radyatör-kasa, soğutma yeterliliği)
    kontrol ediyor — kademe SEÇİMİ artık kurDene()'nin skor döngüsünde. */
+const KART_PAY = 15; /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
 const radBoyu = k => k.rad != null ? k.rad : String(k.n).match(/\b(120|140|240|280|360|420)\s*mm\b/) ? +RegExp.$1 : 0;
 /* SERT KURAL — radyatör kasaya sığacak. Bunu bütçe bandının kasayla denk
    gelmesine bırakamayız; kasa değişirse site sessizce kurulamayacak bir
    sistem önermeye başlar. */
 const cSigar = (k, cs) => {
   const r = radBoyu(k);
+  /* SERT KURAL — hava soğutucunun yüksekliği kasanın sınırını geçemez
+     (cpuH: üretici teknik sayfaları). Ölçü yoksa uygulanmaz. */
+  if (k.h && cs && cs.cpuH && k.h > cs.cpuH) return false;
   return !r || cs && cs.rad != null && r <= cs.rad;
 };
 /* SERT KURAL — soğutucu işlemciyi gerçekten soğutabilecek kapasitede
    olmalı. Bu asla "kademe tercihi" değil, güvenlik alt sınırı. */
-const cYeter = (k, c) => k.cap >= c.tdp * 1.15;
+const cYeter = (k, c) => k.cap >= c.tdp * 1.15 && (c.tdp < 120 || k.sinif !== 'tek' && k.sinif !== 'stok');
 
 /* pick: {cpu:'AMD'|'Intel'|'', gpu:'NVIDIA'|'AMD'|''} — boş = fark etmez */
 function buildSystem(budget, prof, pick, game, res) {
@@ -1102,7 +1134,10 @@ function kurDene(budget, prof, pick, esikliMi, game, res) {
         /* SERT KURAL — kart kasaya sığacak. Uzunluğu ölçülmemiş kartta kural
            uygulanmıyor: uydurma bir boyla sistemi reddetmek de en az kabul
            etmek kadar yanlış olur. Eksik ölçümler denetimde raporlanıyor. */
-        if (g.boy && cs.gpuMax && g.boy > cs.gpuMax) continue;
+        /* 21.09.2026: en az KART_PAY mm boşluk. 300 mm kart 300 mm sınırlı
+           kasaya "sığar" sayılıyordu — kablo/ön fan payı sıfır, 300 W'lık
+           kartın önünde hava boşluğu yok. */
+        if (g.boy && cs.gpuMax && g.boy + KART_PAY > cs.gpuMax) continue;
         const mb = pickBoard(c, budget, g, cs);
         if (!mb) continue; // bu kasaya uyan anakart yok
         const psu = pickPsu(g, c);
@@ -2383,13 +2418,24 @@ function parcalariGetir() {
         w: x.watt || 0,
         p: x.fiyat
       })), o => o.id, ['pin8', 'k16']));
-      const radKoru = (eski, yeniler, anahtar) => koru(eski, yeniler, anahtar, ['rad']);
-      koy(COOLERS, radKoru(COOLERS.slice(), grup('sogutucu').map(x => ({
+      /* Veritabanında henüz satırı olmayan kod parçası (ör. 21.09'da eklenen
+         çift kule) canlıda KAYBOLMASIN diye sona eklenir; fiyatı bot
+         dosyasından (fiyatlar.json) güncellenir. */
+      const kodSogutucu = COOLERS.slice();
+      const dbSogutucu = koru(kodSogutucu, grup('sogutucu').map(x => ({
         id: kimlik(x),
         n: x.ad,
         cap: x.sogutma_kap || 0,
         p: x.fiyat
-      })), o => o.id));
+      })), o => o.id, ['rad', 'h', 'sinif']);
+      for (const k of kodSogutucu) if (!dbSogutucu.some(o => o.id === k.id)) {
+        const b = bf['sogutucu:' + k.id];
+        dbSogutucu.push(b && b.fiyat > 0 ? {
+          ...k,
+          p: b.fiyat
+        } : k);
+      }
+      koy(COOLERS, dbSogutucu);
       /* Anakartlar platforma göre gruplu; platformsuz satır yok sayılıyor
          çünkü uyumsuz bir anakart doğrudan çalışmayan sistem demek. */
       const ana = grup('anakart').filter(x => x.plat);
@@ -2422,7 +2468,7 @@ function parcalariGetir() {
             p: x.fiyat,
             upTo: x.butce_ust == null ? Infinity : x.butce_ust
           };
-          for (const a of ['rad', 'gpuMax', 'formMax']) if (e[a] != null) k[a] = e[a];
+          for (const a of ['rad', 'gpuMax', 'formMax', 'cpuH']) if (e[a] != null) k[a] = e[a];
           return k;
         }));
       }
@@ -4285,7 +4331,7 @@ function parcaNeden(sys) {
    araması 5070 kartlarını da getiriyordu. Eşleme scripts/epey-eslesme.json,
    derleme sırasında buraya gömülür (scripts/build.mjs). Eşlemesi olmayan
    parça (panelden yeni eklenmiş) için Akakçe araması yedek olarak kalır. */
-const EPEY_LINK = {"gpu:7600":"https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html","gpu:5060":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-ventus-2x-oc-white.html","gpu:9060xt":"https://www.epey.com/ekran-karti/asus-dual-radeon-rx-9060-xt-16gb.html","gpu:5060ti":"https://www.epey.com/ekran-karti/zotac-gaming-geforce-rtx-5060-ti-twin-edge-oc-16gb.html","gpu:9070":"https://www.epey.com/ekran-karti/gigabyte-radeon-rx-9070-gaming-oc.html","gpu:5070":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-argb-epic-x-triple-oc.html","gpu:9070xt":"https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html","gpu:5070ti":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-ti-triple-oc.html","gpu:5080":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5080-16g-shadow-3x-oc.html","gpu:5090":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html","cpu:8500g":"https://www.epey.com/islemci/amd-ryzen-5-8500g.html","cpu:7500f":"https://www.epey.com/islemci/amd-ryzen-5-7500f.html","cpu:7600":"https://www.epey.com/islemci/amd-ryzen-5-7600.html","cpu:245k":"https://www.epey.com/islemci/intel-core-ultra-5-245k.html","cpu:9600x":"https://www.epey.com/islemci/amd-ryzen-5-9600x.html","cpu:265k":"https://www.epey.com/islemci/intel-core-ultra-7-265k.html","cpu:9700x":"https://www.epey.com/islemci/amd-ryzen-7-9700x.html","cpu:285k":"https://www.epey.com/islemci/intel-core-ultra-9-285k.html","cpu:7800x3d":"https://www.epey.com/islemci/amd-ryzen-7-7800x3d.html","cpu:9950x3d":"https://www.epey.com/islemci/amd-ryzen-9-9950x3d.html","cpu:9800x3d":"https://www.epey.com/islemci/amd-ryzen-7-9800x3d.html","ram:16":"https://www.epey.com/bellek-ram/xpg-lancer-blade-ax5u6000c4816g-slabbk.html","ram:32":"https://www.epey.com/bellek-ram/apacer-panther-ah5u32g60c6227baa-2.html","ram:64":"https://www.epey.com/bellek-ram/g-skill-ripjaws-s5-f5-6000j3636f32gx2-rs5k.html","ssd:500":"https://www.epey.com/sabit-disk/wd-blue-sn5100-500-gb.html","ssd:1t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-1-tb.html","ssd:2t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-2-tb.html","psu:550":"https://www.epey.com/power-supply-psu/msi-mag-a550bnl-550w.html","psu:650":"https://www.epey.com/power-supply-psu/msi-mag-a650bnl-650-w.html","psu:750":"https://www.epey.com/power-supply-psu/msi-mag-a750bn-750w.html","psu:850":"https://www.epey.com/power-supply-psu/msi-mag-a850gn-850w.html","psu:1000":"https://www.epey.com/power-supply-psu/msi-mag-a1000gl-1000w.html","psu:1200":"https://www.epey.com/power-supply-psu/zalman-watttera-zm1200-ebtii-1200w.html","sogutucu:air":"https://www.epey.com/islemci-sogutucu/thermalright-assassin-x-120-refined-se-argb.html","sogutucu:aio360":"https://www.epey.com/islemci-sogutucu/thermalright-frozen-magic-360-argb.html","sogutucu:aio360p":"https://www.epey.com/islemci-sogutucu/msi-mag-coreliquid-a13-360.html","anakart:AM5-0":"https://www.epey.com/anakart/msi-pro-a620am-g-evo-wifi.html","anakart:AM5-1":"https://www.epey.com/anakart/gigabyte-b650m-gaming-wifi6e.html","anakart:AM5-2":"https://www.epey.com/anakart/asus-b650e-max-gaming-wifi-w.html","anakart:LGA1851-0":"https://www.epey.com/anakart/msi-pro-b860m-e.html","anakart:LGA1851-1":"https://www.epey.com/anakart/msi-pro-z890-s-wifi6e.html","kasa:0":"https://www.epey.com/bilgisayar-kasasi/msi-mag-forge-m100a.html","kasa:1":"https://www.epey.com/bilgisayar-kasasi/nzxt-h3-flow-cc-h31fw-01.html","kasa:2":"https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html"};
+const EPEY_LINK = {"gpu:7600":"https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html","gpu:5060":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-ventus-2x-oc-white.html","gpu:9060xt":"https://www.epey.com/ekran-karti/asus-dual-radeon-rx-9060-xt-16gb.html","gpu:5060ti":"https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-ti-oc-16gb.html","gpu:9070":"https://www.epey.com/ekran-karti/gigabyte-radeon-rx-9070-gaming-oc.html","gpu:5070":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-argb-epic-x-triple-oc.html","gpu:9070xt":"https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html","gpu:5070ti":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-ti-triple-oc.html","gpu:5080":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5080-16g-shadow-3x-oc.html","gpu:5090":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html","cpu:8500g":"https://www.epey.com/islemci/amd-ryzen-5-8500g.html","cpu:7500f":"https://www.epey.com/islemci/amd-ryzen-5-7500f.html","cpu:7600":"https://www.epey.com/islemci/amd-ryzen-5-7600.html","cpu:245k":"https://www.epey.com/islemci/intel-core-ultra-5-245k.html","cpu:9600x":"https://www.epey.com/islemci/amd-ryzen-5-9600x.html","cpu:265k":"https://www.epey.com/islemci/intel-core-ultra-7-265k.html","cpu:9700x":"https://www.epey.com/islemci/amd-ryzen-7-9700x.html","cpu:285k":"https://www.epey.com/islemci/intel-core-ultra-9-285k.html","cpu:7800x3d":"https://www.epey.com/islemci/amd-ryzen-7-7800x3d.html","cpu:9950x3d":"https://www.epey.com/islemci/amd-ryzen-9-9950x3d.html","cpu:9800x3d":"https://www.epey.com/islemci/amd-ryzen-7-9800x3d.html","ram:16":"https://www.epey.com/bellek-ram/xpg-lancer-blade-ax5u6000c4816g-slabbk.html","ram:32":"https://www.epey.com/bellek-ram/apacer-panther-ah5u32g60c6227baa-2.html","ram:64":"https://www.epey.com/bellek-ram/g-skill-ripjaws-s5-f5-6000j3636f32gx2-rs5k.html","ssd:500":"https://www.epey.com/sabit-disk/wd-blue-sn5100-500-gb.html","ssd:1t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-1-tb.html","ssd:2t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-2-tb.html","psu:550":"https://www.epey.com/power-supply-psu/msi-mag-a550bnl-550w.html","psu:650":"https://www.epey.com/power-supply-psu/msi-mag-a650bnl-650-w.html","psu:750":"https://www.epey.com/power-supply-psu/msi-mag-a750bn-750w.html","psu:850":"https://www.epey.com/power-supply-psu/msi-mag-a850gn-850w.html","psu:1000":"https://www.epey.com/power-supply-psu/msi-mag-a1000gl-1000w.html","psu:1200":"https://www.epey.com/power-supply-psu/zalman-watttera-zm1200-ebtii-1200w.html","sogutucu:air":"https://www.epey.com/islemci-sogutucu/thermalright-assassin-x-120-refined-se-argb.html","sogutucu:cift":"https://www.epey.com/islemci-sogutucu/thermalright-peerless-assassin-120.html","sogutucu:aio360":"https://www.epey.com/islemci-sogutucu/thermalright-frozen-magic-360-argb.html","sogutucu:aio360p":"https://www.epey.com/islemci-sogutucu/msi-mag-coreliquid-a13-360.html","anakart:AM5-0":"https://www.epey.com/anakart/msi-pro-a620am-g-evo-wifi.html","anakart:AM5-1":"https://www.epey.com/anakart/gigabyte-b650m-gaming-wifi6e.html","anakart:AM5-2":"https://www.epey.com/anakart/asus-b650e-max-gaming-wifi-w.html","anakart:LGA1851-0":"https://www.epey.com/anakart/msi-pro-b860m-e.html","anakart:LGA1851-1":"https://www.epey.com/anakart/msi-pro-z890-s-wifi6e.html","kasa:0":"https://www.epey.com/bilgisayar-kasasi/msi-mag-forge-m100a.html","kasa:1":"https://www.epey.com/bilgisayar-kasasi/nzxt-h3-flow-cc-h31fw-01.html","kasa:2":"https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html"};
 function parcaAnahtari(k, sys) {
   switch (k) {
     case 'gpu':
