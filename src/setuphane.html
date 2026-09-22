@@ -324,7 +324,9 @@ const GPUS=[
  {id:'5070',   n:'GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)', b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:47393, boy:300, psuMin:650,  pin8:2, p16:true},
  {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)', b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:41570, boy:325, psuMin:800,  pin8:2},
  {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (PNY Triple OC)',            b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:58093, boy:300, psuMin:750,  pin8:3, p16:true},
- {id:'5080',   n:'GeForce RTX 5080 16 GB (MSI Shadow 3X OC)',       b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:83105, boy:303, psuMin:850,  pin8:3, p16:true},
+ /* 22.09.2026: Gigabyte Windforce OC SFF 94.093 TL / 5 satıcı — MSI Shadow'dan
+    (100.000) ucuz, kural gereği değişti. 304 mm, 360 W, üretici 850 W, 16-pin (Epey). */
+ {id:'5080',   n:'GeForce RTX 5080 16 GB (Gigabyte Windforce OC SFF)', b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:94093, boy:304, psuMin:850,  pin8:3, p16:true},
  {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',       b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:318181, boy:325, psuMin:1000, pin8:4, p16:true},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
@@ -391,11 +393,20 @@ const RAMS=[
     olduğu için elendi (çift kanal kaybı). Kit bilgisi ürün sayfasından. */
  {id:'32',n:'32 GB DDR5-6000 (2×16) (Apacer Panther)',gb:32,tip:'DDR5',hiz:6000,p:28109},
  {id:'64',n:'64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',   gb:64,tip:'DDR5',hiz:6000,p:53939},
+ /* 22.09.2026 üst bant: video kurgu / 3B iş için 96 GB. 3+ satıcılı en ucuz
+    2×48 DDR5 kit (Epey: 74.689 TL, 5 satıcı). 5600 MT/s — ramS hız çarpanı
+    bunu zaten hesaba katıyor. Oyun profilinde RAM puanı 92'de kesildiği için
+    oyun sistemine asla girmez. */
+ {id:'96',n:'96 GB DDR5-5600 (2×48) (Crucial Pro)',          gb:96,tip:'DDR5',hiz:5600,p:74689},
 ];
 const SSDS=[
  {id:'500',n:'500 GB NVMe Gen4 (WD Blue SN5100)', gb:500, p:4945},
  {id:'1t', n:'1 TB NVMe Gen4 (WD Blue SN5100)',   gb:1000,p:8281},
  {id:'2t', n:'2 TB NVMe Gen4 (WD Blue SN5100)',   gb:2000,p:16430},
+ /* 22.09.2026 üst bant: 3+ satıcılı en ucuz 4 TB NVMe (WD Blue SN5000, 35.953 TL,
+    7 satıcı; daha ucuz 4 TB'lar HDD). Puanı 2 TB'tan çok az yüksek: yalnızca
+    bütçe arttığında seçilir, kart/işlemciden asla kesmez. */
+ {id:'4t', n:'4 TB NVMe Gen4 (WD Blue SN5000)',   gb:4000,p:35953},
 ];
 const PSUS=[
  /* pin8: PCIe 6+2 kablo sayısı, k16: yerel 16-pin kablonun taşıdığı güç (W,
@@ -481,9 +492,9 @@ const RES=[
    kapasitenin yanında ikincil, ama sıfır değil.
    Yardımcı bilerek satır içinde: denetim aracı kodu buradan itibaren
    alıyor, dışarıda tanımlanan yardımcı denetimde tanımsız kalıyordu. */
-const ramS = r => (r.gb>=64?100 : r.gb>=32?92 : 68) *
+const ramS = r => (r.gb>=96?104 : r.gb>=64?100 : r.gb>=32?92 : 68) *
   (r.hiz ? Math.max(.92, Math.min(1.06, 1 + (r.hiz-6000)/40000)) : 1);
-const ssdS = s => s.gb>=2000?100 : s.gb>=1000?90 : 66;
+const ssdS = s => s.gb>=4000?104 : s.gb>=2000?100 : s.gb>=1000?90 : 66;
 
 /* Denge cezası — oyun odaklı profillerde ZORUNLU.
    Ceza olmadan puanlamadaki tekil işlemci terimi, ekran kartının asla
@@ -542,7 +553,9 @@ const PROFILES=[
      Esik oyundakinden yuksek, cunku render islemciye gercekten yaslanir. */
   score:(g,c,r,s)=> (.32*g.idx + .44*c.m + .16*ramS(r) + .08*ssdS(s)) * balPenalty(g,c,2.2)},
  {id:'ofis',n:'Ofis, ders, internet',sub:'Hızlı açılsın, takılmasın',needGpu:false,minRam:16,minSsd:500,
-  score:(g,c,r,s)=> .42*c.m + .28*ramS(r) + .30*ssdS(s)},
+  /* 22.09.2026: ofis/ders işine 32 GB üstü bellek ve 2 TB üstü disk fayda
+     etmez; tavan konmazsa 96 GB + 4 TB ofis bilgisayarı öneriyordu. */
+  score:(g,c,r,s)=> .42*c.m + .28*Math.min(92,ramS(r)) + .30*Math.min(100,ssdS(s))},
 ];
 
 /* ═══════════════════ hesap motoru ═══════════════════ */
@@ -629,7 +642,42 @@ const cYeter  = (k,c) => k.cap >= c.tdp*1.15 && (c.tdp<120 || (k.sinif!=='tek' &
 function buildSystem(budget,prof,pick,game,res){
   /* Once kaliteli esiklerle dene, sonuc cikmazsa esikleri kaldirip tekrar
      dene. Kural yuzunden ziyaretciye "sistem kurulamadi" demiyoruz. */
-  return kurDene(budget,prof,pick,true,game,res) || kurDene(budget,prof,pick,false,game,res);
+  const s = kurDene(budget,prof,pick,true,game,res) || kurDene(budget,prof,pick,false,game,res);
+  return yukseltmeyeHazirla(s,budget,pick||{cpu:'',gpu:''});
+}
+/* 22.09.2026 — ÜST BANT. RTX 5080 ile 5090 arasında piyasada oyun kartı yok;
+   175-400 bin arası bütçenin büyük kısmı performansa dönüşemiyor. Bütçenin en
+   az %10'u boşta kalıyorsa güç kaynağı (ve gerekirse kasa) BİR ÜST KARTI da
+   taşıyacak şekilde seçilir: kart yükseltirken ikinci kez güç kaynağı/kasa
+   alınmaz. Kart, işlemci ve diğer parçalar DEĞİŞMEZ; yeni seçimler aynı sert
+   kurallardan (psuYeter, kasa payı, cSigar, anakart formu) geçer. */
+function yukseltmeyeHazirla(s,budget,pick){
+  if(!s || s.g.id==='igpu' || budget-s.total < budget*0.10) return s;
+  const ust=GPUS.filter(x=>x.id!=='igpu' && x.idx>s.g.idx && (!pick.gpu||x.b===pick.gpu))
+    .sort((a,b)=>a.idx-b.idx)[0];
+  if(!ust) return s;
+  const psu = psuYeter(ust,s.c,s.psu) ? s.psu
+    : PSUS.filter(p=>psuYeter(ust,s.c,p) && psuYeter(s.g,s.c,p)).sort((a,b)=>a.p-b.p)[0];
+  if(!psu) return s;
+  const kasaTutar=k=> (!ust.boy || !k.gpuMax || ust.boy+KART_PAY<=k.gpuMax)
+    && (!s.g.boy || !k.gpuMax || s.g.boy+KART_PAY<=k.gpuMax)
+    && (!s.mb.form || !k.formMax || ({ITX:1,mATX:2,ATX:3})[s.mb.form]<=({ITX:1,mATX:2,ATX:3})[k.formMax])
+    && cSigar(s.cl,k);
+  const cs = kasaTutar(s.cs) ? s.cs : CASES.filter(kasaTutar).sort((a,b)=>a.p-b.p)[0];
+  if(!cs) return s;
+  const total = s.total - s.psu.p + psu.p - s.cs.p + cs.p;
+  if(total > budget) return s;
+  return {...s, psu, cs, total, hazir:ust};
+}
+/* Bir üst ekran kartının seçildiği en düşük bütçe (ziyaretçiye "bu bütçede daha
+   fazla FPS veren kart yok, üst kademe şuradan başlıyor" demek için). */
+function ustKademeButce(sys,prof,pick,game,res){
+  if(!sys || sys.g.id==='igpu') return null;
+  const ok=b=>{ const x=buildSystem(b,prof,pick,game,res); return x && x.g.idx>sys.g.idx; };
+  if(!ok(BUD_MAX)) return null;
+  let alt=sys.total, ust=BUD_MAX;
+  while(ust-alt>2500){ const o=Math.round((alt+ust)/2); if(ok(o)) ust=o; else alt=o; }
+  return ust;
 }
 function kurDene(budget,prof,pick,esikliMi,game,res){
   pick = pick || {cpu:'',gpu:''};
@@ -1153,22 +1201,30 @@ function parcalariGetir(){
         koy(CPUS, koru(CPUS.slice(), grup('cpu').map(x=>({id:kimlik(x), n:x.ad, plat:x.plat,
           g:x.oyun||0, m:x.coklu_is||0, tdp:x.tdp||0, p:x.fiyat, ig:!!x.dahili_grafik})),
           o=>o.id, ['x4']));
-        koy(RAMS, koru(RAMS.slice(), grup('ram').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})),
-          o=>o.id, ['tip','hiz']));
-        koy(SSDS, grup('ssd').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})));
+        /* Veritabanında henüz satırı olmayan kod parçası (ör. 22.09'da eklenen
+           96 GB RAM, 4 TB SSD, 21.09'daki çift kule) canlıda KAYBOLMASIN diye
+           eklenir; fiyatı bot dosyasından (fiyatlar.json) alınır. Sıra kodla
+           aynı kalsın diye (dizinle eşleşen ölçüler bozulmasın) kapasiteye
+           göre sıralanır. */
+        const eksikEkle=(kod,db,on,sirala)=>{
+          for(const k of kod) if(!db.some(o=>o.id===k.id)){
+            const b=bf[on+':'+k.id]; db.push(b&&b.fiyat>0?{...k,p:b.fiyat}:k);
+          }
+          return sirala ? db.sort(sirala) : db;
+        };
+        const kodRam=RAMS.slice(), kodSsd=SSDS.slice();
+        koy(RAMS, eksikEkle(kodRam, koru(kodRam, grup('ram').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})),
+          o=>o.id, ['tip','hiz']), 'ram', (a,b)=>a.gb-b.gb));
+        koy(SSDS, eksikEkle(kodSsd, grup('ssd').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})), 'ssd', (a,b)=>a.gb-b.gb));
         koy(PSUS, koru(PSUS.slice(), grup('psu').map(x=>({id:kimlik(x), n:x.ad, w:x.watt||0, p:x.fiyat})),
           o=>o.id, ['pin8','k16']));
         /* Veritabanında henüz satırı olmayan kod parçası (ör. 21.09'da eklenen
            çift kule) canlıda KAYBOLMASIN diye sona eklenir; fiyatı bot
            dosyasından (fiyatlar.json) güncellenir. */
         const kodSogutucu=COOLERS.slice();
-        const dbSogutucu=koru(kodSogutucu,
+        koy(COOLERS, eksikEkle(kodSogutucu, koru(kodSogutucu,
           grup('sogutucu').map(x=>({id:kimlik(x), n:x.ad, cap:x.sogutma_kap||0, p:x.fiyat})),
-          o=>o.id, ['rad','h','sinif']);
-        for(const k of kodSogutucu) if(!dbSogutucu.some(o=>o.id===k.id)){
-          const b=bf['sogutucu:'+k.id]; dbSogutucu.push(b&&b.fiyat>0?{...k,p:b.fiyat}:k);
-        }
-        koy(COOLERS, dbSogutucu);
+          o=>o.id, ['rad','h','sinif']), 'sogutucu'));
         /* Anakartlar platforma göre gruplu; platformsuz satır yok sayılıyor
            çünkü uyumsuz bir anakart doğrudan çalışmayan sistem demek. */
         const ana=grup('anakart').filter(x=>x.plat);
@@ -2637,6 +2693,8 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
     ['case','Kasa',sys.cs.n,sys.cs.p],
   ] : [];
   const neden = sys ? parcaNeden(sys) : {};
+  const ustButce = useMemo(()=> (sys && budget-sys.total>=budget*0.10) ? ustKademeButce(sys,prof,pick,game,res) : null,
+    [sys,budget,prof,pick,game,res]);
 
   return (
         <Card className="mt-6 p-5 sm:p-9">
@@ -2691,7 +2749,16 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                 {budget-sys.total>=3000 && (
                   <p className="mb-7 text-[.88rem] text-dim leading-relaxed max-w-[52ch]">
                     Bütçenden <span className="num text-cy">{fmt(budget-sys.total)}</span> kullanılmadı —
-                    bu parayı harcamak performansı artırmıyor. Cebinde kalsın, ya da bir üst kademe için biriktir.
+                    bu parayı harcamak performansı artırmıyor.
+                    {ustButce ? <> Daha fazla {prof.needGpu?'FPS':'performans'} veren bir üst kademe sistem <span className="num text-cy">{fmt(ustButce)}</span>’den başlıyor.</> : null}
+                    {' '}Cebinde kalsın, ya da bir üst kademe için biriktir.
+                  </p>
+                )}
+                {sys.hazir && (
+                  <p className="mb-7 text-[.85rem] leading-relaxed max-w-[52ch] border-l-2 border-cy pl-3 text-ink/85">
+                    <span className="text-cy">Yükseltmeye hazır:</span> güç kaynağı ve kasa, ileride
+                    {' '}<span className="text-ink">{sys.hazir.n}</span> takabileceğin şekilde seçildi —
+                    kartı değiştirirken ikinci kez güç kaynağı almazsın.
                   </p>
                 )}
                 <div className="flex items-baseline justify-between mb-5 gap-4">

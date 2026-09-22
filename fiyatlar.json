@@ -46,9 +46,9 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "cpu:7600": {
-   "fiyat": 6600,
+   "fiyat": 7243,
    "ad": "Ryzen 5 7600",
-   "tarih": "2026-09-22T06:46:43.055Z"
+   "tarih": "2026-09-22T07:32:31.519Z"
   },
   "cpu:245k": {
    "fiyat": 10999,
@@ -191,9 +191,9 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "gpu:5080": {
-   "fiyat": 100000,
-   "ad": "GeForce RTX 5080 16 GB (MSI Shadow 3X OC)",
-   "tarih": "2026-09-21T13:38:39.593Z"
+   "fiyat": 94879,
+   "ad": "GeForce RTX 5080 16 GB (Gigabyte Windforce OC SFF)",
+   "tarih": "2026-09-22T07:32:31.519Z"
   },
   "psu:550": {
    "fiyat": 2020,
@@ -204,7 +204,17 @@
    "fiyat": 2714,
    "ad": "Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)",
    "tarih": "2026-09-22T06:49:07.968Z"
+  },
+  "ram:96": {
+   "fiyat": 72800,
+   "ad": "96 GB DDR5-5600 (2×48) (Crucial Pro)",
+   "tarih": "2026-09-22T07:32:31.519Z"
+  },
+  "ssd:4t": {
+   "fiyat": 36398,
+   "ad": "4 TB NVMe Gen4 (WD Blue SN5000)",
+   "tarih": "2026-09-22T07:32:31.519Z"
   }
  },
- "guncelleme": "2026-09-22T07:01:03.743Z"
+ "guncelleme": "2026-09-22T07:32:31.519Z"
 }

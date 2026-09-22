@@ -21,6 +21,23 @@ Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitl
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
 
+### 22.09.2026 — Üst bant (200-500 bin)
+
+Gerçek: RTX 5080 ile 5090 arasında piyasada oyun kartı YOK (Epey 100-320 bin
+aralığında 3+ satıcılı tek oyun kartı ailesi 5080). Oyun sistemi 175 binde
+tıkanıyor, sonraki adım ~400 bin. Bant, performans uydurmadan doldurildi:
+- 4 TB NVMe (WD Blue SN5000, 7 satıcı), 96 GB 2×48 DDR5 (Crucial Pro, 5 satıcı);
+  ssdS/ramS'e küçük üst puan — yalnızca artan bütçede seçilir
+- `yukseltmeyeHazirla`: bütçenin ≥%10'u boştaysa güç kaynağı + kasa bir üst
+  kartı da taşıyacak şekilde seçilir (sys.hazir); denetimde `yukseltmeye-hazir`
+- "Kullanılmadı" mesajı üst kademenin başladığı bütçeyi söylüyor (ustKademeButce)
+- Ofis profiline RAM 32 GB / disk 2 TB puan tavanı (yoksa 96 GB + 4 TB ofis PC'si)
+- RTX 5080: MSI Shadow -> Gigabyte Windforce OC SFF (94k, 5 satıcı, 304 mm, 850 W)
+- Yükleyici DB'de satırı olmayan kod parçalarını (RAM/SSD/soğutucu) geri ekliyor;
+  denetim bunu `DBDE_YOK` ile sınıyor (eklemese 6 ölçü kaybı yakalanıyor)
+- Sonuç: oyun 200k→198k, 250-350k→208k (5090'a hazır); yayın/tasarım
+  250k→247k, 300-350k→269k. Oyun FPS düşüşü 0.
+
 ### 22.09.2026 — Denge kuralları: soğutucu sınıfı, kasa payı, soğutucu yüksekliği
 
 Kullanıcı: 142 bin TL'lik 9800X3D + 5070 Ti sisteminde 1.300 TL'lik tek kule

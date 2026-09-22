@@ -100,6 +100,18 @@ const KURALLAR = [
     const s = SOGUTUCU_OLCU[b.cl.id] ? SOGUTUCU_OLCU[b.cl.id].sinif : 'stok';
     return b.c.tdp >= 120 && (s === 'tek' || s === 'stok') ? `${b.c.n} (${b.c.tdp} W) tek kule/kutu soğutucuyla` : null;
   }],
+  // 'Yukseltmeye hazir' iddiasi dogru olmali: guc kaynagi ve kasa o ust karti
+  // gercekten tasiyabilmeli (bagimsiz tablolarla).
+  ['yukseltmeye-hazir', b => {
+    if (!b.hazir) return null;
+    const min = URETICI_PSU[b.hazir.id], k = KART_KABLO[b.hazir.id], p = PSU_KABLO[b.psu.id];
+    const max = KASA_OLCU[b.cs.n] && KASA_OLCU[b.cs.n].gpuMax;
+    if (!min || !k || !p) return `${b.hazir.n}: denetim tablosunda yok`;
+    if (b.psu.w < min) return `hazir denilen ${b.hazir.n} icin ${b.psu.w} W yetmez (${min} W)`;
+    if (!(k.p16 && p.k16 >= b.hazir.tdp) && p.pin8 < k.pin8) return `hazir denilen ${b.hazir.n} icin kablo yetmez`;
+    if (b.hazir.boy && max && b.hazir.boy + 15 > max) return `hazir denilen ${b.hazir.n} kasaya sigmaz`;
+    return null;
+  }],
   ['radyator-kasa', b => {
     // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.
     // Bunu butce bandinin kasayla denk gelmesine birakamayiz.
@@ -281,7 +293,11 @@ if (eksikBoy.length) {
   };
   // Veritabani satirlari: yalnizca tabloda gercekten var olan kolonlar.
   const r = []; let sira = 0;
-  const ekle = o => r.push({ sira: (sira += 10), guncelleme: '2026-01-01', ...o });
+  // Canli veritabaninda HENUZ SATIRI OLMAYAN kod parcalari (panelden/SQL ile
+  // eklenmemis). Yukleyici bunlari koddan geri eklemeli; eklemezse canlida
+  // parca kaybolur. Burada bilerek disarida birakiliyor ki o yol sinansin.
+  const DBDE_YOK = new Set(['sogutucu:cift', 'ram:96', 'ssd:4t']);
+  const ekle = o => { if (!DBDE_YOK.has(o.anahtar)) r.push({ sira: (sira += 10), guncelleme: '2026-01-01', ...o }); };
   GPUS.forEach(g => ekle({ anahtar: 'gpu:' + g.id, kat: 'gpu', ad: g.n, marka: g.b, fiyat: g.p, idx: g.idx, vram: g.vram, tdp: g.tdp }));
   CPUS.forEach(c => ekle({ anahtar: 'cpu:' + c.id, kat: 'cpu', ad: c.n, fiyat: c.p, plat: c.plat, oyun: c.g, coklu_is: c.m, tdp: c.tdp, dahili_grafik: c.ig }));
   RAMS.forEach(x => ekle({ anahtar: 'ram:' + x.id, kat: 'ram', ad: x.n, fiyat: x.p, kapasite: x.gb }));
@@ -300,7 +316,8 @@ if (eksikBoy.length) {
     const kayip = [];
     for (const [ad, alanlar] of Object.entries(OLCU))
       once[ad].forEach((o, i) => {
-        const y = { GPUS, CPUS, RAMS, COOLERS, CASES, PSUS }[ad][i];
+        const dizi = { GPUS, CPUS, RAMS, COOLERS, CASES, PSUS }[ad];
+        const y = (o.id != null && dizi.find(x => x.id === o.id)) || (o.id == null && dizi[i]) || null;
         for (const a of alanlar) if (o[a] != null && (!y || y[a] !== o[a])) kayip.push(`${ad} ${o.n || o.id}: ${a} ${o[a]} -> ${y ? y[a] : 'YOK'}`);
       });
     for (const pl of Object.keys(once.BOARDS)) once.BOARDS[pl].forEach((o, i) => {
