@@ -21,6 +21,19 @@ Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitl
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
 
+### 22.09.2026 — Hazır sistemlerden katalog genişletme
+
+İtopya+İncehesap 913 paketinde sık olup bizde olmayanlar tarandı. YALNIZCA
+TechPowerUp ölçümü olanlar eklendi (aynı ölçeğe köprülenip mevcut değerlerle
+±2 tutarlılık doğrulandı): RTX 5050 (idx 51), Core Ultra 5 250K/250KF Plus
+(g101 m114), Core Ultra 7 270K Plus (g104 m132), 245KF (245K'nın grafiksiz
+ikizi). EKLENMEDİ: 225F (hazır sistemlerin 1 numarası ama TPU ölçümü yok),
+7500X3D, 9900X3D, RX 9060 — ölçüm bulunursa eklenecek. Anakart eklenmedi
+(H810 yalnız 65 W işlemciyle anlamlı; B850/X870 değer katmıyor). LGA1700
+(12700F, 14700K) bilinçli dışarıda — ölü soket. Yükleyici DB'de olmayan
+kart/işlemcileri de koddan ekliyor (DBDE_YOK). Yayın/tasarım FPS düşüşü
+66 -> 46, oyun 0.
+
 ### 22.09.2026 — Üst bant (200-500 bin)
 
 Gerçek: RTX 5080 ile 5090 arasında piyasada oyun kartı YOK (Epey 100-320 bin

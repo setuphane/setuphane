@@ -45,5 +45,10 @@
   "anakart:LGA1851-1": "https://www.epey.com/anakart/msi-pro-z890-s-wifi6e.html",
   "kasa:0": "https://www.epey.com/bilgisayar-kasasi/msi-mag-forge-m100a.html",
   "kasa:1": "https://www.epey.com/bilgisayar-kasasi/nzxt-h3-flow-cc-h31fw-01.html",
-  "kasa:2": "https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html"
+  "kasa:2": "https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html",
+  "gpu:5050": "https://www.epey.com/ekran-karti/galax-geforce-rtx-5050-1-click-oc-v2.html",
+  "cpu:245kf": "https://www.epey.com/islemci/intel-core-ultra-5-245kf.html",
+  "cpu:250kf": "https://www.epey.com/islemci/intel-core-ultra-5-250kf-plus.html",
+  "cpu:250k": "https://www.epey.com/islemci/intel-core-ultra-5-250k-plus.html",
+  "cpu:270k": "https://www.epey.com/islemci/intel-core-ultra-7-270k-plus.html"
 }

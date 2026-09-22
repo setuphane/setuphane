@@ -36,9 +36,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "cpu:8500g": {
-   "fiyat": 7926,
+   "fiyat": 7851,
    "ad": "Ryzen 5 8500G",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-22T08:26:58.352Z"
   },
   "cpu:7500f": {
    "fiyat": 6726,
@@ -86,14 +86,14 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "ram:16": {
-   "fiyat": 12739,
+   "fiyat": 12999,
    "ad": "16 GB DDR5-6000 (XPG Lancer Blade)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-22T08:26:58.352Z"
   },
   "ram:32": {
-   "fiyat": 28109,
+   "fiyat": 28119,
    "ad": "32 GB DDR5-6000 (2×16) (Apacer Panther)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-22T08:26:58.352Z"
   },
   "ram:64": {
    "fiyat": 55497,
@@ -111,9 +111,9 @@
    "tarih": "2026-09-21T13:00:24.051Z"
   },
   "psu:650": {
-   "fiyat": 2674,
+   "fiyat": 2538,
    "ad": "650 W 80+ (MSI MAG A650BNL)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-22T08:26:58.352Z"
   },
   "psu:750": {
    "fiyat": 3249,
@@ -176,9 +176,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "kasa:2": {
-   "fiyat": 8730,
+   "fiyat": 9793,
    "ad": "Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-22T08:26:58.352Z"
   },
   "gpu:5060": {
    "fiyat": 25025,
@@ -214,7 +214,32 @@
    "fiyat": 36398,
    "ad": "4 TB NVMe Gen4 (WD Blue SN5000)",
    "tarih": "2026-09-22T07:32:31.519Z"
+  },
+  "gpu:5050": {
+   "fiyat": 18541,
+   "ad": "GeForce RTX 5050 8 GB (Galax 1-Click OC V2)",
+   "tarih": "2026-09-22T08:26:58.352Z"
+  },
+  "cpu:245kf": {
+   "fiyat": 8644,
+   "ad": "Core Ultra 5 245KF",
+   "tarih": "2026-09-22T08:26:58.352Z"
+  },
+  "cpu:250kf": {
+   "fiyat": 12999,
+   "ad": "Core Ultra 5 250KF Plus",
+   "tarih": "2026-09-22T08:26:58.352Z"
+  },
+  "cpu:250k": {
+   "fiyat": 13899,
+   "ad": "Core Ultra 5 250K Plus",
+   "tarih": "2026-09-22T08:26:58.352Z"
+  },
+  "cpu:270k": {
+   "fiyat": 20045,
+   "ad": "Core Ultra 7 270K Plus",
+   "tarih": "2026-09-22T08:26:58.352Z"
   }
  },
- "guncelleme": "2026-09-22T07:32:31.519Z"
+ "guncelleme": "2026-09-22T08:26:58.352Z"
 }

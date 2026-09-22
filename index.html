@@ -341,6 +341,27 @@ const GPUS = [{
   pin8: 1,
   kal: 44,
   yuk: 107
+},
+/* 22.09.2026: hazır sistemlerde sık görülen giriş kartı. idx TechPowerUp
+   "Gigabyte RTX 5050 Gaming OC" incelemesi, 1080p: 5050 = 100, RTX 5070 =
+   198 -> 51 (aynı tabloda 5060 65, 9060 XT 71, 5080 132 — bizim değerlerle
+   ±2 tutarlı). r1440/r2160: aynı tablodaki RX 7600 köprü (1440p: ikisi de
+   %100/%97 -> 0,96; 4K: 100/88 vs 97 -> 0,90). 3+ satıcılı en ucuz: Galax
+   1-Click OC V2 (Epey: 222 mm, 130 W, üretici 550 W, tek 8-pin). */
+{
+  id: '5050',
+  n: 'GeForce RTX 5050 8 GB (Galax 1-Click OC V2)',
+  b: 'NVIDIA',
+  idx: 51,
+  r1440: 0.96,
+  r2160: 0.90,
+  vram: 8,
+  tdp: 130,
+  p: 18541,
+  boy: 222,
+  psuMin: 550,
+  pin8: 1,
+  yuk: 114
 }, {
   id: '5060',
   n: 'GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)',
@@ -559,6 +580,48 @@ const CPUS = [{
   m: 101,
   tdp: 125,
   p: 10729,
+  ig: true
+},
+/* 22.09.2026 — hazır sistemlerde sık görülen yeni Intel'ler. TechPowerUp
+   "Core Ultra 5 250K Plus" incelemesi, 720p oyun ve uygulama özeti; 9800X3D
+   (123,5 / 94,9) = 125 / 108 çapasıyla. Aynı tablodaki 9600X 101, 265K 100,
+   285K 104, 7800X3D 112 — mevcut değerlerle birebir tutarlı. KF modeller aynı
+   çip, yalnızca dahili grafik yok (Intel adlandırması). */
+{
+  id: '245kf',
+  n: 'Core Ultra 5 245KF',
+  plat: 'LGA1851',
+  g: 96,
+  m: 101,
+  tdp: 125,
+  p: 8733,
+  ig: false
+}, {
+  id: '250kf',
+  n: 'Core Ultra 5 250KF Plus',
+  plat: 'LGA1851',
+  g: 101,
+  m: 114,
+  tdp: 125,
+  p: 12999,
+  ig: false
+}, {
+  id: '250k',
+  n: 'Core Ultra 5 250K Plus',
+  plat: 'LGA1851',
+  g: 101,
+  m: 114,
+  tdp: 125,
+  p: 13899,
+  ig: true
+}, {
+  id: '270k',
+  n: 'Core Ultra 7 270K Plus',
+  plat: 'LGA1851',
+  g: 104,
+  m: 132,
+  tdp: 125,
+  p: 20062,
   ig: true
 }, {
   id: '9600x',
@@ -2219,8 +2282,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/eclipse-storm-oem-paket-fiyati-76056/',
   ikiz: {
-    toplam: 57340,
-    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Asus Dual GeForce RTX 5060 OC', 23399], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
+    toplam: 57600,
+    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Asus Dual GeForce RTX 5060 OC', 23399], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2238,8 +2301,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-d315b9.png',
   link: 'https://www.itopya.com/phoenix-9060xt-amd-ryzen-5-7600-asus-radeon-rx-9060-xt-16gb-16gb-ddr5-500gb-nvme-m2-ssd-o_h29706',
   ikiz: {
-    toplam: 63664,
-    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Asus Dual Radeon RX 9060 XT 16GB', 29600], ['Anakart', 'Gigabyte A620M H', 3822], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
+    toplam: 63924,
+    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Asus Dual Radeon RX 9060 XT 16GB', 29600], ['Anakart', 'Gigabyte A620M H', 3822], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2257,27 +2320,27 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/fusion-quantum-oem-paket-fiyati-81920/',
   ikiz: {
-    toplam: 63690,
-    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Gigabyte Radeon RX 9060 XT Gaming OC 16G', 29749], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
+    toplam: 63950,
+    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Gigabyte Radeon RX 9060 XT Gaming OC 16G', 29749], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
-  ad: 'VOK-DUKE V2',
-  fiyat: 70322,
+  ad: 'THUNDER-9060 XT V2',
+  fiyat: 76247,
   magaza: 'İtopya',
-  cpu: 'Ryzen 5 7600',
+  cpu: 'Core Ultra 5 245KF',
   kart: 'RX 9060 XT 16 GB',
   idx: 71,
-  cpuIdx: 95,
+  cpuIdx: 96,
   vram: 16,
   ram: 16,
   ramAdet: 1,
-  ssd: 500,
-  gorsel: 'https://img.yenieera22.com/cdn/250/1-dd16b8.png',
-  link: 'https://www.itopya.com/vok-duke-v2-amd-ryzen-5-7600-asus-radeon-rx-9060-xt-16gb-16gb-ddr5-500gb-m2-ssd-oem-paket_h32795',
+  ssd: 1000,
+  gorsel: 'https://img.yenieera22.com/cdn/250/1-13753d.png',
+  link: 'https://www.itopya.com/thunder-9060-xt-v2-intel-core-ultra-5-245kf-gigabyte-radeon-rx-9060-xt-16gb-16gb-ddr5-1tb-m_h35367',
   ikiz: {
-    toplam: 63664,
-    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Asus Dual Radeon RX 9060 XT 16GB', 29600], ['Anakart', 'Gigabyte A620M H', 3822], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
+    toplam: 69800,
+    parca: [['İşlemci', 'Intel Core Ultra 5 245KF', 8733], ['Ekran kartı', 'Gigabyte Radeon RX 9060 XT Gaming OC 16G', 29749], ['Anakart', 'ASRock H810M-H', 2825], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '550 W 80+ (MSI MAG A550BNL)', 2020], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2295,8 +2358,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/shadow-thunder-oem-paket-fiyati-76145/',
   ikiz: {
-    toplam: 76851,
-    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'MSI GeForce RTX 5060 Ti Inspire 2X OC 16GB', 42256], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '650 W 80+ (MSI MAG A650BNL)', 2674], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
+    toplam: 76975,
+    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'MSI GeForce RTX 5060 Ti Inspire 2X OC 16GB', 42256], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '650 W 80+ (MSI MAG A650BNL)', 2538], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2314,8 +2377,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/5-ea177a.png',
   link: 'https://www.itopya.com/enis-kirazoglu-oem-x-amd-ryzen-5-7600-xfx-swift-radeon-rx-9070-xt-16gb-16gb-ddr5-1tb-m2-ss_h33513',
   ikiz: {
-    toplam: 87480,
-    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'XFX Swift Radeon RX 9070 XT Triple Fan Gaming Edition', 44119], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 87740,
+    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'XFX Swift Radeon RX 9070 XT Triple Fan Gaming Edition', 44119], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2333,8 +2396,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/ozan-sihay-oem-paket-fiyati-50392/',
   ikiz: {
-    toplam: 91018,
-    parca: [['İşlemci', 'AMD Ryzen 5 7500F', 6719], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 91278,
+    parca: [['İşlemci', 'AMD Ryzen 5 7500F', 6719], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2352,8 +2415,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/2-7602e3.png',
   link: 'https://www.itopya.com/kuark-might-amd-ryzen-5-7600-asus-radeon-rx-9070-xt-16gb-16gb-ddr5-500gb-m2-ssd-oem-paket_h32004',
   ikiz: {
-    toplam: 87831,
-    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'Gigabyte A620M H', 3822], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 88091,
+    parca: [['İşlemci', 'AMD Ryzen 5 7600', 7171], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'Gigabyte A620M H', 3822], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)', 1314], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2371,8 +2434,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/thunder-9070xt-oem-paket-fiyati-69567/',
   ikiz: {
-    toplam: 97996,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 98256,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2390,8 +2453,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-a6bd43.png',
   link: 'https://www.itopya.com/vok-friday-v-amd-ryzen-7-7800x3d-xfx-swift-radeon-rx-9070-xt-16gb-16gb-ddr5-1tb-m2-ssd-oem_h31503',
   ikiz: {
-    toplam: 97768,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'XFX Swift Radeon RX 9070 XT Triple Fan Gaming Edition', 44119], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 98028,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'XFX Swift Radeon RX 9070 XT Triple Fan Gaming Edition', 44119], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2409,8 +2472,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/omega-zenith-oem-paket-fiyati-76528/',
   ikiz: {
-    toplam: 111356,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Gigabyte Radeon RX 9070 XT Gaming OC', 46499], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 111366,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Gigabyte Radeon RX 9070 XT Gaming OC', 46499], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '500 GB NVMe Gen4 (WD Blue SN5100)', 4899], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2428,8 +2491,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-637855.png',
   link: 'https://www.itopya.com/kuark-optimus-amd-ryzen-7-7800x3d-asus-radeon-rx-9070-xt-16gb-16gb-ddr5-1tb-m2-ssd-oem-pa_h33427',
   ikiz: {
-    toplam: 102158,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 102418,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2447,8 +2510,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/negatron-oem-paket-fiyati-58697/',
   ikiz: {
-    toplam: 117128,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 117138,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2485,8 +2548,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/nova-strike-oem-paket-fiyati-76090/',
   ikiz: {
-    toplam: 119219,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Gigabyte GeForce RTX 5070 Ti Windforce OC V2', 69999], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '750 W 80+ (MSI MAG A750BN PCIE5 II)', 3249], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
+    toplam: 119479,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Gigabyte GeForce RTX 5070 Ti Windforce OC V2', 69999], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '750 W 80+ (MSI MAG A750BN PCIE5 II)', 3249], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2504,8 +2567,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-7f5eb4.png',
   link: 'https://www.itopya.com/radeon-bts-amd-ryzen-7-7800x3dasus-radeon-rx-9070-xt-16gb32gb-ddr51tb-m2-ssdoem-paket_h30610',
   ikiz: {
-    toplam: 117251,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'Gigabyte A620M H', 3822], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 117261,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime Radeon RX 9070 XT OC', 48509], ['Anakart', 'Gigabyte A620M H', 3822], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2523,8 +2586,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/2-c63186.png',
   link: 'https://www.itopya.com/astral-x1-intel-core-ultra-7-265k-asus-geforce-rtx-5080-16gb-32gb-ddr5-1tb-m2-ssd-oem-pak_h28189',
   ikiz: {
-    toplam: 168568,
-    parca: [['İşlemci', 'Intel Core Ultra 7 265K', 17619], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'MSI Pro B860M-E', 5599], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 168578,
+    parca: [['İşlemci', 'Intel Core Ultra 7 265K', 17619], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'MSI Pro B860M-E', 5599], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2542,8 +2605,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/stratos-sonic-oem-paket-fiyati-76093/',
   ikiz: {
-    toplam: 129207,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Gainward GeForce RTX 5070 Ti Phoenix-S', 72573], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '750 W 80+ (MSI MAG A750BN PCIE5 II)', 3249], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 129467,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Gainward GeForce RTX 5070 Ti Phoenix-S', 72573], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '750 W 80+ (MSI MAG A750BN PCIE5 II)', 3249], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2561,8 +2624,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/2-c63186.png',
   link: 'https://www.itopya.com/supraze-stream-amd-ryzen-7-9800x3d-gigabyte-geforce-rtx-5070-ti-16gb-32gb-ddr5-1tb-m2-ssd-o_h29944',
   ikiz: {
-    toplam: 140903,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Gigabyte GeForce RTX 5070 Ti Windforce OC V2', 69999], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '750 W 80+ (MSI MAG A750BN PCIE5 II)', 3249], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
+    toplam: 140913,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Gigabyte GeForce RTX 5070 Ti Windforce OC V2', 69999], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '750 W 80+ (MSI MAG A750BN PCIE5 II)', 3249], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Hava akışlı standart kasa (MSI MAG Forge M100A)', 2099]],
     notlar: ['Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2580,8 +2643,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/goliath-gold-oem-paket-fiyati-52893/',
   ikiz: {
-    toplam: 147342,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Gigabyte GeForce RTX 5080 Windforce OC SFF 16G', 94093], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 147602,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Gigabyte GeForce RTX 5080 Windforce OC SFF 16G', 94093], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2599,8 +2662,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-35b460.png',
   link: 'https://www.itopya.com/phoenix-5080-v3-amd-ryzen-7-7800x3d-asus-geforce-rtx-5080-16gb-16gb-ddr5-1tb-nvme-m2-ssd-_h32080',
   ikiz: {
-    toplam: 151921,
-    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'Maxsun Challanger B850M-K', 5882], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 152181,
+    parca: [['İşlemci', 'AMD Ryzen 7 7800X3D', 16059], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'Maxsun Challanger B850M-K', 5882], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2618,8 +2681,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/iron-strike-oem-paket-fiyati-76191/',
   ikiz: {
-    toplam: 155652,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12739], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 155912,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '16 GB DDR5-6000 (XPG Lancer Blade)', 12999], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde RAM tek modül (16 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2637,8 +2700,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/c-alis-ma-yu-zeyi-1-b1560c.png',
   link: 'https://www.itopya.com/tolga-demirci-left-winger-amd-ryzen-7-9800x3d-gigabyte-geforce-rtx-5080-16gb-32gb-ddr5-1tb_h32937',
   ikiz: {
-    toplam: 169026,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Gigabyte GeForce RTX 5080 Windforce OC SFF 16G', 94093], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 169036,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Gigabyte GeForce RTX 5080 Windforce OC SFF 16G', 94093], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2694,8 +2757,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-17afd4.png',
   link: 'https://www.itopya.com/dogan-keser-seffafs-melek-amd-ryzen-7-9800x3d-asus-geforce-rtx-5080-16gb-32gb-ddr5-1tb-m2_h32856',
   ikiz: {
-    toplam: 177822,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'Gigabyte X870 Gaming WiFi6', 10499], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 177832,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus Prime GeForce RTX 5080 16GB GDDR7', 96489], ['Anakart', 'Gigabyte X870 Gaming WiFi6', 10499], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2713,8 +2776,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-6b2cc6.png',
   link: 'https://www.itopya.com/mustafa-kadir-new-game-amd-ryzen-7-9800x3d-msi-geforce-rtx-5080-16g-16gb-32gb-ddr5-1tb-m2-ss_h33892',
   ikiz: {
-    toplam: 164932,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'MSI GeForce RTX 5080 Ventus 3X OC', 89999], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28109], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
+    toplam: 164942,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'MSI GeForce RTX 5080 Ventus 3X OC', 89999], ['Anakart', 'Gigabyte B650M S2H', 4099], ['Bellek', '32 GB DDR5-6000 (2×16) (Apacer Panther)', 28119], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '850 W 80+ Gold (MSI MAG A850GN PCIE5)', 5778], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Mesh ön panelli kasa (NZXT H3 Flow)', 3599]],
     notlar: ['Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2770,8 +2833,8 @@ const OEM_SISTEMLER = [{
   gorsel: 'https://img.yenieera22.com/cdn/250/1-17afd4.png',
   link: 'https://www.itopya.com/phoenix-5090-v6-amd-ryzen-7-9800x3d-asus-geforce-rtx-5090-32gb-32gb-ddr5-1tb-m2-ssd-oem-pak_h26193',
   ikiz: {
-    toplam: 407637,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus TUF Gaming GeForce RTX 5090 32GB GDDR7 OC Edition', 326340], ['Anakart', 'Gigabyte X870 Gaming WiFi6', 10499], ['Bellek', 'Patriot Signature Line 32 GB 4800 MT/s DDR5', 20321], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)', 8399], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)', 8730]],
+    toplam: 408700,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus TUF Gaming GeForce RTX 5090 32GB GDDR7 OC Edition', 326340], ['Anakart', 'Gigabyte X870 Gaming WiFi6', 10499], ['Bellek', 'Patriot Signature Line 32 GB 4800 MT/s DDR5', 20321], ['Disk', '1 TB NVMe Gen4 (WD Blue SN5100)', 8661], ['Güç kaynağı', '1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)', 8399], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)', 9793]],
     notlar: ['Hazır sistemde RAM tek modül (32 GB × 1): çift kanal çalışmaz. Kendin toplarken 2 modüllü kit seçmen daha iyi olur.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }, {
@@ -2808,8 +2871,8 @@ const OEM_SISTEMLER = [{
   gorsel: '',
   link: 'https://www.incehesap.com/elnath-oem-paket-fiyati-60102/',
   ikiz: {
-    toplam: 443782,
-    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus TUF Gaming GeForce RTX 5090 32GB GDDR7 OC Edition', 326340], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)', 55497], ['Disk', '2 TB NVMe Gen4 (WD Blue SN5100)', 16430], ['Güç kaynağı', '1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)', 8399], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)', 8730]],
+    toplam: 444845,
+    parca: [['İşlemci', 'AMD Ryzen 7 9800X3D', 21973], ['Ekran kartı', 'Asus TUF Gaming GeForce RTX 5090 32GB GDDR7 OC Edition', 326340], ['Anakart', 'MSI Pro A620AM-B Evo', 3699], ['Bellek', '64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)', 55497], ['Disk', '2 TB NVMe Gen4 (WD Blue SN5100)', 16430], ['Güç kaynağı', '1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)', 8399], ['Soğutucu', 'Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)', 2714], ['Kasa', 'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)', 9793]],
     notlar: ['İlanda anakart modeli yazmıyor; ikizde bu soketin 3+ satıcılı en ucuz anakartı kullanıldı.', 'Hazır sistemde güç kaynağı, kasa ve soğutucu markası belirtilmiyor; ikizdekiler üretici önerisine göre seçildi.']
   }
 }];
@@ -2985,7 +3048,18 @@ function parcalariGetir() {
         const e = gpuOnce.find(o => o.id === g.id);
         if (e && e.tdp > g.tdp) g.tdp = e.tdp;
       });
-      koy(CPUS, koru(CPUS.slice(), grup('cpu').map(x => ({
+      /* Veritabanında satırı olmayan kod kartları/işlemcileri (22.09: RTX 5050,
+         250K/250KF/270K Plus, 245KF) canlıda kaybolmasın; fiyat bot dosyasından. */
+      for (const [kod, dizi, on] of [[gpuOnce, GPUS, 'gpu']]) for (const k of kod) if (!dizi.some(o => o.id === k.id)) {
+        const b = bf[on + ':' + k.id];
+        dizi.push(b && b.fiyat > 0 ? {
+          ...k,
+          p: b.fiyat
+        } : k);
+      }
+      GPUS.sort((x, y) => x.idx - y.idx);
+      const cpuOnce = CPUS.slice();
+      koy(CPUS, koru(cpuOnce, grup('cpu').map(x => ({
         id: kimlik(x),
         n: x.ad,
         plat: x.plat,
@@ -2995,6 +3069,13 @@ function parcalariGetir() {
         p: x.fiyat,
         ig: !!x.dahili_grafik
       })), o => o.id, ['x4']));
+      for (const k of cpuOnce) if (!CPUS.some(o => o.id === k.id)) {
+        const b = bf['cpu:' + k.id];
+        CPUS.push(b && b.fiyat > 0 ? {
+          ...k,
+          p: b.fiyat
+        } : k);
+      }
       /* Veritabanında henüz satırı olmayan kod parçası (ör. 22.09'da eklenen
          96 GB RAM, 4 TB SSD, 21.09'daki çift kule) canlıda KAYBOLMASIN diye
          eklenir; fiyatı bot dosyasından (fiyatlar.json) alınır. Sıra kodla
@@ -5505,11 +5586,11 @@ function parcaNeden(sys) {
    araması 5070 kartlarını da getiriyordu. Eşleme scripts/epey-eslesme.json,
    derleme sırasında buraya gömülür (scripts/build.mjs). Eşlemesi olmayan
    parça (panelden yeni eklenmiş) için Akakçe araması yedek olarak kalır. */
-const EPEY_LINK = {"gpu:7600":"https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html","gpu:5060":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-ventus-2x-oc-white.html","gpu:9060xt":"https://www.epey.com/ekran-karti/asus-dual-radeon-rx-9060-xt-16gb.html","gpu:5060ti":"https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-ti-oc-16gb.html","gpu:9070":"https://www.epey.com/ekran-karti/gigabyte-radeon-rx-9070-gaming-oc.html","gpu:5070":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-argb-epic-x-triple-oc.html","gpu:9070xt":"https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html","gpu:5070ti":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-ti-triple-oc.html","gpu:5080":"https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5080-windforce-oc-sff-16g.html","gpu:5090":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html","cpu:8500g":"https://www.epey.com/islemci/amd-ryzen-5-8500g.html","cpu:7500f":"https://www.epey.com/islemci/amd-ryzen-5-7500f.html","cpu:7600":"https://www.epey.com/islemci/amd-ryzen-5-7600.html","cpu:245k":"https://www.epey.com/islemci/intel-core-ultra-5-245k.html","cpu:9600x":"https://www.epey.com/islemci/amd-ryzen-5-9600x.html","cpu:265k":"https://www.epey.com/islemci/intel-core-ultra-7-265k.html","cpu:9700x":"https://www.epey.com/islemci/amd-ryzen-7-9700x.html","cpu:285k":"https://www.epey.com/islemci/intel-core-ultra-9-285k.html","cpu:7800x3d":"https://www.epey.com/islemci/amd-ryzen-7-7800x3d.html","cpu:9950x3d":"https://www.epey.com/islemci/amd-ryzen-9-9950x3d.html","cpu:9800x3d":"https://www.epey.com/islemci/amd-ryzen-7-9800x3d.html","ram:16":"https://www.epey.com/bellek-ram/xpg-lancer-blade-ax5u6000c4816g-slabbk.html","ram:32":"https://www.epey.com/bellek-ram/apacer-panther-ah5u32g60c6227baa-2.html","ram:96":"https://www.epey.com/bellek-ram/crucial-pro-cp2k48g56c46u5.html","ram:64":"https://www.epey.com/bellek-ram/g-skill-ripjaws-s5-f5-6000j3636f32gx2-rs5k.html","ssd:500":"https://www.epey.com/sabit-disk/wd-blue-sn5100-500-gb.html","ssd:1t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-1-tb.html","ssd:4t":"https://www.epey.com/sabit-disk/wd-blue-sn5000-4-tb.html","ssd:2t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-2-tb.html","psu:550":"https://www.epey.com/power-supply-psu/msi-mag-a550bnl-550w.html","psu:650":"https://www.epey.com/power-supply-psu/msi-mag-a650bnl-650-w.html","psu:750":"https://www.epey.com/power-supply-psu/msi-mag-a750bn-750w.html","psu:850":"https://www.epey.com/power-supply-psu/msi-mag-a850gn-850w.html","psu:1000":"https://www.epey.com/power-supply-psu/msi-mag-a1000gl-1000w.html","psu:1200":"https://www.epey.com/power-supply-psu/zalman-watttera-zm1200-ebtii-1200w.html","sogutucu:air":"https://www.epey.com/islemci-sogutucu/thermalright-assassin-x-120-refined-se-argb.html","sogutucu:cift":"https://www.epey.com/islemci-sogutucu/thermalright-peerless-assassin-120.html","sogutucu:aio360":"https://www.epey.com/islemci-sogutucu/thermalright-frozen-magic-360-argb.html","sogutucu:aio360p":"https://www.epey.com/islemci-sogutucu/msi-mag-coreliquid-a13-360.html","anakart:AM5-0":"https://www.epey.com/anakart/msi-pro-a620am-g-evo-wifi.html","anakart:AM5-1":"https://www.epey.com/anakart/gigabyte-b650m-gaming-wifi6e.html","anakart:AM5-2":"https://www.epey.com/anakart/asus-b650e-max-gaming-wifi-w.html","anakart:LGA1851-0":"https://www.epey.com/anakart/msi-pro-b860m-e.html","anakart:LGA1851-1":"https://www.epey.com/anakart/msi-pro-z890-s-wifi6e.html","kasa:0":"https://www.epey.com/bilgisayar-kasasi/msi-mag-forge-m100a.html","kasa:1":"https://www.epey.com/bilgisayar-kasasi/nzxt-h3-flow-cc-h31fw-01.html","kasa:2":"https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html"};
+const EPEY_LINK = {"gpu:7600":"https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html","gpu:5060":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-ventus-2x-oc-white.html","gpu:9060xt":"https://www.epey.com/ekran-karti/asus-dual-radeon-rx-9060-xt-16gb.html","gpu:5060ti":"https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-ti-oc-16gb.html","gpu:9070":"https://www.epey.com/ekran-karti/gigabyte-radeon-rx-9070-gaming-oc.html","gpu:5070":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-argb-epic-x-triple-oc.html","gpu:9070xt":"https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html","gpu:5070ti":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-ti-triple-oc.html","gpu:5080":"https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5080-windforce-oc-sff-16g.html","gpu:5090":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html","cpu:8500g":"https://www.epey.com/islemci/amd-ryzen-5-8500g.html","cpu:7500f":"https://www.epey.com/islemci/amd-ryzen-5-7500f.html","cpu:7600":"https://www.epey.com/islemci/amd-ryzen-5-7600.html","cpu:245k":"https://www.epey.com/islemci/intel-core-ultra-5-245k.html","cpu:9600x":"https://www.epey.com/islemci/amd-ryzen-5-9600x.html","cpu:265k":"https://www.epey.com/islemci/intel-core-ultra-7-265k.html","cpu:9700x":"https://www.epey.com/islemci/amd-ryzen-7-9700x.html","cpu:285k":"https://www.epey.com/islemci/intel-core-ultra-9-285k.html","cpu:7800x3d":"https://www.epey.com/islemci/amd-ryzen-7-7800x3d.html","cpu:9950x3d":"https://www.epey.com/islemci/amd-ryzen-9-9950x3d.html","cpu:9800x3d":"https://www.epey.com/islemci/amd-ryzen-7-9800x3d.html","ram:16":"https://www.epey.com/bellek-ram/xpg-lancer-blade-ax5u6000c4816g-slabbk.html","ram:32":"https://www.epey.com/bellek-ram/apacer-panther-ah5u32g60c6227baa-2.html","ram:96":"https://www.epey.com/bellek-ram/crucial-pro-cp2k48g56c46u5.html","ram:64":"https://www.epey.com/bellek-ram/g-skill-ripjaws-s5-f5-6000j3636f32gx2-rs5k.html","ssd:500":"https://www.epey.com/sabit-disk/wd-blue-sn5100-500-gb.html","ssd:1t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-1-tb.html","ssd:4t":"https://www.epey.com/sabit-disk/wd-blue-sn5000-4-tb.html","ssd:2t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-2-tb.html","psu:550":"https://www.epey.com/power-supply-psu/msi-mag-a550bnl-550w.html","psu:650":"https://www.epey.com/power-supply-psu/msi-mag-a650bnl-650-w.html","psu:750":"https://www.epey.com/power-supply-psu/msi-mag-a750bn-750w.html","psu:850":"https://www.epey.com/power-supply-psu/msi-mag-a850gn-850w.html","psu:1000":"https://www.epey.com/power-supply-psu/msi-mag-a1000gl-1000w.html","psu:1200":"https://www.epey.com/power-supply-psu/zalman-watttera-zm1200-ebtii-1200w.html","sogutucu:air":"https://www.epey.com/islemci-sogutucu/thermalright-assassin-x-120-refined-se-argb.html","sogutucu:cift":"https://www.epey.com/islemci-sogutucu/thermalright-peerless-assassin-120.html","sogutucu:aio360":"https://www.epey.com/islemci-sogutucu/thermalright-frozen-magic-360-argb.html","sogutucu:aio360p":"https://www.epey.com/islemci-sogutucu/msi-mag-coreliquid-a13-360.html","anakart:AM5-0":"https://www.epey.com/anakart/msi-pro-a620am-g-evo-wifi.html","anakart:AM5-1":"https://www.epey.com/anakart/gigabyte-b650m-gaming-wifi6e.html","anakart:AM5-2":"https://www.epey.com/anakart/asus-b650e-max-gaming-wifi-w.html","anakart:LGA1851-0":"https://www.epey.com/anakart/msi-pro-b860m-e.html","anakart:LGA1851-1":"https://www.epey.com/anakart/msi-pro-z890-s-wifi6e.html","kasa:0":"https://www.epey.com/bilgisayar-kasasi/msi-mag-forge-m100a.html","kasa:1":"https://www.epey.com/bilgisayar-kasasi/nzxt-h3-flow-cc-h31fw-01.html","kasa:2":"https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html","gpu:5050":"https://www.epey.com/ekran-karti/galax-geforce-rtx-5050-1-click-oc-v2.html","cpu:245kf":"https://www.epey.com/islemci/intel-core-ultra-5-245kf.html","cpu:250kf":"https://www.epey.com/islemci/intel-core-ultra-5-250kf-plus.html","cpu:250k":"https://www.epey.com/islemci/intel-core-ultra-5-250k-plus.html","cpu:270k":"https://www.epey.com/islemci/intel-core-ultra-7-270k-plus.html"};
 /* Gerçek ürün görseli (scripts/parca-gorsel.mjs -> urun/parca/<anahtar>.jpg,
    üreticinin resmî görseli, Epey ürün sayfasından). Liste derlemede gömülür.
    Görseli olmayan ya da yüklenemeyen parça eski çizim ikona döner. */
-const PARCA_GORSEL = ["anakart-AM5-0","anakart-AM5-1","anakart-AM5-2","anakart-LGA1851-0","anakart-LGA1851-1","cpu-245k","cpu-265k","cpu-285k","cpu-7500f","cpu-7600","cpu-7800x3d","cpu-8500g","cpu-9600x","cpu-9700x","cpu-9800x3d","cpu-9950x3d","gpu-5060","gpu-5060ti","gpu-5070","gpu-5070ti","gpu-5080","gpu-5090","gpu-7600","gpu-9060xt","gpu-9070","gpu-9070xt","kasa-0","kasa-1","kasa-2","psu-1000","psu-550","psu-650","psu-750","psu-850","ram-16","ram-32","ram-64","ram-96","sogutucu-aio360","sogutucu-aio360p","sogutucu-air","sogutucu-cift","ssd-1t","ssd-2t","ssd-4t","ssd-500"];
+const PARCA_GORSEL = ["anakart-AM5-0","anakart-AM5-1","anakart-AM5-2","anakart-LGA1851-0","anakart-LGA1851-1","cpu-245k","cpu-245kf","cpu-250k","cpu-250kf","cpu-265k","cpu-270k","cpu-285k","cpu-7500f","cpu-7600","cpu-7800x3d","cpu-8500g","cpu-9600x","cpu-9700x","cpu-9800x3d","cpu-9950x3d","gpu-5050","gpu-5060","gpu-5060ti","gpu-5070","gpu-5070ti","gpu-5080","gpu-5090","gpu-7600","gpu-9060xt","gpu-9070","gpu-9070xt","kasa-0","kasa-1","kasa-2","psu-1000","psu-1200","psu-550","psu-650","psu-750","psu-850","ram-16","ram-32","ram-64","ram-96","sogutucu-aio360","sogutucu-aio360p","sogutucu-air","sogutucu-cift","ssd-1t","ssd-2t","ssd-4t","ssd-500"];
 function ParcaGorsel({
   k,
   sys,
