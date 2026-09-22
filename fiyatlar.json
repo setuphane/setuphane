@@ -11,9 +11,9 @@
    "tarih": "2026-09-22T10:29:01.408Z"
   },
   "gpu:5060ti": {
-   "fiyat": 40231,
+   "fiyat": 40894,
    "ad": "GeForce RTX 5060 Ti 16 GB (Asus Dual OC)",
-   "tarih": "2026-09-22T11:33:34.054Z"
+   "tarih": "2026-09-22T13:04:07.308Z"
   },
   "gpu:9070": {
    "fiyat": 40999,
@@ -61,9 +61,9 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "cpu:265k": {
-   "fiyat": 17553,
+   "fiyat": 17619,
    "ad": "Core Ultra 7 265K",
-   "tarih": "2026-09-22T06:46:43.055Z"
+   "tarih": "2026-09-22T13:04:07.308Z"
   },
   "cpu:9700x": {
    "fiyat": 14303,
@@ -176,9 +176,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "kasa:2": {
-   "fiyat": 9793,
+   "fiyat": 9017,
    "ad": "Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)",
-   "tarih": "2026-09-22T08:26:58.352Z"
+   "tarih": "2026-09-22T13:04:07.308Z"
   },
   "gpu:5060": {
    "fiyat": 25025,
@@ -249,7 +249,12 @@
    "fiyat": 5192,
    "ad": "Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)",
    "tarih": "2026-09-22T11:33:34.054Z"
+  },
+  "fan:tlc12": {
+   "fiyat": 523,
+   "ad": "120 mm kasa fanı (Thermalright TL-C12015)",
+   "tarih": "2026-09-22T13:05:36.041Z"
   }
  },
- "guncelleme": "2026-09-22T11:33:34.054Z"
+ "guncelleme": "2026-09-22T13:05:36.041Z"
 }

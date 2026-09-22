@@ -83,6 +83,7 @@ const kodAdlari = (() => {
   const B = nesne('BOARDS');
   for (const pl of Object.keys(B)) B[pl].forEach((b, i) => { m['anakart:' + pl + '-' + i] = b.n; });
   dizi('CASES').forEach((k, i) => { m['kasa:' + i] = k.n; });
+  dizi('FANS').forEach(k => { m['fan:' + k.id] = k.n; });
   return m;
 })();
 

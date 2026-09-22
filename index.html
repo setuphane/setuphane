@@ -939,7 +939,9 @@ const CASES = [
   formMax: 'mATX',
   upTo: 35000,
   cpuH: 160,
-  dis: [200, 388, 423]
+  dis: [200, 388, 423],
+  fan: 4,
+  fanKap: 6
 }, {
   n: 'Mesh ön panelli kasa (NZXT H3 Flow)',
   p: 3599,
@@ -948,7 +950,9 @@ const CASES = [
   formMax: 'mATX',
   upTo: 70000,
   cpuH: 170,
-  dis: [225, 389, 400]
+  dis: [225, 389, 400],
+  fan: 1,
+  fanKap: 7
 },
 /* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
   RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
@@ -961,7 +965,10 @@ const CASES = [
   formMax: 'ATX',
   upTo: Infinity,
   cpuH: 185,
-  dis: [246, 499, 478]
+  dis: [246, 499, 478],
+  fan: 3,
+  fanKap: 10,
+  ters: true
 },
 /* 22.09.2026 — orta fiyatlı ATX kasa (kullanıcı: üst sınıf ATX anakart daha çok
    sisteme girebilsin). Epey: 5.192 TL, 8 satıcı; ATX, 4×140 mm fan dahil, üst
@@ -974,7 +981,9 @@ const CASES = [
   formMax: 'ATX',
   upTo: Infinity,
   cpuH: 180,
-  dis: [219, 456, 456]
+  dis: [219, 456, 456],
+  fan: 4,
+  fanKap: 8
 }];
 const GAMES = [{
   id: 'valorant',
@@ -1169,7 +1178,7 @@ function pickBoard(c, budget, g, cs) {
      B650E seçiliyordu. Oysa 9800X3D 120 W'lık tek CCD'li bir işlemci;
      7.631 ₺'lik B650M onu rahat besler ve aradaki 3.062 ₺ doğrudan ekran
      kartından kesiliyordu.
-      Intel'de "125 W" taban değer, gerçek turbo çekişi bunun iki katına
+       Intel'de "125 W" taban değer, gerçek turbo çekişi bunun iki katına
      çıkabiliyor — bu yüzden Intel tarafında TDP değil çoklu iş gücü (m)
      ölçüt alınıyor: 265K ve 285K güçlü güç katmanı ister, 245K istemez. */
   const cokGuc = c.tdp >= 170 || c.plat === 'LGA1851' && c.m >= 120;
@@ -1207,7 +1216,34 @@ const pickPsu = (g, c) => enUcuzUygun(PSUS, p => psuYeter(g, c, p));
    kaliteli kasa/soğutucu" beklentisi ÇELİŞMEDEN bir arada yaşıyor. Aşağıdaki
    iki yardımcı yalnızca FİZİKSEL uyumu (radyatör-kasa, soğutma yeterliliği)
    kontrol ediyor — kademe SEÇİMİ artık kurDene()'nin skor döngüsünde. */
-const KART_PAY = 15; /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
+const KART_PAY = 15;
+/* ═══ KASA HAVA AKIŞI ═══ 22.09.2026 (kullanıcı: "bazı kasalarda fan yetersiz").
+   Kart + işlemci ısısına göre gereken kasa fanı: <250 W: 2, 250–450 W: 3,
+   >450 W: 4. Sıvı soğutmanın radyatör fanları (360 mm = 3) sayılır. Kasanın
+   hazır fanı (CASES.fan, Epey) yetmezse eksik kadar fan eklenir; kasanın fan
+   yuvası (fanKap) yetmezse o kasa bu sisteme uygun değildir. Eklenen fanlar
+   arka/üst EGZOZ içindir: normal yönlü fan doğru seçim (4500X'in hazır fanları
+   zaten ters yönlü "reverse" — alt/yan girişte kanat estetiği için). */
+const FANS = [
+/* 3+ satıcılı, PWM, soğutucularla aynı marka (Epey: 523 TL, 7 satıcı). Fan
+   paketleri 3 satıcı eşiğini geçmedi; tekli fan adetle ekleniyor. */
+{
+  id: 'tlc12',
+  n: '120 mm kasa fanı (Thermalright TL-C12015)',
+  p: 523
+}];
+const fanGerek = (g, c) => {
+  const q = (g && g.id !== 'igpu' ? g.tdp : 0) + (c ? c.tdp : 0);
+  return q < 250 ? 2 : q <= 450 ? 3 : 4;
+};
+/* Eklenecek fan adedi; kasa yuvası yetmezse -1. Ölçüsü olmayan kasada 0. */
+const fanEk = (g, c, cs, cl) => {
+  if (cs.fan == null) return 0;
+  const rad = cl && cl.rad ? Math.round(cl.rad / 120) : 0;
+  const ek = Math.max(0, fanGerek(g, c) - cs.fan - rad);
+  if (ek && cs.fanKap != null && cs.fan + rad + ek > cs.fanKap) return -1;
+  return ek;
+}; /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
 const radBoyu = k => k.rad != null ? k.rad : String(k.n).match(/\b(120|140|240|280|360|420)\s*mm\b/) ? +RegExp.$1 : 0;
 /* SERT KURAL — radyatör kasaya sığacak. Bunu bütçe bandının kasayla denk
    gelmesine bırakamayız; kasa değişirse site sessizce kurulamayacak bir
@@ -1254,16 +1290,26 @@ function yukseltmeyeHazirla(s, budget, pick) {
     mATX: 2,
     ATX: 3
   }[k.formMax]) && cSigar(s.cl, k);
-  const cs = kasaTutar(s.cs) ? s.cs : CASES.filter(kasaTutar).sort((a, b) => a.p - b.p)[0];
+  const fanFiyat = k => {
+    const n = fanEk(s.g, s.c, k, s.cl);
+    return n < 0 ? Infinity : n * FANS[0].p;
+  };
+  const cs = kasaTutar(s.cs) ? s.cs : CASES.filter(k => kasaTutar(k) && fanFiyat(k) < Infinity).sort((a, b) => a.p + fanFiyat(a) - (b.p + fanFiyat(b)))[0];
   if (!cs) return s;
-  const total = s.total - s.psu.p + psu.p - s.cs.p + cs.p;
+  const eskiFan = s.fan ? s.fan.adet * s.fan.p : 0,
+    yeniN = fanEk(s.g, s.c, cs, s.cl);
+  const total = s.total - s.psu.p + psu.p - s.cs.p + cs.p - eskiFan + yeniN * FANS[0].p;
   if (total > budget) return s;
   return {
     ...s,
     psu,
     cs,
     total,
-    hazir: ust
+    hazir: ust,
+    fan: yeniN ? {
+      adet: yeniN,
+      ...FANS[0]
+    } : null
   };
 }
 /* 22.09.2026 — kullanıcı önerisi (MSI MPG X870E Edge Ti WiFi'yi kendisi
@@ -1289,9 +1335,14 @@ function ustAnakart(s, budget) {
   let en = null;
   for (const b of BOARDS[s.c.plat] || []) {
     if (!b.ust || b.p <= s.mb.p || s.r.tip && b.ram && b.ram !== s.r.tip) continue;
-    const cs = kasaUyar(s.cs, b) ? s.cs : CASES.filter(k => kasaUyar(k, b)).sort((x, y) => x.p - y.p)[0];
+    const fanF = k => {
+      const n = fanEk(s.g, s.c, k, s.cl);
+      return n < 0 ? Infinity : n * FANS[0].p;
+    };
+    const cs = kasaUyar(s.cs, b) ? s.cs : CASES.filter(k => kasaUyar(k, b) && fanF(k) < Infinity).sort((x, y) => x.p + fanF(x) - (y.p + fanF(y)))[0];
     if (!cs) continue;
-    const ek = b.p - s.mb.p + (cs.p - s.cs.p);
+    const eskiFan = s.fan ? s.fan.adet * s.fan.p : 0;
+    const ek = b.p - s.mb.p + (cs.p - s.cs.p) + fanF(cs) - eskiFan;
     if (ek > bos) continue;
     if (!en || b.p > en.b.p) en = {
       b,
@@ -1299,13 +1350,19 @@ function ustAnakart(s, budget) {
       ek
     };
   }
-  return en ? {
+  if (!en) return s;
+  const n = fanEk(s.g, s.c, en.cs, s.cl);
+  return {
     ...s,
     mb: en.b,
     cs: en.cs,
     total: s.total + en.ek,
-    ustMb: true
-  } : s;
+    ustMb: true,
+    fan: n ? {
+      adet: n,
+      ...FANS[0]
+    } : null
+  };
 }
 /* Bir üst ekran kartının seçildiği en düşük bütçe (ziyaretçiye "bu bütçede daha
    fazla FPS veren kart yok, üst kademe şuradan başlıyor" demek için). */
@@ -1379,7 +1436,9 @@ function kurDene(budget, prof, pick, esikliMi, game, res) {
         const psu = pickPsu(g, c);
         for (const cl of COOLERS) {
           if (!cYeter(cl, c) || !cSigar(cl, cs)) continue;
-          const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p;
+          const fanAdet = fanEk(g, c, cs, cl);
+          if (fanAdet < 0) continue; // kasanın fan yuvası bu ısıya yetmiyor
+          const base = g.p + c.p + mb.p + psu.p + cl.p + cs.p + fanAdet * FANS[0].p;
           for (const r of RAMS) {
             if (r.gb < minRam) continue;
             /* SERT KURAL — ust segment kart (idx>=110: RX 9070 ve ustu,
@@ -1414,7 +1473,11 @@ function kurDene(budget, prof, pick, esikliMi, game, res) {
                 cs,
                 total,
                 score,
-                kalite
+                kalite,
+                fan: fanAdet ? {
+                  adet: fanAdet,
+                  ...FANS[0]
+                } : null
               };
               if (!best || score > best.score + 1e-9 || Math.abs(score - best.score) < 1e-9 && (kalite > best.kalite || kalite === best.kalite && total < best.total)) best = aday;
               /* BERABERLIK BOZUCU — puanca neredeyse esit adaylar arasindan
@@ -3161,6 +3224,11 @@ function parcalariGetir() {
         }
         return sirala ? db.sort(sirala) : db;
       };
+      /* Kasa fanı fiyatı yalnız bot dosyasından (veritabanında satırı yok). */
+      FANS.forEach(k => {
+        const x = bf['fan:' + k.id];
+        if (x && x.fiyat > 0) k.p = x.fiyat;
+      });
       const kodRam = RAMS.slice(),
         kodSsd = SSDS.slice();
       koy(RAMS, eksikEkle(kodRam, koru(kodRam, grup('ram').map(x => ({
@@ -3235,7 +3303,7 @@ function parcalariGetir() {
             p: x.fiyat,
             upTo: x.butce_ust == null ? Infinity : x.butce_ust
           };
-          for (const a of ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis']) if (e[a] != null) k[a] = e[a];
+          for (const a of ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis', 'fan', 'fanKap', 'ters']) if (e[a] != null) k[a] = e[a];
           return k;
         }));
         /* Veritabanında satırı olmayan kod kasası (22.09: Lancool 207) eklenir. */
@@ -5449,17 +5517,6 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
   cam.rotation.y = Math.PI / 2;
   cam.position.x = W / 2;
   sahne.add(cam);
-  /* Ön fanlar */
-  for (let i = 0; i < 3; i++) {
-    const f = new T.Mesh(new T.RingGeometry(50, 53, 40), new T.MeshBasicMaterial({
-      color: 0xFF2D95,
-      side: T.DoubleSide,
-      transparent: true,
-      opacity: .16
-    }));
-    f.position.set(0, H / 2 - 90 - i * 130, D / 2 - 2);
-    sahne.add(f);
-  }
   /* Anakart: arka-sol duvar (x = -W/2), üst-arka köşe */
   const tepsi = -W / 2 + 22,
     arka = -D / 2 + 12;
@@ -5476,6 +5533,43 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
     return m;
   };
   bil(mbKutu, ['Anakart', mb.n], mb.form && mb.form + ' boyut', mb.ram && mb.ram + (mb.ramHiz ? ' · ' + mb.ramHiz + ' MT/s\'ye kadar' : ''), mb.ozellik, 'Soket: ' + sys.c.plat);
+  /* Fanlar: kasanın hazır fanları önde (pembe), sistemin eklediği fanlar arka/üst
+     egzozda (camgöbeği). Halka görünüm, arkasındaki saydam disk üzerine gelmeyi yakalar. */
+  const isi = (g.id !== 'igpu' ? g.tdp : 0) + sys.c.tdp;
+  const fanCiz = (x, y, z, ry, rx, renk, bilgi) => {
+    const h = new T.Mesh(new T.RingGeometry(50, 54, 40), new T.MeshBasicMaterial({
+      color: renk,
+      side: T.DoubleSide,
+      transparent: true,
+      opacity: .55
+    }));
+    const d = new T.Mesh(new T.CircleGeometry(54, 32), new T.MeshBasicMaterial({
+      color: renk,
+      side: T.DoubleSide,
+      transparent: true,
+      opacity: .06
+    }));
+    for (const m of [h, d]) {
+      m.position.set(x, y, z);
+      m.rotation.set(rx || 0, ry || 0, 0);
+      sahne.add(m);
+    }
+    d.userData.bilgi = bilgi;
+  };
+  const hazirFan = Math.min(cs.fan ?? 3, 3);
+  for (let i = 0; i < hazirFan; i++) fanCiz(0, H / 2 - 90 - i * 130, D / 2 - 2, 0, 0, 0xFF2D95, {
+    tur: 'Kasanın hazır fanı',
+    ad: cs.n,
+    satir: [(cs.fan ?? '?') + ' hazır fan' + (cs.ters ? ' (ters yönlü "reverse")' : ''), 'Sistem ~' + isi + ' W ısı üretir · en az ' + fanGerek(g, sys.c) + ' fan gerekir']
+  });
+  if (sys.fan) for (let i = 0; i < sys.fan.adet; i++) {
+    const arkaFan = i === 0;
+    fanCiz(arkaFan ? 20 : -10, arkaFan ? H / 2 - 110 : H / 2 - 8, arkaFan ? -D / 2 + 2 : -D / 2 + 100 + (i - 1) * 130, 0, arkaFan ? 0 : Math.PI / 2, 0x2DE2E6, {
+      tur: 'Eklenen kasa fanı',
+      ad: sys.fan.n,
+      satir: [(arkaFan ? 'Arka' : 'Üst') + ' egzoz · normal yönlü', 'Kasanın ' + cs.fan + ' hazır fanı ~' + isi + ' W ısı için yetmiyor']
+    });
+  }
   /* İşlemci soketi ve soğutucu */
   const sokY = mbUst - 75,
     sokZ = arka + 150;
@@ -5739,7 +5833,7 @@ function SistemAciklama({
     r
   } = sys;
   const sayi = x => x.toLocaleString('tr-TR');
-  const kontrol = [['Soket', c.n + ' ve ' + mb.n.replace(/\s*\(.*\)$/, '') + ' aynı soket (' + c.plat + ')'], g.id !== 'igpu' && ['Güç', 'Sistem en fazla ~' + (g.tdp + c.tdp + 90) + ' W çeker' + (g.psuMin ? '; kart üreticisi ' + g.psuMin + ' W istiyor' : '') + '; güç kaynağı ' + psu.w + ' W'], g.id !== 'igpu' && g.pin8 && ['Kablo', g.p16 && psu.k16 >= g.tdp ? 'Kart 16-pin istiyor, güç kaynağında yerel 16-pin var' : 'Kart ' + g.pin8 + ' adet 8-pin istiyor, güç kaynağında ' + (psu.pin8 ?? 'yeterli') + ' adet var'], g.boy && cs.gpuMax && ['Kasa', 'Kart ' + g.boy + ' mm, kasa ' + cs.gpuMax + ' mm alıyor (' + (cs.gpuMax - g.boy) + ' mm boşluk)'], mb.form && cs.formMax && ['Anakart', mb.form + ' anakart, kasa ' + cs.formMax + '\'e kadar destekliyor'], ['Soğutma', 'İşlemci ' + c.tdp + ' W ısı üretir, soğutucu ' + cl.cap + ' W kaldırır' + (cl.h && cs.cpuH ? '; ' + cl.h + ' mm yükseklik, kasa ' + cs.cpuH + ' mm alıyor' : '') + (cl.rad && cs.rad ? '; kasa ' + cs.rad + ' mm radyatör alıyor' : '')], r.tip && mb.ram && ['Bellek', r.tip + ' bellek, anakart ' + mb.ram + (mb.ramHiz ? ' (' + mb.ramHiz + ' MT/s\'ye kadar)' : '')], ['Fiyat', 'Her parça en az 3 farklı mağazada satılan modelin en ucuz fiyatı · ' + fiyatYasi().metin]].filter(Boolean);
+  const kontrol = [['Soket', c.n + ' ve ' + mb.n.replace(/\s*\(.*\)$/, '') + ' aynı soket (' + c.plat + ')'], g.id !== 'igpu' && ['Güç', 'Sistem en fazla ~' + (g.tdp + c.tdp + 90) + ' W çeker' + (g.psuMin ? '; kart üreticisi ' + g.psuMin + ' W istiyor' : '') + '; güç kaynağı ' + psu.w + ' W'], g.id !== 'igpu' && g.pin8 && ['Kablo', g.p16 && psu.k16 >= g.tdp ? 'Kart 16-pin istiyor, güç kaynağında yerel 16-pin var' : 'Kart ' + g.pin8 + ' adet 8-pin istiyor, güç kaynağında ' + (psu.pin8 ?? 'yeterli') + ' adet var'], g.boy && cs.gpuMax && ['Kasa', 'Kart ' + g.boy + ' mm, kasa ' + cs.gpuMax + ' mm alıyor (' + (cs.gpuMax - g.boy) + ' mm boşluk)'], mb.form && cs.formMax && ['Anakart', mb.form + ' anakart, kasa ' + cs.formMax + '\'e kadar destekliyor'], cs.fan != null && ['Hava akışı', 'Kart + işlemci ~' + ((g.id !== 'igpu' ? g.tdp : 0) + c.tdp) + ' W ısı üretir, en az ' + fanGerek(g, c) + ' kasa fanı gerekir; kasada ' + cs.fan + ' hazır fan' + (cl.rad ? ' + radyatörde ' + Math.round(cl.rad / 120) : '') + (sys.fan ? ' + ' + sys.fan.adet + ' eklenen fan' : '')], ['Soğutma', 'İşlemci ' + c.tdp + ' W ısı üretir, soğutucu ' + cl.cap + ' W kaldırır' + (cl.h && cs.cpuH ? '; ' + cl.h + ' mm yükseklik, kasa ' + cs.cpuH + ' mm alıyor' : '') + (cl.rad && cs.rad ? '; kasa ' + cs.rad + ' mm radyatör alıyor' : '')], r.tip && mb.ram && ['Bellek', r.tip + ' bellek, anakart ' + mb.ram + (mb.ramHiz ? ' (' + mb.ramHiz + ' MT/s\'ye kadar)' : '')], ['Fiyat', 'Her parça en az 3 farklı mağazada satılan modelin en ucuz fiyatı · ' + fiyatYasi().metin]].filter(Boolean);
   const Baslik = ({
     children
   }) => /*#__PURE__*/React.createElement("div", {
@@ -5847,7 +5941,8 @@ function parcaNeden(sys) {
     ek('psu', 'Sistem en fazla ~' + cek + ' W çeker' + (g.psuMin ? ' · kart üreticisi en az ' + g.psuMin + ' W öneriyor' : ' · %' + Math.round((psu.w / cek - 1) * 100) + ' güvenlik payı'));
   }
   if (cl.cap && c.tdp) ek('cooler', 'İşlemci ' + c.tdp + ' W ısı üretir · soğutucu ' + cl.cap + ' W kaldırır' + (cl.rad && cs.rad ? ' · kasa ' + cs.rad + ' mm radyatör alır' : ''));
-  if (cs.gpuMax && g.boy) ek('case', 'Kart ' + g.boy + ' mm · kasa ' + cs.gpuMax + ' mm\'ye kadar alır' + (cs.formMax ? ' · ' + cs.formMax + ' anakart sığar' : ''));
+  if (sys.fan) ek('fan', 'Kasanın ' + cs.fan + ' hazır fanı yetmiyor: sistem ~' + ((g.tdp || 0) + (c.tdp || 0)) + ' W ısı üretir, ' + fanGerek(g, c) + ' fan gerekir · arka/üst egzoz için normal yönlü');
+  if (cs.gpuMax && g.boy) ek('case', (cs.fan != null ? cs.fan + ' hazır fan' + (cs.ters ? ' (ters yönlü)' : '') + ' · ' : '') + 'Kart ' + g.boy + ' mm · kasa ' + cs.gpuMax + ' mm\'ye kadar alır' + (cs.formMax ? ' · ' + cs.formMax + ' anakart sığar' : ''));
   return n;
 }
 /* "Fiyat karşılaştır" hedefi: önerdiğimiz modelin BİREBİR Epey ürün sayfası
@@ -5856,12 +5951,12 @@ function parcaNeden(sys) {
    araması 5070 kartlarını da getiriyordu. Eşleme scripts/epey-eslesme.json,
    derleme sırasında buraya gömülür (scripts/build.mjs). Eşlemesi olmayan
    parça (panelden yeni eklenmiş) için Akakçe araması yedek olarak kalır. */
-const EPEY_LINK = {"gpu:7600":"https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html","gpu:5060":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-ventus-2x-oc-white.html","gpu:9060xt":"https://www.epey.com/ekran-karti/asus-dual-radeon-rx-9060-xt-16gb.html","gpu:5060ti":"https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-ti-oc-16gb.html","gpu:9070":"https://www.epey.com/ekran-karti/gigabyte-radeon-rx-9070-gaming-oc.html","gpu:5070":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-argb-epic-x-triple-oc.html","gpu:9070xt":"https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html","gpu:5070ti":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-ti-triple-oc.html","gpu:5080":"https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5080-windforce-oc-sff-16g.html","gpu:5090":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html","cpu:8500g":"https://www.epey.com/islemci/amd-ryzen-5-8500g.html","cpu:7500f":"https://www.epey.com/islemci/amd-ryzen-5-7500f.html","cpu:7600":"https://www.epey.com/islemci/amd-ryzen-5-7600.html","cpu:245k":"https://www.epey.com/islemci/intel-core-ultra-5-245k.html","cpu:9600x":"https://www.epey.com/islemci/amd-ryzen-5-9600x.html","cpu:265k":"https://www.epey.com/islemci/intel-core-ultra-7-265k.html","cpu:9700x":"https://www.epey.com/islemci/amd-ryzen-7-9700x.html","cpu:285k":"https://www.epey.com/islemci/intel-core-ultra-9-285k.html","cpu:7800x3d":"https://www.epey.com/islemci/amd-ryzen-7-7800x3d.html","cpu:9950x3d":"https://www.epey.com/islemci/amd-ryzen-9-9950x3d.html","cpu:9800x3d":"https://www.epey.com/islemci/amd-ryzen-7-9800x3d.html","ram:16":"https://www.epey.com/bellek-ram/xpg-lancer-blade-ax5u6000c4816g-slabbk.html","ram:32":"https://www.epey.com/bellek-ram/apacer-panther-ah5u32g60c6227baa-2.html","ram:96":"https://www.epey.com/bellek-ram/crucial-pro-cp2k48g56c46u5.html","ram:64":"https://www.epey.com/bellek-ram/g-skill-ripjaws-s5-f5-6000j3636f32gx2-rs5k.html","ssd:500":"https://www.epey.com/sabit-disk/wd-blue-sn5100-500-gb.html","ssd:1t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-1-tb.html","ssd:4t":"https://www.epey.com/sabit-disk/wd-blue-sn5000-4-tb.html","ssd:2t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-2-tb.html","psu:550":"https://www.epey.com/power-supply-psu/msi-mag-a550bnl-550w.html","psu:650":"https://www.epey.com/power-supply-psu/msi-mag-a650bnl-650-w.html","psu:750":"https://www.epey.com/power-supply-psu/msi-mag-a750bn-750w.html","psu:850":"https://www.epey.com/power-supply-psu/msi-mag-a850gn-850w.html","psu:1000":"https://www.epey.com/power-supply-psu/msi-mag-a1000gl-1000w.html","psu:1200":"https://www.epey.com/power-supply-psu/zalman-watttera-zm1200-ebtii-1200w.html","sogutucu:air":"https://www.epey.com/islemci-sogutucu/thermalright-assassin-x-120-refined-se-argb.html","sogutucu:cift":"https://www.epey.com/islemci-sogutucu/thermalright-peerless-assassin-120.html","sogutucu:aio360":"https://www.epey.com/islemci-sogutucu/thermalright-frozen-magic-360-argb.html","sogutucu:aio360p":"https://www.epey.com/islemci-sogutucu/msi-mag-coreliquid-a13-360.html","anakart:AM5-0":"https://www.epey.com/anakart/msi-pro-a620am-g-evo-wifi.html","anakart:AM5-1":"https://www.epey.com/anakart/gigabyte-b650m-gaming-wifi6e.html","anakart:AM5-2":"https://www.epey.com/anakart/asus-b650e-max-gaming-wifi-w.html","anakart:LGA1851-0":"https://www.epey.com/anakart/msi-pro-b860m-e.html","anakart:LGA1851-1":"https://www.epey.com/anakart/msi-pro-z890-s-wifi6e.html","kasa:0":"https://www.epey.com/bilgisayar-kasasi/msi-mag-forge-m100a.html","kasa:1":"https://www.epey.com/bilgisayar-kasasi/nzxt-h3-flow-cc-h31fw-01.html","kasa:2":"https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html","gpu:5050":"https://www.epey.com/ekran-karti/galax-geforce-rtx-5050-1-click-oc-v2.html","cpu:245kf":"https://www.epey.com/islemci/intel-core-ultra-5-245kf.html","cpu:250kf":"https://www.epey.com/islemci/intel-core-ultra-5-250kf-plus.html","cpu:250k":"https://www.epey.com/islemci/intel-core-ultra-5-250k-plus.html","cpu:270k":"https://www.epey.com/islemci/intel-core-ultra-7-270k-plus.html","anakart:AM5-3":"https://www.epey.com/anakart/msi-mpg-x870e-edge-ti-wifi.html","kasa:3":"https://www.epey.com/bilgisayar-kasasi/lian-li-lancool-207-beyaz.html"};
+const EPEY_LINK = {"gpu:7600":"https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html","gpu:5060":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-ventus-2x-oc-white.html","gpu:9060xt":"https://www.epey.com/ekran-karti/asus-dual-radeon-rx-9060-xt-16gb.html","gpu:5060ti":"https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-ti-oc-16gb.html","gpu:9070":"https://www.epey.com/ekran-karti/gigabyte-radeon-rx-9070-gaming-oc.html","gpu:5070":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-argb-epic-x-triple-oc.html","gpu:9070xt":"https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html","gpu:5070ti":"https://www.epey.com/ekran-karti/pny-geforce-rtx-5070-ti-triple-oc.html","gpu:5080":"https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5080-windforce-oc-sff-16g.html","gpu:5090":"https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html","cpu:8500g":"https://www.epey.com/islemci/amd-ryzen-5-8500g.html","cpu:7500f":"https://www.epey.com/islemci/amd-ryzen-5-7500f.html","cpu:7600":"https://www.epey.com/islemci/amd-ryzen-5-7600.html","cpu:245k":"https://www.epey.com/islemci/intel-core-ultra-5-245k.html","cpu:9600x":"https://www.epey.com/islemci/amd-ryzen-5-9600x.html","cpu:265k":"https://www.epey.com/islemci/intel-core-ultra-7-265k.html","cpu:9700x":"https://www.epey.com/islemci/amd-ryzen-7-9700x.html","cpu:285k":"https://www.epey.com/islemci/intel-core-ultra-9-285k.html","cpu:7800x3d":"https://www.epey.com/islemci/amd-ryzen-7-7800x3d.html","cpu:9950x3d":"https://www.epey.com/islemci/amd-ryzen-9-9950x3d.html","cpu:9800x3d":"https://www.epey.com/islemci/amd-ryzen-7-9800x3d.html","ram:16":"https://www.epey.com/bellek-ram/xpg-lancer-blade-ax5u6000c4816g-slabbk.html","ram:32":"https://www.epey.com/bellek-ram/apacer-panther-ah5u32g60c6227baa-2.html","ram:96":"https://www.epey.com/bellek-ram/crucial-pro-cp2k48g56c46u5.html","ram:64":"https://www.epey.com/bellek-ram/g-skill-ripjaws-s5-f5-6000j3636f32gx2-rs5k.html","ssd:500":"https://www.epey.com/sabit-disk/wd-blue-sn5100-500-gb.html","ssd:1t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-1-tb.html","ssd:4t":"https://www.epey.com/sabit-disk/wd-blue-sn5000-4-tb.html","ssd:2t":"https://www.epey.com/sabit-disk/wd-blue-sn5100-2-tb.html","psu:550":"https://www.epey.com/power-supply-psu/msi-mag-a550bnl-550w.html","psu:650":"https://www.epey.com/power-supply-psu/msi-mag-a650bnl-650-w.html","psu:750":"https://www.epey.com/power-supply-psu/msi-mag-a750bn-750w.html","psu:850":"https://www.epey.com/power-supply-psu/msi-mag-a850gn-850w.html","psu:1000":"https://www.epey.com/power-supply-psu/msi-mag-a1000gl-1000w.html","psu:1200":"https://www.epey.com/power-supply-psu/zalman-watttera-zm1200-ebtii-1200w.html","sogutucu:air":"https://www.epey.com/islemci-sogutucu/thermalright-assassin-x-120-refined-se-argb.html","sogutucu:cift":"https://www.epey.com/islemci-sogutucu/thermalright-peerless-assassin-120.html","sogutucu:aio360":"https://www.epey.com/islemci-sogutucu/thermalright-frozen-magic-360-argb.html","sogutucu:aio360p":"https://www.epey.com/islemci-sogutucu/msi-mag-coreliquid-a13-360.html","anakart:AM5-0":"https://www.epey.com/anakart/msi-pro-a620am-g-evo-wifi.html","anakart:AM5-1":"https://www.epey.com/anakart/gigabyte-b650m-gaming-wifi6e.html","anakart:AM5-2":"https://www.epey.com/anakart/asus-b650e-max-gaming-wifi-w.html","anakart:LGA1851-0":"https://www.epey.com/anakart/msi-pro-b860m-e.html","anakart:LGA1851-1":"https://www.epey.com/anakart/msi-pro-z890-s-wifi6e.html","kasa:0":"https://www.epey.com/bilgisayar-kasasi/msi-mag-forge-m100a.html","kasa:1":"https://www.epey.com/bilgisayar-kasasi/nzxt-h3-flow-cc-h31fw-01.html","kasa:2":"https://www.epey.com/bilgisayar-kasasi/corsair-frame-4500x-rs-r-argb.html","gpu:5050":"https://www.epey.com/ekran-karti/galax-geforce-rtx-5050-1-click-oc-v2.html","cpu:245kf":"https://www.epey.com/islemci/intel-core-ultra-5-245kf.html","cpu:250kf":"https://www.epey.com/islemci/intel-core-ultra-5-250kf-plus.html","cpu:250k":"https://www.epey.com/islemci/intel-core-ultra-5-250k-plus.html","cpu:270k":"https://www.epey.com/islemci/intel-core-ultra-7-270k-plus.html","anakart:AM5-3":"https://www.epey.com/anakart/msi-mpg-x870e-edge-ti-wifi.html","kasa:3":"https://www.epey.com/bilgisayar-kasasi/lian-li-lancool-207-beyaz.html","fan:tlc12":"https://www.epey.com/kasa-fani/thermalright-tl-c12015.html"};
 /* Gerçek ürün görseli (scripts/parca-gorsel.mjs -> urun/parca/<anahtar>.jpg,
    üreticinin resmî görseli, Epey ürün sayfasından). Liste derlemede gömülür.
    Görseli olmayan ya da yüklenemeyen parça eski çizim ikona döner. */
-const PARCA_GORSEL = ["anakart-AM5-0","anakart-AM5-1","anakart-AM5-2","anakart-AM5-3","anakart-LGA1851-0","anakart-LGA1851-1","cpu-245k","cpu-245kf","cpu-250k","cpu-250kf","cpu-265k","cpu-270k","cpu-285k","cpu-7500f","cpu-7600","cpu-7800x3d","cpu-8500g","cpu-9600x","cpu-9700x","cpu-9800x3d","cpu-9950x3d","gpu-5050","gpu-5060","gpu-5060ti","gpu-5070","gpu-5070ti","gpu-5080","gpu-5090","gpu-7600","gpu-9060xt","gpu-9070","gpu-9070xt","kasa-0","kasa-1","kasa-2","kasa-3","psu-1000","psu-550","psu-650","psu-750","psu-850","ram-16","ram-32","ram-64","ram-96","sogutucu-aio360","sogutucu-aio360p","sogutucu-air","sogutucu-cift","ssd-1t","ssd-2t","ssd-4t","ssd-500"];
-const PARCA_GORSEL3B = ["anakart-AM5-0","anakart-AM5-1","anakart-AM5-2","anakart-AM5-3","anakart-LGA1851-0","anakart-LGA1851-1","cpu-245k","cpu-245kf","cpu-250k","cpu-250kf","cpu-265k","cpu-270k","cpu-285k","cpu-7500f","cpu-7600","cpu-7800x3d","cpu-8500g","cpu-9600x","cpu-9700x","cpu-9800x3d","cpu-9950x3d","gpu-5050","gpu-5060","gpu-5060ti","gpu-5070","gpu-5070ti","gpu-5080","gpu-5090","gpu-7600","gpu-9060xt","gpu-9070","gpu-9070xt","kasa-0","kasa-1","kasa-2","kasa-3","psu-1000","psu-550","psu-650","psu-750","psu-850","ram-16","ram-32","ram-64","ram-96","sogutucu-air","sogutucu-cift","ssd-1t","ssd-2t","ssd-4t","ssd-500"]; /* orta boy (urun/parca/3b) — yalnız 3B sahnede yüklenir */
+const PARCA_GORSEL = ["anakart-AM5-0","anakart-AM5-1","anakart-AM5-2","anakart-AM5-3","anakart-LGA1851-0","anakart-LGA1851-1","cpu-245k","cpu-245kf","cpu-250k","cpu-250kf","cpu-265k","cpu-270k","cpu-285k","cpu-7500f","cpu-7600","cpu-7800x3d","cpu-8500g","cpu-9600x","cpu-9700x","cpu-9800x3d","cpu-9950x3d","fan-tlc12","gpu-5050","gpu-5060","gpu-5060ti","gpu-5070","gpu-5070ti","gpu-5080","gpu-5090","gpu-7600","gpu-9060xt","gpu-9070","gpu-9070xt","kasa-0","kasa-1","kasa-2","kasa-3","psu-1000","psu-550","psu-650","psu-750","psu-850","ram-16","ram-32","ram-64","ram-96","sogutucu-aio360","sogutucu-aio360p","sogutucu-air","sogutucu-cift","ssd-1t","ssd-2t","ssd-4t","ssd-500"];
+const PARCA_GORSEL3B = ["anakart-AM5-0","anakart-AM5-1","anakart-AM5-2","anakart-AM5-3","anakart-LGA1851-0","anakart-LGA1851-1","cpu-245k","cpu-245kf","cpu-250k","cpu-250kf","cpu-265k","cpu-270k","cpu-285k","cpu-7500f","cpu-7600","cpu-7800x3d","cpu-8500g","cpu-9600x","cpu-9700x","cpu-9800x3d","cpu-9950x3d","fan-tlc12","gpu-5050","gpu-5060","gpu-5060ti","gpu-5070","gpu-5070ti","gpu-5080","gpu-5090","gpu-7600","gpu-9060xt","gpu-9070","gpu-9070xt","kasa-0","kasa-1","kasa-2","kasa-3","psu-1000","psu-550","psu-650","psu-750","psu-850","ram-16","ram-32","ram-64","ram-96","sogutucu-air","sogutucu-cift","ssd-1t","ssd-2t","ssd-4t","ssd-500"]; /* orta boy (urun/parca/3b) — yalnız 3B sahnede yüklenir */
 function ParcaGorsel({
   k,
   sys,
@@ -5908,6 +6003,8 @@ function parcaAnahtari(k, sys) {
         const i = CASES.findIndex(x => x.n === sys.cs.n);
         return i < 0 ? null : 'kasa:' + i;
       }
+    case 'fan':
+      return sys.fan ? 'fan:' + sys.fan.id : null;
     case 'mb':
       {
         const l = BOARDS[sys.c.plat] || [];
@@ -5951,7 +6048,7 @@ function Builder({
   } = useCur();
   const [copied, copy] = useCopy(sys, prof, plain);
   const [paylasildi, paylas] = usePaylas(budget, prof, pick, gid, rid);
-  const rows = sys ? [['gpu', 'Ekran kartı', sys.g.n, sys.g.p], ['cpu', 'İşlemci', sys.c.n, sys.c.p], ['mb', 'Anakart', sys.mb.n, sys.mb.p], ['ram', 'Bellek (RAM)', sys.r.n, sys.r.p], ['ssd', 'Disk (SSD)', sys.s.n, sys.s.p], ['psu', 'Güç kaynağı', sys.psu.n, sys.psu.p], ['cooler', 'Soğutucu', sys.cl.n, sys.cl.p], ['case', 'Kasa', sys.cs.n, sys.cs.p]] : [];
+  const rows = sys ? [['gpu', 'Ekran kartı', sys.g.n, sys.g.p], ['cpu', 'İşlemci', sys.c.n, sys.c.p], ['mb', 'Anakart', sys.mb.n, sys.mb.p], ['ram', 'Bellek (RAM)', sys.r.n, sys.r.p], ['ssd', 'Disk (SSD)', sys.s.n, sys.s.p], ['psu', 'Güç kaynağı', sys.psu.n, sys.psu.p], ['cooler', 'Soğutucu', sys.cl.n, sys.cl.p], ['case', 'Kasa', sys.cs.n, sys.cs.p], ...(sys.fan ? [['fan', 'Kasa fanı (ek)', sys.fan.adet + ' × ' + sys.fan.n, sys.fan.adet * sys.fan.p]] : [])] : [];
   const neden = sys ? parcaNeden(sys) : {};
   const ustButce = useMemo(() => sys && budget - sys.total >= budget * 0.10 ? ustKademeButce(sys, prof, pick, game, res) : null, [sys, budget, prof, pick, game, res]);
   return /*#__PURE__*/React.createElement(Card, {
@@ -6586,7 +6683,7 @@ function Glossary() {
 
 /* ═══════════════════ ÖZET — sağ panel + mobil dock ═══════════════════ */
 function summaryText(sys, prof, plain) {
-  return ['SETUP HANE — sistem listesi', 'Amaç: ' + prof.n, '', 'Ekran kartı : ' + sys.g.n, 'İşlemci     : ' + sys.c.n, 'Anakart     : ' + sys.mb.n, 'RAM         : ' + sys.r.n, 'SSD         : ' + sys.s.n, 'Güç kaynağı : ' + sys.psu.n, 'Soğutucu    : ' + sys.cl.n, 'Kasa        : ' + sys.cs.n, '', 'TOPLAM      : ' + plain(sys.total), '', 'instagram.com/setuphane'].join('\n');
+  return ['SETUP HANE — sistem listesi', 'Amaç: ' + prof.n, '', 'Ekran kartı : ' + sys.g.n, 'İşlemci     : ' + sys.c.n, 'Anakart     : ' + sys.mb.n, 'RAM         : ' + sys.r.n, 'SSD         : ' + sys.s.n, 'Güç kaynağı : ' + sys.psu.n, 'Soğutucu    : ' + sys.cl.n, 'Kasa        : ' + sys.cs.n, ...(sys.fan ? ['Kasa fanı   : ' + sys.fan.adet + ' × ' + sys.fan.n] : []), '', 'TOPLAM      : ' + plain(sys.total), '', 'instagram.com/setuphane'].join('\n');
 }
 function useCopy(sys, prof, plain) {
   const [copied, setCopied] = useState(false);
@@ -10385,7 +10482,7 @@ function useUrunler() {
 }
 function AksesuarBosKart() {
   return /*#__PURE__*/React.createElement("div", {
-    className: "aspect-[4/3] border border-dashed border-line/70 grid place-items-center gap-2.5 text-dim/70 transition-colors duration-300 hover:border-cy/40 hover:text-cy/70"
+    className: "aspect-[4/3] border border-dashed border-line/70 grid place-items-center gap-2.5\r text-dim/70 transition-colors duration-300 hover:border-cy/40 hover:text-cy/70"
   }, /*#__PURE__*/React.createElement("svg", {
     width: "20",
     height: "20",
@@ -10420,7 +10517,7 @@ function AksesuarUrunKart({
     target: "_blank",
     rel: "sponsored noopener noreferrer",
     onClick: tik,
-    className: "group block aspect-[4/3] border border-line/70 relative overflow-hidden transition-colors duration-300 hover:border-cy/50"
+    className: "group block aspect-[4/3] border border-line/70 relative overflow-hidden\r transition-colors duration-300 hover:border-cy/50"
   }, /*#__PURE__*/React.createElement("img", {
     src: gorselYolu(u.gorsel),
     "data-asil": u.gorsel,
@@ -10755,7 +10852,7 @@ function OnerHub() {
     value: butce,
     onChange: e => setButce(e.target.value),
     placeholder: "\xF6r. 1500",
-    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50 focus:border-cy transition-colors"
+    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50\r focus:border-cy transition-colors"
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "oner-istek",
     className: "lbl text-dim mb-3 block"
@@ -10765,10 +10862,10 @@ function OnerHub() {
     value: istek,
     onChange: e => setIstek(e.target.value),
     placeholder: "\xF6r. masam da\u011F\u0131n\u0131k, kablo toparlamak istiyorum",
-    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50 focus:border-cy transition-colors"
+    className: "w-full bg-transparent border border-line px-4 py-3 text-ink placeholder:text-dim/50\r focus:border-cy transition-colors"
   })), /*#__PURE__*/React.createElement("button", {
     type: "submit",
-    className: "sm:col-span-2 border border-cy text-cy px-6 py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300 w-fit"
+    className: "sm:col-span-2 border border-cy text-cy px-6 py-3.5 lbl hover:bg-cy hover:text-bg\r transition-colors duration-300 w-fit"
   }, "\xD6NER\u0130 AL"))), sonuc && /*#__PURE__*/React.createElement(Reveal, {
     delay: 120
   }, /*#__PURE__*/React.createElement("div", {

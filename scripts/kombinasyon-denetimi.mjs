@@ -54,10 +54,10 @@ const SOGUTUCU_OLCU = { air: { sinif: 'tek', h: 148 }, cift: { sinif: 'cift', h:
   aio360: { sinif: 'sivi' }, aio360p: { sinif: 'sivi' } };
 // cpuH: MSI / NZXT / Corsair teknik verisi; gpuMax: Epey (21.09.2026)
 const KASA_OLCU = {
-  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160 },
-  'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170 },
-  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185 },
-  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180 } };
+  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160, fan: 4 },
+  'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170, fan: 1 },
+  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185, fan: 3 },
+  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180, fan: 4 } };
 
 const KURALLAR = [
   ['guc-kaynagi', b => {
@@ -112,6 +112,14 @@ const KURALLAR = [
     if (!(k.p16 && p.k16 >= b.hazir.tdp) && p.pin8 < k.pin8) return `hazir denilen ${b.hazir.n} icin kablo yetmez`;
     if (b.hazir.boy && max && b.hazir.boy + 15 > max) return `hazir denilen ${b.hazir.n} kasaya sigmaz`;
     return null;
+  }],
+  // Hava akisi (22.09.2026): kart+islemci isisina gore en az kasa fani.
+  // BAGIMSIZ tablo (Epey 'Dahili Fan Sayisi'); radyator fanlari sayilir.
+  ['hava-akisi', b => {
+    const k = KASA_OLCU[b.cs.n]; if (!k || k.fan == null) return b.cs.n + ': fan verisi denetim tablosunda yok';
+    const q = (b.g.id !== 'igpu' ? b.g.tdp : 0) + b.c.tdp, gerek = q < 250 ? 2 : q <= 450 ? 3 : 4;
+    const var_ = k.fan + (b.cl.rad ? Math.round(b.cl.rad / 120) : 0) + (b.fan ? b.fan.adet : 0);
+    return var_ < gerek ? q + ' W isi, ' + var_ + ' fan var, ' + gerek + ' gerekiyor (' + b.cs.n + ')' : null;
   }],
   ['radyator-kasa', b => {
     // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.
@@ -285,7 +293,7 @@ if (eksikBoy.length) {
   const OLCU = {
     GPUS: ['boy', 'r1440', 'r2160', 'psuMin', 'pin8', 'p16', 'kal', 'yuk'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
     PSUS: ['pin8', 'k16'],
-    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis'],
+    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis', 'fan', 'fanKap', 'ters'],
   };
   const once = {
     GPUS: structuredClone(GPUS), CPUS: structuredClone(CPUS), RAMS: structuredClone(RAMS),

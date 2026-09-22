@@ -486,16 +486,16 @@ const CASES=[
  /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
     doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
     280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
- {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160, dis:[200,388,423]},
- {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170, dis:[225,389,400]},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160, dis:[200,388,423], fan:4, fanKap:6},
+ {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170, dis:[225,389,400], fan:1, fanKap:7},
  /* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
    RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
    (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478]},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478], fan:3, fanKap:10, ters:true},
  /* 22.09.2026 — orta fiyatlı ATX kasa (kullanıcı: üst sınıf ATX anakart daha çok
     sisteme girebilsin). Epey: 5.192 TL, 8 satıcı; ATX, 4×140 mm fan dahil, üst
     360 mm radyatör, kart en fazla 375 mm, soğutucu 180 mm, 219×456×456 mm. */
- {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5192,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456]},
+ {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5192,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456], fan:4, fanKap:8},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -650,7 +650,28 @@ const pickPsu   = (g,c)=> enUcuzUygun(PSUS, p=>psuYeter(g,c,p));
    kaliteli kasa/soğutucu" beklentisi ÇELİŞMEDEN bir arada yaşıyor. Aşağıdaki
    iki yardımcı yalnızca FİZİKSEL uyumu (radyatör-kasa, soğutma yeterliliği)
    kontrol ediyor — kademe SEÇİMİ artık kurDene()'nin skor döngüsünde. */
-const KART_PAY = 15;   /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
+const KART_PAY = 15;
+/* ═══ KASA HAVA AKIŞI ═══ 22.09.2026 (kullanıcı: "bazı kasalarda fan yetersiz").
+   Kart + işlemci ısısına göre gereken kasa fanı: <250 W: 2, 250–450 W: 3,
+   >450 W: 4. Sıvı soğutmanın radyatör fanları (360 mm = 3) sayılır. Kasanın
+   hazır fanı (CASES.fan, Epey) yetmezse eksik kadar fan eklenir; kasanın fan
+   yuvası (fanKap) yetmezse o kasa bu sisteme uygun değildir. Eklenen fanlar
+   arka/üst EGZOZ içindir: normal yönlü fan doğru seçim (4500X'in hazır fanları
+   zaten ters yönlü "reverse" — alt/yan girişte kanat estetiği için). */
+const FANS=[
+ /* 3+ satıcılı, PWM, soğutucularla aynı marka (Epey: 523 TL, 7 satıcı). Fan
+    paketleri 3 satıcı eşiğini geçmedi; tekli fan adetle ekleniyor. */
+ {id:'tlc12', n:'120 mm kasa fanı (Thermalright TL-C12015)', p:523},
+];
+const fanGerek = (g,c)=>{ const q=(g&&g.id!=='igpu'?g.tdp:0)+(c?c.tdp:0); return q<250?2 : q<=450?3 : 4; };
+/* Eklenecek fan adedi; kasa yuvası yetmezse -1. Ölçüsü olmayan kasada 0. */
+const fanEk = (g,c,cs,cl)=>{
+  if(cs.fan==null) return 0;
+  const rad=cl&&cl.rad?Math.round(cl.rad/120):0;
+  const ek=Math.max(0, fanGerek(g,c)-cs.fan-rad);
+  if(ek && cs.fanKap!=null && cs.fan+rad+ek>cs.fanKap) return -1;
+  return ek;
+};   /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
 const radBoyu = k => k.rad != null ? k.rad
   : (String(k.n).match(/\b(120|140|240|280|360|420)\s*mm\b/) ? +RegExp.$1 : 0);
 /* SERT KURAL — radyatör kasaya sığacak. Bunu bütçe bandının kasayla denk
@@ -690,11 +711,13 @@ function yukseltmeyeHazirla(s,budget,pick){
     && (!s.g.boy || !k.gpuMax || s.g.boy+KART_PAY<=k.gpuMax)
     && (!s.mb.form || !k.formMax || ({ITX:1,mATX:2,ATX:3})[s.mb.form]<=({ITX:1,mATX:2,ATX:3})[k.formMax])
     && cSigar(s.cl,k);
-  const cs = kasaTutar(s.cs) ? s.cs : CASES.filter(kasaTutar).sort((a,b)=>a.p-b.p)[0];
+  const fanFiyat=k=>{ const n=fanEk(s.g,s.c,k,s.cl); return n<0?Infinity:n*FANS[0].p; };
+  const cs = kasaTutar(s.cs) ? s.cs : CASES.filter(k=>kasaTutar(k)&&fanFiyat(k)<Infinity).sort((a,b)=>(a.p+fanFiyat(a))-(b.p+fanFiyat(b)))[0];
   if(!cs) return s;
-  const total = s.total - s.psu.p + psu.p - s.cs.p + cs.p;
+  const eskiFan=s.fan?s.fan.adet*s.fan.p:0, yeniN=fanEk(s.g,s.c,cs,s.cl);
+  const total = s.total - s.psu.p + psu.p - s.cs.p + cs.p - eskiFan + yeniN*FANS[0].p;
   if(total > budget) return s;
-  return {...s, psu, cs, total, hazir:ust};
+  return {...s, psu, cs, total, hazir:ust, fan:yeniN?{adet:yeniN,...FANS[0]}:null};
 }
 /* 22.09.2026 — kullanıcı önerisi (MSI MPG X870E Edge Ti WiFi'yi kendisi
    kullanıyor). Üst sınıf anakart FPS kazandırmaz; bu yüzden karttan para
@@ -717,13 +740,17 @@ function ustAnakart(s,budget){
   let en=null;
   for(const b of (BOARDS[s.c.plat]||[])){
     if(!b.ust || b.p<=s.mb.p || (s.r.tip && b.ram && b.ram!==s.r.tip)) continue;
-    const cs = kasaUyar(s.cs,b) ? s.cs : CASES.filter(k=>kasaUyar(k,b)).sort((x,y)=>x.p-y.p)[0];
+    const fanF=k=>{ const n=fanEk(s.g,s.c,k,s.cl); return n<0?Infinity:n*FANS[0].p; };
+    const cs = kasaUyar(s.cs,b) ? s.cs : CASES.filter(k=>kasaUyar(k,b)&&fanF(k)<Infinity).sort((x,y)=>(x.p+fanF(x))-(y.p+fanF(y)))[0];
     if(!cs) continue;
-    const ek=(b.p-s.mb.p)+(cs.p-s.cs.p);
+    const eskiFan=s.fan?s.fan.adet*s.fan.p:0;
+    const ek=(b.p-s.mb.p)+(cs.p-s.cs.p)+fanF(cs)-eskiFan;
     if(ek>bos) continue;
     if(!en || b.p>en.b.p) en={b,cs,ek};
   }
-  return en ? {...s, mb:en.b, cs:en.cs, total:s.total+en.ek, ustMb:true} : s;
+  if(!en) return s;
+  const n=fanEk(s.g,s.c,en.cs,s.cl);
+  return {...s, mb:en.b, cs:en.cs, total:s.total+en.ek, ustMb:true, fan:n?{adet:n,...FANS[0]}:null};
 }
 /* Bir üst ekran kartının seçildiği en düşük bütçe (ziyaretçiye "bu bütçede daha
    fazla FPS veren kart yok, üst kademe şuradan başlıyor" demek için). */
@@ -789,7 +816,9 @@ function kurDene(budget,prof,pick,esikliMi,game,res){
 
         for(const cl of COOLERS){
           if(!cYeter(cl,c) || !cSigar(cl,cs)) continue;
-          const base=g.p+c.p+mb.p+psu.p+cl.p+cs.p;
+          const fanAdet=fanEk(g,c,cs,cl);
+          if(fanAdet<0) continue;                 // kasanın fan yuvası bu ısıya yetmiyor
+          const base=g.p+c.p+mb.p+psu.p+cl.p+cs.p+fanAdet*FANS[0].p;
           for(const r of RAMS){
             if(r.gb<minRam) continue;
             /* SERT KURAL — ust segment kart (idx>=110: RX 9070 ve ustu,
@@ -813,7 +842,7 @@ function kurDene(budget,prof,pick,esikliMi,game,res){
                  Skor GERÇEKTEN düşükse (kademe başka bir yerden — RAM/SSD/
                  GPU/CPU'dan — kesmiş demektir) o kombinasyon zaten elenir. */
               const kalite=cs.p+cl.p;
-              const aday={g,c,r,s,mb,psu,cl,cs,total,score,kalite};
+              const aday={g,c,r,s,mb,psu,cl,cs,total,score,kalite,fan:fanAdet?{adet:fanAdet,...FANS[0]}:null};
               if(!best || score>best.score+1e-9 ||
                  (Math.abs(score-best.score)<1e-9 &&
                    (kalite>best.kalite || (kalite===best.kalite && total<best.total))))
@@ -1377,6 +1406,8 @@ function parcalariGetir(){
           }
           return sirala ? db.sort(sirala) : db;
         };
+        /* Kasa fanı fiyatı yalnız bot dosyasından (veritabanında satırı yok). */
+        FANS.forEach(k=>{ const x=bf['fan:'+k.id]; if(x&&x.fiyat>0) k.p=x.fiyat; });
         const kodRam=RAMS.slice(), kodSsd=SSDS.slice();
         koy(RAMS, eksikEkle(kodRam, koru(kodRam, grup('ram').map(x=>({id:kimlik(x), n:x.ad, gb:x.kapasite||0, p:x.fiyat})),
           o=>o.id, ['tip','hiz']), 'ram', (a,b)=>a.gb-b.gb));
@@ -1421,7 +1452,7 @@ function parcalariGetir(){
             const m=String(x.anahtar||'').match(/^kasa:(\d+)$/);
             const e=(m && eskiKasa[+m[1]]) || eskiKasa.find(o=>o.n===x.ad) || {};
             const k={n:x.ad, p:x.fiyat, upTo:(x.butce_ust==null?Infinity:x.butce_ust)};
-            for(const a of ['rad','gpuMax','formMax','cpuH','dis']) if(e[a]!=null) k[a]=e[a];
+            for(const a of ['rad','gpuMax','formMax','cpuH','dis','fan','fanKap','ters']) if(e[a]!=null) k[a]=e[a];
             return k;
           }));
           /* Veritabanında satırı olmayan kod kasası (22.09: Lancool 207) eklenir. */
@@ -2831,9 +2862,6 @@ function kasaSahnesi(T,OrbitControls,el,sys){
   sahne.add(new T.LineSegments(new T.EdgesGeometry(kg),new T.LineBasicMaterial({color:0x2DE2E6})));
   const cam=new T.Mesh(new T.PlaneGeometry(D,H),new T.MeshBasicMaterial({color:0x2DE2E6,transparent:true,opacity:.04,side:T.DoubleSide}));
   cam.rotation.y=Math.PI/2; cam.position.x=W/2; sahne.add(cam);
-  /* Ön fanlar */
-  for(let i=0;i<3;i++){ const f=new T.Mesh(new T.RingGeometry(50,53,40),new T.MeshBasicMaterial({color:0xFF2D95,side:T.DoubleSide,transparent:true,opacity:.16}));
-    f.position.set(0,H/2-90-i*130,D/2-2); sahne.add(f); }
   /* Anakart: arka-sol duvar (x = -W/2), üst-arka köşe */
   const tepsi=-W/2+22, arka=-D/2+12;
   const mbY=(mb.form==='ATX')?305:244, mbZ=244;
@@ -2841,6 +2869,23 @@ function kasaSahnesi(T,OrbitControls,el,sys){
   const mbKutu=kutu(3,mbY,mbZ,tepsi,mbUst-mbY/2,arka+mbZ/2,0x1b2a33,0x3a5563);
   const bil=(m,baslik,...satir)=>{ if(m) m.userData.bilgi={tur:baslik[0],ad:baslik[1],satir:satir.filter(Boolean)}; return m; };
   bil(mbKutu,['Anakart',mb.n], mb.form&&(mb.form+' boyut'), mb.ram&&(mb.ram+(mb.ramHiz?' · '+mb.ramHiz+' MT/s\'ye kadar':'')), mb.ozellik, 'Soket: '+sys.c.plat);
+  /* Fanlar: kasanın hazır fanları önde (pembe), sistemin eklediği fanlar arka/üst
+     egzozda (camgöbeği). Halka görünüm, arkasındaki saydam disk üzerine gelmeyi yakalar. */
+  const isi=(g.id!=='igpu'?g.tdp:0)+sys.c.tdp;
+  const fanCiz=(x,y,z,ry,rx,renk,bilgi)=>{
+    const h=new T.Mesh(new T.RingGeometry(50,54,40),new T.MeshBasicMaterial({color:renk,side:T.DoubleSide,transparent:true,opacity:.55}));
+    const d=new T.Mesh(new T.CircleGeometry(54,32),new T.MeshBasicMaterial({color:renk,side:T.DoubleSide,transparent:true,opacity:.06}));
+    for(const m of [h,d]){ m.position.set(x,y,z); m.rotation.set(rx||0,ry||0,0); sahne.add(m); }
+    d.userData.bilgi=bilgi;
+  };
+  const hazirFan=Math.min(cs.fan??3,3);
+  for(let i=0;i<hazirFan;i++) fanCiz(0,H/2-90-i*130,D/2-2,0,0,0xFF2D95,
+    {tur:'Kasanın hazır fanı',ad:cs.n,satir:[(cs.fan??'?')+' hazır fan'+(cs.ters?' (ters yönlü "reverse")':''),'Sistem ~'+isi+' W ısı üretir · en az '+fanGerek(g,sys.c)+' fan gerekir']});
+  if(sys.fan) for(let i=0;i<sys.fan.adet;i++){
+    const arkaFan=i===0;
+    fanCiz(arkaFan?20:-10, arkaFan?H/2-110:H/2-8, arkaFan?-D/2+2:(-D/2+100+(i-1)*130), 0, arkaFan?0:Math.PI/2, 0x2DE2E6,
+      {tur:'Eklenen kasa fanı',ad:sys.fan.n,satir:[(arkaFan?'Arka':'Üst')+' egzoz · normal yönlü','Kasanın '+cs.fan+' hazır fanı ~'+isi+' W ısı için yetmiyor']});
+  }
   /* İşlemci soketi ve soğutucu */
   const sokY=mbUst-75, sokZ=arka+150;
   if(cl.rad){
@@ -2993,6 +3038,7 @@ function SistemAciklama({sys,budget,prof,pick,game,res}){
     g.id!=='igpu' && g.pin8 && ['Kablo', (g.p16&&psu.k16>=g.tdp)?'Kart 16-pin istiyor, güç kaynağında yerel 16-pin var':'Kart '+g.pin8+' adet 8-pin istiyor, güç kaynağında '+(psu.pin8??'yeterli')+' adet var'],
     g.boy && cs.gpuMax && ['Kasa', 'Kart '+g.boy+' mm, kasa '+cs.gpuMax+' mm alıyor ('+(cs.gpuMax-g.boy)+' mm boşluk)'],
     mb.form && cs.formMax && ['Anakart', mb.form+' anakart, kasa '+cs.formMax+'\'e kadar destekliyor'],
+    cs.fan!=null && ['Hava akışı', 'Kart + işlemci ~'+((g.id!=='igpu'?g.tdp:0)+c.tdp)+' W ısı üretir, en az '+fanGerek(g,c)+' kasa fanı gerekir; kasada '+cs.fan+' hazır fan'+(cl.rad?' + radyatörde '+Math.round(cl.rad/120):'')+(sys.fan?' + '+sys.fan.adet+' eklenen fan':'')],
     ['Soğutma', 'İşlemci '+c.tdp+' W ısı üretir, soğutucu '+cl.cap+' W kaldırır'+(cl.h&&cs.cpuH?'; '+cl.h+' mm yükseklik, kasa '+cs.cpuH+' mm alıyor':'')+(cl.rad&&cs.rad?'; kasa '+cs.rad+' mm radyatör alıyor':'')],
     r.tip && mb.ram && ['Bellek', r.tip+' bellek, anakart '+mb.ram+(mb.ramHiz?' ('+mb.ramHiz+' MT/s\'ye kadar)':'')],
     ['Fiyat', 'Her parça en az 3 farklı mağazada satılan modelin en ucuz fiyatı · '+fiyatYasi().metin],
@@ -3083,7 +3129,8 @@ function parcaNeden(sys){
   }
   if(cl.cap && c.tdp) ek('cooler', 'İşlemci '+c.tdp+' W ısı üretir · soğutucu '+cl.cap+' W kaldırır'+
     (cl.rad&&cs.rad?' · kasa '+cs.rad+' mm radyatör alır':''));
-  if(cs.gpuMax && g.boy) ek('case', 'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
+  if(sys.fan) ek('fan', 'Kasanın '+cs.fan+' hazır fanı yetmiyor: sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, '+fanGerek(g,c)+' fan gerekir · arka/üst egzoz için normal yönlü');
+  if(cs.gpuMax && g.boy) ek('case', (cs.fan!=null?cs.fan+' hazır fan'+(cs.ters?' (ters yönlü)':'')+' · ':'')+'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
     (cs.formMax?' · '+cs.formMax+' anakart sığar':''));
   return n;
 }
@@ -3120,6 +3167,7 @@ function parcaAnahtari(k,sys){
     case 'psu': return 'psu:'+sys.psu.id;
     case 'cooler': return 'sogutucu:'+sys.cl.id;
     case 'case': { const i=CASES.findIndex(x=>x.n===sys.cs.n); return i<0?null:'kasa:'+i; }
+    case 'fan': return sys.fan ? 'fan:'+sys.fan.id : null;
     case 'mb': { const l=BOARDS[sys.c.plat]||[]; const i=l.findIndex(x=>x.n===sys.mb.n); return i<0?null:'anakart:'+sys.c.plat+'-'+i; }
   }
   return null;
@@ -3156,6 +3204,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
     ['psu','Güç kaynağı',sys.psu.n,sys.psu.p],
     ['cooler','Soğutucu',sys.cl.n,sys.cl.p],
     ['case','Kasa',sys.cs.n,sys.cs.p],
+    ...(sys.fan ? [['fan','Kasa fanı (ek)',sys.fan.adet+' × '+sys.fan.n,sys.fan.adet*sys.fan.p]] : []),
   ] : [];
   const neden = sys ? parcaNeden(sys) : {};
   const ustButce = useMemo(()=> (sys && budget-sys.total>=budget*0.10) ? ustKademeButce(sys,prof,pick,game,res) : null,
@@ -3665,7 +3714,8 @@ function summaryText(sys,prof,plain){
     'SSD         : '+sys.s.n,
     'Güç kaynağı : '+sys.psu.n,
     'Soğutucu    : '+sys.cl.n,
-    'Kasa        : '+sys.cs.n,'',
+    'Kasa        : '+sys.cs.n,
+    ...(sys.fan ? ['Kasa fanı   : '+sys.fan.adet+' × '+sys.fan.n] : []),'',
     'TOPLAM      : '+plain(sys.total),'',
     'instagram.com/setuphane'
   ].join('\n');

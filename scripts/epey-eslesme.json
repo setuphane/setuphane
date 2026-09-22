@@ -52,5 +52,6 @@
   "cpu:250k": "https://www.epey.com/islemci/intel-core-ultra-5-250k-plus.html",
   "cpu:270k": "https://www.epey.com/islemci/intel-core-ultra-7-270k-plus.html",
   "anakart:AM5-3": "https://www.epey.com/anakart/msi-mpg-x870e-edge-ti-wifi.html",
-  "kasa:3": "https://www.epey.com/bilgisayar-kasasi/lian-li-lancool-207-beyaz.html"
+  "kasa:3": "https://www.epey.com/bilgisayar-kasasi/lian-li-lancool-207-beyaz.html",
+  "fan:tlc12": "https://www.epey.com/kasa-fani/thermalright-tl-c12015.html"
 }

@@ -21,6 +21,18 @@ Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitl
 (11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
 gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
 
+### 22.09.2026 — Kasa hava akışı (fan) kuralı
+
+Kullanıcı: "bazı kasalarda fan var ama yetersiz". NZXT H3 Flow'da tek hazır fan
+var ve ~500 W'lık sistemlerde kullanılıyordu; eski motorda 1.884 sistem yetersiz
+fanlıydı. Kural: kart+işlemci ısısı <250 W: 2, 250–450: 3, >450: 4 fan; radyatör
+fanları sayılır; eksik kadar Thermalright TL-C12015 (523 TL, 7 satıcı, PWM)
+eklenir ve kasa seçiminde MALİYETE dahildir; fan yuvası (fanKap) yetmeyen kasa
+elenir. CASES.fan/fanKap/ters (Epey). Eklenenler arka/üst egzoz, normal yönlü
+(4500X'in hazır fanları zaten ters yönlü). Denetim: bağımsız 'hava-akisi' kuralı.
+3D'de hazır fanlar pembe, eklenenler camgöbeği; üzerine gelince açıklama.
+Sitede "3B" -> "3D"; 3D'de parçanın üzerine gelince adı ve ölçüleri.
+
 ### 22.09.2026 — Hazır sistemlerden katalog genişletme
 
 İtopya+İncehesap 913 paketinde sık olup bizde olmayanlar tarandı. YALNIZCA
