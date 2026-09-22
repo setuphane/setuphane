@@ -282,9 +282,9 @@ if (eksikBoy.length) {
 // calistiriliyor ve hicbir olcu alaninin kaybolmadigi dogrulaniyor.
 {
   const OLCU = {
-    GPUS: ['boy', 'r1440', 'r2160', 'psuMin', 'pin8', 'p16'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
+    GPUS: ['boy', 'r1440', 'r2160', 'psuMin', 'pin8', 'p16', 'kal', 'yuk'], CPUS: ['x4', 'plat'], RAMS: ['tip', 'hiz'],
     PSUS: ['pin8', 'k16'],
-    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH'],
+    COOLERS: ['rad', 'cap', 'h', 'sinif'], CASES: ['rad', 'gpuMax', 'formMax', 'cpuH', 'dis'],
   };
   const once = {
     GPUS: structuredClone(GPUS), CPUS: structuredClone(CPUS), RAMS: structuredClone(RAMS),
@@ -318,7 +318,7 @@ if (eksikBoy.length) {
       once[ad].forEach((o, i) => {
         const dizi = { GPUS, CPUS, RAMS, COOLERS, CASES, PSUS }[ad];
         const y = (o.id != null && dizi.find(x => x.id === o.id)) || (o.id == null && dizi[i]) || null;
-        for (const a of alanlar) if (o[a] != null && (!y || y[a] !== o[a])) kayip.push(`${ad} ${o.n || o.id}: ${a} ${o[a]} -> ${y ? y[a] : 'YOK'}`);
+        for (const a of alanlar) if (o[a] != null && (!y || JSON.stringify(y[a]) !== JSON.stringify(o[a]))) kayip.push(`${ad} ${o.n || o.id}: ${a} ${o[a]} -> ${y ? y[a] : 'YOK'}`);
       });
     for (const pl of Object.keys(once.BOARDS)) once.BOARDS[pl].forEach((o, i) => {
       const y = (BOARDS[pl] || [])[i];

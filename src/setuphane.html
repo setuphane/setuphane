@@ -314,20 +314,20 @@ const GPUS=[
     modelin kendi değeri (ör. RX 7600 Sapphire Pulse 185 W, referans 165 W).
     21.09 öncesi motor yalnızca tdp formülüne bakıyordu ve RX 9070 Gaming OC
     (üretici: 750 W) için 550 W öneriyordu. */
- {id:'7600',   n:'Radeon RX 7600 8 GB (Sapphire Pulse)',           b:'AMD',    idx:48,  r1440:0.96, r2160:0.82, vram:8,  tdp:185, p:17289, boy:240, psuMin:550,  pin8:1},
- {id:'5060',   n:'GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)', b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:19700, boy:197, psuMin:550,  pin8:1},
- {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:160, p:26299, boy:202, psuMin:550,  pin8:1},
- {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',        b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:40595, boy:229, psuMin:550,  pin8:1},
- {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:36809, boy:288, psuMin:750,  pin8:2},
+ {id:'7600',   n:'Radeon RX 7600 8 GB (Sapphire Pulse)',           b:'AMD',    idx:48,  r1440:0.96, r2160:0.82, vram:8,  tdp:185, p:17289, boy:240, psuMin:550,  pin8:1, kal:44, yuk:107},
+ {id:'5060',   n:'GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)', b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:19700, boy:197, psuMin:550,  pin8:1, kal:41, yuk:120},
+ {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:160, p:26299, boy:202, psuMin:550,  pin8:1, kal:49, yuk:120},
+ {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',        b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:40595, boy:229, psuMin:550,  pin8:1, kal:50, yuk:120},
+ {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:36809, boy:288, psuMin:750,  pin8:2, kal:50, yuk:132},
  /* 21.09.2026: Gainward Phoenix Epey'de 0 teklife düştü; yerine 3+ satıcılı en
     ucuz 5070. Uzunluk ürün sayfasındaki "Derinlik"ten (VCG507012TFXXPB1-O). */
- {id:'5070',   n:'GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)', b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:47393, boy:300, psuMin:650,  pin8:2, p16:true},
- {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)', b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:41570, boy:325, psuMin:800,  pin8:2},
- {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (PNY Triple OC)',            b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:58093, boy:300, psuMin:750,  pin8:3, p16:true},
+ {id:'5070',   n:'GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)', b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:47393, boy:300, psuMin:650,  pin8:2, p16:true, kal:48, yuk:120},
+ {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)', b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:41570, boy:325, psuMin:800,  pin8:2, kal:65, yuk:150},
+ {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (PNY Triple OC)',            b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:58093, boy:300, psuMin:750,  pin8:3, p16:true, kal:60, yuk:120},
  /* 22.09.2026: Gigabyte Windforce OC SFF 94.093 TL / 5 satıcı — MSI Shadow'dan
     (100.000) ucuz, kural gereği değişti. 304 mm, 360 W, üretici 850 W, 16-pin (Epey). */
- {id:'5080',   n:'GeForce RTX 5080 16 GB (Gigabyte Windforce OC SFF)', b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:94093, boy:304, psuMin:850,  pin8:3, p16:true},
- {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',       b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:318181, boy:325, psuMin:1000, pin8:4, p16:true},
+ {id:'5080',   n:'GeForce RTX 5080 16 GB (Gigabyte Windforce OC SFF)', b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:94093, boy:304, psuMin:850,  pin8:3, p16:true, kal:50, yuk:126},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',       b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:318181, boy:325, psuMin:1000, pin8:4, p16:true, kal:67, yuk:139},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -465,12 +465,12 @@ const CASES=[
  /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
     doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
     280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
- {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160},
- {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160, dis:[200,388,423]},
+ {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170, dis:[225,389,400]},
  /* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
    RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
    (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478]},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -1295,7 +1295,7 @@ function parcalariGetir(){
         const gpuOnce=GPUS.slice();
         koy(GPUS, koru(gpuOnce, grup('gpu').map(x=>({id:kimlik(x), n:x.ad, b:x.marka||'—',
           idx:x.idx||0, vram:x.vram||0, tdp:x.tdp||0, p:x.fiyat})),
-          o=>o.id, ['r1440','r2160','boy','psuMin','pin8','p16']));
+          o=>o.id, ['r1440','r2160','boy','psuMin','pin8','p16','kal','yuk']));
         /* Güç tüketimi: veritabanındaki (çoğu zaman referans model) ile koddaki
            (satılan modelin kendi değeri) arasından BÜYÜK olan — güç kaynağı
            hesabında düşük tahmin kapanan bilgisayar demek. */
@@ -1352,7 +1352,7 @@ function parcalariGetir(){
             const m=String(x.anahtar||'').match(/^kasa:(\d+)$/);
             const e=(m && eskiKasa[+m[1]]) || eskiKasa.find(o=>o.n===x.ad) || {};
             const k={n:x.ad, p:x.fiyat, upTo:(x.butce_ust==null?Infinity:x.butce_ust)};
-            for(const a of ['rad','gpuMax','formMax','cpuH']) if(e[a]!=null) k[a]=e[a];
+            for(const a of ['rad','gpuMax','formMax','cpuH','dis']) if(e[a]!=null) k[a]=e[a];
             return k;
           }));
         }
@@ -2664,6 +2664,150 @@ function sistemAnaliz(sys){
   const tasir=GPUS.filter(x=>x.id!=='igpu' && psuYeter(x,c,psu)).sort((a,b)=>b.idx-a.idx)[0];
   return {degis, dikkat, yuk, tasir};
 }
+
+/* ═══════════════════ 3B KASA İÇİ — GERÇEK ÖLÇÜLERLE ═══════════════════
+   22.09.2026. Seçilen sistemin kasası ve parçaları milimetre ölçeğinde:
+   kasa dış ölçüleri (CASES.dis, Epey), kart uzunluk/yükseklik/kalınlık
+   (GPUS.boy/yuk/kal, Epey), soğutucu yüksekliği (COOLERS.h), kasanın kart
+   ve soğutucu sınırları (gpuMax, cpuH). Parçaların GÖRÜNÜMÜ temsilidir
+   (üreticiler 3B model yayınlamıyor) ama ÖLÇÜLERİ ve boşluklar gerçektir:
+   yeşil bölge kartın önündeki boşluk, kırmızı çizgi/düzlem kasanın sınırı.
+   three.js yalnızca "3B gör"e basınca CDN'den yüklenir; sayfa açılışını
+   etkilemez. Ölçüsü olmayan parça için standart boyut kullanılır ve altta
+   "temsili" diye yazılır. */
+const THREE_URL='https://cdn.jsdelivr.net/npm/three@0.170.0/+esm';
+const ORBIT_URL='https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/controls/OrbitControls.js/+esm';
+function Kasa3B({sys}){
+  const [acik,setAcik]=useState(false);
+  const [durum,setDurum]=useState('');
+  const kap=useRef(null);
+  useEffect(()=>{
+    if(!acik || !sys || !kap.current) return;
+    let iptal=false, temizle=()=>{};
+    setDurum('yükleniyor');
+    Promise.all([import(THREE_URL), import(ORBIT_URL)]).then(([T,{OrbitControls}])=>{
+      if(iptal || !kap.current) return;
+      setDurum('');
+      temizle=kasaSahnesi(T,OrbitControls,kap.current,sys);
+    }).catch(()=>setDurum('hata'));
+    return ()=>{ iptal=true; temizle(); };
+  },[acik,sys]);
+  if(!sys || sys.g.id==='igpu') return null;
+  const {g,cs,cl}=sys;
+  const olc=[
+    g.boy && cs.gpuMax && ['Ekran kartı', g.boy+' mm uzunluk · kasa '+cs.gpuMax+' mm alıyor', (cs.gpuMax-g.boy)+' mm boşluk'],
+    cl.h && cs.cpuH && ['Soğutucu', cl.h+' mm yükseklik · kasa '+cs.cpuH+' mm alıyor', (cs.cpuH-cl.h)+' mm boşluk'],
+    cl.rad && cs.rad && ['Radyatör', cl.rad+' mm · kasa '+cs.rad+' mm radyatör alıyor', 'sığıyor'],
+  ].filter(Boolean);
+  return (
+    <div className="mt-6 border border-line">
+      <button onClick={()=>{ setAcik(x=>!x); if(!acik) olay('kasa_3b_acildi'); }} aria-expanded={acik}
+        className="w-full flex items-center justify-between gap-4 px-4 sm:px-5 py-4 text-left hover:bg-cy/[.04] transition-colors">
+        <span>
+          <span className="block text-[.95rem] text-ink">Kasanın içini 3B gör</span>
+          <span className="block text-[.75rem] text-dim mt-1">Gerçek ölçülerle: parçalar nereye oturuyor, ne kadar boşluk kalıyor</span>
+        </span>
+        <span className="shrink-0 lbl text-cy">{acik?'KAPAT':'3B GÖR'}</span>
+      </button>
+      {acik && (
+        <div className="border-t border-line">
+          <div ref={kap} className="relative w-full h-[340px] sm:h-[440px] bg-[#05050a] touch-none">
+            {durum==='yükleniyor' && <div className="absolute inset-0 grid place-items-center lbl text-dim">3B MODEL HAZIRLANIYOR…</div>}
+            {durum==='hata' && <div className="absolute inset-0 grid place-items-center text-[.85rem] text-dim px-6 text-center">3B görünüm yüklenemedi (bağlantı ya da tarayıcı desteği).</div>}
+          </div>
+          <div className="px-4 sm:px-5 py-4 text-[.8rem] space-y-2">
+            <div className="text-[.72rem] text-dim">Sürükle: döndür · iki parmak / tekerlek: yakınlaştır</div>
+            {olc.map(([k,t,b])=>(
+              <div key={k} className="flex flex-wrap justify-between gap-x-4">
+                <span><span className="text-ink">{k}:</span> <span className="text-ink/80">{t}</span></span>
+                <span className="text-cy num">{b}</span>
+              </div>
+            ))}
+            <div className="flex flex-wrap gap-x-5 gap-y-1 pt-2 text-[.72rem] text-dim">
+              <span><span className="inline-block w-2.5 h-2.5 bg-[#22c55e] opacity-70 mr-1.5 align-middle"></span>kartın önündeki boşluk</span>
+              <span><span className="inline-block w-2.5 h-2.5 bg-[#ff2d55] mr-1.5 align-middle"></span>kasanın sınırı</span>
+            </div>
+            <p className="text-[.7rem] text-dim/80 leading-relaxed">Ölçüler gerçek; parçaların görünümü temsilidir.</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+function kasaSahnesi(T,OrbitControls,el,sys){
+  const {g,cs,cl,mb}=sys;
+  const [W,D,H]=cs.dis||[225,420,450];
+  const w=el.clientWidth, h=el.clientHeight;
+  const sahne=new T.Scene();
+  const kamera=new T.PerspectiveCamera(30,w/h,1,8000);
+  const uzak=Math.max(W,H,D)*(w<500?3.6:2.9); kamera.position.set(uzak*.72,uzak*.32,uzak*.62);
+  const r=new T.WebGLRenderer({antialias:true,alpha:true});
+  r.setPixelRatio(Math.min(2,window.devicePixelRatio||1)); r.setSize(w,h); el.appendChild(r.domElement);
+  sahne.add(new T.AmbientLight(0xffffff,.55));
+  const isik=new T.DirectionalLight(0xffffff,1.1); isik.position.set(400,600,500); sahne.add(isik);
+  const kutu=(sx,sy,sz,x,y,z,renk,kenar,op)=>{
+    const geo=new T.BoxGeometry(sx,sy,sz);
+    const m=new T.Mesh(geo,new T.MeshStandardMaterial({color:renk,transparent:op!=null,opacity:op??1,roughness:.6,metalness:.2}));
+    m.position.set(x,y,z); sahne.add(m);
+    if(kenar){ const e=new T.LineSegments(new T.EdgesGeometry(geo),new T.LineBasicMaterial({color:kenar})); e.position.copy(m.position); sahne.add(e); }
+    return m;
+  };
+  /* Kasa: kenar çizgileri + yarı saydam cam */
+  const kg=new T.BoxGeometry(W,H,D);
+  sahne.add(new T.LineSegments(new T.EdgesGeometry(kg),new T.LineBasicMaterial({color:0x2DE2E6})));
+  const cam=new T.Mesh(new T.PlaneGeometry(D,H),new T.MeshBasicMaterial({color:0x2DE2E6,transparent:true,opacity:.04,side:T.DoubleSide}));
+  cam.rotation.y=Math.PI/2; cam.position.x=W/2; sahne.add(cam);
+  /* Ön fanlar */
+  for(let i=0;i<3;i++){ const f=new T.Mesh(new T.RingGeometry(50,54,40),new T.MeshBasicMaterial({color:0xFF2D95,side:T.DoubleSide,transparent:true,opacity:.35}));
+    f.position.set(0,H/2-90-i*130,D/2-2); sahne.add(f); }
+  /* Anakart: arka-sol duvar (x = -W/2), üst-arka köşe */
+  const tepsi=-W/2+22, arka=-D/2+12;
+  const mbY=(mb.form==='ATX')?305:244, mbZ=244;
+  const mbUst=H/2-28;
+  kutu(3,mbY,mbZ,tepsi,mbUst-mbY/2,arka+mbZ/2,0x1b2a33,0x3a5563);
+  /* İşlemci soketi ve soğutucu */
+  const sokY=mbUst-75, sokZ=arka+150;
+  if(cl.rad){
+    kutu(40,62,62,tepsi+22,sokY,sokZ,0x1f1f28,0x2DE2E6);                       // pompa
+    const rl=cl.rad+37; kutu(120,27,rl,-W/2+22+75,H/2-30,arka+rl/2+20,0x2a2a34,0x2DE2E6); // radyatör (üst)
+  } else if(cl.h){
+    const kule=cl.sinif==='cift'?135:74;
+    kutu(cl.h,125,kule,tepsi+cl.h/2,sokY,sokZ,0x9aa3ad,0xdfe6ec);
+    /* kasanın soğutucu yükseklik sınırı */
+    if(cs.cpuH){ const s=new T.Mesh(new T.PlaneGeometry(170,170),new T.MeshBasicMaterial({color:0xff2d55,transparent:true,opacity:.18,side:T.DoubleSide}));
+      s.rotation.y=Math.PI/2; s.position.set(tepsi+cs.cpuH,sokY,sokZ); sahne.add(s); }
+  }
+  /* RAM */
+  for(let i=0;i<2;i++) kutu(32,133,7,tepsi+18,sokY-10,sokZ+80+i*10,0x2DE2E6,null,.85);
+  /* Ekran kartı: yuvadan cama doğru yükseklik (yuk), aşağı kalınlık (kal), öne uzunluk (boy) */
+  const gL=g.boy||280, gH=g.yuk||125, gK=g.kal||50;
+  const yuvaY=sokY-120;
+  kutu(gH,gK,gL,tepsi+gH/2+4,yuvaY-gK/2,arka+gL/2,0x16161d,0xFF2D95);
+  /* Kartın önündeki boşluk (yeşil) ve kasanın kart sınırı (kırmızı) */
+  if(cs.gpuMax){
+    const bos=cs.gpuMax-gL;
+    if(bos>0) kutu(gH,gK,bos,tepsi+gH/2+4,yuvaY-gK/2,arka+gL+bos/2,0x22c55e,null,.28);
+    const cz=arka+cs.gpuMax;
+    const cizgi=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(tepsi,yuvaY+10,cz),new T.Vector3(tepsi+gH+20,yuvaY+10,cz),
+      new T.Vector3(tepsi+gH+20,yuvaY-gK-10,cz),new T.Vector3(tepsi,yuvaY-gK-10,cz),new T.Vector3(tepsi,yuvaY+10,cz)]),new T.LineBasicMaterial({color:0xff2d55}));
+    sahne.add(cizgi);
+  }
+  /* Güç kaynağı (standart ATX: 150 × 86 × 140) ve SSD */
+  kutu(140,86,150,tepsi+80,-H/2+50,arka+85,0x23232c,0x6b7280);
+  kutu(2,22,80,tepsi+3,sokY-60,sokZ+20,0x1e3a8a,null);
+  const kon=new OrbitControls(kamera,r.domElement);
+  kon.enableDamping=true; kon.autoRotate=true; kon.autoRotateSpeed=.8; kon.target.set(0,0,0);
+  kon.addEventListener('start',()=>{ kon.autoRotate=false; });
+  let dur=false;
+  const ciz=()=>{ if(dur) return; kon.update(); r.render(sahne,kamera); requestAnimationFrame(ciz); };
+  ciz();
+  const boyut=()=>{ const w2=el.clientWidth,h2=el.clientHeight; kamera.aspect=w2/h2; kamera.updateProjectionMatrix(); r.setSize(w2,h2); };
+  window.addEventListener('resize',boyut);
+  return ()=>{ dur=true; window.removeEventListener('resize',boyut); kon.dispose(); r.dispose();
+    sahne.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
+    if(r.domElement.parentNode) r.domElement.parentNode.removeChild(r.domElement); };
+}
+
 function SistemAciklama({sys,budget,prof,pick,game,res}){
   const {fmt}=useCur();
   const [acik,setAcik]=useState(false);
@@ -2952,6 +3096,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                     {paylasildi?'LİNK KOPYALANDI ✓':'PAYLAŞ'}
                   </button>
                 </div>
+                <Kasa3B sys={sys}/>
                 <SistemAciklama sys={sys} budget={budget} prof={prof} pick={pick} game={game} res={res}/>
               </>
             )}
