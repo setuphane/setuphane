@@ -5346,20 +5346,20 @@ function Kasa3B({
     className: "w-full flex items-center justify-between gap-4 px-4 sm:px-5 py-4 text-left hover:bg-cy/[.04] transition-colors"
   }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
     className: "block text-[.95rem] text-ink"
-  }, "Kasan\u0131n i\xE7ini 3B g\xF6r"), /*#__PURE__*/React.createElement("span", {
+  }, "Kasan\u0131n i\xE7ini 3D g\xF6r"), /*#__PURE__*/React.createElement("span", {
     className: "block text-[.75rem] text-dim mt-1"
   }, "Ger\xE7ek \xF6l\xE7\xFClerle: par\xE7alar nereye oturuyor, ne kadar bo\u015Fluk kal\u0131yor")), /*#__PURE__*/React.createElement("span", {
     className: "shrink-0 lbl text-cy"
-  }, acik ? 'KAPAT' : '3B GÖR')), acik && /*#__PURE__*/React.createElement("div", {
+  }, acik ? 'KAPAT' : '3D GÖR')), acik && /*#__PURE__*/React.createElement("div", {
     className: "border-t border-line"
   }, /*#__PURE__*/React.createElement("div", {
     ref: kap,
     className: "relative w-full h-[340px] sm:h-[440px] bg-[#05050a] touch-none"
   }, durum === 'yükleniyor' && /*#__PURE__*/React.createElement("div", {
     className: "absolute inset-0 grid place-items-center lbl text-dim"
-  }, "3B MODEL HAZIRLANIYOR\u2026"), durum === 'hata' && /*#__PURE__*/React.createElement("div", {
+  }, "3D MODEL HAZIRLANIYOR\u2026"), durum === 'hata' && /*#__PURE__*/React.createElement("div", {
     className: "absolute inset-0 grid place-items-center text-[.85rem] text-dim px-6 text-center"
-  }, "3B g\xF6r\xFCn\xFCm y\xFCklenemedi (ba\u011Flant\u0131 ya da taray\u0131c\u0131 deste\u011Fi)."), kasaFoto && /*#__PURE__*/React.createElement("div", {
+  }, "3D g\xF6r\xFCn\xFCm y\xFCklenemedi (ba\u011Flant\u0131 ya da taray\u0131c\u0131 deste\u011Fi)."), kasaFoto && /*#__PURE__*/React.createElement("div", {
     className: "absolute left-2 bottom-2 w-[74px] sm:w-[96px] rounded-md bg-white p-1 pointer-events-none"
   }, /*#__PURE__*/React.createElement("img", {
     src: kasaFoto,
@@ -5371,7 +5371,7 @@ function Kasa3B({
     className: "px-4 sm:px-5 py-4 text-[.8rem] space-y-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "text-[.72rem] text-dim"
-  }, "S\xFCr\xFCkle: d\xF6nd\xFCr \xB7 iki parmak / tekerlek: yak\u0131nla\u015Ft\u0131r"), olc.map(([k, t, b]) => /*#__PURE__*/React.createElement("div", {
+  }, "S\xFCr\xFCkle: d\xF6nd\xFCr \xB7 iki parmak / tekerlek: yak\u0131nla\u015Ft\u0131r \xB7 par\xE7an\u0131n \xFCzerine gel (telefonda dokun): ad\u0131 ve \xF6l\xE7\xFCleri"), olc.map(([k, t, b]) => /*#__PURE__*/React.createElement("div", {
     key: k,
     className: "flex flex-wrap justify-between gap-x-4"
   }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("span", {
@@ -5467,16 +5467,25 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
     mbZ = 244;
   const mbUst = H / 2 - 28;
   const mbKutu = kutu(3, mbY, mbZ, tepsi, mbUst - mbY / 2, arka + mbZ / 2, 0x1b2a33, 0x3a5563);
+  const bil = (m, baslik, ...satir) => {
+    if (m) m.userData.bilgi = {
+      tur: baslik[0],
+      ad: baslik[1],
+      satir: satir.filter(Boolean)
+    };
+    return m;
+  };
+  bil(mbKutu, ['Anakart', mb.n], mb.form && mb.form + ' boyut', mb.ram && mb.ram + (mb.ramHiz ? ' · ' + mb.ramHiz + ' MT/s\'ye kadar' : ''), mb.ozellik, 'Soket: ' + sys.c.plat);
   /* İşlemci soketi ve soğutucu */
   const sokY = mbUst - 75,
     sokZ = arka + 150;
   if (cl.rad) {
-    kutu(40, 62, 62, tepsi + 22, sokY, sokZ, 0x1f1f28, 0x2DE2E6); // pompa
+    bil(kutu(40, 62, 62, tepsi + 22, sokY, sokZ, 0x1f1f28, 0x2DE2E6), ['İşlemci + pompa', sys.c.n + ' · ' + cl.n], sys.c.tdp + ' W işlemci'); // pompa
     const rl = cl.rad + 37;
-    var sogKutu = kutu(120, 27, rl, -W / 2 + 22 + 75, H / 2 - 30, arka + rl / 2 + 20, 0x2a2a34, 0x2DE2E6); // radyatör (üst)
+    var sogKutu = bil(kutu(120, 27, rl, -W / 2 + 22 + 75, H / 2 - 30, arka + rl / 2 + 20, 0x2a2a34, 0x2DE2E6), ['Sıvı soğutma', cl.n], cl.rad + ' mm radyatör · kasa ' + (cs.rad || '?') + ' mm alıyor', cl.cap + ' W soğutma · işlemci ' + sys.c.tdp + ' W'); // radyatör (üst)
   } else if (cl.h) {
     const kule = cl.sinif === 'cift' ? 135 : 74;
-    var sogKutu = kutu(cl.h, 125, kule, tepsi + cl.h / 2, sokY, sokZ, 0x9aa3ad, 0xdfe6ec);
+    var sogKutu = bil(kutu(cl.h, 125, kule, tepsi + cl.h / 2, sokY, sokZ, 0x9aa3ad, 0xdfe6ec), ['İşlemci soğutucu', cl.n], cl.h + ' mm yükseklik' + (cs.cpuH ? ' · kasa ' + cs.cpuH + ' mm alıyor (' + (cs.cpuH - cl.h) + ' mm boşluk)' : ''), cl.cap + ' W soğutma · ' + sys.c.n + ' ' + sys.c.tdp + ' W');
     /* kasanın soğutucu yükseklik sınırı */
     if (cs.cpuH) {
       const s = new T.Mesh(new T.PlaneGeometry(170, 170), new T.MeshBasicMaterial({
@@ -5488,20 +5497,21 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
       s.rotation.y = Math.PI / 2;
       s.position.set(tepsi + cs.cpuH, sokY, sokZ);
       sahne.add(s);
+      bil(s, ['Kasanın soğutucu sınırı', cs.n], 'En fazla ' + cs.cpuH + ' mm yükseklikte soğutucu alır');
     }
   }
   /* RAM */
-  for (let i = 0; i < 2; i++) kutu(32, 133, 7, tepsi + 18, sokY - 10, sokZ + 80 + i * 10, 0x2DE2E6, null, .85);
+  for (let i = 0; i < 2; i++) bil(kutu(32, 133, 7, tepsi + 18, sokY - 10, sokZ + 80 + i * 10, 0x2DE2E6, null, .85), ['Bellek (RAM)', sys.r.n], (sys.r.tip || '') + (sys.r.hiz ? '-' + sys.r.hiz : ''));
   /* Ekran kartı: yuvadan cama doğru yükseklik (yuk), aşağı kalınlık (kal), öne uzunluk (boy) */
   const gL = g.boy || 280,
     gH = g.yuk || 125,
     gK = g.kal || 50;
   const yuvaY = sokY - 120;
-  const gpuKutu = kutu(gH, gK, gL, tepsi + gH / 2 + 4, yuvaY - gK / 2, arka + gL / 2, 0x16161d, 0xFF2D95);
+  const gpuKutu = bil(kutu(gH, gK, gL, tepsi + gH / 2 + 4, yuvaY - gK / 2, arka + gL / 2, 0x16161d, 0xFF2D95), ['Ekran kartı', g.n], gL + ' mm uzunluk · ' + gH + ' mm yükseklik' + (g.kal ? ' · ' + g.kal + ' mm kalınlık' : ''), g.tdp + ' W tüketim' + (g.psuMin ? ' · üretici ' + g.psuMin + ' W güç kaynağı istiyor' : ''));
   /* Kartın önündeki boşluk (yeşil) ve kasanın kart sınırı (kırmızı) */
   if (cs.gpuMax) {
     const bos = cs.gpuMax - gL;
-    if (bos > 0) kutu(gH, gK, bos, tepsi + gH / 2 + 4, yuvaY - gK / 2, arka + gL + bos / 2, 0x22c55e, null, .28);
+    if (bos > 0) bil(kutu(gH, gK, bos, tepsi + gH / 2 + 4, yuvaY - gK / 2, arka + gL + bos / 2, 0x22c55e, null, .28), ['Kartın önündeki boşluk', bos + ' mm'], 'Kart ' + gL + ' mm · kasa en fazla ' + cs.gpuMax + ' mm alıyor', 'Kablo ve ön fanlar için hava payı');
     const cz = arka + cs.gpuMax;
     const cizgi = new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(tepsi, yuvaY + 10, cz), new T.Vector3(tepsi + gH + 20, yuvaY + 10, cz), new T.Vector3(tepsi + gH + 20, yuvaY - gK - 10, cz), new T.Vector3(tepsi, yuvaY - gK - 10, cz), new T.Vector3(tepsi, yuvaY + 10, cz)]), new T.LineBasicMaterial({
       color: 0xff2d55
@@ -5509,8 +5519,8 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
     sahne.add(cizgi);
   }
   /* Güç kaynağı (standart ATX: 150 × 86 × 140) ve SSD */
-  const psuKutu = kutu(140, 86, 150, tepsi + 80, -H / 2 + 50, arka + 85, 0x23232c, 0x6b7280);
-  kutu(2, 22, 80, tepsi + 3, sokY - 60, sokZ + 20, 0x1e3a8a, null);
+  const psuKutu = bil(kutu(140, 86, 150, tepsi + 80, -H / 2 + 50, arka + 85, 0x23232c, 0x6b7280), ['Güç kaynağı', sys.psu.n], sys.psu.w + ' W' + (g.psuMin ? ' · kart üreticisi en az ' + g.psuMin + ' W istiyor' : ''), 'Sistem en fazla ~' + ((g.tdp || 0) + (sys.c.tdp || 0) + 90) + ' W çeker');
+  bil(kutu(2, 22, 80, tepsi + 3, sokY - 60, sokZ + 20, 0x1e3a8a, null), ['Disk (SSD)', sys.s.n]);
 
   /* ── GERÇEK ÜRÜN FOTOĞRAFLARI ──
      Her parçanın resmî fotoğrafı (urun/parca/3b), beyaz zemini tarayıcıda
@@ -5581,6 +5591,7 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
       m.rotation.set(rot[0] || 0, rot[1] || 0, rot[2] || 0);
       sahne.add(m);
       /* Fotoğraf geldiyse temsili kutu geri çekilsin: ürün öne çıksın, ölçü kenarları kalsın. */
+      if (kutuRef && kutuRef.userData.bilgi) m.userData.bilgi = kutuRef.userData.bilgi;
       if (kutuRef) {
         kutuRef.material.transparent = true;
         kutuRef.material.opacity = .18;
@@ -5601,6 +5612,70 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
   dekal(foto('ram'), 131, 30, [tepsi + 18, sokY - 10, sokZ + 80 + 10 + 4.5], [0, 0, Y90]); // RAM, ön yüz
   dekal(foto('gpu'), gL * .98, gH * .98, [tepsi + gH / 2 + 4, yuvaY + 1.5, arka + gL / 2], [-Y90, 0, Y90], gpuKutu); // kart, üst yüz
   dekal(foto('psu'), 148, 84, [tepsi + 80 + 71, -H / 2 + 50, arka + 85], [0, Y90, 0], psuKutu); // güç kaynağı, yan
+  /* ── Üzerine gelince bilgi ── Işın (raycaster) imlecin altındaki en yakın
+     etiketli parçayı bulur; kutu imlecin yanında açılır, parça hafifçe
+     vurgulanır. Dokunmatikte dokunma aynı işi görür. */
+  const ipucu = document.createElement('div');
+  ipucu.setAttribute('role', 'tooltip');
+  ipucu.style.cssText = 'position:absolute;pointer-events:none;z-index:5;max-width:260px;padding:8px 10px;background:rgba(7,7,11,.94);' + 'border:1px solid rgba(45,226,230,.55);color:#ECEBF2;font:12px/1.4 "Space Grotesk",system-ui,sans-serif;display:none;box-shadow:0 6px 24px rgba(0,0,0,.5)';
+  el.appendChild(ipucu);
+  const isin = new T.Raycaster(),
+    fare = new T.Vector2();
+  let secili = null;
+  const vurgula = m => {
+    if (secili === m) return;
+    if (secili && secili.material && secili.userData._eski != null) {
+      secili.material.opacity = secili.userData._eski;
+      secili.material.transparent = secili.userData._saydam;
+    }
+    secili = m;
+    if (m && m.material && m.material.color) {
+      m.userData._eski = m.material.opacity;
+      m.userData._saydam = m.material.transparent;
+      if (!m.material.map) {
+        m.material.transparent = true;
+        m.material.opacity = Math.min(1, (m.material.opacity || 1) * 0.6 + 0.35);
+      }
+    }
+  };
+  const kacis = t => String(t).replace(/[&<>]/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;'
+  })[c]);
+  const goster = e => {
+    const rc = r.domElement.getBoundingClientRect();
+    fare.x = (e.clientX - rc.left) / rc.width * 2 - 1;
+    fare.y = -((e.clientY - rc.top) / rc.height) * 2 + 1;
+    isin.setFromCamera(fare, kamera);
+    const vur = isin.intersectObjects(sahne.children, false).find(h => h.object.userData.bilgi);
+    if (!vur) {
+      ipucu.style.display = 'none';
+      vurgula(null);
+      r.domElement.style.cursor = 'grab';
+      return;
+    }
+    const b = vur.object.userData.bilgi;
+    ipucu.innerHTML = '<div style="font:10px/1 JetBrains Mono,monospace;letter-spacing:.14em;color:#2DE2E6;margin-bottom:4px">' + kacis(b.tur.toLocaleUpperCase('tr')) + '</div>' + '<div style="font-weight:500;margin-bottom:' + (b.satir.length ? '4px' : '0') + '">' + kacis(b.ad) + '</div>' + b.satir.map(x => '<div style="color:#8B88A0">' + kacis(x) + '</div>').join('');
+    ipucu.style.display = 'block';
+    let x = e.clientX - rc.left + 14,
+      y = e.clientY - rc.top + 14;
+    if (x + ipucu.offsetWidth > rc.width - 6) x = e.clientX - rc.left - ipucu.offsetWidth - 14;
+    if (y + ipucu.offsetHeight > rc.height - 6) y = e.clientY - rc.top - ipucu.offsetHeight - 14;
+    ipucu.style.left = Math.max(4, x) + 'px';
+    ipucu.style.top = Math.max(4, y) + 'px';
+    vurgula(vur.object);
+    r.domElement.style.cursor = 'pointer';
+  };
+  const cik = () => {
+    ipucu.style.display = 'none';
+    vurgula(null);
+  };
+  r.domElement.addEventListener('pointermove', goster);
+  r.domElement.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse') goster(e);
+  });
+  r.domElement.addEventListener('pointerleave', cik);
   const kon = new OrbitControls(kamera, r.domElement);
   kon.enableDamping = true;
   kon.autoRotate = true;
@@ -5628,6 +5703,7 @@ function kasaSahnesi(T, OrbitControls, el, sys) {
   return () => {
     dur = true;
     window.removeEventListener('resize', boyut);
+    if (ipucu.parentNode) ipucu.parentNode.removeChild(ipucu);
     kon.dispose();
     r.dispose();
     dokular.forEach(t => t.dispose());
