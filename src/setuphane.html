@@ -451,6 +451,11 @@ const BOARDS={
   {n:'MSI Pro A620AM-G Evo WiFi (A620)',      p:4879, t:1, form:'mATX', ram:'DDR5', ramHiz:7200},
   {n:'Gigabyte B650M Gaming WiFi6E (B650)',   p:6642, t:2, form:'mATX', ram:'DDR5', ramHiz:6400},
   {n:'Asus B650E Max Gaming WiFi W (B650E)',  p:8571,t:3, form:'ATX',  ram:'DDR5', ramHiz:8000},
+  /* Üst sınıf (ust:true) — yalnız bütçe fazlasında (ustAnakart). Epey 22.09.2026,
+     3+ satıcı; özellikler Epey teknik sayfasından. X870E Edge Ti kullanıcının
+     kendi kartı ve önerisi. (B850M Mortar denendi, hiç seçilmediği için çıkarıldı:
+     bütçe fazlası olan sistemler zaten ATX alan 4500X kasayla kuruluyor.) */
+  {n:'MSI MPG X870E Edge Ti WiFi (X870E)',    p:17999,t:4, form:'ATX',  ram:'DDR5', ramHiz:8600, ust:true, ozellik:'Wi-Fi 7 · PCIe 5.0 · USB4'},
  ],
  LGA1851:[
   {n:'MSI Pro B860M-E (B860)',                p:6029, t:2, form:'mATX', ram:'DDR5', ramHiz:9066},
@@ -583,7 +588,9 @@ function pickBoard(c,budget,g,cs){
      Veri yoksa kural uygulanmıyor (uydurma boyla reddetmiyoruz). */
   const sira={'ITX':1,'mATX':2,'ATX':3};
   const sigar=b=>(!b.form || !cs || !cs.formMax) ? true : sira[b.form]<=sira[cs.formMax];
-  const list=(BOARDS[c.plat]||[]).filter(sigar);
+  /* 'ust' anakartlar normal seçime girmez (FPS kazandırmaz); yalnız
+     ustAnakart() bütçe fazlası olduğunda seçer. */
+  const list=(BOARDS[c.plat]||[]).filter(b=>!b.ust).filter(sigar);
   if(!list.length) return null;
   /* Anakart kademesi ISLEMCIYE gore secilir, butceye gore degil.
      65 W bir Ryzen 5 icin A620 fazlasiyla yeterli; onu B650a zorlamak
@@ -659,7 +666,7 @@ function buildSystem(budget,prof,pick,game,res){
   /* Once kaliteli esiklerle dene, sonuc cikmazsa esikleri kaldirip tekrar
      dene. Kural yuzunden ziyaretciye "sistem kurulamadi" demiyoruz. */
   const s = kurDene(budget,prof,pick,true,game,res) || kurDene(budget,prof,pick,false,game,res);
-  return yukseltmeyeHazirla(s,budget,pick||{cpu:'',gpu:''});
+  return ustAnakart(yukseltmeyeHazirla(s,budget,pick||{cpu:'',gpu:''}), budget);
 }
 /* 22.09.2026 — ÜST BANT. RTX 5080 ile 5090 arasında piyasada oyun kartı yok;
    175-400 bin arası bütçenin büyük kısmı performansa dönüşemiyor. Bütçenin en
@@ -684,6 +691,21 @@ function yukseltmeyeHazirla(s,budget,pick){
   const total = s.total - s.psu.p + psu.p - s.cs.p + cs.p;
   if(total > budget) return s;
   return {...s, psu, cs, total, hazir:ust};
+}
+/* 22.09.2026 — kullanıcı önerisi (MSI MPG X870E Edge Ti WiFi'yi kendisi
+   kullanıyor). Üst sınıf anakart FPS kazandırmaz; bu yüzden karttan para
+   kesilmez, YALNIZCA bütçenin ≥%10'u hâlâ boştaysa seçilir. Kasanın aldığı
+   en büyük form (4500X ATX -> X870E Edge Ti; mATX kasa -> B850M Mortar)
+   ve aynı sert kurallar (bellek türü, form). */
+function ustAnakart(s,budget){
+  if(!s || s.g.id==='igpu' || budget-s.total < budget*0.10) return s;   /* ofis/ekran kartsız sistemde üst sınıf oyuncu anakartı anlamsız */
+  const sira={ITX:1,mATX:2,ATX:3};
+  const aday=(BOARDS[s.c.plat]||[]).filter(b=>b.ust && b.p>s.mb.p
+    && (!b.form || !s.cs.formMax || sira[b.form]<=sira[s.cs.formMax])
+    && (!s.r.tip || !b.ram || b.ram===s.r.tip)
+    && s.total - s.mb.p + b.p <= budget)
+    .sort((a,b)=>sira[b.form]-sira[a.form] || b.p-a.p)[0];
+  return aday ? {...s, mb:aday, total:s.total - s.mb.p + aday.p, ustMb:true} : s;
 }
 /* Bir üst ekran kartının seçildiği en düşük bütçe (ziyaretçiye "bu bütçede daha
    fazla FPS veren kart yok, üst kademe şuradan başlıyor" demek için). */
@@ -1362,9 +1384,15 @@ function parcalariGetir(){
             const e=(m && BOARDS[m[1]] && BOARDS[m[1]][+m[2]])
                   || (BOARDS[x.plat]||[]).find(o=>o.n===x.ad) || {};
             const b={n:x.ad, p:x.fiyat, t:x.kademe||1};
-            for(const a of ['form','ram','ramHiz']) if(e[a]!=null) b[a]=e[a];
+            for(const a of ['form','ram','ramHiz','ust','ozellik']) if(e[a]!=null) b[a]=e[a];
             (yeni[x.plat]=yeni[x.plat]||[]).push(b);
           }
+          /* Veritabanında satırı olmayan kod anakartları (22.09: üst sınıf B850M
+             Mortar, X870E Edge Ti) canlıda kaybolmasın; dizin sırası korunur. */
+          for(const pl of Object.keys(BOARDS)) BOARDS[pl].forEach((k,i)=>{
+            const l=(yeni[pl]=yeni[pl]||[]);
+            if(!l.some(o=>o.n===k.n) && i>=l.length){ const b=bf['anakart:'+pl+'-'+i]; l.push(b&&b.fiyat>0?{...k,p:b.fiyat}:k); }
+          });
           for(const k of Object.keys(BOARDS)) delete BOARDS[k];
           Object.assign(BOARDS, yeni);
         }
@@ -2979,7 +3007,7 @@ function parcaNeden(sys){
   const ek=(k,t)=>{ if(t) n[k]=t; };
   if(g.id!=='igpu' && g.vram) ek('gpu', g.vram+' GB görüntü belleği'+(g.tdp?' · '+g.tdp+' W tüketim':''));
   if(c.plat) ek('cpu', c.plat+' soket'+(c.tdp?' · '+c.tdp+' W':'')+(c.ig?' · dahili grafikli':''));
-  if(c.plat) ek('mb', 'İşlemciyle aynı soket ('+c.plat+')'+(mb.form?' · '+mb.form:'')+(mb.ram?' · '+mb.ram:''));
+  if(c.plat) ek('mb', (sys.ustMb?'Üst sınıf, bütçe fazlasından · '+(mb.ozellik||'')+' · ':'')+'İşlemciyle aynı soket ('+c.plat+')'+(mb.form?' · '+mb.form:'')+(mb.ram?' · '+mb.ram:''));
   if(mb.ram && r.tip) ek('ram', 'Anakart '+mb.ram+(mb.ramHiz?'-'+mb.ramHiz:'')+' destekliyor');
   if(psu.w){
     const cek=(g.tdp||0)+(c.tdp||0)+90;
