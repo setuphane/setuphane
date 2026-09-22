@@ -486,16 +486,16 @@ const CASES=[
  /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
     doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
     280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
- {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160, dis:[200,388,423], fan:4, fanKap:6},
- {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170, dis:[225,389,400], fan:1, fanKap:7},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160, dis:[200,388,423], fan:4, fanKap:6, duzen:{on:3,arka:1}},
+ {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170, dis:[225,389,400], fan:1, fanKap:7, duzen:{arka:1}},
  /* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
    RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
    (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478], fan:3, fanKap:10, ters:true},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478], fan:3, fanKap:10, ters:true, duzen:{yan:3}},
  /* 22.09.2026 — orta fiyatlı ATX kasa (kullanıcı: üst sınıf ATX anakart daha çok
     sisteme girebilsin). Epey: 5.192 TL, 8 satıcı; ATX, 4×140 mm fan dahil, üst
     360 mm radyatör, kart en fazla 375 mm, soğutucu 180 mm, 219×456×456 mm. */
- {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5192,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456], fan:4, fanKap:8},
+ {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5192,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456], fan:4, fanKap:8, duzen:{on:2,alt:2}},
 ];
 const GAMES=[
  {id:'valorant',n:'Valorant',                    k:4.20,ck:4.6,vram:4, tag:'çok hafif'},
@@ -663,6 +663,20 @@ const FANS=[
     paketleri 3 satıcı eşiğini geçmedi; tekli fan adetle ekleniyor. */
  {id:'tlc12', n:'120 mm kasa fanı (Thermalright TL-C12015)', p:523},
 ];
+/* duzen: kasanın hazır fanlarının GERÇEK yeri (üretici: M100A 3 ön + 1 arka;
+   H3 Flow yalnız 1 arka; 4500X RS-R 3 yan (ters yönlü giriş); Lancool 207
+   2 ön + 2 alt). Eklenen fanlar boş yerlere: önce ön (giriş), sonra arka
+   (egzoz), sonra üst (egzoz). */
+const FAN_YER={on:'ön (giriş)', arka:'arka (egzoz)', ust:'üst (egzoz)', alt:'alt (giriş)', yan:'yan (giriş)'};
+const fanYerlesim=(cs,adet,rad)=>{  /* rad: üstte radyatör varsa üst dolu */
+  const d=(cs&&cs.duzen)||{}, yer=[];
+  const bos={on:d.on?0:2, arka:d.arka?0:1, ust:(d.ust||rad)?0:3};
+  for(const k of ['on','arka','ust']) while(bos[k]-- >0 && yer.length<adet) yer.push(k);
+  while(yer.length<adet) yer.push(rad?'on':'ust');
+  return yer;
+};
+const fanYerMetni=(cs,adet,rad)=>{ const say={}; fanYerlesim(cs,adet,rad).forEach(k=>say[k]=(say[k]||0)+1);
+  return Object.entries(say).map(([k,n])=>n+' '+FAN_YER[k]).join(' + '); };
 const fanGerek = (g,c)=>{ const q=(g&&g.id!=='igpu'?g.tdp:0)+(c?c.tdp:0); return q<250?2 : q<=450?3 : 4; };
 /* Eklenecek fan adedi; kasa yuvası yetmezse -1. Ölçüsü olmayan kasada 0. */
 const fanEk = (g,c,cs,cl)=>{
@@ -1452,7 +1466,7 @@ function parcalariGetir(){
             const m=String(x.anahtar||'').match(/^kasa:(\d+)$/);
             const e=(m && eskiKasa[+m[1]]) || eskiKasa.find(o=>o.n===x.ad) || {};
             const k={n:x.ad, p:x.fiyat, upTo:(x.butce_ust==null?Infinity:x.butce_ust)};
-            for(const a of ['rad','gpuMax','formMax','cpuH','dis','fan','fanKap','ters']) if(e[a]!=null) k[a]=e[a];
+            for(const a of ['rad','gpuMax','formMax','cpuH','dis','fan','fanKap','ters','duzen']) if(e[a]!=null) k[a]=e[a];
             return k;
           }));
           /* Veritabanında satırı olmayan kod kasası (22.09: Lancool 207) eklenir. */
@@ -2878,14 +2892,22 @@ function kasaSahnesi(T,OrbitControls,el,sys){
     for(const m of [h,d]){ m.position.set(x,y,z); m.rotation.set(rx||0,ry||0,0); sahne.add(m); }
     d.userData.bilgi=bilgi;
   };
-  const hazirFan=Math.min(cs.fan??3,3);
-  for(let i=0;i<hazirFan;i++) fanCiz(0,H/2-90-i*130,D/2-2,0,0,0xFF2D95,
-    {tur:'Kasanın hazır fanı',ad:cs.n,satir:[(cs.fan??'?')+' hazır fan'+(cs.ters?' (ters yönlü "reverse")':''),'Sistem ~'+isi+' W ısı üretir · en az '+fanGerek(g,sys.c)+' fan gerekir']});
-  if(sys.fan) for(let i=0;i<sys.fan.adet;i++){
-    const arkaFan=i===0;
-    fanCiz(arkaFan?20:-10, arkaFan?H/2-110:H/2-8, arkaFan?-D/2+2:(-D/2+100+(i-1)*130), 0, arkaFan?0:Math.PI/2, 0x2DE2E6,
-      {tur:'Eklenen kasa fanı',ad:sys.fan.n,satir:[(arkaFan?'Arka':'Üst')+' egzoz · normal yönlü','Kasanın '+cs.fan+' hazır fanı ~'+isi+' W ısı için yetmiyor']});
-  }
+  /* Konum: ön = ön panel (z+), arka = arka panel (z-), üst = tavan (y+), alt =
+     taban (y-), yan = anakart tepsisinin önündeki yan duvar (x-). */
+  const yerCiz=(yer,i,renk,bilgi,cap)=>{
+    const r=cap||60;
+    if(yer==='on')   return fanCiz(0, H/2-90-i*130, D/2-2, 0,0, renk,bilgi);
+    if(yer==='arka') return fanCiz(20, H/2-110-i*130, -D/2+2, 0,0, renk,bilgi);
+    if(yer==='ust')  return fanCiz(-10, H/2-2, -D/2+100+i*130, 0,Math.PI/2, renk,bilgi);
+    if(yer==='alt')  return fanCiz(0, -H/2+2, D/2-90-i*140, 0,Math.PI/2, renk,bilgi);
+    if(yer==='yan')  return fanCiz(-W/2+2, H/2-90-i*130, D/2-95, Math.PI/2,0, renk,bilgi);
+  };
+  const duzen=cs.duzen||{on:Math.min(cs.fan??3,3)};
+  for(const [yer,n] of Object.entries(duzen)) for(let i=0;i<n;i++) yerCiz(yer,i,0xFF2D95,
+    {tur:'Kasanın hazır fanı · '+FAN_YER[yer],ad:cs.n,satir:[(cs.fan??'?')+' hazır fan'+(cs.ters&&yer==='yan'?' · ters yönlü ("reverse"): hava içeri, ışıklı yüz camdan görünür':''),'Sistem ~'+isi+' W ısı üretir · en az '+fanGerek(g,sys.c)+' fan gerekir']});
+  if(sys.fan){ const yerler=fanYerlesim(cs,sys.fan.adet,!!cl.rad), sira={};
+    yerler.forEach(yer=>{ const i=(sira[yer]=(sira[yer]||0)+1)-1; yerCiz(yer,i,0x2DE2E6,
+      {tur:'Eklenen kasa fanı · '+FAN_YER[yer],ad:sys.fan.n,satir:['Normal yönlü','Kasanın '+cs.fan+' hazır fanı ~'+isi+' W ısı için yetmiyor']}); }); }
   /* İşlemci soketi ve soğutucu */
   const sokY=mbUst-75, sokZ=arka+150;
   if(cl.rad){
@@ -3129,8 +3151,8 @@ function parcaNeden(sys){
   }
   if(cl.cap && c.tdp) ek('cooler', 'İşlemci '+c.tdp+' W ısı üretir · soğutucu '+cl.cap+' W kaldırır'+
     (cl.rad&&cs.rad?' · kasa '+cs.rad+' mm radyatör alır':''));
-  if(sys.fan) ek('fan', 'Kasanın '+cs.fan+' hazır fanı yetmiyor: sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, '+fanGerek(g,c)+' fan gerekir · arka/üst egzoz için normal yönlü');
-  if(cs.gpuMax && g.boy) ek('case', (cs.fan!=null?cs.fan+' hazır fan'+(cs.ters?' (ters yönlü)':'')+' · ':'')+'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
+  if(sys.fan) ek('fan', 'Kasanın '+cs.fan+' hazır fanı yetmiyor: sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, '+fanGerek(g,c)+' fan gerekir · takılacağı yer: '+fanYerMetni(cs,sys.fan.adet,!!cl.rad)+' · normal yönlü');
+  if(cs.gpuMax && g.boy) ek('case', (cs.fan!=null?cs.fan+' hazır fan'+(cs.duzen?' ('+Object.entries(cs.duzen).map(([k,n])=>n+' '+FAN_YER[k].split(' ')[0]).join(', ')+(cs.ters?', ters yönlü':'')+')':'')+' · ':'')+'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
     (cs.formMax?' · '+cs.formMax+' anakart sığar':''));
   return n;
 }
