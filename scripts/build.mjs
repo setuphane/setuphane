@@ -42,6 +42,10 @@ const gorseller = existsSync(gorselDizin) ? readdirSync(gorselDizin).filter(f =>
 const gorselYer = 'const PARCA_GORSEL = [];';
 if (!code.includes(gorselYer)) throw new Error('PARCA_GORSEL yer tutucusu derlenmiş kodda bulunamadı');
 code = code.replace(gorselYer, 'const PARCA_GORSEL = ' + JSON.stringify(gorseller) + ';');
+const dizin3b = path.join(root, 'urun/parca/3b');
+const gorsel3b = existsSync(dizin3b) ? readdirSync(dizin3b).filter(f => f.endsWith('.jpg')).map(f => f.slice(0, -4)) : [];
+if (!code.includes('const PARCA_GORSEL3B = [];')) throw new Error('PARCA_GORSEL3B yer tutucusu bulunamadı');
+code = code.replace('const PARCA_GORSEL3B = [];', 'const PARCA_GORSEL3B = ' + JSON.stringify(gorsel3b) + ';');
 
 // 2) Tailwind CSS: kullanılan sınıfları src/setuphane.html içeriğinden tarar.
 const tmp = await mkdtemp(path.join(tmpdir(), 'sh-tw-'));

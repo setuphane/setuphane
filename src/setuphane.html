@@ -2717,6 +2717,8 @@ function Kasa3B({sys}){
   },[acik,sys]);
   if(!sys || sys.g.id==='igpu') return null;
   const {g,cs,cl}=sys;
+  const kasaA=parcaAnahtari('case',sys), kasaD=kasaA&&kasaA.replace(/:/g,'-');
+  const kasaFoto=kasaD&&PARCA_GORSEL.indexOf(kasaD)>=0?'/urun/parca/'+kasaD+'.jpg':null;
   const olc=[
     g.boy && cs.gpuMax && ['Ekran kartı', g.boy+' mm uzunluk · kasa '+cs.gpuMax+' mm alıyor', (cs.gpuMax-g.boy)+' mm boşluk'],
     cl.h && cs.cpuH && ['Soğutucu', cl.h+' mm yükseklik · kasa '+cs.cpuH+' mm alıyor', (cs.cpuH-cl.h)+' mm boşluk'],
@@ -2737,6 +2739,7 @@ function Kasa3B({sys}){
           <div ref={kap} className="relative w-full h-[340px] sm:h-[440px] bg-[#05050a] touch-none">
             {durum==='yükleniyor' && <div className="absolute inset-0 grid place-items-center lbl text-dim">3B MODEL HAZIRLANIYOR…</div>}
             {durum==='hata' && <div className="absolute inset-0 grid place-items-center text-[.85rem] text-dim px-6 text-center">3B görünüm yüklenemedi (bağlantı ya da tarayıcı desteği).</div>}
+            {kasaFoto && <div className="absolute left-2 bottom-2 w-[74px] sm:w-[96px] rounded-md bg-white p-1 pointer-events-none"><img src={kasaFoto} alt={cs.n} className="w-full h-auto"/><div className="text-[8px] text-center text-black/60 mt-0.5">KASA</div></div>}
           </div>
           <div className="px-4 sm:px-5 py-4 text-[.8rem] space-y-2">
             <div className="text-[.72rem] text-dim">Sürükle: döndür · iki parmak / tekerlek: yakınlaştır</div>
@@ -2750,7 +2753,7 @@ function Kasa3B({sys}){
               <span><span className="inline-block w-2.5 h-2.5 bg-[#22c55e] opacity-70 mr-1.5 align-middle"></span>kartın önündeki boşluk</span>
               <span><span className="inline-block w-2.5 h-2.5 bg-[#ff2d55] mr-1.5 align-middle"></span>kasanın sınırı</span>
             </div>
-            <p className="text-[.7rem] text-dim/80 leading-relaxed">Ölçüler gerçek; parçaların görünümü temsilidir.</p>
+            <p className="text-[.7rem] text-dim/80 leading-relaxed">Ölçüler ve ürün fotoğrafları gerçek; fotoğraflar düz olduğu için yandan bakınca derinlik temsilidir.</p>
           </div>
         </div>
       )}
@@ -2763,7 +2766,7 @@ function kasaSahnesi(T,OrbitControls,el,sys){
   const w=el.clientWidth, h=el.clientHeight;
   const sahne=new T.Scene();
   const kamera=new T.PerspectiveCamera(30,w/h,1,8000);
-  const uzak=Math.max(W,H,D)*(w<500?3.6:2.9); kamera.position.set(uzak*.72,uzak*.32,uzak*.62);
+  const uzak=Math.max(W,H,D)*(w<500?3.2:2.45); kamera.position.set(uzak*.72,uzak*.32,uzak*.62);
   const r=new T.WebGLRenderer({antialias:true,alpha:true});
   r.setPixelRatio(Math.min(2,window.devicePixelRatio||1)); r.setSize(w,h); el.appendChild(r.domElement);
   sahne.add(new T.AmbientLight(0xffffff,.55));
@@ -2781,21 +2784,21 @@ function kasaSahnesi(T,OrbitControls,el,sys){
   const cam=new T.Mesh(new T.PlaneGeometry(D,H),new T.MeshBasicMaterial({color:0x2DE2E6,transparent:true,opacity:.04,side:T.DoubleSide}));
   cam.rotation.y=Math.PI/2; cam.position.x=W/2; sahne.add(cam);
   /* Ön fanlar */
-  for(let i=0;i<3;i++){ const f=new T.Mesh(new T.RingGeometry(50,54,40),new T.MeshBasicMaterial({color:0xFF2D95,side:T.DoubleSide,transparent:true,opacity:.35}));
+  for(let i=0;i<3;i++){ const f=new T.Mesh(new T.RingGeometry(50,53,40),new T.MeshBasicMaterial({color:0xFF2D95,side:T.DoubleSide,transparent:true,opacity:.16}));
     f.position.set(0,H/2-90-i*130,D/2-2); sahne.add(f); }
   /* Anakart: arka-sol duvar (x = -W/2), üst-arka köşe */
   const tepsi=-W/2+22, arka=-D/2+12;
   const mbY=(mb.form==='ATX')?305:244, mbZ=244;
   const mbUst=H/2-28;
-  kutu(3,mbY,mbZ,tepsi,mbUst-mbY/2,arka+mbZ/2,0x1b2a33,0x3a5563);
+  const mbKutu=kutu(3,mbY,mbZ,tepsi,mbUst-mbY/2,arka+mbZ/2,0x1b2a33,0x3a5563);
   /* İşlemci soketi ve soğutucu */
   const sokY=mbUst-75, sokZ=arka+150;
   if(cl.rad){
     kutu(40,62,62,tepsi+22,sokY,sokZ,0x1f1f28,0x2DE2E6);                       // pompa
-    const rl=cl.rad+37; kutu(120,27,rl,-W/2+22+75,H/2-30,arka+rl/2+20,0x2a2a34,0x2DE2E6); // radyatör (üst)
+    const rl=cl.rad+37; var sogKutu=kutu(120,27,rl,-W/2+22+75,H/2-30,arka+rl/2+20,0x2a2a34,0x2DE2E6); // radyatör (üst)
   } else if(cl.h){
     const kule=cl.sinif==='cift'?135:74;
-    kutu(cl.h,125,kule,tepsi+cl.h/2,sokY,sokZ,0x9aa3ad,0xdfe6ec);
+    var sogKutu=kutu(cl.h,125,kule,tepsi+cl.h/2,sokY,sokZ,0x9aa3ad,0xdfe6ec);
     /* kasanın soğutucu yükseklik sınırı */
     if(cs.cpuH){ const s=new T.Mesh(new T.PlaneGeometry(170,170),new T.MeshBasicMaterial({color:0xff2d55,transparent:true,opacity:.18,side:T.DoubleSide}));
       s.rotation.y=Math.PI/2; s.position.set(tepsi+cs.cpuH,sokY,sokZ); sahne.add(s); }
@@ -2805,7 +2808,7 @@ function kasaSahnesi(T,OrbitControls,el,sys){
   /* Ekran kartı: yuvadan cama doğru yükseklik (yuk), aşağı kalınlık (kal), öne uzunluk (boy) */
   const gL=g.boy||280, gH=g.yuk||125, gK=g.kal||50;
   const yuvaY=sokY-120;
-  kutu(gH,gK,gL,tepsi+gH/2+4,yuvaY-gK/2,arka+gL/2,0x16161d,0xFF2D95);
+  const gpuKutu=kutu(gH,gK,gL,tepsi+gH/2+4,yuvaY-gK/2,arka+gL/2,0x16161d,0xFF2D95);
   /* Kartın önündeki boşluk (yeşil) ve kasanın kart sınırı (kırmızı) */
   if(cs.gpuMax){
     const bos=cs.gpuMax-gL;
@@ -2816,8 +2819,57 @@ function kasaSahnesi(T,OrbitControls,el,sys){
     sahne.add(cizgi);
   }
   /* Güç kaynağı (standart ATX: 150 × 86 × 140) ve SSD */
-  kutu(140,86,150,tepsi+80,-H/2+50,arka+85,0x23232c,0x6b7280);
+  const psuKutu=kutu(140,86,150,tepsi+80,-H/2+50,arka+85,0x23232c,0x6b7280);
   kutu(2,22,80,tepsi+3,sokY-60,sokZ+20,0x1e3a8a,null);
+
+  /* ── GERÇEK ÜRÜN FOTOĞRAFLARI ──
+     Her parçanın resmî fotoğrafı (urun/parca/3b), beyaz zemini tarayıcıda
+     silinip ürün sınırına kırpılarak, parçanın kasa içinde o yüzü gösteren
+     tarafına GERÇEK ORANINDA kaplanır: anakart cama bakan yüzde (üstten
+     görünüş), kule soğutucu önde (fan yüzü), radyatör üstte, kart üstte,
+     RAM önde, güç kaynağı yan etikette. Fotoğrafı olmayan parça kutu kalır. */
+  const foto=k=>{ const a=parcaAnahtari(k,sys), d=a&&a.replace(/:/g,'-');
+    return d && PARCA_GORSEL3B.indexOf(d)>=0 ? '/urun/parca/3b/'+d+'.jpg' : null; };
+  const dokular=[];
+  const dekal=(url,gen,yuk,pos,rot,kutuRef)=>{
+    if(!url) return;
+    const img=new Image();
+    img.onload=()=>{
+      if(dur) return;
+      const c=document.createElement('canvas'); c.width=img.width; c.height=img.height;
+      const x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0);
+      const v=x.getImageData(0,0,c.width,c.height), p=v.data;
+      let x0=c.width,y0=c.height,x1=0,y1=0;
+      for(let i=0,n=0;i<p.length;i+=4,n++){
+        const m=Math.min(p[i],p[i+1],p[i+2]);
+        if(m>238) p[i+3]=0; else if(m>222) p[i+3]=Math.round((238-m)/16*255);
+        if(p[i+3]>40){ const px=n%c.width, py=(n/c.width)|0; if(px<x0)x0=px; if(px>x1)x1=px; if(py<y0)y0=py; if(py>y1)y1=py; }
+      }
+      x.putImageData(v,0,0);
+      if(x1<=x0||y1<=y0) return;
+      const k=document.createElement('canvas'); k.width=x1-x0+1; k.height=y1-y0+1;
+      k.getContext('2d').drawImage(c,x0,y0,k.width,k.height,0,0,k.width,k.height);
+      const tex=new T.CanvasTexture(k); tex.colorSpace=T.SRGBColorSpace; tex.anisotropy=4; dokular.push(tex);
+      const oran=k.width/k.height; let w=gen, h=gen/oran; if(h>yuk){ h=yuk; w=yuk*oran; }
+      const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.08,side:T.DoubleSide}));
+      m.position.set(pos[0],pos[1],pos[2]); m.rotation.set(rot[0]||0,rot[1]||0,rot[2]||0); sahne.add(m);
+      /* Fotoğraf geldiyse temsili kutu geri çekilsin: ürün öne çıksın, ölçü kenarları kalsın. */
+      if(kutuRef){ kutuRef.material.transparent=true; kutuRef.material.opacity=.18; kutuRef.material.needsUpdate=true; }
+    };
+    img.src=url;
+  };
+  const Y90=Math.PI/2;
+  dekal(foto('mb'), mbZ*.98, mbY*.98, [tepsi+2.5, mbUst-mbY/2, arka+mbZ/2], [0,Y90,0], mbKutu);           // anakart, cama bakan yüz
+  if(cl.rad){
+    const rl=cl.rad+37;
+    dekal(foto('cooler'), rl*.98, 118, [-W/2+22+75, H/2-30+14.5, arka+rl/2+20], [-Y90,0,Y90], sogKutu);   // radyatör, üst
+  } else if(cl.h){
+    const kule=cl.sinif==='cift'?135:74;
+    dekal(foto('cooler'), cl.h*.98, 123, [tepsi+cl.h/2, sokY, sokZ+kule/2+1.5], [0,0,0], sogKutu);        // kule, ön (fan) yüzü
+  }
+  dekal(foto('ram'), 131, 30, [tepsi+18, sokY-10, sokZ+80+10+4.5], [0,0,Y90]);                    // RAM, ön yüz
+  dekal(foto('gpu'), gL*.98, gH*.98, [tepsi+gH/2+4, yuvaY+1.5, arka+gL/2], [-Y90,0,Y90], gpuKutu);         // kart, üst yüz
+  dekal(foto('psu'), 148, 84, [tepsi+80+71, -H/2+50, arka+85], [0,Y90,0], psuKutu);                         // güç kaynağı, yan
   const kon=new OrbitControls(kamera,r.domElement);
   kon.enableDamping=true; kon.autoRotate=true; kon.autoRotateSpeed=.8; kon.target.set(0,0,0);
   kon.addEventListener('start',()=>{ kon.autoRotate=false; });
@@ -2826,7 +2878,7 @@ function kasaSahnesi(T,OrbitControls,el,sys){
   ciz();
   const boyut=()=>{ const w2=el.clientWidth,h2=el.clientHeight; kamera.aspect=w2/h2; kamera.updateProjectionMatrix(); r.setSize(w2,h2); };
   window.addEventListener('resize',boyut);
-  return ()=>{ dur=true; window.removeEventListener('resize',boyut); kon.dispose(); r.dispose();
+  return ()=>{ dur=true; window.removeEventListener('resize',boyut); kon.dispose(); r.dispose(); dokular.forEach(t=>t.dispose());
     sahne.traverse(o=>{ if(o.geometry) o.geometry.dispose(); if(o.material) o.material.dispose(); });
     if(r.domElement.parentNode) r.domElement.parentNode.removeChild(r.domElement); };
 }
@@ -2950,6 +3002,7 @@ const EPEY_LINK = {};
    üreticinin resmî görseli, Epey ürün sayfasından). Liste derlemede gömülür.
    Görseli olmayan ya da yüklenemeyen parça eski çizim ikona döner. */
 const PARCA_GORSEL = [];
+const PARCA_GORSEL3B = [];   /* orta boy (urun/parca/3b) — yalnız 3B sahnede yüklenir */
 function ParcaGorsel({k,sys,ad}){
   const a=parcaAnahtari(k,sys), dosya=a && a.replace(/:/g,'-');
   const [hata,setHata]=useState(false);

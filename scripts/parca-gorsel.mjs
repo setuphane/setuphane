@@ -16,6 +16,8 @@ const CURL = process.env.CURL || 'curl';
 const eslesme = JSON.parse(readFileSync('scripts/epey-eslesme.json', 'utf8'));
 mkdirSync('urun/parca', { recursive: true });
 const dosya = a => 'urun/parca/' + a.replace(/:/g, '-') + '.jpg';
+mkdirSync('urun/parca/3b', { recursive: true });
+const dosya3b = a => 'urun/parca/3b/' + a.replace(/:/g, '-') + '.jpg';
 const kaynak = {};
 let indi = 0, var_ = 0, hata = [];
 for (const [anahtar, link] of Object.entries(eslesme)) {
@@ -27,11 +29,28 @@ for (const [anahtar, link] of Object.entries(eslesme)) {
     if (!og) throw new Error('og:image yok');
     const kucuk = og.replace(/\/(?:[a-z]_)?([^/]+)$/, '/z_$1').replace('/z_z_', '/z_');
     execFileSync(CURL, ['-sS', '-A', UA, '--max-time', '30', '-o', hedef, kucuk]);
+    if (!existsSync(hedef) || statSync(hedef).size < 1000)   // z_ yoksa orta boy (m_)
+      execFileSync(CURL, ['-sS', '-A', UA, '--max-time', '30', '-o', hedef, og.replace(/\/(?:[a-z]_)?([^/]+)$/, '/m_$1')]);
     if (!existsSync(hedef) || statSync(hedef).size < 1000) throw new Error('görsel küçük/boş');
+    /* 3B sahne için orta boy (m_, ~350 px) — yalnız "3B gör" açılınca yüklenir. */
+    try { execFileSync(CURL, ['-sS', '-A', UA, '--max-time', '30', '-o', dosya3b(anahtar), og.replace(/\/(?:[a-z]_)?([^/]+)$/, '/m_$1')]);
+      if (statSync(dosya3b(anahtar)).size < 1500) writeFileSync(dosya3b(anahtar), ''); } catch {}
     kaynak[anahtar] = og; indi++;
     console.log('ok  ' + anahtar.padEnd(18) + ' ' + Math.round(statSync(hedef).size / 1024) + ' KB');
   } catch (e) { hata.push(anahtar + ': ' + e.message.slice(0, 60)); }
   await new Promise(r => setTimeout(r, 600));
 }
+/* Küçük görsel boş/bozuk (bazı ürünlerde z_ sürümü yok) ya da kaynağı zaten
+   büyükse (anakart görselleri 180 KB+) orta boy sürüm kullanılır. */
+import('node:fs').then(({ readdirSync, copyFileSync, unlinkSync }) => {
+  for (const f of readdirSync('urun/parca/3b')) {
+    const b = 'urun/parca/3b/' + f, k = 'urun/parca/' + f;
+    const bs = statSync(b).size;
+    if (bs < 1500) { unlinkSync(b); continue; }
+    const ks = existsSync(k) ? statSync(k).size : 0;
+    if ((ks < 1500 || ks > 60000) && bs < 60000) { copyFileSync(b, k); console.log('orta boy kullanıldı: ' + f); }
+  }
+  for (const f of readdirSync('urun/parca')) if (f.endsWith('.jpg') && statSync('urun/parca/' + f).size < 1500) unlinkSync('urun/parca/' + f);
+});
 console.log(`\n${indi} indirildi, ${var_} zaten vardı, ${hata.length} hata`);
 hata.forEach(h => console.log('  !! ' + h));
