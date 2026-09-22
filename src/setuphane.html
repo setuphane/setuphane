@@ -2387,6 +2387,182 @@ function BudgetSlider({id,label,budget,setBudget}){
   );
 }
 
+/* ═══════════════════ "BU SİSTEMİ NASIL KURDUK?" ═══════════════════
+   22.09.2026. Her cümle bu sistemin kendi verisinden ve motorun KENDİ kural
+   fonksiyonlarından (psuYeter, cYeter, cSigar, pickBoard, KART_PAY)
+   hesaplanıyor — kalıp övgü yok. "Güvenli değişiklik" diye gösterilen her
+   seçenek aynı sert kurallardan geçmiş olmak zorunda; kural değişirse metin
+   kendiliğinden değişir. Motor değişmedi: sayım ayrı, yalnızca açıklama için. */
+const gucGerek = (g,c)=> Math.max(Math.ceil((g.tdp+c.tdp+90)*1.35), g.psuMin||0);
+function sistemSayim(budget,prof,pick){
+  const n={toplam:0, platform:0, kasa:0, sogutma:0, guc:0, ram:0, ihtiyac:0, butce:0, uygun:0};
+  const ekle=(k,m)=>{ n[k]+=m; n.toplam+=m; };
+  const tumu=CASES.length*COOLERS.length*RAMS.length*SSDS.length;
+  for(const g of GPUS){
+    if(prof.needGpu && g.id==='igpu') continue;
+    if(pick.gpu && g.id!=='igpu' && g.b!==pick.gpu) continue;
+    for(const c of CPUS){
+      if(pick.cpu && cpuBrand(c)!==pick.cpu) continue;
+      if((g.id==='igpu' && !c.ig) || (g.id!=='igpu' && c.x4)){ ekle('platform',tumu); continue; }
+      const psu=pickPsu(g,c);
+      for(const cs of CASES){
+        const alt=COOLERS.length*RAMS.length*SSDS.length;
+        if(g.boy && cs.gpuMax && g.boy+KART_PAY>cs.gpuMax){ ekle('kasa',alt); continue; }
+        const mb=pickBoard(c,budget,g,cs);
+        if(!mb){ ekle('kasa',alt); continue; }
+        if(!psuYeter(g,c,psu)){ ekle('guc',alt); continue; }
+        for(const cl of COOLERS){
+          const alt2=RAMS.length*SSDS.length;
+          if(!cSigar(cl,cs)){ ekle('kasa',alt2); continue; }
+          if(!cYeter(cl,c)){ ekle('sogutma',alt2); continue; }
+          for(const r of RAMS) for(const s of SSDS){
+            if(r.tip && mb.ram && r.tip!==mb.ram){ ekle('ram',1); continue; }
+            if(r.gb<prof.minRam || s.gb<prof.minSsd){ ekle('ihtiyac',1); continue; }
+            const t=g.p+c.p+mb.p+psu.p+cl.p+cs.p+r.p+s.p;
+            if(t>budget){ ekle('butce',1); continue; }
+            ekle('uygun',1);
+          }
+        }
+      }
+    }
+  }
+  return n;
+}
+function sistemAnaliz(sys){
+  const {g,c,mb,r,s,psu,cl,cs}=sys;
+  const kasaUyar=(k,kart)=> (!kart.boy || !k.gpuMax || kart.boy+KART_PAY<=k.gpuMax)
+    && (!mb.form || !k.formMax || ({ITX:1,mATX:2,ATX:3})[mb.form]<=({ITX:1,mATX:2,ATX:3})[k.formMax])
+    && cSigar(cl,k);
+  /* Kendin değiştirebileceklerin — hepsi kurallardan geçiyor */
+  const degis=[];
+  SSDS.filter(x=>x.gb>s.gb).slice(0,1).forEach(x=>degis.push({t:'Daha büyük disk: '+x.n, fark:x.p-s.p}));
+  RAMS.filter(x=>x.gb>r.gb && (!x.tip||!mb.ram||x.tip===mb.ram)).slice(0,1)
+    .forEach(x=>degis.push({t:'Daha fazla bellek: '+x.n, fark:x.p-r.p}));
+  COOLERS.filter(x=>x.p>cl.p && cYeter(x,c) && cSigar(x,cs)).slice(0,1)
+    .forEach(x=>degis.push({t:'Daha sessiz/serin soğutma: '+x.n, fark:x.p-cl.p}));
+  CASES.filter(x=>x.n!==cs.n && kasaUyar(x,g)).forEach(x=>degis.push({t:'Başka kasa: '+x.n, fark:x.p-cs.p}));
+  /* Dikkat edilecekler — alt sınırlar */
+  const dikkat=[];
+  if(g.id!=='igpu'){
+    dikkat.push('Güç kaynağını '+gucGerek(g,c)+' W altına düşürme'+(g.psuMin?' (kart üreticisi '+g.psuMin+' W istiyor)':'')+
+      (g.pin8?'; '+(g.p16?'yerel 16-pin kablo ya da ':'')+'en az '+g.pin8+' adet 8-pin kablosu olsun.':'.'));
+    if(g.boy) dikkat.push('Kasa en az '+(g.boy+KART_PAY)+' mm uzunluğunda kart almalı (kart '+g.boy+' mm, '+KART_PAY+' mm hava/kablo payı).');
+  }
+  if(mb.form) dikkat.push('Kasa '+mb.form+' anakart desteklemeli'+(cl.rad?' ve '+cl.rad+' mm radyatör almalı.':(cl.h?' ve '+cl.h+' mm yüksekliğinde soğutucu almalı.':'.')));
+  if(c.tdp) dikkat.push('Soğutucu en az '+Math.ceil(c.tdp*1.15)+' W kaldırmalı'+(c.tdp>=120?'; '+c.tdp+' W işlemcide tek kuleli soğutucu kullanma.':'.'));
+  if(mb.ram) dikkat.push('Bellek '+mb.ram+' olmalı'+(mb.ramHiz?' (anakart '+mb.ramHiz+' MT/s\'ye kadar destekliyor).':'.'));
+  /* İleride yükseltme */
+  const yuk=[];
+  if(g.id!=='igpu'){
+    GPUS.filter(x=>x.id!=='igpu' && x.idx>g.idx).sort((a,b)=>a.idx-b.idx).slice(0,3).forEach(x=>{
+      const psuTamam=psuYeter(x,c,psu), kasaTamam=!x.boy||!cs.gpuMax||x.boy+KART_PAY<=cs.gpuMax;
+      const kazanc=Math.round((x.idx/g.idx-1)*100);
+      let not = psuTamam && kasaTamam ? 'mevcut güç kaynağı ve kasa yeterli'
+        : [!psuTamam && ('güç kaynağı yetmez, en az '+gucGerek(x,c)+' W gerekir'), !kasaTamam && ('kasaya sığmaz ('+x.boy+' mm)')].filter(Boolean).join(' · ');
+      yuk.push({t:x.n+' — ~%'+kazanc+' daha güçlü', not, iyi:psuTamam&&kasaTamam});
+    });
+  }
+  const cpuUst=CPUS.filter(x=>x.plat===c.plat && x.g>c.g && !x.x4).sort((a,b)=>b.g-a.g)[0];
+  if(cpuUst){
+    const sogOk=cYeter(cl,cpuUst), psuOk=g.id==='igpu'||psuYeter(g,cpuUst,psu);
+    yuk.push({t:cpuUst.n+' — aynı '+c.plat+' soket, anakart değişmeden takılır',
+      not: sogOk&&psuOk ? 'mevcut soğutucu ve güç kaynağı yeterli'
+        : [!sogOk&&'daha güçlü soğutucu gerekir', !psuOk&&'güç kaynağı yetmez'].filter(Boolean).join(' · '), iyi:sogOk&&psuOk});
+  }
+  if(!cpuUst) yuk.push({t:'İşlemci: '+c.n, not:'bu soketteki en güçlü oyun işlemcisi zaten seçili', iyi:true});
+  if(r.gb<32) yuk.push({t:'Belleği 32 GB\'a çıkarmak', not:'aynı tip ('+(mb.ram||r.tip||'DDR5')+') 2×16 kit', iyi:true});
+  /* Güç kaynağının taşıyabileceği en güçlü kart */
+  const tasir=GPUS.filter(x=>x.id!=='igpu' && psuYeter(x,c,psu)).sort((a,b)=>b.idx-a.idx)[0];
+  return {degis, dikkat, yuk, tasir};
+}
+function SistemAciklama({sys,budget,prof,pick,game,res}){
+  const {fmt}=useCur();
+  const [acik,setAcik]=useState(false);
+  const sayim=useMemo(()=>acik?sistemSayim(budget,prof,pick):null,[acik,budget,prof,pick]);
+  const a=useMemo(()=>acik?sistemAnaliz(sys):null,[acik,sys]);
+  if(!sys) return null;
+  const {g,c,mb,psu,cl,cs,r}=sys;
+  const sayi=x=>x.toLocaleString('tr-TR');
+  const kontrol=[
+    ['Soket', c.n+' ve '+mb.n.replace(/\s*\(.*\)$/,'')+' aynı soket ('+c.plat+')'],
+    g.id!=='igpu' && ['Güç', 'Sistem en fazla ~'+(g.tdp+c.tdp+90)+' W çeker'+(g.psuMin?'; kart üreticisi '+g.psuMin+' W istiyor':'')+'; güç kaynağı '+psu.w+' W'],
+    g.id!=='igpu' && g.pin8 && ['Kablo', (g.p16&&psu.k16>=g.tdp)?'Kart 16-pin istiyor, güç kaynağında yerel 16-pin var':'Kart '+g.pin8+' adet 8-pin istiyor, güç kaynağında '+(psu.pin8??'yeterli')+' adet var'],
+    g.boy && cs.gpuMax && ['Kasa', 'Kart '+g.boy+' mm, kasa '+cs.gpuMax+' mm alıyor ('+(cs.gpuMax-g.boy)+' mm boşluk)'],
+    mb.form && cs.formMax && ['Anakart', mb.form+' anakart, kasa '+cs.formMax+'\'e kadar destekliyor'],
+    ['Soğutma', 'İşlemci '+c.tdp+' W ısı üretir, soğutucu '+cl.cap+' W kaldırır'+(cl.h&&cs.cpuH?'; '+cl.h+' mm yükseklik, kasa '+cs.cpuH+' mm alıyor':'')+(cl.rad&&cs.rad?'; kasa '+cs.rad+' mm radyatör alıyor':'')],
+    r.tip && mb.ram && ['Bellek', r.tip+' bellek, anakart '+mb.ram+(mb.ramHiz?' ('+mb.ramHiz+' MT/s\'ye kadar)':'')],
+    ['Fiyat', 'Her parça en az 3 farklı mağazada satılan modelin en ucuz fiyatı · '+fiyatYasi().metin],
+  ].filter(Boolean);
+  const Baslik=({children})=><div className="lbl text-cy mb-3 mt-7">{children}</div>;
+  return (
+    <div className="mt-6 border border-line">
+      <button onClick={()=>{ setAcik(x=>!x); if(!acik) olay('aciklama_acildi'); }} aria-expanded={acik}
+        className="w-full flex items-center justify-between gap-4 px-4 sm:px-5 py-4 text-left hover:bg-cy/[.04] transition-colors">
+        <span>
+          <span className="block text-[.95rem] text-ink">Bu sistemi nasıl kurduk?</span>
+          <span className="block text-[.75rem] text-dim mt-1">Kontroller, değiştirebileceklerin ve ileride yükseltme</span>
+        </span>
+        <span className={'shrink-0 text-cy transition-transform duration-300 '+(acik?'rotate-180':'')} aria-hidden="true">▾</span>
+      </button>
+      {acik && sayim && a && (
+        <div className="px-4 sm:px-5 pb-6 text-[.85rem] leading-relaxed text-ink/85 border-t border-line">
+          <Baslik>NASIL SEÇTİK</Baslik>
+          <p>
+            Bu bütçe ve amaç için <span className="num text-cy">{sayi(sayim.toplam)}</span> parça birleşimi tek tek denendi.
+            {' '}<span className="num">{sayi(sayim.toplam-sayim.uygun-sayim.butce)}</span> tanesi uyumsuz ya da amaca yetersiz olduğu için,
+            {' '}<span className="num">{sayi(sayim.butce)}</span> tanesi bütçeyi aştığı için elendi.
+            Kalan <span className="num text-cy">{sayi(sayim.uygun)}</span> sistem “{prof.n.toLowerCase()}” amacına göre puanlandı;
+            puanı birbirine çok yakın olanlar arasından {prof.needGpu ? <>{game?game.n:'oyunda'}{res?' '+res.n:''} için en yüksek FPS’i veren</> : 'en hızlısı'} seçildi.
+          </p>
+          <ul className="mt-3 text-[.78rem] text-dim grid sm:grid-cols-2 gap-x-6 gap-y-1">
+            {[['Kasaya sığmayan (kart, anakart ya da soğutucu)',sayim.kasa],['Güç kaynağı yetmeyen',sayim.guc],['Soğutması yetersiz',sayim.sogutma],
+              ['Soket/hat uyumsuzluğu',sayim.platform],['Bellek türü uymayan',sayim.ram],['Amaca göre RAM/disk az',sayim.ihtiyac]]
+              .filter(([,v])=>v>0).map(([t,v])=><li key={t}>{t}: <span className="num">{sayi(v)}</span></li>)}
+          </ul>
+
+          <Baslik>NELERİ KONTROL ETTİK</Baslik>
+          <ul className="space-y-2">
+            {kontrol.map(([k,t])=>(
+              <li key={k} className="flex gap-3"><span className="text-cy shrink-0">✓</span>
+                <span><span className="text-ink">{k}:</span> {t}</span></li>
+            ))}
+          </ul>
+
+          <Baslik>KENDİN DEĞİŞTİREBİLECEKLERİN</Baslik>
+          {a.degis.length ? (
+            <ul className="space-y-1.5">
+              {a.degis.map(d=>(
+                <li key={d.t} className="flex justify-between gap-4"><span>{d.t}</span>
+                  <span className="num text-dim shrink-0">{d.fark>=0?'+':''}{fmt(d.fark)}</span></li>
+              ))}
+            </ul>
+          ) : <p className="text-dim">Bu sistemde uyumlu daha üst seçenek yok.</p>}
+          <p className="mt-2 text-[.75rem] text-dim">Bunların hepsi yukarıdaki uyumluluk kurallarından geçiyor.</p>
+          <div className="mt-4 text-[.8rem]">
+            <div className="text-mg mb-1.5">Başka parça alacaksan dikkat:</div>
+            <ul className="space-y-1.5 text-ink/80">
+              {a.dikkat.map(t=><li key={t} className="flex gap-2"><span className="text-mg shrink-0">!</span><span>{t}</span></li>)}
+            </ul>
+          </div>
+
+          <Baslik>İLERİDE YÜKSELTME</Baslik>
+          <ul className="space-y-2.5">
+            {a.yuk.map(y=>(
+              <li key={y.t}><div>{y.t}</div>
+                <div className={'text-[.78rem] mt-0.5 '+(y.iyi?'text-cy':'text-mg')}>{y.iyi?'✓ ':'! '}{y.not}</div></li>
+            ))}
+          </ul>
+          {a.tasir && g.id!=='igpu' && (
+            <p className="mt-3 text-[.78rem] text-dim">
+              Bu güç kaynağıyla takılabilecek en güçlü kart: <span className="text-ink/85">{a.tasir.n}</span>.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* Her parçanın altındaki tek satırlık gerekçe. Yalnızca motorun kendi
    kullandığı ölçülerden türetiliyor (uydurma "en iyisi" iddiası yok);
    bir ölçü eksikse o satır hiç yazılmıyor. */
@@ -2446,7 +2622,7 @@ function fiyatAramaUrl(ad){
   return 'https://www.akakce.com/arama/?q='+encodeURIComponent(q.trim());
 }
 
-function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
+function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,game}){
   const {fmt,plain}=useCur();
   const [copied,copy]=useCopy(sys,prof,plain);
   const [paylasildi,paylas]=usePaylas(budget,prof,pick,gid,rid);
@@ -2560,6 +2736,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
                     {paylasildi?'LİNK KOPYALANDI ✓':'PAYLAŞ'}
                   </button>
                 </div>
+                <SistemAciklama sys={sys} budget={budget} prof={prof} pick={pick} game={game} res={res}/>
               </>
             )}
           </div>
@@ -7624,7 +7801,7 @@ function App(){
                 {mode==='topla'
                   ? <>
                       <Builder budget={budget} setBudget={setBudget} prof={prof} setProf={setProf} res={res}
-                               sys={sys} pick={pick} setPick={setPick} gid={gid} rid={rid}/>
+                               sys={sys} pick={pick} setPick={setPick} gid={gid} rid={rid} game={game}/>
                       <AmdIntelCompare budget={budget} prof={prof} game={game} res={res}/>
                     </>
                   : mode==='oem'
