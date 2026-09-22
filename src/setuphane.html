@@ -2381,9 +2381,31 @@ function parcaNeden(sys){
     (cs.formMax?' · '+cs.formMax+' anakart sığar':''));
   return n;
 }
-/* Akakçe araması: parantez içindeki satılan model adı + ana model
-   (ör. "Gainward Phoenix RTX 5070 12 GB"). Yalnızca açıklayıcı ad varsa
-   ("Kule tipi hava soğutucu (…)") parantez içi tek başına yeterli. */
+/* "Fiyat karşılaştır" hedefi: önerdiğimiz modelin BİREBİR Epey ürün sayfası
+   (tüm mağazaların fiyatı, fiyat botunun her gün okuduğu sayfa). Akakçe
+   araması benzer adlı modelleri karıştırıyordu — "PNY RTX 5070 Ti Triple OC"
+   araması 5070 kartlarını da getiriyordu. Eşleme scripts/epey-eslesme.json,
+   derleme sırasında buraya gömülür (scripts/build.mjs). Eşlemesi olmayan
+   parça (panelden yeni eklenmiş) için Akakçe araması yedek olarak kalır. */
+const EPEY_LINK = {};
+function parcaAnahtari(k,sys){
+  switch(k){
+    case 'gpu': return 'gpu:'+sys.g.id;
+    case 'cpu': return 'cpu:'+sys.c.id;
+    case 'ram': return 'ram:'+sys.r.id;
+    case 'ssd': return 'ssd:'+sys.s.id;
+    case 'psu': return 'psu:'+sys.psu.id;
+    case 'cooler': return 'sogutucu:'+sys.cl.id;
+    case 'case': { const i=CASES.findIndex(x=>x.n===sys.cs.n); return i<0?null:'kasa:'+i; }
+    case 'mb': { const l=BOARDS[sys.c.plat]||[]; const i=l.findIndex(x=>x.n===sys.mb.n); return i<0?null:'anakart:'+sys.c.plat+'-'+i; }
+  }
+  return null;
+}
+function fiyatLinki(k,sys,ad){
+  const a=parcaAnahtari(k,sys);
+  return (a && EPEY_LINK[a]) || fiyatAramaUrl(ad);
+}
+/* Yedek — Akakçe araması: parantez içindeki satılan model adı + ana model. */
 function fiyatAramaUrl(ad){
   const m=String(ad).match(/^(.*?)\s*\(([^)]+)\)\s*$/);
   let q=ad;
@@ -2483,7 +2505,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid}){
                         <div className="text-[.92rem] sm:text-[1rem] leading-snug">{name}</div>
                         {neden[k] && <div className="text-[.74rem] text-dim mt-1 leading-snug">{neden[k]}</div>}
                         {price>0 && (
-                          <a href={fiyatAramaUrl(name)} target="_blank" rel="noopener noreferrer"
+                          <a href={fiyatLinki(k,sys,name)} target="_blank" rel="noopener noreferrer"
                              onClick={()=>olay('fiyat_karsilastir',{parca:k})}
                              className="inline-block mt-1.5 text-[.72rem] text-cy/85 hover:text-cy underline underline-offset-2">
                             Fiyat karşılaştır ↗

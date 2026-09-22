@@ -23,10 +23,17 @@ const src = await readFile(srcPath, 'utf8');
 // 1) JSX <script> bloğunu çıkar ve Babel ile derle.
 const jsxMatch = src.match(/<script type="text\/babel" data-presets="react">\r?\n([\s\S]*?)\r?\n<\/script>/);
 if (!jsxMatch) throw new Error('JSX <script> bloğu bulunamadı');
-const { code } = babel.transform(jsxMatch[1], {
+const { code: babelKod } = babel.transform(jsxMatch[1], {
   presets: [['@babel/preset-react', { development: false }]],
   babelrc: false, configFile: false,
 });
+
+// 1b) "Fiyat karşılaştır" linkleri: parça -> birebir Epey ürün sayfası.
+//     Fiyat botunun kullandığı eşlemeyle AYNI dosya; tek kaynak.
+const epeyLink = JSON.parse(await readFile(path.join(root, 'scripts/epey-eslesme.json'), 'utf8'));
+const epeyYer = 'const EPEY_LINK = {};';
+if (!babelKod.includes(epeyYer)) throw new Error('EPEY_LINK yer tutucusu derlenmiş kodda bulunamadı');
+const code = babelKod.replace(epeyYer, 'const EPEY_LINK = ' + JSON.stringify(epeyLink) + ';');
 
 // 2) Tailwind CSS: kullanılan sınıfları src/setuphane.html içeriğinden tarar.
 const tmp = await mkdtemp(path.join(tmpdir(), 'sh-tw-'));
