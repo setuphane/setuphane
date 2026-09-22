@@ -410,7 +410,7 @@ kararı bekleniyor.
   2. ve 3. en iyi sistem neredeyse bedavaya saklanabilir.
 - **220 / 300 / 350 / 400 bin bandında OEM sistem yok.** İncehesap'ta o
   aralıkta paket yok. Sinerji/İtopya eklenirse dolar; tarayıcı yapısı hazır.
-- **OEM listesi panelden yönetilmiyor**, şimdilik yalnızca kodda.
+- **OEM listesi panelden yönetilmiyor**, şimdilik yalnızca kodda (22.09: İtopya+İncehesap, ikizli).
   Tazeleme: `node scripts/oem-sec.mjs && node scripts/oem-kod.mjs`
 
 ## Araçlar
