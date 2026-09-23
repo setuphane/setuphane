@@ -1229,6 +1229,146 @@ const ESKI_GPU = [{
   idx: 49,
   vram: 16
 }];
+/* ═══ ELİMDEKİ İŞLEMCİ — yükseltme aracı için (23.09.2026) ══════════════
+   oyun: Tom's Hardware "1080p Gaming Score" ölçeği (en hızlı = 100). Eski
+   nesiller güncel tabloda yok; arşiv sürümleri ortak işlemcilerle bağlandı:
+     2023 arşivi -> güncel  ×0.865  (9 ortak işlemci, dağılım 0.847-0.918)
+     2021 arşivi -> 2023    ×0.657  (3 ortak işlemci, dağılım 0.640-0.660)
+   NEDEN AYRI ÖLÇEK: bizim g değerlerimiz TechPowerUp ölçümünden geliyor ve
+   Tom's ile katsayı 1.23-1.45 arasında oynuyor (%15 pay). Bu yüzden bu sayılar
+   FPS hesabına SOKULMAZ; yalnızca "işlemcin bu kartı besler mi" sorusunu üç
+   bantta yanıtlamak için kullanılır. Karşılaştırma, kendi sattığımız
+   işlemcilerin aynı tablodaki değerleriyle yapılır (KATALOG_OYUN).
+   Ölçümü bulunamayan işlemci (ör. i5-10400F) listeye EKLENMEDİ. */
+const ESKI_CPU = [{
+  n: 'Core i5-8400',
+  oyun: 39
+}, {
+  n: 'Core i5-9600K',
+  oyun: 41
+}, {
+  n: 'Core i7-8700K',
+  oyun: 42
+}, {
+  n: 'Ryzen 5 3600',
+  oyun: 42
+}, {
+  n: 'Ryzen 5 3600X',
+  oyun: 42
+}, {
+  n: 'Ryzen 7 3700X',
+  oyun: 44
+}, {
+  n: 'Core i9-9900K',
+  oyun: 45
+}, {
+  n: 'Core i7-9700K',
+  oyun: 45
+}, {
+  n: 'Ryzen 5 5500',
+  oyun: 45
+}, {
+  n: 'Core i5-10600K',
+  oyun: 46
+}, {
+  n: 'Core i3-12100',
+  oyun: 49
+}, {
+  n: 'Core i5-11400',
+  oyun: 49
+}, {
+  n: 'Core i3-13100F',
+  oyun: 49
+}, {
+  n: 'Core i7-10700K',
+  oyun: 49
+}, {
+  n: 'Core i5-11600K',
+  oyun: 51
+}, {
+  n: 'Core i9-10900K',
+  oyun: 52
+}, {
+  n: 'Core i7-11700K',
+  oyun: 52
+}, {
+  n: 'Ryzen 5 5600',
+  oyun: 53
+}, {
+  n: 'Ryzen 5 5600X',
+  oyun: 54
+}, {
+  n: 'Core i5-12400',
+  oyun: 55
+}, {
+  n: 'Ryzen 7 5700X',
+  oyun: 55
+}, {
+  n: 'Ryzen 7 5800X',
+  oyun: 55
+}, {
+  n: 'Core i9-11900K',
+  oyun: 56
+}, {
+  n: 'Ryzen 9 5900X',
+  oyun: 57
+}, {
+  n: 'Ryzen 9 5950X',
+  oyun: 57
+}, {
+  n: 'Core i5-13400F',
+  oyun: 59
+}, {
+  n: 'Core i5-12600K',
+  oyun: 61
+}, {
+  n: 'Ryzen 5 7600',
+  oyun: 63
+}, {
+  n: 'Core i7-12700K',
+  oyun: 66
+}, {
+  n: 'Ryzen 5 7600X',
+  oyun: 67
+}, {
+  n: 'Ryzen 7 7700X',
+  oyun: 71
+}, {
+  n: 'Core i5-13600K',
+  oyun: 71
+}, {
+  n: 'Ryzen 7 5800X3D',
+  oyun: 75
+}, {
+  n: 'Core i7-13700K',
+  oyun: 76
+}, {
+  n: 'Core i9-13900K',
+  oyun: 77
+}, {
+  n: 'Core i9-14900K',
+  oyun: 78
+}, {
+  n: 'Ryzen 7 7800X3D',
+  oyun: 86
+}];
+/* Sattığımız işlemcilerin AYNI tablodaki değerleri: karşılaştırma tek ölçekte
+   kalsın diye. Tom's tablosunda olmayanlar (7500F, 8500G) burada yok. */
+const KATALOG_OYUN = {
+  '7600': 63,
+  '245k': 67,
+  '245kf': 67,
+  '250k': 73,
+  '250kf': 73,
+  '9600x': 73,
+  '265k': 70,
+  '270k': 78,
+  '285k': 72,
+  '9700x': 74,
+  '7800x3d': 86,
+  '9950x3d': 96,
+  '9800x3d': 97
+};
 const GAMES = [{
   id: 'valorant',
   n: 'Valorant',

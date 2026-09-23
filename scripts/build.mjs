@@ -26,6 +26,10 @@ if (!jsxMatch) throw new Error('JSX <script> bloğu bulunamadı');
 const { code: babelKod } = babel.transform(jsxMatch[1], {
   presets: [['@babel/preset-react', { development: false }]],
   babelrc: false, configFile: false,
+  /* 23.09.2026: kod 500 KB'i asinca Babel kendiliginden "compact" moda geciyor
+     ve 'const X = {};' -> 'const X={};' oluyordu; yer tutucu aramasi kiriliyordu.
+     Bicimi sabitliyoruz ki derleme cikti buyudukce bozulmasin. */
+  compact: false, generatorOpts: { compact: false },
 });
 
 // 1b) "Fiyat karşılaştır" linkleri: parça -> birebir Epey ürün sayfası.
