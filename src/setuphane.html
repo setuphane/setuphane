@@ -2053,6 +2053,8 @@ const ROTA_META={
             d:'Bütçene uygun sistem sor, kurulumunu paylaş, arızanı çöz. Kayıt için e-posta istenmez.'},
   yukselt: {t:'Ekran Kartı Yükseltme: Neyi değiştirmeliyim? | SETUP HANE',
             d:'Elindeki ekran kartını ve işlemcini seç, bütçeni söyle: yalnız kart mı, işlemciyle birlikte mi, yoksa komple yeni sistem mi? Ölçülmüş verilerle.'},
+  yontem: {t:'Yöntem: Nasıl karar veriyoruz | SETUP HANE',
+            d:'Performans değerleri ölçümden gelir, fiyat en az üç satıcıdan alınır, uymayan kombinasyon hiç gösterilmez. Para hiçbir öneriyi değiştirmez.'},
   hakkimizda: {t:'Hakkımızda | SETUP HANE',
             d:'SETUP HANE nedir, kim yapıyor, hangi ilkelerle çalışıyor? Kısaca.'},
   isbirlikleri: {t:'İş Birlikleri | SETUP HANE',
@@ -2069,6 +2071,7 @@ function rotaCoz(){
   if(p==='/aksesuarlar') return {route:'aksesuarlar', sub:null};
   if(p==='/oner') return {route:'oner', sub:null};
   if(p==='/yukselt') return {route:'yukselt', sub:null};
+  if(p==='/yontem') return {route:'yontem', sub:null};
   if(p==='/hakkimizda') return {route:'hakkimizda', sub:null};
   if(p==='/isbirlikleri') return {route:'isbirlikleri', sub:null};
   if(p==='/gizlilik') return {route:'gizlilik', sub:null};
@@ -2507,6 +2510,13 @@ function OemPicker({budget,setBudget,sel,setSel,game,res}){
 
   return (
     <Card className="mt-6 p-5 sm:p-9">
+      <BeklemedeKart baslik="Burada amacımız seni bir mağazaya göndermek değil.">
+        <p>Mağazaların hazır sistemlerini alıp aynı parçaları tek tek toplasan ne tutardı, onu
+           gösteriyoruz. Kimseden komisyon almıyoruz, hiçbir mağazaya yönlendirme yapmıyoruz;
+           bağlantılar yalnızca fiyatı kendin görebilesin diye var.</p>
+        <p>Bu bölüm de beklemede: mağaza listeleri elle taranıyor, günlük değil. Sayıyı büyütmeden
+           önce bunu otomatik ve doğrulanabilir hale getireceğiz.</p>
+      </BeklemedeKart>
       <BudgetSlider id="obud" label="EN FAZLA NE KADAR" budget={budget} setBudget={setBudget}/>
 
       {list.length===0 ? (
@@ -2660,6 +2670,15 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
 
   return (
     <Card className="mt-6 p-5 sm:p-9">
+      <BeklemedeKart baslik="Laptop listesini hakkıyla yapana kadar büyütmüyoruz.">
+        <p>Masaüstü tarafında her fiyat, en az üç satıcıda satılan modelin en ucuzudur ve her gün
+           yenilenir. Laptopta henüz orada değiliz: liste elle güncelleniyor{lapTarih?<>, son güncelleme{' '}
+           {new Date(lapTarih).toLocaleDateString('tr-TR',{day:'numeric',month:'long'})}</>:null}.
+           O yüzden buraya yeni model eklemiyoruz; aşağıdakiler kalsın ki bir fikir verebilsin,
+           ama alım kararından önce fiyatı kendin doğrula.</p>
+        <p>Aynı kuralları laptopta da uygulayabildiğimiz gün bu uyarıyı kaldıracağız. Eksik veriyle
+           dolu bir liste, boş listeden daha zararlı.</p>
+      </BeklemedeKart>
       <BudgetSlider id="lbud" label="EN FAZLA NE KADAR" budget={budget} setBudget={setBudget}/>
 
       {list.length===0 ? (
@@ -7403,6 +7422,113 @@ function YukseltSayfa(){
   );
 }
 
+/* Beklemede kartı: bir bölümün neden olduğu yerde durduğunu ziyaretçiye
+   söylemek, eksiği gizlemekten daha güven verici (kullanıcı, 23.09.2026). */
+function BeklemedeKart({baslik,children}){
+  return (
+    <div className="mb-6 border border-cy/35 bg-cy/[.04] p-5">
+      <div className="lbl text-cy mb-2">BU BÖLÜM BEKLEMEDE</div>
+      <div className="text-ink text-[1.02rem] mb-2">{baslik}</div>
+      <div className="text-[.86rem] text-dim leading-relaxed space-y-2">{children}</div>
+      <a href="/yontem" className="inline-block mt-3 text-[.86rem] text-cy underline underline-offset-4">
+        Nasıl karar verdiğimizi oku →
+      </a>
+    </div>
+  );
+}
+/* /yontem — "Nasıl karar veriyoruz" sayfası. Kurallar zaten kodda ve motorda
+   uygulanıyor; burada ziyaretçinin görebileceği yere yazılıyor. Ayrıca iş
+   birliği sınırı baştan ilan ediliyor: gelir öneri motorunun DIŞINDAN gelir.
+   Kullanıcı isteği 23.09.2026: "ziyaretçi bize güvensin ve bizi onlardan biri
+   olarak görsün; neticede bizler firmalardan daha zengin kişiler değiliz." */
+function YontemSayfa(){
+  const Kural=({baslik,children})=>(
+    <div className="border border-line p-5 sm:p-6">
+      <div className="text-ink text-[1.02rem] mb-2">{baslik}</div>
+      <div className="text-[.88rem] text-dim leading-relaxed space-y-2">{children}</div>
+    </div>
+  );
+  return (
+    <BasitSayfa etiket="YÖNTEM" baslik="Nasıl karar veriyoruz, neyi kabul etmiyoruz.">
+      <p>
+        Burada çalışan tek kişi var ve o kişi de senin gibi kendi parasıyla bilgisayar topluyor.
+        Elimizde sonsuz kaynak yok; olan tek şey, kuralları baştan yazmak ve onlara uymak.
+        Bu sayfa o kuralları açık ediyor ki bize körü körüne güvenmek zorunda kalma.
+      </p>
+
+      <div className="grid gap-4 not-prose py-2">
+        <Kural baslik="Performans rakamları ölçümden gelir">
+          <p>
+            Sitedeki FPS ve güç değerleri bağımsız ölçümlere dayanır. Bir parçanın güvenilir ölçümü
+            yoksa o parça listeye hiç eklenmez. Yeni çıktı diye tahminle sıralama yapmayız.
+          </p>
+        </Kural>
+        <Kural baslik="Fiyat, tek bir mağazanın vitrin fiyatı değildir">
+          <p>
+            Bir modelin fiyatı, <span className="text-ink">en az üç farklı satıcıda</span> satıldığı
+            durumda ve en ucuz ilanı üzerinden yazılır. Tek mağazanın stok bitmiş "kampanya" fiyatı
+            bizim için fiyat sayılmaz. Fiyatlar her gün yenilenir, tarihi sayfada yazar.
+          </p>
+        </Kural>
+        <Kural baslik="Uymayan kombinasyonu hiç göstermeyiz">
+          <p>
+            Güç kaynağının wattı ve kabloları, kartın kasaya sığması, soğutucunun işlemciyi
+            kaldırması, kasanın içeri aldığı ve dışarı attığı hava dengesi: bunların hepsi sert
+            kuraldır. Bir kombinasyon bu kurallardan kalıyorsa sana hiç önerilmez, "ucuz olsun"
+            diye gösterilmez.
+          </p>
+        </Kural>
+        <Kural baslik="Neden seçildiğini yazarız">
+          <p>
+            Her parçanın yanında gerekçesi vardır. Kabul etmek zorunda değilsin; listeyi alıp
+            istediğin parçayı değiştirebilirsin. Amacımız senin yerine karar vermek değil,
+            kararını kendin verebilesin diye hesabı önüne koymak.
+          </p>
+        </Kural>
+      </div>
+
+      <h2 className="text-[1.25rem] text-ink pt-4">Para nereden gelirse gelsin, öneriyi değiştirmez</h2>
+      <p>
+        Bugün hiçbir gelirimiz yok. İleride olursa da kural şudur: <span className="text-ink">gelir,
+        öneri motorunun dışından gelir.</span> Bir markanın ödeme yapması, o markanın parçasının
+        listede yukarı çıkmasını sağlayamaz. Böyle bir teklif gelirse reddederiz; çünkü bunu bir kez
+        yaparsak buradaki her sayının değeri sıfırlanır.
+      </p>
+      <div className="grid sm:grid-cols-2 gap-4 not-prose py-2">
+        <div className="border border-cy/40 p-5">
+          <div className="lbl text-cy mb-3">KABUL EDİLEBİLİR</div>
+          <ul className="text-[.88rem] text-dim leading-relaxed space-y-2">
+            <li>· Açıkça etiketlenmiş, öneri listesinden ayrı duran sponsorlu alan</li>
+            <li>· Test için gönderilen ürün: ölçüm ne çıkarsa o yazılır</li>
+            <li>· Marka içeriği, üstünde kimin ödediği yazmak şartıyla</li>
+          </ul>
+        </div>
+        <div className="border border-mg/40 p-5">
+          <div className="lbl text-mg mb-3">ASLA</div>
+          <ul className="text-[.88rem] text-dim leading-relaxed space-y-2">
+            <li>· Para karşılığı sıralamada üst sıra</li>
+            <li>· Ölçümde kaybeden ürünü "en iyi" diye göstermek</li>
+            <li>· Olumsuz sonucu yayınlamama sözü vermek</li>
+            <li>· Sana haber vermeden komisyonlu bağlantı koymak</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 className="text-[1.25rem] text-ink pt-4">Bitmeyen işleri saklamayız</h2>
+      <p>
+        Sitede beklemede olan bölümler var ve bunu üstlerinde açıkça yazıyoruz. Laptop ve hazır
+        sistem tarafında, masaüstünde uyguladığımız kuralların aynısını uygulayabilecek hale
+        gelmeden yeni model eklemiyoruz. Eksik veriyle dolu bir liste, boş bir listeden daha
+        zararlıdır: yanlış fiyata bakarak alınan karar geri alınamıyor.
+      </p>
+      <p className="text-[.85rem] text-dim">
+        Bir hata görürsen ya da bir kuralın çiğnendiğini düşünürsen{' '}
+        <a href="/forum" className="text-cy hover:underline underline-offset-4">forumdan</a> yaz.
+        Düzeltmek, savunmaktan önce gelir.
+      </p>
+    </BasitSayfa>
+  );
+}
 function HakkimizdaSayfa(){
   return (
     <BasitSayfa etiket="HAKKIMIZDA" baslik="Bir kişinin kurduğu, ciddiye alınan bir araç.">
@@ -7445,6 +7571,13 @@ function IsBirlikleriSayfa(){
         SETUP HANE, PC/setup ekosistemindeki markalarla iş birliğine açık.
         Aşağıdakiler şu an gerçekten sunabildiğim kanallar; burada olmayan bir
         şeyi vaat etmiyorum.
+      </p>
+      <p>
+        Bir sınır var ve pazarlığa açık değil: <span className="text-ink">ödeme, sitedeki hiçbir
+        öneriyi veya sıralamayı değiştirmez.</span> Sponsorlu alan ayrı durur ve üstünde kimin
+        ödediği yazar. Ayrıntısı{' '}
+        <a href="/yontem" className="text-cy hover:underline underline-offset-4">Yöntem sayfasında</a>.
+        Bu kural markayı da korur: burada yer alan ürün, parayla değil ölçümle oradadır.
       </p>
       <div className="grid sm:grid-cols-3 gap-4 not-prose py-2">
         {hizmetler.map(h=>(
@@ -7500,6 +7633,7 @@ function GizlilikSayfa(){
 }
 
 const FOOTER_LINKLER=[
+  {href:'/yontem',       t:'Yöntem'},
   {href:'/hakkimizda',   t:'Hakkımızda'},
   {href:'/isbirlikleri', t:'İş Birlikleri'},
   {href:'/gizlilik',     t:'Gizlilik ve Çerez Politikası'},
@@ -8710,6 +8844,13 @@ function App(){
       {route==='yukselt' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
           <YukseltSayfa/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='yontem' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <YontemSayfa/>
           <Footer/>
         </main>
       )}

@@ -498,3 +498,10 @@ Kullanıcı isteği: "elindekini ne yapsam" aracı; eski parçalar da dahil.
 - Sayfa üç yol gösterir: yalnız kart (kazanç %, VRAM, PSU watt/kablo, kasa uzunluğu), işlemci durumu (ağır oyun ve rekabetçi oyun AYRI — tek senaryo yanıltıyordu), komple yeni sistem (motorun kendisi; kart elindekinden zayıfsa açıkça uyarır).
 - i5-10400F gibi ölçümü bulunamayan işlemciler listeye alınmadı; "bilmiyorum" seçeneği var.
 - Derleme notu: kod 500 KB'ı aşınca Babel compact moda geçip yer tutucuları bozdu → build.mjs'e `compact:false` eklendi.
+
+## 23.09.2026 (4) — Yöntem sayfası + "beklemede" kartları
+Kullanıcı: "ziyaretçi bize güvensin ve bizi onlardan biri olarak görsün; firmalardan zengin değiliz."
+- **/yontem** sayfası: dört kural (ölçülmüş performans, 3 satıcı kuralı, uymayan kombinasyon gösterilmez, gerekçe yazılır) + **gelir sınırı**: ödeme hiçbir öneriyi/sıralamayı değiştirmez; kabul edilebilir ve asla listesi. Alt menüye eklendi, sitemap + llms.txt güncellendi.
+- **BeklemedeKart**: laptop ve hazır sistem bölümlerinin başında. Laptop kartı son güncelleme tarihini veriden okuyor (şu an 19 Ağustos). Eksiği gizlemek yerine ilan ediyoruz.
+- İş Birlikleri sayfasına sınır cümlesi ve /yontem bağlantısı eklendi.
+Not: Laptop verisini tazeleme kararı kullanıcıya bırakıldı; bu kartlar o güne kadar doğru bilgi veriyor.

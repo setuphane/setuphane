@@ -9,6 +9,7 @@
 - [Yükseltme](https://www.setuphane.com/yukselt): Elindeki ekran kartını ve işlemcini seç, bütçeni gir; yalnız kart mı, işlemciyle birlikte mi, yoksa komple yeni sistem mi daha mantıklı, ölçülmüş verilerle karşılaştırır.
 - [Testler](https://www.setuphane.com/testler): FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri — 12 tarayıcı içi araç.
 - [Forum](https://www.setuphane.com/forum): Sistem tavsiyesi ve bilgisayar sorunları için kayıt gerektirmeyen topluluk forumu.
+- [Yöntem](https://www.setuphane.com/yontem): Karar kuralları: performans ölçümden gelir, fiyat en az üç satıcıdan alınır, uymayan kombinasyon gösterilmez; ödeme hiçbir öneriyi veya sıralamayı değiştirmez.
 - [Hakkımızda](https://www.setuphane.com/hakkimizda): SETUP HANE'nin ne olduğu, kim tarafından yapıldığı ve çalışma ilkeleri.
 - [İş Birlikleri](https://www.setuphane.com/isbirlikleri): Markalarla iş birliği için sunulan gerçek kanallar ve iletişim.
 - [Gizlilik ve Çerez Politikası](https://www.setuphane.com/gizlilik): Hangi verinin tutulduğu, hangi çerezlerin kullanıldığı.
