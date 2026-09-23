@@ -56,9 +56,9 @@ module.exports = {
     colors: { bg:'#07070B', bg2:'#0E0E15', ink:'#ECEBF2', dim:'#8B88A0',
               cy:'#2DE2E6', mg:'#FF2D95', line:'rgba(236,235,242,.10)' },
     fontFamily: {
-      display:['"Space Grotesk"','system-ui','sans-serif'],
+      display:['"Geist"','system-ui','sans-serif'],
       serif:['Newsreader','Georgia','serif'],
-      mono:['"JetBrains Mono"','ui-monospace','monospace']
+      mono:['"Geist Mono"','ui-monospace','monospace']
     }
   } }
 };`;

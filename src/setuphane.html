@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@1,6..72,200;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@1,6..72,200;1,6..72,300;1,6..72,400&family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 <script>
@@ -52,9 +52,9 @@ tailwind.config = {
         cy:'#2DE2E6', mg:'#FF2D95', line:'rgba(236,235,242,.10)'
       },
       fontFamily: {
-        display:['"Space Grotesk"','system-ui','sans-serif'],
+        display:['"Geist"','system-ui','sans-serif'],
         serif:['Newsreader','Georgia','serif'],
-        mono:['"JetBrains Mono"','ui-monospace','monospace']
+        mono:['"Geist Mono"','ui-monospace','monospace']
       }
     }
   }
@@ -72,7 +72,7 @@ html,body{max-width:100%;overflow-x:clip}
 html{scroll-behavior:smooth}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font-family:"Space Grotesk",system-ui,sans-serif; font-weight:300;
+  font-family:"Geist",system-ui,sans-serif; font-weight:300;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
 ::selection{background:var(--cy);color:#07070B}
@@ -94,7 +94,7 @@ body{
 /* ── neon logo ────────────────────────────────────────────────────── */
 .neonSvg{filter:drop-shadow(0 0 5px rgba(45,226,230,.55)) drop-shadow(0 0 18px rgba(255,45,149,.30))}
 .neonWord{
-  font-family:"Space Grotesk",sans-serif;font-weight:600;letter-spacing:.015em;
+  font-family:"Geist",sans-serif;font-weight:600;letter-spacing:.015em;
   color:transparent;-webkit-text-stroke-width:.055em;-webkit-text-stroke-color:var(--cy);
   text-shadow:0 0 .12em rgba(45,226,230,.75),0 0 .42em rgba(45,226,230,.40);
   white-space:nowrap;line-height:1;
@@ -167,8 +167,8 @@ body{
 /* ── tipografi ───────────────────────────────────────────────────── */
 .h-xl{font-weight:300;line-height:.9;letter-spacing:-.035em}
 .em{font-family:Newsreader,Georgia,serif;font-style:italic;font-weight:300;color:var(--mg);letter-spacing:-.01em}
-.lbl{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;font-weight:400}
-.num{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;white-space:nowrap}
+.lbl{font-family:"Geist Mono",monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;font-weight:400}
+.num{font-family:"Geist Mono",monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;white-space:nowrap}
 .rule{height:1px;background:linear-gradient(to right,rgba(45,226,230,.45),rgba(236,235,242,.07) 40%,transparent)}
 
 /* ── form kontrolleri ────────────────────────────────────────────── */
@@ -179,7 +179,7 @@ input[type=range]::-moz-range-track{height:2px;background:rgba(236,235,242,.16)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-7px;border-radius:50%;background:var(--cy);border:3px solid var(--bg);box-shadow:0 0 0 1px var(--cy),0 0 22px rgba(45,226,230,.8);transition:transform .25s var(--ease)}
 input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--cy);border:3px solid var(--bg);box-shadow:0 0 0 1px var(--cy),0 0 22px rgba(45,226,230,.8)}
 input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.25)}
-select{background:transparent;color:var(--ink);border:1px solid var(--line);font-family:"Space Grotesk",sans-serif;
+select{background:transparent;color:var(--ink);border:1px solid var(--line);font-family:"Geist",sans-serif;
   -webkit-appearance:none;appearance:none;
   background-image:linear-gradient(45deg,transparent 50%,var(--cy) 50%),linear-gradient(135deg,var(--cy) 50%,transparent 50%);
   background-position:calc(100% - 18px) 52%,calc(100% - 13px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
@@ -243,7 +243,7 @@ select option{background:#0E0E15;color:#ECEBF2}
     <!-- .neonWord/.hn: Wordmark bileşeniyle aynı CSS sınıfları — JS henüz
          yüklenmediği için burada React değil, aynı görünümü veren düz HTML. -->
     <div class="neonWord" style="font-size:20px;margin-bottom:10px">SETUP<span class="hn">HANE</span></div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.3em;color:#8B88A0">YÜKLENİYOR</div>
+    <div style="font-family:'Geist Mono',monospace;font-size:10px;letter-spacing:.3em;color:#8B88A0">YÜKLENİYOR</div>
   </div>
 </div>
 
@@ -3050,7 +3050,7 @@ function kasaSahnesi(T,OrbitControls,el,sys){
   const ipucu=document.createElement('div');
   ipucu.setAttribute('role','tooltip');
   ipucu.style.cssText='position:absolute;pointer-events:none;z-index:5;max-width:260px;padding:8px 10px;background:rgba(7,7,11,.94);'+
-    'border:1px solid rgba(45,226,230,.55);color:#ECEBF2;font:12px/1.4 "Space Grotesk",system-ui,sans-serif;display:none;box-shadow:0 6px 24px rgba(0,0,0,.5)';
+    'border:1px solid rgba(45,226,230,.55);color:#ECEBF2;font:12px/1.4 "Geist",system-ui,sans-serif;display:none;box-shadow:0 6px 24px rgba(0,0,0,.5)';
   el.appendChild(ipucu);
   const isin=new T.Raycaster(), fare=new T.Vector2();
   let secili=null;
@@ -3069,7 +3069,7 @@ function kasaSahnesi(T,OrbitControls,el,sys){
     const vur=isin.intersectObjects(sahne.children,false).find(h=>h.object.userData.bilgi);
     if(!vur){ ipucu.style.display='none'; vurgula(null); r.domElement.style.cursor='grab'; return; }
     const b=vur.object.userData.bilgi;
-    ipucu.innerHTML='<div style="font:10px/1 JetBrains Mono,monospace;letter-spacing:.14em;color:#2DE2E6;margin-bottom:4px">'+kacis(b.tur.toLocaleUpperCase('tr'))+'</div>'+
+    ipucu.innerHTML='<div style="font:10px/1 Geist Mono,monospace;letter-spacing:.14em;color:#2DE2E6;margin-bottom:4px">'+kacis(b.tur.toLocaleUpperCase('tr'))+'</div>'+
       '<div style="font-weight:500;margin-bottom:'+(b.satir.length?'4px':'0')+'">'+kacis(b.ad)+'</div>'+
       b.satir.map(x=>'<div style="color:#8B88A0">'+kacis(x)+'</div>').join('');
     ipucu.style.display='block';
