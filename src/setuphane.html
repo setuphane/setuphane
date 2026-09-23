@@ -312,27 +312,37 @@ const GPUS=[
     modelin kendi değeri (ör. RX 7600 Sapphire Pulse 185 W, referans 165 W).
     21.09 öncesi motor yalnızca tdp formülüne bakıyordu ve RX 9070 Gaming OC
     (üretici: 750 W) için 550 W öneriyordu. */
- {id:'7600',   n:'Radeon RX 7600 8 GB (Sapphire Pulse)',           b:'AMD',    idx:48,  r1440:0.96, r2160:0.82, vram:8,  tdp:185, p:17289, boy:240, psuMin:550,  pin8:1, kal:44, yuk:107},
+ {id:'7600',   n:'Radeon RX 7600 8 GB (Sapphire Pulse)',           b:'AMD',    idx:48,  r1440:0.96, r2160:0.82, vram:8,  tdp:185, p:16816, boy:240, psuMin:550,  pin8:1, kal:44, yuk:107},
  /* 22.09.2026: hazır sistemlerde sık görülen giriş kartı. idx TechPowerUp
     "Gigabyte RTX 5050 Gaming OC" incelemesi, 1080p: 5050 = 100, RTX 5070 =
     198 -> 51 (aynı tabloda 5060 65, 9060 XT 71, 5080 132 — bizim değerlerle
     ±2 tutarlı). r1440/r2160: aynı tablodaki RX 7600 köprü (1440p: ikisi de
     %100/%97 -> 0,96; 4K: 100/88 vs 97 -> 0,90). 3+ satıcılı en ucuz: Galax
     1-Click OC V2 (Epey: 222 mm, 130 W, üretici 550 W, tek 8-pin). */
- {id:'5050',   n:'GeForce RTX 5050 8 GB (Galax 1-Click OC V2)',    b:'NVIDIA', idx:51,  r1440:0.96, r2160:0.90, vram:8,  tdp:130, p:18541, boy:222, psuMin:550,  pin8:1, yuk:114},
- {id:'5060',   n:'GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)', b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:19700, boy:197, psuMin:550,  pin8:1, kal:41, yuk:120},
- {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:160, p:26299, boy:202, psuMin:550,  pin8:1, kal:49, yuk:120},
- {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',        b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:40595, boy:229, psuMin:550,  pin8:1, kal:50, yuk:120},
- {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:36809, boy:288, psuMin:750,  pin8:2, kal:50, yuk:132},
+ /* 23.09.2026 — giriş segmentine 12 GB'lık seçenek. TechPowerUp: RTX 5070'in
+    %183'ü kadar hızlı -> bizim ölçekte idx 55 (RTX 5050'den hızlı, ondan ucuz).
+    Epey: 18.199 TL, 4 satıcı; 272 mm, 2 yuva, 1x8 pin. TDP 190 W, önerilen
+    güç kaynağı 450 W (TechPowerUp). Bu kartın çözünürlük katsayıları (r1440/
+    r2160) ölçülü değil, o yüzden yazılmadı: katsayısız kart 1.00 sayılır,
+    uydurma bir değer girmiyoruz. */
+ {id:'b580',   n:'Arc B580 12 GB (Intel)',                       b:'Intel',  idx:55,  vram:12, tdp:190, p:18199, boy:272, psuMin:450,  pin8:1, kal:45, yuk:115},
+ {id:'5050',   n:'GeForce RTX 5050 8 GB (Asus Dual OC)',           b:'NVIDIA', idx:51,  r1440:0.96, r2160:0.90, vram:8,  tdp:130, p:18999, boy:203, psuMin:550,  pin8:1, kal:40, yuk:120},
+ {id:'5060',   n:'GeForce RTX 5060 8 GB (MSI Shadow 2X OC Max)',   b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:22900, boy:197, psuMin:550,  pin8:1, kal:40, yuk:120},
+ {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:160, p:28830, boy:202, psuMin:550,  pin8:1, kal:49, yuk:120},
+ {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',        b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:40894, boy:229, psuMin:550,  pin8:1, kal:50, yuk:120},
+ {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:40999, boy:288, psuMin:750,  pin8:2, kal:50, yuk:132},
  /* 21.09.2026: Gainward Phoenix Epey'de 0 teklife düştü; yerine 3+ satıcılı en
     ucuz 5070. Uzunluk ürün sayfasındaki "Derinlik"ten (VCG507012TFXXPB1-O). */
- {id:'5070',   n:'GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)', b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:47393, boy:300, psuMin:650,  pin8:2, p16:true, kal:48, yuk:120},
- {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)', b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:41570, boy:325, psuMin:800,  pin8:2, kal:65, yuk:150},
- {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (PNY Triple OC)',            b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:58093, boy:300, psuMin:750,  pin8:3, p16:true, kal:60, yuk:120},
+ {id:'5070',   n:'GeForce RTX 5070 12 GB (MSI Ventus 3X OC)',      b:'NVIDIA', idx:100, r1440:1.01, r2160:1.02, vram:12, tdp:250, p:47781, boy:302, psuMin:650,  pin8:2, p16:true, kal:49, yuk:121},
+ {id:'9070xt', n:'Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)', b:'AMD',    idx:117, r1440:1.02, r2160:1.06, vram:16, tdp:304, p:47775, boy:325, psuMin:800,  pin8:2, kal:65, yuk:150},
+ {id:'5070ti', n:'GeForce RTX 5070 Ti 16 GB (Gigabyte Windforce OC V2)', b:'NVIDIA', idx:121, r1440:1.04, r2160:1.09, vram:16, tdp:300, p:69999, boy:261, psuMin:750,  pin8:3, p16:true, kal:50, yuk:126},
  /* 22.09.2026: Gigabyte Windforce OC SFF 94.093 TL / 5 satıcı — MSI Shadow'dan
     (100.000) ucuz, kural gereği değişti. 304 mm, 360 W, üretici 850 W, 16-pin (Epey). */
- {id:'5080',   n:'GeForce RTX 5080 16 GB (Gigabyte Windforce OC SFF)', b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:94093, boy:304, psuMin:850,  pin8:3, p16:true, kal:50, yuk:126},
- {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',       b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:318181, boy:325, psuMin:1000, pin8:4, p16:true, kal:67, yuk:139},
+ /* 23.09.2026: Windforce OC SFF tek saticiya dustu (3 satici kurali).
+    Yerine Palit GamingPro: 85.100 TL, 4 satici; Epey teknik: 332 mm uzunluk,
+    127 mm yukseklik, 60 mm kalinlik (3 yuva), 16 pin guc baglantisi. */
+ {id:'5080',   n:'GeForce RTX 5080 16 GB (Palit GamingPro)', b:'NVIDIA', idx:131, r1440:1.06, r2160:1.14, vram:16, tdp:360, p:85100, boy:332, psuMin:850,  pin8:3, p16:true, kal:60, yuk:127},
+ {id:'5090',   n:'GeForce RTX 5090 32 GB (MSI Ventus 3X OC)',       b:'NVIDIA', idx:168, r1440:1.16, r2160:1.36, vram:32, tdp:575, p:335999, boy:325, psuMin:1000, pin8:4, p16:true, kal:67, yuk:139},
 ];
 /* İşlemci markası soketten türer — ayrı alan tutmaya gerek yok. */
 const cpuBrand = c => c.plat==='AM5' ? 'AMD' : 'Intel';
@@ -367,26 +377,26 @@ const brandDot = b => BRAND[b] || null;
    dahili grafiği kapalı ve 100 MHz düşük saatli — ölçülmüş fark %1-2.
    Bu tek çıkarım, kaynağı belli olsun diye burada yazılı. */
 const CPUS=[
- {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:75,  m:64,  tdp:65,  p:7941,  ig:true, x4:true},
- {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:93,  m:77,  tdp:65,  p:6709,  ig:false},
- {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:95,  m:78,  tdp:65,  p:7119,  ig:true},
- {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:96,  m:101, tdp:125, p:10729, ig:true},
+ {id:'8500g',  n:'Ryzen 5 8500G',     plat:'AM5',     g:75,  m:64,  tdp:65,  p:7851,  ig:true, x4:true},
+ {id:'7500f',  n:'Ryzen 5 7500F',     plat:'AM5',     g:93,  m:77,  tdp:65,  p:6726,  ig:false},
+ {id:'7600',   n:'Ryzen 5 7600',      plat:'AM5',     g:95,  m:78,  tdp:65,  p:7243,  ig:true},
+ {id:'245k',   n:'Core Ultra 5 245K', plat:'LGA1851', g:96,  m:101, tdp:125, p:10999, ig:true},
  /* 22.09.2026 — hazır sistemlerde sık görülen yeni Intel'ler. TechPowerUp
     "Core Ultra 5 250K Plus" incelemesi, 720p oyun ve uygulama özeti; 9800X3D
     (123,5 / 94,9) = 125 / 108 çapasıyla. Aynı tablodaki 9600X 101, 265K 100,
     285K 104, 7800X3D 112 — mevcut değerlerle birebir tutarlı. KF modeller aynı
     çip, yalnızca dahili grafik yok (Intel adlandırması). */
- {id:'245kf',  n:'Core Ultra 5 245KF', plat:'LGA1851', g:96,  m:101, tdp:125, p:8733,  ig:false},
+ {id:'245kf',  n:'Core Ultra 5 245KF', plat:'LGA1851', g:96,  m:101, tdp:125, p:8635,  ig:false},
  {id:'250kf',  n:'Core Ultra 5 250KF Plus', plat:'LGA1851', g:101, m:114, tdp:125, p:12999, ig:false},
  {id:'250k',   n:'Core Ultra 5 250K Plus',  plat:'LGA1851', g:101, m:114, tdp:125, p:13899, ig:true},
- {id:'270k',   n:'Core Ultra 7 270K Plus',  plat:'LGA1851', g:104, m:132, tdp:125, p:20062, ig:true},
- {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:101, m:87,  tdp:65,  p:9416,  ig:true},
- {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:100, m:120, tdp:125, p:16409, ig:true},
- {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:104, m:98,  tdp:65,  p:14188, ig:true},
+ {id:'270k',   n:'Core Ultra 7 270K Plus',  plat:'LGA1851', g:104, m:132, tdp:125, p:20020, ig:true},
+ {id:'9600x',  n:'Ryzen 5 9600X',     plat:'AM5',     g:101, m:87,  tdp:65,  p:8999,  ig:true},
+ {id:'265k',   n:'Core Ultra 7 265K', plat:'LGA1851', g:100, m:120, tdp:125, p:17619, ig:true},
+ {id:'9700x',  n:'Ryzen 7 9700X',     plat:'AM5',     g:104, m:98,  tdp:65,  p:14303, ig:true},
  {id:'285k',   n:'Core Ultra 9 285K', plat:'LGA1851', g:104, m:130, tdp:125, p:27899, ig:true},
- {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:112, m:89,  tdp:120, p:15280, ig:true},
- {id:'9950x3d',n:'Ryzen 9 9950X3D',   plat:'AM5',     g:118, m:139, tdp:170, p:34332, ig:true},
- {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:21999, ig:true},
+ {id:'7800x3d',n:'Ryzen 7 7800X3D',   plat:'AM5',     g:112, m:89,  tdp:120, p:16025, ig:true},
+ {id:'9950x3d',n:'Ryzen 9 9950X3D',   plat:'AM5',     g:118, m:139, tdp:170, p:34521, ig:true},
+ {id:'9800x3d',n:'Ryzen 7 9800X3D',   plat:'AM5',     g:125, m:108, tdp:120, p:21828, ig:true},
 ];
 /* RAM fiyatları: 2026'da yapay zeka veri merkezlerinin (HBM) bellek talebi
    yüzünden küresel bir DDR5 arz krizi var — üreticiler üretimi yüksek
@@ -400,39 +410,39 @@ const CPUS=[
    sayar ve uyarı vermeden yanlış öneri verirdi. Özellikle Ryzen'de bellek
    hızı oyun FPS'ini gerçekten etkiler. */
 const RAMS=[
- {id:'16',n:'16 GB DDR5-6000 (XPG Lancer Blade)',            gb:16,tip:'DDR5',hiz:6000,p:12999},
+ {id:'16',n:'16 GB DDR5-6000 (XPG Lancer Blade)',            gb:16,tip:'DDR5',hiz:6000,p:13599},
  /* 21.09.2026: "Patriot Viper Xtreme 5 DDR5-6000 CL30" diye bir ürün Epey'de
     yok (seri 6400'den başlıyor) — ad ile fiyat aynı ürüne ait değildi. Yerine
     3+ satıcılı en ucuz 2×16 kit. Daha ucuz Kingston KF560C40BB-32 TEK modül
     olduğu için elendi (çift kanal kaybı). Kit bilgisi ürün sayfasından. */
- {id:'32',n:'32 GB DDR5-6000 (2×16) (Apacer Panther)',gb:32,tip:'DDR5',hiz:6000,p:28109},
- {id:'64',n:'64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',   gb:64,tip:'DDR5',hiz:6000,p:53939},
+ {id:'32',n:'32 GB DDR5-6000 (2×16) (Apacer Panther)',gb:32,tip:'DDR5',hiz:6000,p:28129},
+ {id:'64',n:'64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)',   gb:64,tip:'DDR5',hiz:6000,p:55497},
  /* 22.09.2026 üst bant: video kurgu / 3B iş için 96 GB. 3+ satıcılı en ucuz
     2×48 DDR5 kit (Epey: 74.689 TL, 5 satıcı). 5600 MT/s — ramS hız çarpanı
     bunu zaten hesaba katıyor. Oyun profilinde RAM puanı 92'de kesildiği için
     oyun sistemine asla girmez. */
- {id:'96',n:'96 GB DDR5-5600 (2×48) (Crucial Pro)',          gb:96,tip:'DDR5',hiz:5600,p:74689},
+ {id:'96',n:'96 GB DDR5-5600 (2×48) (Crucial Pro)',          gb:96,tip:'DDR5',hiz:5600,p:72800},
 ];
 const SSDS=[
- {id:'500',n:'500 GB NVMe Gen4 (WD Blue SN5100)', gb:500, p:4945},
- {id:'1t', n:'1 TB NVMe Gen4 (WD Blue SN5100)',   gb:1000,p:8281},
+ {id:'500',n:'500 GB NVMe Gen4 (WD Blue SN5100)', gb:500, p:4899},
+ {id:'1t', n:'1 TB NVMe Gen4 (WD Blue SN5100)',   gb:1000,p:8661},
  {id:'2t', n:'2 TB NVMe Gen4 (WD Blue SN5100)',   gb:2000,p:16430},
  /* 22.09.2026 üst bant: 3+ satıcılı en ucuz 4 TB NVMe (WD Blue SN5000, 35.953 TL,
     7 satıcı; daha ucuz 4 TB'lar HDD). Puanı 2 TB'tan çok az yüksek: yalnızca
     bütçe arttığında seçilir, kart/işlemciden asla kesmez. */
- {id:'4t', n:'4 TB NVMe Gen4 (WD Blue SN5000)',   gb:4000,p:35953},
+ {id:'4t', n:'4 TB NVMe Gen4 (WD Blue SN5000)',   gb:4000,p:36398},
 ];
 const PSUS=[
  /* pin8: PCIe 6+2 kablo sayısı, k16: yerel 16-pin kablonun taşıdığı güç (W,
     yoksa 0). Kaynak: MSI teknik sayfaları, Zalman için satıcı teknik verisi
     (21.09.2026). A850GN'nin 16-pin gücü yazılmıyor; ATX 3.x alt sınırı 450 W
     varsayıldı (5090 zaten psuMin 1000 ile bu kaynağı seçemez). */
- {id:'550', n:'550 W 80+ (MSI MAG A550BNL)',            w:550, p:1799, pin8:2, k16:0},
- {id:'650', n:'650 W 80+ (MSI MAG A650BNL)',            w:650, p:2820, pin8:2, k16:0},
- {id:'750', n:'750 W 80+ (MSI MAG A750BN PCIE5 II)',     w:750, p:3299, pin8:3, k16:450},
- {id:'850', n:'850 W 80+ Gold (MSI MAG A850GN PCIE5)',  w:850, p:5111, pin8:2, k16:450},
- {id:'1000',n:'1000 W 80+ Gold (MSI MAG A1000GL PCIE5 II)',w:1000,p:8299, pin8:4, k16:600},
- {id:'1200',n:'1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)',w:1200,p:7979, pin8:8, k16:0},
+ {id:'550', n:'550 W 80+ (MSI MAG A550BNL)',            w:550, p:1899, pin8:2, k16:0},
+ {id:'650', n:'650 W 80+ (MSI MAG A650BNL)',            w:650, p:2538, pin8:2, k16:0},
+ {id:'750', n:'750 W 80+ (MSI MAG A750BN PCIE5 II)',     w:750, p:3703, pin8:3, k16:450},
+ {id:'850', n:'850 W 80+ Gold (MSI MAG A850GN PCIE5)',  w:850, p:5778, pin8:2, k16:450},
+ {id:'1000',n:'1000 W 80+ Gold (MSI MAG A1000GL PCIE5 II)',w:1000,p:8399, pin8:4, k16:600},
+ {id:'1200',n:'1200 W 80+ Gold (Zalman Watttera ZM1200-EBTII)',w:1200,p:8399, pin8:8, k16:0},
 ];
 /* Genel "A620 anakart" gibi etiketler yerine gerçek, satın alınabilir
    modeller (Akakçe, Ağustos 2026, en ucuz liste fiyatı) — her yonga
@@ -468,7 +478,7 @@ const COOLERS=[
     gürültü; çift kule farkı ~1.400 TL. cap: üretici üst değerinin %80'i
     (tek kule 225->180, çift kule 265->212) — ikisi de aynı temkinle. */
  {id:'stock', n:'Kutudan çıkan soğutucu',                                          cap:65, rad:0,  p:0, sinif:'stok'},
- {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)',cap:180,rad:0,  p:1279, sinif:'tek', h:148},
+ {id:'air',   n:'Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)',cap:180,rad:0,  p:1314, sinif:'tek', h:148},
  /* En ucuz gerçek çift kule + 120 mm fan, 3+ satıcı (Epey 21.09.2026: 2.714 TL,
     6 satıcı). Daha ucuz "Dual" adlılar tek kule + çift fan (Ocypus A40 Dual)
     ya da 90 mm fanlı (Peerless Assassin 90 SE) — elendi. 157 mm, 6 ısı borusu,
@@ -478,22 +488,22 @@ const COOLERS=[
     arızası sistemi komple götüren tek arıza. İkisi de bilinen marka ve
     5+ satıcısı var (Epey, 20.08.2026). */
  {id:'aio360',n:'360 mm sıvı soğutma (Thermalright Frozen Magic 360 ARGB)',        cap:280,rad:360,p:3517, sinif:'sivi'},
- {id:'aio360p',n:'360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)',               cap:300,rad:360,p:4700, sinif:'sivi'},
+ {id:'aio360p',n:'360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)',               cap:300,rad:360,p:4499, sinif:'sivi'},
 ];
 const CASES=[
  /* rad: kasanın alabileceği EN BÜYÜK radyatör (mm), Epey teknik sayfalarından
     doğrulandı (20.08.2026). Soğutucu seçimi buna bakmak ZORUNDA; yoksa
     280'lik kasaya 360'lık radyatör önerir ve kimse o sistemi kuramaz. */
- {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2184,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160, dis:[200,388,423], fan:4, fanKap:6, duzen:{on:3,arka:1}},
+ {n:'Hava akışlı standart kasa (MSI MAG Forge M100A)',      p:2099,rad:240,gpuMax:300,formMax:'mATX',upTo:35000, cpuH:160, dis:[200,388,423], fan:4, fanKap:6, duzen:{on:3,arka:1}},
  {n:'Mesh ön panelli kasa (NZXT H3 Flow)',                  p:3599,rad:280,gpuMax:352,formMax:'mATX',upTo:70000, cpuH:170, dis:[225,389,400], fan:1, fanKap:7, duzen:{arka:1}},
  /* 24.08.2026: Corsair 4000D RS ARGB uretimden kalkti, yerini 4500X
    RS-R ARGB aldi (Epey, 6 satici). GPU max 430->460, radyator ayni
    (urun aciklamasi: 'iki 360 mm radyator icin uygun'). */
- {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8671,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478], fan:3, fanKap:10, ters:true, duzen:{yan:3}},
+ {n:'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)',p:8730,rad:360,gpuMax:460,formMax:'ATX',upTo:Infinity, cpuH:185, dis:[246,499,478], fan:3, fanKap:10, ters:true, duzen:{yan:3}},
  /* 22.09.2026 — orta fiyatlı ATX kasa (kullanıcı: üst sınıf ATX anakart daha çok
     sisteme girebilsin). Epey: 5.192 TL, 8 satıcı; ATX, 4×140 mm fan dahil, üst
     360 mm radyatör, kart en fazla 375 mm, soğutucu 180 mm, 219×456×456 mm. */
- {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5192,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456], fan:4, fanKap:8, duzen:{on:2,alt:2}},
+ {n:'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)',p:5249,rad:360,gpuMax:375,formMax:'ATX',upTo:Infinity, cpuH:180, dis:[219,456,456], fan:4, fanKap:8, duzen:{on:2,alt:2}},
  /* 22.09.2026 — premium kasalar (kullanıcı isteği). Epey teknik sayfası:
     Lancool III: 9.999 TL, 5 satıcı; 4×140 mm fan dahil (3 ön + 1 arka), fan
     kapasitesi 10, radyatör 360, kart en fazla 435 mm, soğutucu 187 mm,
@@ -4907,6 +4917,10 @@ window.addEventListener('error', e=>{
      yalnızca kendi dosyalarımızdan çıkan hatalar bizi ilgilendiriyor. */
   const k=e.filename||'';
   if(k && location.origin && k.indexOf(location.origin)!==0) return;
+  /* Vercel'in analiz betiği yerel geliştirmede yok; sunucu index.html döndürünce
+     "Unexpected token '<'" hatası çıkıyor ve canlı hata tablosunu kirletiyordu.
+     Ziyaretçiyi ilgilendiren bir hata değil (23.09.2026). */
+  if(k.indexOf('/_vercel/')>=0) return;
   hataBildir(e.message, k+(e.lineno?':'+e.lineno:''));
 });
 window.addEventListener('unhandledrejection', e=>{

@@ -511,3 +511,11 @@ Kullanıcı kararı: iki bölümdeki gerçek ürünler ziyaretçiye gösterilmey
 - `OemPicker` ve `LaptopPicker` artık `BosBolum` döndürüyor. Eski liste bileşenleri `OemPickerEski` / `LaptopPickerEski` olarak duruyor (veri geri açılınca kullanılacak); Supabase'deki laptop satırları ve OEM verisi SİLİNMEDİ.
 - BosBolum: neden kapalı olduğunu sade dille anlatır + markalar için "ürün burada böyle görünecek" örnek kartı (üstünde GERÇEK ÜRÜN DEĞİL yazar).
 - /yontem metinleri sadeleştirildi (kullanıcı: "yapay zeka dilinden uzaklaş"). "Gelir öneri motorunun dışından gelir" gibi anlaşılmayan cümleler yerine: "Bu siteden para kazanıyor muyuz? Şu an hayır... Bize para veren marka, sistem önerilerinde daha yukarı çıkamaz."
+
+## 23.09.2026 (6) — Genel tarama + veri düzeltmeleri
+- **Model değişiklikleri (3 satıcı kuralı):** RTX 5080 Windforce SFF tek satıcıya düşmüştü → **Palit GamingPro** (85.100, 4 satıcı, 332 mm). Ayrıca kural gereği daha ucuz olanlara geçildi: RTX 5050 → Asus Dual OC (18.999), RTX 5060 → MSI Shadow 2X OC Max (22.900), RTX 5070 → MSI Ventus 3X OC (47.781), RTX 5070 Ti → Gigabyte Windforce OC V2 (69.999). Hepsinin ölçüsü Epey teknik sayfasından alındı; görseller ve epey-eslesme güncellendi; bot --yaz ile fiyat/ad senkronlandı.
+- **Yeni kart: Intel Arc B580 12 GB** (18.199, 4 satıcı). idx 55 (TechPowerUp: RTX 5070'in %183'ü). 55-90 bin bandında seçiliyor. r1440/r2160 ölçümü olmadığı için yazılmadı (1.00 sayılır). Denetim tablolarına (URETICI_PSU 450 W, KART_KABLO 1x8pin) eklendi.
+- **scripts/kod-fiyat-senkron.mjs**: koddaki yedek fiyatları fiyatlar.json'dan günceller. 36 fiyat güncellendi (RTX 5070 Ti kodda 58.093 iken gerçekte 74.835'ti; yedek yalnız Supabase+json okunamazsa devreye giriyor ama yine de yanlıştı).
+- Hata bildiriminde /_vercel/ kaynaklı hatalar artık kaydedilmiyor (yerelde analitik betiği yok, canlı hata tablosunu kirletiyordu).
+- Önceki nesil kartlar (RX 7800 XT, RTX 4070 Super, RX 7700 XT...) Türkiye'de 3+ satıcıda bulunamadı: kural gereği eklenmedi.
+- Kontroller: 13.673 kombinasyon temiz, oyun profilinde FPS düşüşü 0, 22 sayfada konsol hatası ve kırık görsel yok, 57 parçanın hepsinin görseli var.

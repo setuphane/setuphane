@@ -41,9 +41,9 @@ const { buildSystem, PROFILES, cpuBrand } = kur;
 
 // ── Kurallar ───────────────────────────────────────────────────────────
 // Her kural bir sistem alir, sorun varsa metin doner.
-const URETICI_PSU = { '5050': 550, '7600': 550, '5060': 550, '9060xt': 550, '5060ti': 550, '9070': 750,
+const URETICI_PSU = { 'b580': 450, '5050': 550, '7600': 550, '5060': 550, '9060xt': 550, '5060ti': 550, '9070': 750,
   '5070': 650, '9070xt': 800, '5070ti': 750, '5080': 850, '5090': 1000 };
-const KART_KABLO = { '5050': { pin8: 1 }, '7600': { pin8: 1 }, '5060': { pin8: 1 }, '9060xt': { pin8: 1 }, '5060ti': { pin8: 1 },
+const KART_KABLO = { 'b580': { pin8: 1 }, '5050': { pin8: 1 }, '7600': { pin8: 1 }, '5060': { pin8: 1 }, '9060xt': { pin8: 1 }, '5060ti': { pin8: 1 },
   '9070': { pin8: 2 }, '9070xt': { pin8: 2 }, '5070': { pin8: 2, p16: true }, '5070ti': { pin8: 3, p16: true },
   '5080': { pin8: 3, p16: true }, '5090': { pin8: 4, p16: true } };
 // MSI resmi teknik sayfalari + Zalman satici verisi (21.09.2026)
@@ -317,7 +317,7 @@ if (eksikBoy.length) {
   // Canli veritabaninda HENUZ SATIRI OLMAYAN kod parcalari (panelden/SQL ile
   // eklenmemis). Yukleyici bunlari koddan geri eklemeli; eklemezse canlida
   // parca kaybolur. Burada bilerek disarida birakiliyor ki o yol sinansin.
-  const DBDE_YOK = new Set(['sogutucu:cift', 'ram:96', 'ssd:4t', 'gpu:5050', 'cpu:245kf', 'cpu:250kf', 'cpu:250k', 'cpu:270k', 'anakart:AM5-3', 'kasa:3', 'kasa:4', 'kasa:5']);
+  const DBDE_YOK = new Set(['sogutucu:cift', 'ram:96', 'ssd:4t', 'gpu:5050', 'cpu:245kf', 'cpu:250kf', 'cpu:250k', 'cpu:270k', 'anakart:AM5-3', 'kasa:3', 'kasa:4', 'kasa:5', 'gpu:b580']);
   const ekle = o => { if (!DBDE_YOK.has(o.anahtar)) r.push({ sira: (sira += 10), guncelleme: '2026-01-01', ...o }); };
   GPUS.forEach(g => ekle({ anahtar: 'gpu:' + g.id, kat: 'gpu', ad: g.n, marka: g.b, fiyat: g.p, idx: g.idx, vram: g.vram, tdp: g.tdp }));
   CPUS.forEach(c => ekle({ anahtar: 'cpu:' + c.id, kat: 'cpu', ad: c.n, fiyat: c.p, plat: c.plat, oyun: c.g, coklu_is: c.m, tdp: c.tdp, dahili_grafik: c.ig }));

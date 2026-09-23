@@ -6,9 +6,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "gpu:9060xt": {
-   "fiyat": 30469,
+   "fiyat": 28830,
    "ad": "Radeon RX 9060 XT 16 GB (Asus Dual)",
-   "tarih": "2026-09-22T10:29:01.408Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "gpu:5060ti": {
    "fiyat": 40894,
@@ -21,14 +21,14 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "gpu:5070": {
-   "fiyat": 50325,
-   "ad": "GeForce RTX 5070 12 GB (PNY ARGB Epic-X Triple OC)",
-   "tarih": "2026-09-22T06:46:43.055Z"
+   "fiyat": 47781,
+   "ad": "GeForce RTX 5070 12 GB (MSI Ventus 3X OC)",
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "gpu:9070xt": {
-   "fiyat": 47320,
+   "fiyat": 47775,
    "ad": "Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)",
-   "tarih": "2026-09-23T07:01:40.586Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "gpu:5090": {
    "fiyat": 335999,
@@ -91,9 +91,9 @@
    "tarih": "2026-09-23T07:01:40.586Z"
   },
   "ram:32": {
-   "fiyat": 28119,
+   "fiyat": 28129,
    "ad": "32 GB DDR5-6000 (2×16) (Apacer Panther)",
-   "tarih": "2026-09-22T08:26:58.352Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "ram:64": {
    "fiyat": 55497,
@@ -141,9 +141,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "sogutucu:aio360p": {
-   "fiyat": 4989,
+   "fiyat": 4499,
    "ad": "360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "anakart:AM5-0": {
    "fiyat": 4939,
@@ -161,9 +161,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "anakart:LGA1851-0": {
-   "fiyat": 6677,
+   "fiyat": 7299,
    "ad": "MSI Pro B860M-E (B860)",
-   "tarih": "2026-09-23T07:01:40.586Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "anakart:LGA1851-1": {
    "fiyat": 11199,
@@ -181,24 +181,24 @@
    "tarih": "2026-09-23T07:01:40.586Z"
   },
   "gpu:5060": {
-   "fiyat": 25649,
-   "ad": "GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)",
-   "tarih": "2026-09-23T07:01:40.586Z"
+   "fiyat": 22900,
+   "ad": "GeForce RTX 5060 8 GB (MSI Shadow 2X OC Max)",
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "gpu:5070ti": {
-   "fiyat": 74835,
-   "ad": "GeForce RTX 5070 Ti 16 GB (PNY Triple OC)",
-   "tarih": "2026-09-22T06:46:43.055Z"
+   "fiyat": 69999,
+   "ad": "GeForce RTX 5070 Ti 16 GB (Gigabyte Windforce OC V2)",
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "gpu:5080": {
-   "fiyat": 94879,
-   "ad": "GeForce RTX 5080 16 GB (Gigabyte Windforce OC SFF)",
-   "tarih": "2026-09-22T07:32:31.519Z"
+   "fiyat": 85100,
+   "ad": "GeForce RTX 5080 16 GB (Palit GamingPro)",
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "psu:550": {
-   "fiyat": 2089,
+   "fiyat": 1899,
    "ad": "550 W 80+ (MSI MAG A550BNL)",
-   "tarih": "2026-09-23T07:01:40.586Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "sogutucu:cift": {
    "fiyat": 2714,
@@ -216,14 +216,14 @@
    "tarih": "2026-09-22T07:32:31.519Z"
   },
   "gpu:5050": {
-   "fiyat": 20020,
-   "ad": "GeForce RTX 5050 8 GB (Galax 1-Click OC V2)",
-   "tarih": "2026-09-22T10:29:01.408Z"
+   "fiyat": 18999,
+   "ad": "GeForce RTX 5050 8 GB (Asus Dual OC)",
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "cpu:245kf": {
-   "fiyat": 8644,
+   "fiyat": 8635,
    "ad": "Core Ultra 5 245KF",
-   "tarih": "2026-09-22T08:26:58.352Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "cpu:250kf": {
    "fiyat": 12999,
@@ -241,14 +241,14 @@
    "tarih": "2026-09-23T07:01:40.586Z"
   },
   "anakart:AM5-3": {
-   "fiyat": 22999,
+   "fiyat": 22799,
    "ad": "MSI MPG X870E Edge Ti WiFi (X870E)",
-   "tarih": "2026-09-22T10:29:01.408Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "kasa:3": {
-   "fiyat": 5192,
+   "fiyat": 5249,
    "ad": "Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)",
-   "tarih": "2026-09-22T11:33:34.054Z"
+   "tarih": "2026-09-23T14:02:55.978Z"
   },
   "fan:tlc12": {
    "fiyat": 523,
@@ -266,5 +266,5 @@
    "tarih": "2026-09-23T07:01:40.586Z"
   }
  },
- "guncelleme": "2026-09-23T07:01:40.586Z"
+ "guncelleme": "2026-09-23T14:02:55.978Z"
 }
