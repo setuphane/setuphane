@@ -29,7 +29,7 @@ async function kart(req) {
   const tl = Math.round(butce).toLocaleString('tr-TR') + ' ₺';
   const amac = AMAC[p[1]] || 'oyun';
   const coz = COZ[p[5]] || '1080p';
-  const baslik = `${tl} ${amac} bilgisayarı — SETUP HANE`;
+  const baslik = `${tl} ${amac} bilgisayarı | SETUP HANE`;
   const aciklama = `${tl} bütçeyle kurulan ${amac} sistemi (${coz}). Parça parça liste, `
                  + `her parçanın neden seçildiği ve tahmini FPS. Satış yok, komisyon yok.`;
 
