@@ -1041,6 +1041,194 @@ const CASES = [
     yan: 3
   }
 }];
+/* ═══ ELİMDEKİ KART — yükseltme aracı için (23.09.2026) ═══════════════════
+   Bu kartları SATMIYORUZ; ziyaretçi "bende şu var" desin diye listede.
+   idx: bizim ölçeğimiz (RTX 5070 = 100). Kaynak, katalogla AYNI: TechPowerUp
+   GPU Database "Relative Performance". Her kartın kendi sayfasında RTX 5070'in
+   yüzdesi okundu, idx = 10000 / o yüzde. Böylece eski kart ile önerdiğimiz
+   kart aynı ölçekte kalıyor, iki farklı testin sayıları karışmıyor.
+   Ölçümü olmayan hiçbir kart eklenmedi (BİRİNCİ KURAL). */
+const ESKI_GPU = [{
+  n: 'GeForce GTX 1650',
+  idx: 19,
+  vram: 4
+}, {
+  n: 'GeForce GTX 1650 SUPER',
+  idx: 25,
+  vram: 4
+}, {
+  n: 'GeForce GTX 1060 6 GB',
+  idx: 24,
+  vram: 6
+}, {
+  n: 'GeForce GTX 1660',
+  idx: 28,
+  vram: 6
+}, {
+  n: 'GeForce GTX 1660 SUPER',
+  idx: 31,
+  vram: 6
+}, {
+  n: 'GeForce GTX 1660 Ti',
+  idx: 31,
+  vram: 6
+}, {
+  n: 'GeForce GTX 1070',
+  idx: 32,
+  vram: 8
+}, {
+  n: 'GeForce GTX 1080',
+  idx: 36,
+  vram: 8
+}, {
+  n: 'GeForce GTX 1080 Ti',
+  idx: 49,
+  vram: 11
+}, {
+  n: 'GeForce RTX 2060',
+  idx: 37,
+  vram: 6
+}, {
+  n: 'GeForce RTX 2060 SUPER',
+  idx: 40,
+  vram: 8
+}, {
+  n: 'GeForce RTX 2070',
+  idx: 43,
+  vram: 8
+}, {
+  n: 'GeForce RTX 2070 SUPER',
+  idx: 49,
+  vram: 8
+}, {
+  n: 'GeForce RTX 2080',
+  idx: 53,
+  vram: 8
+}, {
+  n: 'GeForce RTX 2080 Ti',
+  idx: 69,
+  vram: 11
+}, {
+  n: 'GeForce RTX 3050 8 GB',
+  idx: 29,
+  vram: 8
+}, {
+  n: 'GeForce RTX 3060 12 GB',
+  idx: 47,
+  vram: 12
+}, {
+  n: 'GeForce RTX 3060 Ti',
+  idx: 61,
+  vram: 8
+}, {
+  n: 'GeForce RTX 3070',
+  idx: 69,
+  vram: 8
+}, {
+  n: 'GeForce RTX 3070 Ti',
+  idx: 74,
+  vram: 8
+}, {
+  n: 'GeForce RTX 3080 10 GB',
+  idx: 88,
+  vram: 10
+}, {
+  n: 'GeForce RTX 3080 Ti',
+  idx: 97,
+  vram: 12
+}, {
+  n: 'GeForce RTX 3090',
+  idx: 99,
+  vram: 24
+}, {
+  n: 'GeForce RTX 4060',
+  idx: 55,
+  vram: 8
+}, {
+  n: 'GeForce RTX 4060 Ti 8 GB',
+  idx: 68,
+  vram: 8
+}, {
+  n: 'GeForce RTX 4070',
+  idx: 90,
+  vram: 12
+}, {
+  n: 'GeForce RTX 4070 SUPER',
+  idx: 94,
+  vram: 12
+}, {
+  n: 'Radeon RX 570',
+  idx: 21,
+  vram: 4
+}, {
+  n: 'Radeon RX 580',
+  idx: 25,
+  vram: 8
+}, {
+  n: 'Radeon RX 5500 XT',
+  idx: 25,
+  vram: 4
+}, {
+  n: 'Radeon RX 5600 XT',
+  idx: 35,
+  vram: 6
+}, {
+  n: 'Radeon RX 5700',
+  idx: 37,
+  vram: 8
+}, {
+  n: 'Radeon RX 5700 XT',
+  idx: 44,
+  vram: 8
+}, {
+  n: 'Radeon RX 6500 XT',
+  idx: 25,
+  vram: 4
+}, {
+  n: 'Radeon RX 6600',
+  idx: 41,
+  vram: 8
+}, {
+  n: 'Radeon RX 6600 XT',
+  idx: 46,
+  vram: 8
+}, {
+  n: 'Radeon RX 6700 XT',
+  idx: 60,
+  vram: 12
+}, {
+  n: 'Radeon RX 6800',
+  idx: 71,
+  vram: 16
+}, {
+  n: 'Radeon RX 6800 XT',
+  idx: 84,
+  vram: 16
+}, {
+  n: 'Radeon RX 6900 XT',
+  idx: 89,
+  vram: 16
+}, {
+  n: 'Radeon RX 7600',
+  idx: 52,
+  vram: 8
+}, {
+  n: 'Radeon RX 7700 XT',
+  idx: 76,
+  vram: 12
+}, {
+  n: 'Radeon RX 7800 XT',
+  idx: 87,
+  vram: 16
+}, {
+  n: 'Intel Arc A750',
+  idx: 45,
+  vram: 8
+}, {
+  n: 'Intel Arc A770',
+  idx: 49,
+  vram: 16
+}];
 const GAMES = [{
   id: 'valorant',
   n: 'Valorant',
