@@ -26,9 +26,9 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "gpu:9070xt": {
-   "fiyat": 46228,
+   "fiyat": 47320,
    "ad": "Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)",
-   "tarih": "2026-09-22T10:29:01.408Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "gpu:5090": {
    "fiyat": 335999,
@@ -71,9 +71,9 @@
    "tarih": "2026-09-22T07:01:03.743Z"
   },
   "cpu:7800x3d": {
-   "fiyat": 16043,
+   "fiyat": 16025,
    "ad": "Ryzen 7 7800X3D",
-   "tarih": "2026-09-22T06:46:43.055Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "cpu:9950x3d": {
    "fiyat": 34521,
@@ -81,14 +81,14 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "cpu:9800x3d": {
-   "fiyat": 21829,
+   "fiyat": 21828,
    "ad": "Ryzen 7 9800X3D",
-   "tarih": "2026-09-22T10:29:01.408Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "ram:16": {
-   "fiyat": 12999,
+   "fiyat": 13599,
    "ad": "16 GB DDR5-6000 (XPG Lancer Blade)",
-   "tarih": "2026-09-22T08:26:58.352Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "ram:32": {
    "fiyat": 28119,
@@ -116,9 +116,9 @@
    "tarih": "2026-09-22T08:26:58.352Z"
   },
   "psu:750": {
-   "fiyat": 3249,
+   "fiyat": 3703,
    "ad": "750 W 80+ (MSI MAG A750BN PCIE5 II)",
-   "tarih": "2026-09-21T13:00:24.051Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "psu:850": {
    "fiyat": 5778,
@@ -161,9 +161,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "anakart:LGA1851-0": {
-   "fiyat": 7299,
+   "fiyat": 6677,
    "ad": "MSI Pro B860M-E (B860)",
-   "tarih": "2026-09-22T06:46:43.055Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "anakart:LGA1851-1": {
    "fiyat": 11199,
@@ -176,14 +176,14 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "kasa:2": {
-   "fiyat": 9017,
+   "fiyat": 8730,
    "ad": "Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)",
-   "tarih": "2026-09-22T13:04:07.308Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "gpu:5060": {
-   "fiyat": 25025,
+   "fiyat": 25649,
    "ad": "GeForce RTX 5060 8 GB (MSI Ventus 2X OC White)",
-   "tarih": "2026-09-21T13:38:39.593Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "gpu:5070ti": {
    "fiyat": 74835,
@@ -196,9 +196,9 @@
    "tarih": "2026-09-22T07:32:31.519Z"
   },
   "psu:550": {
-   "fiyat": 2000,
+   "fiyat": 2089,
    "ad": "550 W 80+ (MSI MAG A550BNL)",
-   "tarih": "2026-09-22T10:29:01.408Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "sogutucu:cift": {
    "fiyat": 2714,
@@ -236,9 +236,9 @@
    "tarih": "2026-09-22T08:26:58.352Z"
   },
   "cpu:270k": {
-   "fiyat": 20045,
+   "fiyat": 20020,
    "ad": "Core Ultra 7 270K Plus",
-   "tarih": "2026-09-22T08:26:58.352Z"
+   "tarih": "2026-09-23T07:01:40.586Z"
   },
   "anakart:AM5-3": {
    "fiyat": 22999,
@@ -254,7 +254,17 @@
    "fiyat": 523,
    "ad": "120 mm kasa fanı (Thermalright TL-C12015)",
    "tarih": "2026-09-22T13:05:36.041Z"
+  },
+  "kasa:4": {
+   "fiyat": 9999,
+   "ad": "Premium hava akışlı kasa, 4 fanlı (Lian Li Lancool III)",
+   "tarih": "2026-09-23T07:01:40.586Z"
+  },
+  "kasa:5": {
+   "fiyat": 11699,
+   "ad": "Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)",
+   "tarih": "2026-09-23T07:01:40.586Z"
   }
  },
- "guncelleme": "2026-09-22T13:05:36.041Z"
+ "guncelleme": "2026-09-23T07:01:40.586Z"
 }
