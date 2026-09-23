@@ -54,11 +54,11 @@ const SOGUTUCU_OLCU = { air: { sinif: 'tek', h: 148 }, cift: { sinif: 'cift', h:
   aio360: { sinif: 'sivi' }, aio360p: { sinif: 'sivi' } };
 // cpuH: MSI / NZXT / Corsair teknik verisi; gpuMax: Epey (21.09.2026)
 const KASA_OLCU = {
-  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160, fan: 4, egzoz: 1, giris: 1 },
+  'Hava akışlı standart kasa (MSI MAG Forge M100A)': { gpuMax: 300, cpuH: 160, fan: 4, egzoz: 1, giris: 3 },
   'Mesh ön panelli kasa (NZXT H3 Flow)': { gpuMax: 352, cpuH: 170, fan: 1, egzoz: 1, giris: 0 },
-  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185, fan: 3, egzoz: 0, giris: 1 },
-  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180, fan: 4, egzoz: 0, giris: 1 },
-  'Premium hava akışlı kasa, 4 fanlı (Lian Li Lancool III)': { gpuMax: 435, cpuH: 187, fan: 4, egzoz: 1, giris: 1 },
+  'Camlı, yüksek hava akışlı kasa (Corsair Frame 4500X RS-R ARGB)': { gpuMax: 460, cpuH: 185, fan: 3, egzoz: 0, giris: 3 },
+  'Camlı ATX kasa, 4 fanlı (Lian Li Lancool 207)': { gpuMax: 375, cpuH: 180, fan: 4, egzoz: 0, giris: 4 },
+  'Premium hava akışlı kasa, 4 fanlı (Lian Li Lancool III)': { gpuMax: 435, cpuH: 187, fan: 4, egzoz: 1, giris: 3 },
   'Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)': { gpuMax: 455, cpuH: 167, fan: 0, egzoz: 0, giris: 0 } };
 
 const KURALLAR = [
@@ -123,10 +123,15 @@ const KURALLAR = [
     const var_ = k.fan + (b.cl.rad ? Math.round(b.cl.rad / 120) : 0) + (b.fan ? b.fan.adet : 0);
     if (var_ < gerek) return q + ' W isi, ' + var_ + ' fan var, ' + gerek + ' gerekiyor (' + b.cs.n + ')';
     // En az bir egzoz: kasanin arka/ust fani, ustteki radyator ya da eklenen fan
-    if (!(k.egzoz || b.cl.rad || b.fan)) return 'egzoz fani yok (' + b.cs.n + ')';
-    // En az bir giris: kasanin on/alt/yan fani ya da egzoz icin kullanilmayan eklenen fan
-    const egzozaGiden = (k.egzoz || b.cl.rad) ? 0 : 1;
-    return (k.giris || (b.fan && b.fan.adet - egzozaGiden >= 1)) ? null : 'giris fani yok (' + b.cs.n + ')';
+    const rad = b.cl.rad ? Math.round(b.cl.rad / 120) : 0, eklenen = b.fan ? b.fan.adet : 0;
+    const egzozVar = k.egzoz + rad, egzozEk = egzozVar ? 0 : 1;
+    if (!(egzozVar || eklenen)) return 'egzoz fani yok (' + b.cs.n + ')';
+    // 23.09.2026 — DENGE: iceri alan fan, disari atandan az olamaz. Eklenen
+    // fanlar once egzoz acigini, sonra giris acigini kapatiyor (motorun
+    // yerlestirme sirasi); burada bagimsiz olarak ayni sayim yapiliyor.
+    const giris = k.giris + Math.max(0, eklenen - egzozEk);
+    return giris >= egzozVar + egzozEk ? null
+      : 'hava akisi dengesiz: ' + giris + ' giris, ' + (egzozVar + egzozEk) + ' egzoz (' + b.cs.n + (rad ? ' + ' + b.cl.rad + ' radyator' : '') + ')';
   }],
   ['radyator-kasa', b => {
     // Sert uyumluluk kurali: radyator kasaya sigmazsa sistem HIC kurulamaz.

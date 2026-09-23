@@ -477,3 +477,10 @@ Düzeltilenler:
 - "En az X ₺ gerekiyor" mesajına "Bu bütçeyle kur →" butonu (olay: en_az_butce).
 - sitemap ana sayfa lastmod.
 Açık: laptop listesinin yenilenmesi (elle, panelden) — kullanıcı kararı.
+
+## 23.09.2026 — Hava akışı dengesi + uzun tire temizliği
+- **Kullanıcı bildirimi** (sistem:197500): O11'de üstte 3 radyatör fanı dışarı üflerken tek 120'lik giriş kalıyordu. Yeni kural: **giriş fanı sayısı egzozdan az olamaz** (radyatör egzoza sayılır). fanDenge() motorda, aynı sayım bağımsız olarak denetimde. Eski davranış 6.878 sistemde dengesiz, yenisinde 0.
+- Lancool III'e gerçek boş yuvalar (alt 3, üst 3) eklendi; yerleşim artık boş yuva bitince fan "uydurmuyor", kombinasyon eleniyor.
+- 197.500 ₺ sistemi: O11 + 360 radyatör → 3 alt giriş fanı (3 giriş / 3 egzoz).
+- **Uzun tire (—) metinlerden kaldırıldı** (kullanıcı: "hiç profesyonel bir adım değil"): 130 yer. Cümlelerde nokta/virgül/iki nokta, ayraçlarda ·, sayfa başlıklarında : ve |, boş değerlerde ·. Kodda yalnızca 3 açıklama satırında kaldı.
+- Denetim temiz (11.282 sistem), gün sonu testi değişmedi (oyun 0 düşüş).

@@ -310,7 +310,7 @@ const PHOTOS = {
 const GPUS = [{
   id: 'igpu',
   n: 'Dahili grafik (ayrı kart yok)',
-  b: '—',
+  b: '·',
   idx: 12,
   vram: 0,
   tdp: 0,
@@ -1020,6 +1020,10 @@ const CASES = [
   duzen: {
     on: 3,
     arka: 1
+  },
+  yuva: {
+    alt: 3,
+    ust: 3
   }
 }, {
   n: 'Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)',
@@ -1083,7 +1087,7 @@ const GAMES = [{
   tag: 'ağır'
 }, {
   id: 'cyber',
-  n: 'Cyberpunk 2077 — yüksek ayar',
+  n: 'Cyberpunk 2077 · yüksek ayar',
   k: 0.86,
   ck: 1.5,
   vram: 10,
@@ -1092,19 +1096,19 @@ const GAMES = [{
 const RES = [{
   id: '1080',
   n: '1080p',
-  full: 'Full HD — 1920×1080',
+  full: 'Full HD · 1920×1080',
   mul: 1.00,
   cmp: 'En yaygın ekran. Uygun fiyatlı ve oyunda en yüksek akıcılığı verir.'
 }, {
   id: '1440',
   n: '1440p',
-  full: '2K — 2560×1440',
+  full: '2K · 2560×1440',
   mul: .66,
   cmp: 'Gözle görülür daha net görüntü. Aynı sistemde performans yaklaşık üçte bir düşer.'
 }, {
   id: '2160',
   n: '4K',
-  full: '4K — 3840×2160',
+  full: '4K · 3840×2160',
   mul: .38,
   cmp: 'Sinema netliği. Aynı görüntü için yaklaşık üç kat fazla güç ister.'
 }];
@@ -1311,6 +1315,35 @@ const girisVar = cs => {
   const d = cs && cs.duzen;
   return !d || !!(d.on || d.alt || d.yan);
 };
+/* 23.09.2026 — kullanıcı: "1 egzoz + 3 radyatör fanı, 4 fanla bu sistem ayakta
+   durur mu?" Durmaz: O11'de üstteki 360 radyatör 3 fanla dışarı üflerken tek
+   120'lik giriş kalıyordu. Kasa sürekli negatif basınçta kalır, tozu her
+   delikten çeker ve karta yalnız ısınmış hava gider. Kural: GİRİŞ sayısı
+   EGZOZ sayısından az olamaz (radyatör fanları egzoza sayılır). */
+const fanSayim = (cs, rad) => {
+  const d = cs && cs.duzen || {};
+  return {
+    giris: (d.on || 0) + (d.alt || 0) + (d.yan || 0),
+    egzoz: (d.arka || 0) + (d.ust || 0) + (rad || 0)
+  };
+};
+/* Kasada ölçü yoksa (duzen bilinmiyor) denge kuralı uygulanmaz: uydurma
+   veriyle sistem elemek de kabul etmek kadar yanlış olur. */
+const fanDenge = (cs, rad) => {
+  if (!cs || !cs.duzen) return {
+    egzozEk: 0,
+    girisEk: 0
+  };
+  const {
+    giris,
+    egzoz
+  } = fanSayim(cs, rad);
+  const egzozEk = egzoz ? 0 : 1;
+  return {
+    egzozEk,
+    girisEk: Math.max(0, egzoz + egzozEk - giris)
+  };
+};
 /* yuva: kasanın BOŞ fan yuvaları, doldurma sırasıyla. Verilmezse standart
    kasa: 2 ön, 1 arka, 3 üst. O11 gibi önü cam kasada ön yuva yoktur. */
 const fanYerlesim = (cs, adet, rad) => {
@@ -1324,14 +1357,24 @@ const fanYerlesim = (cs, adet, rad) => {
     },
     bos = {};
   for (const k in yuva) bos[k] = d[k] || k === 'ust' && rad ? 0 : yuva[k];
-  if (adet > 0 && !egzozVar(cs, rad)) {
+  const {
+    egzozEk,
+    girisEk
+  } = fanDenge(cs, rad);
+  if (adet > 0 && egzozEk) {
     const e = bos.arka ? 'arka' : 'ust';
     yer.push(e);
     bos[e]--;
   } // önce egzoz
+  for (let i = 0; i < girisEk && yer.length < adet; i++) {
+    // sonra denge için giriş
+    const g = ['on', 'alt', 'yan'].find(k => bos[k] > 0);
+    if (!g) break;
+    yer.push(g);
+    bos[g]--;
+  }
   for (const k in bos) while (bos[k]-- > 0 && yer.length < adet) yer.push(k);
-  while (yer.length < adet) yer.push(rad ? 'on' : 'ust');
-  return yer;
+  return yer; /* boş yuva bittiyse kısa döner; fanEk o kombinasyonu eler */
 };
 const fanYerMetni = (cs, adet, rad) => {
   const say = {};
@@ -1346,7 +1389,17 @@ const fanGerek = (g, c) => {
 const fanEk = (g, c, cs, cl) => {
   if (cs.fan == null) return 0;
   const rad = cl && cl.rad ? Math.round(cl.rad / 120) : 0;
-  const ek = Math.max(fanGerek(g, c) - cs.fan - rad, (egzozVar(cs, rad) ? 0 : 1) + (girisVar(cs) ? 0 : 1), 0);
+  const {
+    egzozEk,
+    girisEk
+  } = fanDenge(cs, rad);
+  const ek = Math.max(fanGerek(g, c) - cs.fan - rad, egzozEk + girisEk, 0);
+  /* Gereken fan kasanın boş yuvalarına sığmıyorsa bu kombinasyon kurulamaz. */
+  if (ek && cs.duzen) {
+    const yer = fanYerlesim(cs, ek, rad);
+    if (yer.length < ek) return -1;
+    if (yer.filter(y => y === 'on' || y === 'alt' || y === 'yan').length < girisEk) return -1;
+  }
   if (ek && cs.fanKap != null && cs.fan + rad + ek > cs.fanKap) return -1;
   return ek;
 }; /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
@@ -1723,7 +1776,7 @@ function fpsVerdict(f) {
     c: '#FF2D95'
   };
   if (f < 70) return {
-    t: 'Akıcı — sorunsuz',
+    t: 'Akıcı, sorunsuz',
     c: '#ECEBF2'
   };
   if (f < 110) return {
@@ -1808,7 +1861,7 @@ function balance(c, g, res) {
       unit: enIyisi ? 'BOŞTA' : 'KAYIP',
       kisa: enIyisi ? `1080p'de %${loss} boşta` : `%${loss} kayıp`,
       t: enIyisi ? 'Bundan güçlü işlemci yok' : loss < 12 ? 'Neredeyse dengeli' : 'İşlemci yetişemiyor',
-      d: enIyisi ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor — listedeki en güçlü işlemci sende. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır; yüksek çözünürlükte oynayacaksan sorun değil.` : loss < 12 ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss} — oyunda bunu fark etmezsin.` : `Ekran kartı hazır bekliyor ama işlemci sipariş yetiştiremiyor. Yaklaşık %${loss} performans boşa gidiyor.`
+      d: enIyisi ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor; listedeki en güçlü işlemci sende. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır; yüksek çözünürlükte oynayacaksan sorun değil.` : loss < 12 ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss}, oyunda bunu fark etmezsin.` : `Ekran kartı hazır bekliyor ama işlemci sipariş yetiştiremiyor. Yaklaşık %${loss} performans boşa gidiyor.`
     };
   }
 
@@ -1823,7 +1876,7 @@ function balance(c, g, res) {
     unit: 'İŞLEMCİDE YEDEK GÜÇ',
     kisa: `Ekran kartı sınırlıyor (%${bos} yedek)`,
     t: asiri ? 'İşlemciye fazla harcanmış' : 'Ekran kartı sınırlıyor',
-    d: asiri ? `İşlemci bu ekran kartına göre çok güçlü. Aradaki paranın ekran kartına gitmesi oyunda çok daha fazla kazandırırdı.` : `Oyunda sınırı ekran kartı koyuyor — bu normaldir. İşlemcinin %${bos} kadar yedek gücü var, yani ileride ekran kartını yükseltirsen işlemciyi değiştirmen gerekmez.`
+    d: asiri ? `İşlemci bu ekran kartına göre çok güçlü. Aradaki paranın ekran kartına gitmesi oyunda çok daha fazla kazandırırdı.` : `Oyunda sınırı ekran kartı koyuyor, bu normaldir. İşlemcinin %${bos} kadar yedek gücü var, yani ileride ekran kartını yükseltirsen işlemciyi değiştirmen gerekmez.`
   };
 }
 const bnColor = b => b.sev === 'real' ? '#FF2D95' : b.sev === 'minor' ? '#ECEBF2' : '#2DE2E6';
@@ -1853,7 +1906,7 @@ function fiyatYasi() {
     gun: Math.max(0, g),
     metin: m,
     bayat: g > 30,
-    uyari: g > 30 ? 'Bir aydan eski — alım öncesi kendin de kontrol et.' : null
+    uyari: g > 30 ? 'Bir aydan eski. Alım öncesi kendin de kontrol et.' : null
   };
 }
 
@@ -3275,7 +3328,7 @@ function parcalariGetir() {
       koy(GPUS, koru(gpuOnce, grup('gpu').map(x => ({
         id: kimlik(x),
         n: x.ad,
-        b: x.marka || '—',
+        b: x.marka || '·',
         idx: x.idx || 0,
         vram: x.vram || 0,
         tdp: x.tdp || 0,
@@ -3543,7 +3596,7 @@ function laptopAktif(l) {
     cIdx: laptopCpuIdx(l.cpu),
     total: l.price,
     gName: (l.gpu || '').toUpperCase(),
-    cName: l.cpu || '—',
+    cName: l.cpu || '·',
     vram: LAPTOP_VRAM[l.gpu] || 8,
     lap: l
   };
@@ -4237,18 +4290,18 @@ const SEKMELER = [{
    doğru görünmesi için. */
 const ROTA_META = {
   ana: {
-    t: 'SETUP HANE — Bütçene göre hangi parça neden, birlikte bakalım',
+    t: 'SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım',
     d: 'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz.'
   },
   /* noindex kalktı: 10 kategorinin hepsinde gerçek iş birliği ürünü var,
      sayfa artık Google'ın "içeriksiz sayfa" saydığı durumda değil.
      Ürünler /panel'den yönetiliyor. */
   aksesuarlar: {
-    t: 'Setup Aksesuarları — Kategorilere göre keşfet | SETUP HANE',
-    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.'
+    t: 'Setup Aksesuarları: Kategorilere göre keşfet | SETUP HANE',
+    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası. Kategori kategori, karışıklık olmadan.'
   },
   oner: {
-    t: 'Sana Göre Öner — Bütçene uygun setup aksesuarı | SETUP HANE',
+    t: 'Sana Göre Öner: Bütçene uygun setup aksesuarı | SETUP HANE',
     d: 'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim. Kayıt yok, kurulum yok.'
   },
   /* Yönetim ekranı: arama sonucunda yeri yok. Asıl koruma Supabase RLS'inde,
@@ -4259,16 +4312,16 @@ const ROTA_META = {
     noindex: true
   },
   testler: {
-    t: 'Donanım Testleri — FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
+    t: 'Donanım Testleri: FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
     d: '12 ücretsiz araç: FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri. Kurulum gerekmez.'
   },
   forum: {
-    t: 'Forum — Sistem tavsiyesi ve bilgisayar sorunları | SETUP HANE',
+    t: 'Forum: Sistem tavsiyesi ve bilgisayar sorunları | SETUP HANE',
     d: 'Bütçene uygun sistem sor, kurulumunu paylaş, arızanı çöz. Kayıt için e-posta istenmez.'
   },
   hakkimizda: {
     t: 'Hakkımızda | SETUP HANE',
-    d: 'SETUP HANE nedir, kim yapıyor, hangi ilkelerle çalışıyor — kısaca.'
+    d: 'SETUP HANE nedir, kim yapıyor, hangi ilkelerle çalışıyor? Kısaca.'
   },
   isbirlikleri: {
     t: 'İş Birlikleri | SETUP HANE',
@@ -4276,7 +4329,7 @@ const ROTA_META = {
   },
   gizlilik: {
     t: 'Gizlilik ve Çerez Politikası | SETUP HANE',
-    d: 'Hangi veri tutulur, hangi çerezler kullanılır, kayıt gerekip gerekmediği — açıkça.'
+    d: 'Hangi veri tutulur, hangi çerezler kullanılır, kayıt gerekir mi? Açıkça.'
   }
 };
 function rotaCoz() {
@@ -4358,7 +4411,7 @@ function Nav({
   }, /*#__PURE__*/React.createElement("a", {
     href: route === 'ana' ? '#top' : '/',
     className: "flex items-center gap-3",
-    "aria-label": "SETUP HANE \u2014 ana sayfa"
+    "aria-label": "SETUP HANE ana sayfa"
   }, /*#__PURE__*/React.createElement(MarkSmall, {
     size: 38
   }), /*#__PURE__*/React.createElement("span", {
@@ -4481,9 +4534,9 @@ function Hero({
     className: "text-[1.05rem] sm:text-[1.22rem] leading-[1.65] text-ink/85"
   }, "Elindeki paray\u0131 ve ne yapaca\u011F\u0131n\u0131 s\xF6yle. O paraya kurulabilecek", /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
-  }, " en dengeli sistemi par\xE7a par\xE7a"), " g\xF6stereyim \u2014 her par\xE7an\u0131n neden se\xE7ildi\u011Fini yazarak. Be\u011Fenmedi\u011Fini de\u011Fi\u015Ftir; bu bir re\xE7ete de\u011Fil, ba\u015Flang\u0131\xE7 noktas\u0131."), /*#__PURE__*/React.createElement("p", {
+  }, " en dengeli sistemi par\xE7a par\xE7a"), " g\xF6stereyim. Her par\xE7an\u0131n neden se\xE7ildi\u011Fini yazarak. Be\u011Fenmedi\u011Fini de\u011Fi\u015Ftir; bu bir re\xE7ete de\u011Fil, ba\u015Flang\u0131\xE7 noktas\u0131."), /*#__PURE__*/React.createElement("p", {
     className: "hidden sm:block mt-5 text-[.95rem] text-ink/70 leading-relaxed"
-  }, "Hi\xE7bir \u015Fey satm\u0131yoruz, komisyon alm\u0131yoruz, kimseye y\xF6nlendirmiyoruz. Kulland\u0131\u011F\u0131m\u0131z b\xFCt\xFCn performans de\u011Ferleri ba\u011F\u0131ms\u0131z \xF6l\xE7\xFCmlerden geliyor ve kayna\u011F\u0131 sayfada yaz\u0131l\u0131. Listeyi al\u0131p istedi\u011Fin yerden al\u0131rs\u0131n \u2014 ya da hi\xE7 almazs\u0131n."))), /*#__PURE__*/React.createElement(Reveal, {
+  }, "Hi\xE7bir \u015Fey satm\u0131yoruz, komisyon alm\u0131yoruz, kimseye y\xF6nlendirmiyoruz. Kulland\u0131\u011F\u0131m\u0131z b\xFCt\xFCn performans de\u011Ferleri ba\u011F\u0131ms\u0131z \xF6l\xE7\xFCmlerden geliyor ve kayna\u011F\u0131 sayfada yaz\u0131l\u0131. Listeyi al\u0131p istedi\u011Fin yerden al\u0131rs\u0131n, ya da hi\xE7 almazs\u0131n."))), /*#__PURE__*/React.createElement(Reveal, {
     delay: 260
   }, /*#__PURE__*/React.createElement("div", {
     className: "mt-8 flex flex-wrap items-center gap-x-8 gap-y-4"
@@ -4866,7 +4919,7 @@ function AmdIntelCompare({
     }
   }, diff, " FPS"), " (%", pct, ") daha fazla.") : cheaper ? /*#__PURE__*/React.createElement(React.Fragment, null, "\u0130kisi de ", /*#__PURE__*/React.createElement("span", {
     className: "num"
-  }, fa, " FPS"), " veriyor \u2014 ama", ' ', /*#__PURE__*/React.createElement("span", {
+  }, fa, " FPS"), " veriyor, ama", ' ', /*#__PURE__*/React.createElement("span", {
     style: {
       color: BRAND[cheaper]
     }
@@ -4875,7 +4928,7 @@ function AmdIntelCompare({
     style: {
       color: BRAND[cheaper]
     }
-  }, fmt(costDiff)), " daha ucuza ayn\u0131 sonucu veriyor. Aradaki fark cebinde kal\u0131r.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Bu b\xFCt\xE7ede ikisi de ayn\u0131 FPS'i ayn\u0131 paraya veriyor \u2014 hangisini alsan fark etmez.")));
+  }, fmt(costDiff)), " daha ucuza ayn\u0131 sonucu veriyor. Aradaki fark cebinde kal\u0131r.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Bu b\xFCt\xE7ede ikisi de ayn\u0131 FPS'i ayn\u0131 paraya veriyor; hangisini alsan fark etmez.")));
 }
 
 /* ═══════════════════ HAZIR LAPTOP SEÇİCİ ═══════════════════ */
@@ -4999,7 +5052,7 @@ function OemPicker({
     className: "num text-cy"
   }, "%", Math.round((rivF / oemF - 1) * 100)), " daha fazla kare al\u0131yorsun. Haz\u0131r sistemin bedeli bu; kar\u015F\u0131l\u0131\u011F\u0131nda kurulumla u\u011Fra\u015Fm\u0131yor ve garantiyi tek yerden al\u0131yorsun.") : oemF > rivF * 1.08 ? /*#__PURE__*/React.createElement(React.Fragment, null, "Bu haz\u0131r sistem, ayn\u0131 paraya toplayaca\u011F\u0131n sistemden ", /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
-  }, "%", Math.round((oemF / rivF - 1) * 100)), " daha h\u0131zl\u0131. Ma\u011Faza toplu al\u0131m avantaj\u0131n\u0131 fiyata yans\u0131tm\u0131\u015F \u2014 burada haz\u0131r almak mant\u0131kl\u0131.") : /*#__PURE__*/React.createElement(React.Fragment, null, "\u0130kisi de ayn\u0131 paraya neredeyse ayn\u0131 performans\u0131 veriyor. Kurulumla u\u011Fra\u015Fmak istemiyorsan haz\u0131r sistem makul bir tercih.")), cur.ikiz && (() => {
+  }, "%", Math.round((oemF / rivF - 1) * 100)), " daha h\u0131zl\u0131. Ma\u011Faza toplu al\u0131m avantaj\u0131n\u0131 fiyata yans\u0131tm\u0131\u015F; burada haz\u0131r almak mant\u0131kl\u0131.") : /*#__PURE__*/React.createElement(React.Fragment, null, "\u0130kisi de ayn\u0131 paraya neredeyse ayn\u0131 performans\u0131 veriyor. Kurulumla u\u011Fra\u015Fmak istemiyorsan haz\u0131r sistem makul bir tercih.")), cur.ikiz && (() => {
     /* 22.09.2026 — "Aynısını kendin toplarsan": aynı işlemci, aynı kart
        çipi+VRAM, aynı RAM (modül sayısıyla), aynı SSD, aynı yonga seti;
        ilanda yazmayan güç/kasa/soğutucu sitenin sert kurallarıyla.
@@ -5017,7 +5070,7 @@ function OemPicker({
       className: "num text-[1.8rem] font-light text-ink"
     }, fmt(ik.toplam)), Math.abs(fark) < 1000 ? /*#__PURE__*/React.createElement("span", {
       className: "text-dim text-[.85rem]"
-    }, "\u2014 haz\u0131r sistemle neredeyse ayn\u0131 fiyat") : fark > 0 ? /*#__PURE__*/React.createElement("span", {
+    }, "haz\u0131r sistemle neredeyse ayn\u0131 fiyat") : fark > 0 ? /*#__PURE__*/React.createElement("span", {
       className: "text-cy text-[.9rem]"
     }, /*#__PURE__*/React.createElement("span", {
       className: "num"
@@ -5025,7 +5078,7 @@ function OemPicker({
       className: "text-mg text-[.9rem]"
     }, /*#__PURE__*/React.createElement("span", {
       className: "num"
-    }, fmt(-fark)), " (%", oran, ") daha pahal\u0131 \u2014 burada haz\u0131r almak avantajl\u0131")), /*#__PURE__*/React.createElement("ul", {
+    }, fmt(-fark)), " (%", oran, ") daha pahal\u0131; burada haz\u0131r almak avantajl\u0131")), /*#__PURE__*/React.createElement("ul", {
       className: "mt-4 divide-y divide-line text-[.8rem]"
     }, ik.parca.map(([tur, ad, fy]) => /*#__PURE__*/React.createElement("li", {
       key: tur,
@@ -5048,7 +5101,7 @@ function OemPicker({
     target: "_blank",
     rel: "nofollow noopener noreferrer",
     className: "inline-block mt-5 text-[.85rem] text-cy hover:underline"
-  }, cur.ad, " \u2014 ", cur.magaza, /[aıou]$/i.test(cur.magaza) ? "'da" : "'ta", " g\xF6r \u2192"), /*#__PURE__*/React.createElement("p", {
+  }, cur.ad, " \xB7 ", cur.magaza, /[aıou]$/i.test(cur.magaza) ? "'da" : "'ta", " g\xF6r \u2192"), /*#__PURE__*/React.createElement("p", {
     className: "text-[.75rem] text-dim/70 mt-3 leading-relaxed max-w-[62ch]"
   }, "Bu ba\u011Flant\u0131dan hi\xE7bir kazanc\u0131m\u0131z yok. Fiyatlar ", OEM_TARIHI, " tarihinde al\u0131nd\u0131."))));
 }
@@ -5106,7 +5159,7 @@ function LaptopPicker({
       className: "text-[.82rem] text-dim leading-relaxed mb-4 max-w-[52ch]"
     }, "Elimizdeki listede en pahal\u0131 laptop ", /*#__PURE__*/React.createElement("span", {
       className: "num text-ink"
-    }, fmt(enPahali)), ". Daha \xFCst segment i\xE7in veri hen\xFCz toplanmad\u0131 \u2014 bu b\xFCt\xE7eyle masa\xFCst\xFC toplamak zaten a\xE7\u0131k ara daha mant\u0131kl\u0131.") : null;
+    }, fmt(enPahali)), ". Daha \xFCst segment i\xE7in veri hen\xFCz toplanmad\u0131. Bu b\xFCt\xE7eyle masa\xFCst\xFC toplamak zaten a\xE7\u0131k ara daha mant\u0131kl\u0131.") : null;
   })(), /*#__PURE__*/React.createElement("ul", {
     className: "space-y-2 sm:max-h-[560px] sm:overflow-y-auto sm:pr-1"
   }, list.slice(0, 10).map(l => {
@@ -5176,11 +5229,11 @@ function LaptopPicker({
     className: "lbl text-dim ml-2"
   }, "FPS")), /*#__PURE__*/React.createElement("p", {
     className: "text-[.8rem] text-dim mt-3 leading-relaxed"
-  }, rival ? rival.g.n : '—'))), /*#__PURE__*/React.createElement("p", {
+  }, rival ? rival.g.n : '·'))), /*#__PURE__*/React.createElement("p", {
     className: "mt-5 text-[.88rem] text-ink/80 leading-relaxed max-w-[58ch]"
   }, rivF > lapF ? /*#__PURE__*/React.createElement(React.Fragment, null, "Ayn\u0131 parayla toplad\u0131\u011F\u0131n masa\xFCst\xFC ", /*#__PURE__*/React.createElement("span", {
     className: "text-cy num"
-  }, Math.round(rivF / Math.max(1, lapF) * 10) / 10, "\xD7"), " daha h\u0131zl\u0131. Laptop'un fazlas\u0131 ekran, klavye, batarya ve ta\u015F\u0131nabilirlik \u2014 bunlara ihtiyac\u0131n varsa fark etti\u011Fin para bo\u015Fa gitmiyor. Yoksa masa\xFCst\xFC a\xE7\u0131k ara mant\u0131kl\u0131.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Bu b\xFCt\xE7ede laptop fena de\u011Fil; ta\u015F\u0131nabilirlik cabas\u0131.")), /*#__PURE__*/React.createElement("a", {
+  }, Math.round(rivF / Math.max(1, lapF) * 10) / 10, "\xD7"), " daha h\u0131zl\u0131. Laptop'un fazlas\u0131 ekran, klavye, batarya ve ta\u015F\u0131nabilirlik. Bunlara ihtiyac\u0131n varsa fark etti\u011Fin para bo\u015Fa gitmiyor. Yoksa masa\xFCst\xFC a\xE7\u0131k ara mant\u0131kl\u0131.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Bu b\xFCt\xE7ede laptop fena de\u011Fil; ta\u015F\u0131nabilirlik cabas\u0131.")), /*#__PURE__*/React.createElement("a", {
     href: cur.url,
     target: "_blank",
     rel: "noopener noreferrer",
@@ -5193,7 +5246,7 @@ function LaptopPicker({
     month: 'long'
   }), " tarihli", lapGun > 7 ? /*#__PURE__*/React.createElement("span", {
     className: "text-mg"
-  }, " (", lapGun, " g\xFCn \xF6nce) \u2014 almadan \xF6nce g\xFCncel fiyata bak") : null) : null, ". FPS de\u011Ferleri mobil ekran kart\u0131 s\u0131n\u0131f\u0131na g\xF6re tahmindir; ayn\u0131 isimli mobil kartlar masa\xFCst\xFC s\xFCr\xFCm\xFCnden belirgin \u015Fekilde yava\u015Ft\u0131r."));
+  }, " (", lapGun, " g\xFCn \xF6nce), almadan \xF6nce g\xFCncel fiyata bak") : null) : null, ". FPS de\u011Ferleri mobil ekran kart\u0131 s\u0131n\u0131f\u0131na g\xF6re tahmindir; ayn\u0131 isimli mobil kartlar masa\xFCst\xFC s\xFCr\xFCm\xFCnden belirgin \u015Fekilde yava\u015Ft\u0131r."));
 }
 
 /* ═══════════════════ MODÜL 01 — SİSTEM KURUCU ═══════════════════ */
@@ -5442,7 +5495,7 @@ function sistemAnaliz(sys) {
       const kazanc = Math.round((x.idx / g.idx - 1) * 100);
       let not = psuTamam && kasaTamam ? 'mevcut güç kaynağı ve kasa yeterli' : [!psuTamam && 'güç kaynağı yetmez, en az ' + gucGerek(x, c) + ' W gerekir', !kasaTamam && 'kasaya sığmaz (' + x.boy + ' mm)'].filter(Boolean).join(' · ');
       yuk.push({
-        t: x.n + ' — ~%' + kazanc + ' daha güçlü',
+        t: x.n + ' · ~%' + kazanc + ' daha güçlü',
         not,
         iyi: psuTamam && kasaTamam
       });
@@ -5453,7 +5506,7 @@ function sistemAnaliz(sys) {
     const sogOk = cYeter(cl, cpuUst),
       psuOk = g.id === 'igpu' || psuYeter(g, cpuUst, psu);
     yuk.push({
-      t: cpuUst.n + ' — aynı ' + c.plat + ' soket, anakart değişmeden takılır',
+      t: cpuUst.n + ' · aynı ' + c.plat + ' soket, anakart değişmeden takılır',
       not: sogOk && psuOk ? 'mevcut soğutucu ve güç kaynağı yeterli' : [!sogOk && 'daha güçlü soğutucu gerekir', !psuOk && 'güç kaynağı yetmez'].filter(Boolean).join(' · '),
       iyi: sogOk && psuOk
     });
@@ -6077,7 +6130,7 @@ function parcaNeden(sys) {
     ek('psu', 'Sistem en fazla ~' + cek + ' W çeker' + (g.psuMin ? ' · kart üreticisi en az ' + g.psuMin + ' W öneriyor' : ' · %' + Math.round((psu.w / cek - 1) * 100) + ' güvenlik payı'));
   }
   if (cl.cap && c.tdp) ek('cooler', 'İşlemci ' + c.tdp + ' W ısı üretir · soğutucu ' + cl.cap + ' W kaldırır' + (cl.rad && cs.rad ? ' · kasa ' + cs.rad + ' mm radyatör alır' : ''));
-  if (sys.fan) ek('fan', (!girisVar(cs) ? 'Kasada hazır giriş fanı yok' + (cl.rad ? ' (üstteki radyatör havayı dışarı atar)' : '') + ' — karta taze hava gelmeli; sistem ~' + ((g.tdp || 0) + (c.tdp || 0)) + ' W ısı üretir, en az ' + fanGerek(g, c) + ' fan gerekir' : egzozVar(cs, cl.rad) ? 'Kasanın ' + cs.fan + ' hazır fanı yetmiyor: sistem ~' + ((g.tdp || 0) + (c.tdp || 0)) + ' W ısı üretir, ' + fanGerek(g, c) + ' fan gerekir' : 'Kasanın ' + cs.fan + ' hazır fanının hepsi hava içeri alıyor, egzoz yok — sıcak hava dışarı atılmalı') + ' · takılacağı yer: ' + fanYerMetni(cs, sys.fan.adet, !!cl.rad) + ' · normal yönlü');
+  if (sys.fan) ek('fan', (fanDenge(cs, cl.rad ? Math.round(cl.rad / 120) : 0).girisEk ? 'İçeri hava alan fan, dışarı atandan az kalıyordu' + (cl.rad ? ' (üstteki radyatör 3 fanla dışarı üfler)' : '') + ': kasa negatif basınçta kalır, toz çeker ve kart ısınmış havayı solur. Sistem ~' + ((g.tdp || 0) + (c.tdp || 0)) + ' W ısı üretir, en az ' + fanGerek(g, c) + ' fan gerekir' : egzozVar(cs, cl.rad) ? 'Kasanın ' + cs.fan + ' hazır fanı yetmiyor: sistem ~' + ((g.tdp || 0) + (c.tdp || 0)) + ' W ısı üretir, ' + fanGerek(g, c) + ' fan gerekir' : 'Kasanın ' + cs.fan + ' hazır fanının hepsi hava içeri alıyor, egzoz yok: sıcak hava dışarı atılmalı') + ' · takılacağı yer: ' + fanYerMetni(cs, sys.fan.adet, !!cl.rad) + ' · normal yönlü');
   if (cs.gpuMax && g.boy) ek('case', (cs.fan === 0 ? 'Fansız gelir, fanlar ayrıca eklenir · ' : cs.fan != null ? cs.fan + ' hazır fan' + (cs.duzen && Object.keys(cs.duzen).length ? ' (' + Object.entries(cs.duzen).map(([k, n]) => n + ' ' + FAN_YER[k].split(' ')[0]).join(', ') + (cs.ters ? ', ters yönlü' : '') + ')' : '') + ' · ' : '') + 'Kart ' + g.boy + ' mm · kasa ' + cs.gpuMax + ' mm\'ye kadar alır' + (cs.formMax ? ' · ' + cs.formMax + ' anakart sığar' : ''));
   return n;
 }
@@ -6261,7 +6314,7 @@ function Builder({
     className: "text-mg text-lg font-light"
   }, "Bu b\xFCt\xE7eyle bu i\u015F i\xE7in sa\u011Flam bir sistem \xE7\u0131km\u0131yor."), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-dim mt-3 max-w-[46ch] leading-relaxed"
-  }, pick.cpu || pick.gpu ? /*#__PURE__*/React.createElement(React.Fragment, null, "Marka k\u0131s\u0131t\u0131n\u0131 gev\u015Fetmeyi dene (", [pick.cpu && 'işlemci: ' + pick.cpu, pick.gpu && 'ekran kartı: ' + pick.gpu].filter(Boolean).join(', '), "), ya da b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Ya b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek, ya da daha hafif bir ama\xE7 se\xE7. Yar\u0131m yamalak sistem \xF6nermeyiz \u2014 bir y\u0131l sonra pi\u015Fman olursun.")), (() => {
+  }, pick.cpu || pick.gpu ? /*#__PURE__*/React.createElement(React.Fragment, null, "Marka k\u0131s\u0131t\u0131n\u0131 gev\u015Fetmeyi dene (", [pick.cpu && 'işlemci: ' + pick.cpu, pick.gpu && 'ekran kartı: ' + pick.gpu].filter(Boolean).join(', '), "), ya da b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek.") : /*#__PURE__*/React.createElement(React.Fragment, null, "Ya b\xFCt\xE7eyi biraz yukar\u0131 \xE7ek, ya da daha hafif bir ama\xE7 se\xE7. Yar\u0131m yamalak sistem \xF6nermeyiz; bir y\u0131l sonra pi\u015Fman olursun.")), (() => {
     const az = enAzButce(prof, pick);
     return az ? /*#__PURE__*/React.createElement("p", {
       className: "text-sm text-ink/80 mt-3"
@@ -6287,7 +6340,7 @@ function Builder({
     className: "mb-7 text-[.88rem] text-dim leading-relaxed max-w-[52ch]"
   }, "B\xFCt\xE7enden ", /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
-  }, fmt(budget - sys.total)), " kullan\u0131lmad\u0131 \u2014 bu paray\u0131 harcamak performans\u0131 art\u0131rm\u0131yor.", ustButce ? /*#__PURE__*/React.createElement(React.Fragment, null, " Daha fazla ", prof.needGpu ? 'FPS' : 'performans', " veren bir \xFCst kademe sistem ", /*#__PURE__*/React.createElement("span", {
+  }, fmt(budget - sys.total)), " kullan\u0131lmad\u0131. Bu paray\u0131 harcamak performans\u0131 art\u0131rm\u0131yor.", ustButce ? /*#__PURE__*/React.createElement(React.Fragment, null, " Daha fazla ", prof.needGpu ? 'FPS' : 'performans', " veren bir \xFCst kademe sistem ", /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
   }, fmt(ustButce)), "\u2019den ba\u015Fl\u0131yor.") : null, ' ', "Cebinde kals\u0131n, ya da bir \xFCst kademe i\xE7in biriktir."), sys.hazir && /*#__PURE__*/React.createElement("p", {
     className: "mb-7 text-[.85rem] leading-relaxed max-w-[52ch] border-l-2 border-cy pl-3 text-ink/85"
@@ -6295,7 +6348,7 @@ function Builder({
     className: "text-cy"
   }, "Y\xFCkseltmeye haz\u0131r:"), " g\xFC\xE7 kayna\u011F\u0131 ve kasa, ileride", ' ', /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
-  }, sys.hazir.n), " takabilece\u011Fin \u015Fekilde se\xE7ildi \u2014 kart\u0131 de\u011Fi\u015Ftirirken ikinci kez g\xFC\xE7 kayna\u011F\u0131 almazs\u0131n."), /*#__PURE__*/React.createElement("div", {
+  }, sys.hazir.n), " takabilece\u011Fin \u015Fekilde se\xE7ildi. Kart\u0131 de\u011Fi\u015Ftirirken ikinci kez g\xFC\xE7 kayna\u011F\u0131 almazs\u0131n."), /*#__PURE__*/React.createElement("div", {
     className: "flex items-baseline justify-between mb-5 gap-4"
   }, /*#__PURE__*/React.createElement(Label, null, "SEN\u0130N \u0130\xC7\u0130N SE\xC7\u0130LEN PAR\xC7ALAR"), /*#__PURE__*/React.createElement("span", {
     className: "lbl text-dim"
@@ -6401,7 +6454,7 @@ function GameTest({
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 02 \u2014 CANLI HESAP"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 02 \xB7 CANLI HESAP"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h2", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]"
@@ -6411,7 +6464,7 @@ function GameTest({
     className: "mt-6 text-dim max-w-[54ch] leading-relaxed text-[.95rem]"
   }, /*#__PURE__*/React.createElement("strong", {
     className: "text-ink font-normal"
-  }, "FPS"), ", ekrandaki g\xF6r\xFCnt\xFCn\xFCn saniyede ka\xE7 kez yenilendi\u011Fi. Sinema filmi 24 FPS'tir. Oyunda 60'\u0131n alt\u0131na inince el hareketin ekrana ge\xE7 yans\u0131r \u2014 i\u015Fte o \"tak\u0131lma\" hissi."), /*#__PURE__*/React.createElement("p", {
+  }, "FPS"), ", ekrandaki g\xF6r\xFCnt\xFCn\xFCn saniyede ka\xE7 kez yenilendi\u011Fi. Sinema filmi 24 FPS'tir. Oyunda 60'\u0131n alt\u0131na inince el hareketin ekrana ge\xE7 yans\u0131r. \u0130\u015Fte o \"tak\u0131lma\" hissi."), /*#__PURE__*/React.createElement("p", {
     className: "mt-4 text-[.8rem] text-dim/70 max-w-[54ch] leading-relaxed"
   }, "Ekran kart\u0131 ve i\u015Flemci g\xFC\xE7 de\u011Ferleri \xF6l\xE7\xFCme dayan\u0131yor, tahmine de\u011Fil: masa\xFCst\xFC par\xE7alar", ' ', /*#__PURE__*/React.createElement("a", {
     href: "https://www.techpowerup.com/review/sapphire-radeon-rx-9070-gre-pulse/32.html",
@@ -6440,7 +6493,7 @@ function GameTest({
   }, GAMES.map(g => /*#__PURE__*/React.createElement("option", {
     key: g.id,
     value: g.id
-  }, g.n, " \u2014 ", g.tag)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+  }, g.n, " \xB7 ", g.tag)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "rsel",
     className: "lbl text-dim block mb-3"
   }, "EKRAN \xC7\xD6Z\xDCN\xDCRL\xDC\u011E\xDC"), /*#__PURE__*/React.createElement("select", {
@@ -6457,7 +6510,7 @@ function GameTest({
     className: "text-[.82rem] text-dim mt-1.5 leading-relaxed"
   }, "Bu se\xE7im yukar\u0131daki ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink/80"
-  }, "sistem \xF6nerisini de"), " de\u011Fi\u015Ftirir \u2014 rekabet\xE7i oyunlar i\u015Flemciye, a\u011F\u0131r oyunlar ekran kart\u0131na yaslan\u0131r."), act ? /*#__PURE__*/React.createElement("div", {
+  }, "sistem \xF6nerisini de"), " de\u011Fi\u015Ftirir: rekabet\xE7i oyunlar i\u015Flemciye, a\u011F\u0131r oyunlar ekran kart\u0131na yaslan\u0131r."), act ? /*#__PURE__*/React.createElement("div", {
     className: "mt-10"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-end gap-4 flex-wrap"
@@ -6506,13 +6559,13 @@ function GameTest({
     className: "lbl text-dim mb-2"
   }, "SINIRI KOYAN PAR\xC7A \xB7 DARBO\u011EAZ"), /*#__PURE__*/React.createElement("dd", {
     className: "text-[.92rem] leading-relaxed text-ink/85"
-  }, !act.cIdx ? /*#__PURE__*/React.createElement(React.Fragment, null, "Ekran kart\u0131 \u2014 ", /*#__PURE__*/React.createElement("span", {
+  }, !act.cIdx ? /*#__PURE__*/React.createElement(React.Fragment, null, "Ekran kart\u0131 \xB7 ", /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
   }, act.gName), ' ', /*#__PURE__*/React.createElement("span", {
     className: "text-dim"
-  }, "(laptopta de\u011Fi\u015Ftiremezsin)")) : cpuLimited ? /*#__PURE__*/React.createElement(React.Fragment, null, "\u0130\u015Flemci \u2014 ", /*#__PURE__*/React.createElement("span", {
+  }, "(laptopta de\u011Fi\u015Ftiremezsin)")) : cpuLimited ? /*#__PURE__*/React.createElement(React.Fragment, null, "\u0130\u015Flemci \xB7 ", /*#__PURE__*/React.createElement("span", {
     className: "text-mg"
-  }, act.cName)) : /*#__PURE__*/React.createElement(React.Fragment, null, "Ekran kart\u0131 \u2014 ", /*#__PURE__*/React.createElement("span", {
+  }, act.cName)) : /*#__PURE__*/React.createElement(React.Fragment, null, "Ekran kart\u0131 \xB7 ", /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
   }, act.gName)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("dt", {
     className: "lbl text-dim mb-2"
@@ -6537,7 +6590,7 @@ function GameTest({
     className: "num text-cy"
   }, " ", tatli.ucuzFps, " FPS"), " ile daha h\u0131zl\u0131 (\u015Fu anki sistem ", /*#__PURE__*/React.createElement("span", {
     className: "num"
-  }, tatli.hedefFps, " FPS"), "). Sebebi: bu b\xFCt\xE7ede daha g\xFC\xE7l\xFC ekran kart\u0131 se\xE7iliyor ama i\u015Flemci geriliyor \u2014 bu oyun i\u015Flemciye yasland\u0131\u011F\u0131 i\xE7in sonu\xE7 d\xFC\u015F\xFCyor.") : /*#__PURE__*/React.createElement("p", {
+  }, tatli.hedefFps, " FPS"), "). Sebebi: bu b\xFCt\xE7ede daha g\xFC\xE7l\xFC ekran kart\u0131 se\xE7iliyor ama i\u015Flemci geriliyor; bu oyun i\u015Flemciye yasland\u0131\u011F\u0131 i\xE7in sonu\xE7 d\xFC\u015F\xFCyor.") : /*#__PURE__*/React.createElement("p", {
     className: "text-[.98rem] leading-relaxed text-ink/90 max-w-[62ch]"
   }, "Se\xE7ti\u011Fin oyun ve \xE7\xF6z\xFCn\xFCrl\xFCkte", ' ', /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
@@ -6553,7 +6606,7 @@ function GameTest({
     key: i
   }, "\xB7 ", x)))), /*#__PURE__*/React.createElement("p", {
     className: "text-[.85rem] text-dim mt-5 leading-relaxed max-w-[62ch]"
-  }, "Bunlar \xE7\xF6p de\u011Fil \u2014 daha fazla bellek ve disk ileride i\u015Fine yarar, g\xFC\xE7l\xFC i\u015Flemci daha a\u011F\u0131r oyunlarda ve daha y\xFCksek \xE7\xF6z\xFCn\xFCrl\xFCkte fark eder. Ama ", /*#__PURE__*/React.createElement("span", {
+  }, "Bunlar \xE7\xF6p de\u011Fil: daha fazla bellek ve disk ileride i\u015Fine yarar, g\xFC\xE7l\xFC i\u015Flemci daha a\u011F\u0131r oyunlarda ve daha y\xFCksek \xE7\xF6z\xFCn\xFCrl\xFCkte fark eder. Ama ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink/90"
   }, "bu oyunda, bu \xE7\xF6z\xFCn\xFCrl\xFCkte"), " ekrana yans\u0131yan bir kar\u015F\u0131l\u0131\u011F\u0131 yok. Karar\u0131 sen ver."))) : /*#__PURE__*/React.createElement("p", {
     className: "mt-10 text-dim text-sm"
@@ -6584,7 +6637,7 @@ function BalanceTest({
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 03 \u2014 DARBO\u011EAZ TEST\u0130 \xB7 CANLI HESAP"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 03 \xB7 DARBO\u011EAZ TEST\u0130 \xB7 CANLI HESAP"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h2", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]"
@@ -6598,7 +6651,7 @@ function BalanceTest({
     className: "text-ink font-normal"
   }, "i\u015Flemci"), " sipari\u015Fleri al\u0131p mutfa\u011Fa da\u011F\u0131tan garson,", /*#__PURE__*/React.createElement("strong", {
     className: "text-ink font-normal"
-  }, " ekran kart\u0131"), " ise yeme\u011Fi pi\u015Firen \u015Fef. Garson yava\u015Fsa \u015Fef bo\u015F bekler, \u015Fef yava\u015Fsa garson bo\u015F bekler. \u0130kisi de para eder \u2014 ama biri bo\u015Fta kal\u0131yorsa o paray\u0131 \xE7\xF6pe atm\u0131\u015Fs\u0131n demektir. \u0130\u015Fte o bo\u015Fa giden k\u0131s\u0131m darbo\u011Fazd\u0131r.")), /*#__PURE__*/React.createElement(Reveal, {
+  }, " ekran kart\u0131"), " ise yeme\u011Fi pi\u015Firen \u015Fef. Garson yava\u015Fsa \u015Fef bo\u015F bekler, \u015Fef yava\u015Fsa garson bo\u015F bekler. \u0130kisi de para eder, ama biri bo\u015Fta kal\u0131yorsa o paray\u0131 \xE7\xF6pe atm\u0131\u015Fs\u0131n demektir. \u0130\u015Fte o bo\u015Fa giden k\u0131s\u0131m darbo\u011Fazd\u0131r.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 110
   }, /*#__PURE__*/React.createElement(Card, {
     className: "mt-12 p-5 sm:p-9"
@@ -6691,7 +6744,7 @@ const GLOSSARY = [{
   t: 'Ekran kartı',
   one: 'Oyunda gördüğün her şeyi çizen parça.',
   cmp: 'Restoranın şefi. Yemeği pişiren o.',
-  d: 'Oyunlarda performansı en çok belirleyen parça budur; bütçenin en büyük dilimi genellikle buraya gider. Üzerindeki "GB" yazısı kendi hafızasıdır — çözünürlük ve doku kalitesi arttıkça bu hafıza dolmaya başlar.',
+  d: 'Oyunlarda performansı en çok belirleyen parça budur; bütçenin en büyük dilimi genellikle buraya gider. Üzerindeki "GB" yazısı kendi hafızasıdır; çözünürlük ve doku kalitesi arttıkça bu hafıza dolmaya başlar.',
   care: 'Oyun oynayacaksan burayı kısma.'
 }, {
   k: 'cpu',
@@ -6702,14 +6755,14 @@ const GLOSSARY = [{
   care: 'Video/render işi yapıyorsan öncelik burası.'
 }, {
   k: 'ram',
-  t: 'Bellek — RAM',
+  t: 'Bellek · RAM',
   one: 'Aynı anda kaç işi açık tutabildiğin.',
   cmp: 'Çalışma masanın büyüklüğü. Masa küçükse her seferinde dolaba gidip gelirsin.',
   d: 'RAM kapandığında içindekiler silinir, kalıcı depolama değildir. 16 GB bugün oyun için alt sınır, 32 GB rahat alan demektir. Video kurgu yapacaksan 32 GB neredeyse zorunlu.',
   care: '16 GB alt sınır, 32 GB huzur.'
 }, {
   k: 'ssd',
-  t: 'Disk — SSD',
+  t: 'Disk · SSD',
   one: 'Dosyaların, oyunların ve Windows’un durduğu yer.',
   cmp: 'Dolabın. Kapatınca içindekiler kaybolmaz.',
   d: 'Eski mekanik disklerden 10-20 kat hızlıdır; bilgisayarın "hızlı açılma" hissinin asıl kaynağı budur. Modern bir oyun tek başına 80-150 GB yer kaplar, o yüzden 500 GB çabuk dolar.',
@@ -6720,7 +6773,7 @@ const GLOSSARY = [{
   one: 'Bütün parçaların birbirine bağlandığı taban.',
   cmp: 'Evin elektrik tesisatı. Görünmez ama olmazsa hiçbir şey çalışmaz.',
   d: 'Performansa doğrudan katkısı yoktur; işi parçaları doğru bağlamak ve işlemciye stabil elektrik vermektir. Güçlü işlemci güçlü anakart ister, aksi halde işlemci tam hızına çıkamaz.',
-  care: 'Pahalı olan hızlı yapmaz — uyumlu olan çalıştırır.'
+  care: 'Pahalı olan hızlı yapmaz, uyumlu olan çalıştırır.'
 }, {
   k: 'psu',
   t: 'Güç kaynağı',
@@ -6733,7 +6786,7 @@ const GLOSSARY = [{
   t: 'Soğutucu',
   one: 'İşlemcinin ürettiği ısıyı dışarı atan parça.',
   cmp: 'Mutfaktaki aspiratör.',
-  d: 'İşlemci ısınınca kendini korumak için yavaşlar — buna "kısılma" denir ve performansı sessizce düşürür. Yeterli soğutma, aldığın gücü gerçekten kullanabilmen demektir.',
+  d: 'İşlemci ısınınca kendini korumak için yavaşlar; buna "kısılma" denir ve performansı sessizce düşürür. Yeterli soğutma, aldığın gücü gerçekten kullanabilmen demektir.',
   care: 'Sessizlik istiyorsan buraya biraz fazla ver.'
 }, {
   k: 'case',
@@ -6750,7 +6803,7 @@ function Glossary() {
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 04 \u2014 PAR\xC7A S\xD6ZL\xDC\u011E\xDC"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 04 \xB7 PAR\xC7A S\xD6ZL\xDC\u011E\xDC"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h2", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]"
@@ -6758,7 +6811,7 @@ function Glossary() {
     className: "em"
   }, "ne yapar"), ", tek tek."), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-dim max-w-[52ch] leading-relaxed text-[.95rem]"
-  }, "Teknik terim yok. Her par\xE7ay\u0131 g\xFCnl\xFCk hayattan tan\u0131d\u0131\u011F\u0131n bir \u015Feyle e\u015Fledik \u2014 \xE7\xFCnk\xFC insan bilmedi\u011Fi \u015Feyi ancak bildi\u011Fi bir \u015Feyle k\u0131yaslay\u0131nca anl\u0131yor.")), /*#__PURE__*/React.createElement("div", {
+  }, "Teknik terim yok. Her par\xE7ay\u0131 g\xFCnl\xFCk hayattan tan\u0131d\u0131\u011F\u0131n bir \u015Feyle e\u015Fledik, \xE7\xFCnk\xFC insan bilmedi\u011Fi \u015Feyi ancak bildi\u011Fi bir \u015Feyle k\u0131yaslay\u0131nca anl\u0131yor.")), /*#__PURE__*/React.createElement("div", {
     className: "mt-12 border-t border-line"
   }, GLOSSARY.map((it, i) => {
     const on = open === it.k,
@@ -6828,7 +6881,7 @@ function Glossary() {
 
 /* ═══════════════════ ÖZET — sağ panel + mobil dock ═══════════════════ */
 function summaryText(sys, prof, plain) {
-  return ['SETUP HANE — sistem listesi', 'Amaç: ' + prof.n, '', 'Ekran kartı : ' + sys.g.n, 'İşlemci     : ' + sys.c.n, 'Anakart     : ' + sys.mb.n, 'RAM         : ' + sys.r.n, 'SSD         : ' + sys.s.n, 'Güç kaynağı : ' + sys.psu.n, 'Soğutucu    : ' + sys.cl.n, 'Kasa        : ' + sys.cs.n, ...(sys.fan ? ['Kasa fanı   : ' + sys.fan.adet + ' × ' + sys.fan.n] : []), '', 'TOPLAM      : ' + plain(sys.total), '', 'instagram.com/setuphane'].join('\n');
+  return ['SETUP HANE · sistem listesi', 'Amaç: ' + prof.n, '', 'Ekran kartı : ' + sys.g.n, 'İşlemci     : ' + sys.c.n, 'Anakart     : ' + sys.mb.n, 'RAM         : ' + sys.r.n, 'SSD         : ' + sys.s.n, 'Güç kaynağı : ' + sys.psu.n, 'Soğutucu    : ' + sys.cl.n, 'Kasa        : ' + sys.cs.n, ...(sys.fan ? ['Kasa fanı   : ' + sys.fan.adet + ' × ' + sys.fan.n] : []), '', 'TOPLAM      : ' + plain(sys.total), '', 'instagram.com/setuphane'].join('\n');
 }
 function useCopy(sys, prof, plain) {
   const [copied, setCopied] = useState(false);
@@ -6883,7 +6936,7 @@ function usePaylas(budget, prof, pick, gid, rid) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'SETUP HANE — kurduğum sistem',
+          title: 'SETUP HANE · kurduğum sistem',
           url
         });
         olay('sistem_paylasildi', {
@@ -6965,7 +7018,7 @@ function Panel({
     }
   }, kopya ? 'LİNK KOPYALANDI ✓' : 'PAYLAŞ')), /*#__PURE__*/React.createElement("div", {
     className: "mt-7 pt-6 border-t border-line space-y-3.5"
-  }, (isLap ? [['Model', laptopAd(act.lap).model], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '—') + ' GB']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Bellek', sys.r.n], ['Disk', sys.s.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
+  }, (isLap ? [['Model', laptopAd(act.lap).model], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '·') + ' GB']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Bellek', sys.r.n], ['Disk', sys.s.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
     key: a,
     className: "flex justify-between gap-4 text-[.83rem]"
   }, /*#__PURE__*/React.createElement("span", {
@@ -6993,7 +7046,7 @@ function Panel({
     className: "text-[.85rem]"
   }, isLap ? /*#__PURE__*/React.createElement("span", {
     className: "text-dim leading-relaxed"
-  }, "Laptopta par\xE7a de\u011Fi\u015Ftirilemez \u2014 darbo\u011Faz\u0131 sonradan d\xFCzeltemezsin.") : /*#__PURE__*/React.createElement(BottleneckBadge, {
+  }, "Laptopta par\xE7a de\u011Fi\u015Ftirilemez; darbo\u011Faz\u0131 sonradan d\xFCzeltemezsin.") : /*#__PURE__*/React.createElement(BottleneckBadge, {
     c: sys.c,
     g: sys.g.id === 'igpu' ? GPUS[1] : sys.g,
     res: res,
@@ -7006,7 +7059,7 @@ function Panel({
     className: "num text-[1.7rem] font-light text-cy leading-none"
   }, fmt(saveA)), /*#__PURE__*/React.createElement("div", {
     className: "text-[.8rem] text-dim mt-2.5 leading-relaxed"
-  }, "cebinde kal\u0131yor \u2014 ", /*#__PURE__*/React.createElement("span", {
+  }, "cebinde kal\u0131yor: ", /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
   }, "%", Math.round(pctA)), " daha ucuz. Haz\u0131r sistem fiyat\u0131, par\xE7a tutar\u0131na ortalama %", Math.round(PREBUILT_MARGIN * 100), " k\xE2r pay\u0131 ve ", fmt(ASSEMBLY), " montaj eklenerek hesapland\u0131.")), isLap && /*#__PURE__*/React.createElement("a", {
     href: act.lap.url,
@@ -7028,7 +7081,7 @@ function Panel({
     className: "block mt-1 text-mg"
   }, fiyatYasi().uyari), isLap && act.lap.tarih && Date.now() - new Date(act.lap.tarih).getTime() > 7 * 86400000 && /*#__PURE__*/React.createElement("span", {
     className: "block mt-1 text-mg"
-  }, "Bir haftadan eski \u2014 al\u0131m \xF6ncesi g\xFCncel fiyata bak.")))));
+  }, "Bir haftadan eski. Al\u0131m \xF6ncesi g\xFCncel fiyata bak.")))));
 }
 function MobileDock({
   sys,
@@ -7080,7 +7133,7 @@ function MobileDock({
     className: "accIn"
   }, /*#__PURE__*/React.createElement("div", {
     className: "px-5 pt-5 space-y-3"
-  }, (isLap ? [['Model', laptopAd(act.lap).model], ['Seri', laptopAd(act.lap).seri || '—'], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '—') + ' GB'], ['Disk', act.lap.ssd ? act.lap.ssd >= 1000 ? act.lap.ssd / 1000 + ' TB' : act.lap.ssd + ' GB' : '—'], ['Ekran', (act.lap.inch || '—') + ' inç'], ['Satıcı', act.lap.offers + ' mağaza']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Anakart', sys.mb.n], ['Bellek', sys.r.n], ['Disk', sys.s.n], ['Güç kaynağı', sys.psu.n], ['Soğutucu', sys.cl.n], ['Kasa', sys.cs.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
+  }, (isLap ? [['Model', laptopAd(act.lap).model], ['Seri', laptopAd(act.lap).seri || '·'], ['Ekran kartı', act.gName], ['İşlemci', act.cName], ['Bellek', (act.lap.ram || '·') + ' GB'], ['Disk', act.lap.ssd ? act.lap.ssd >= 1000 ? act.lap.ssd / 1000 + ' TB' : act.lap.ssd + ' GB' : '·'], ['Ekran', (act.lap.inch || '·') + ' inç'], ['Satıcı', act.lap.offers + ' mağaza']] : [['Ekran kartı', sys.g.n], ['İşlemci', sys.c.n], ['Anakart', sys.mb.n], ['Bellek', sys.r.n], ['Disk', sys.s.n], ['Güç kaynağı', sys.psu.n], ['Soğutucu', sys.cl.n], ['Kasa', sys.cs.n]]).map(([a, b]) => /*#__PURE__*/React.createElement("div", {
     key: a,
     className: "flex justify-between gap-4 text-[.8rem]"
   }, /*#__PURE__*/React.createElement("span", {
@@ -7442,7 +7495,7 @@ function DeviceTest({
        sonraki kademeyi rapor ediyordu. */
     for (let i = 0; i < YUK_MERDIVENI.length; i++) {
       const lv = YUK_MERDIVENI[i];
-      setMsg(`Yük artırılıyor — ${lv.r}px · ${lv.s} kademe…`);
+      setMsg(`Yük artırılıyor · ${lv.r}px · ${lv.s} kademe…`);
       const ms = await runLevel(ctx, lv.r, lv.s, 6);
       if (!alive.current) return;
       son = {
@@ -7553,7 +7606,7 @@ function DeviceTest({
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 05 \u2014 GER\xC7EK \xD6L\xC7\xDCM"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 05 \xB7 GER\xC7EK \xD6L\xC7\xDCM"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h1", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]"
@@ -7561,7 +7614,7 @@ function DeviceTest({
     className: "em"
   }, "ne kadar"), " g\xFC\xE7l\xFC?"), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-dim max-w-[56ch] leading-relaxed text-[.95rem]"
-  }, "Bu sayfadaki her \u015Fey tahmindi \u2014 bu de\u011Fil. A\u015Fa\u011F\u0131daki test \u015Fu an kulland\u0131\u011F\u0131n cihaz\u0131n ekran kart\u0131n\u0131 ger\xE7ekten \xE7al\u0131\u015Ft\u0131r\u0131r, y\xFCk\xFC k\u0131r\u0131lana kadar art\u0131r\u0131r ve \xE7\u0131kan sonucu \xF6l\xE7er. Y\xFCkseltme d\xFC\u015F\xFCn\xFCyorsan \xF6nce elindekini bilmen gerekir.")), /*#__PURE__*/React.createElement(Reveal, {
+  }, "Bu sayfadaki her \u015Fey tahmindi, bu de\u011Fil. A\u015Fa\u011F\u0131daki test \u015Fu an kulland\u0131\u011F\u0131n cihaz\u0131n ekran kart\u0131n\u0131 ger\xE7ekten \xE7al\u0131\u015Ft\u0131r\u0131r, y\xFCk\xFC k\u0131r\u0131lana kadar art\u0131r\u0131r ve \xE7\u0131kan sonucu \xF6l\xE7er. Y\xFCkseltme d\xFC\u015F\xFCn\xFCyorsan \xF6nce elindekini bilmen gerekir.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 110
   }, /*#__PURE__*/React.createElement(Card, {
     className: "mt-12 p-5 sm:p-9"
@@ -7569,7 +7622,7 @@ function DeviceTest({
     className: "mb-4"
   }, "C\u0130HAZINDA BULUNANLAR"), /*#__PURE__*/React.createElement("dl", {
     className: "grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5"
-  }, dev && [['Ekran kartı', adTemiz || 'tarayıcı gizliyor'], ['Üretici', dev.vendor ? dev.vendor.replace(/^Google Inc\.\s*/, '').replace(/[()]/g, '') : '—'], ['İşlemci çekirdeği', dev.cores ? dev.cores + ' mantıksal' : 'okunamadı'], ['Bellek', dev.mem ? dev.mem + ' GB+' : 'okunamadı'], ['Ekran', `${dev.scrW}×${dev.scrH}${dev.dpr !== 1 ? `  ·  ${dev.dpr}×` : ''}`], ['Yenileme hızı', hz === null ? 'ölçülemedi' : hz ? hz + ' Hz' : 'ölçülüyor…']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+  }, dev && [['Ekran kartı', adTemiz || 'tarayıcı gizliyor'], ['Üretici', dev.vendor ? dev.vendor.replace(/^Google Inc\.\s*/, '').replace(/[()]/g, '') : '·'], ['İşlemci çekirdeği', dev.cores ? dev.cores + ' mantıksal' : 'okunamadı'], ['Bellek', dev.mem ? dev.mem + ' GB+' : 'okunamadı'], ['Ekran', `${dev.scrW}×${dev.scrH}${dev.dpr !== 1 ? `  ·  ${dev.dpr}×` : ''}`], ['Yenileme hızı', hz === null ? 'ölçülemedi' : hz ? hz + ' Hz' : 'ölçülüyor…']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
     key: k
   }, /*#__PURE__*/React.createElement("dt", {
     className: "lbl text-dim mb-1.5"
@@ -7592,7 +7645,7 @@ function DeviceTest({
   }, GAMES.map(g => /*#__PURE__*/React.createElement("option", {
     key: g.id,
     value: g.id
-  }, g.n, " \u2014 ", g.tag)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+  }, g.n, " \xB7 ", g.tag)))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "dr",
     className: "lbl text-dim block mb-3"
   }, "\xC7\xD6Z\xDCN\xDCRL\xDCK"), /*#__PURE__*/React.createElement("select", {
@@ -7623,7 +7676,7 @@ function DeviceTest({
     className: "mt-5 text-[.86rem] text-dim leading-relaxed max-w-[60ch]"
   }, "Bu tahmin ", /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
-  }, adTemiz), " kart\u0131n\u0131n bilinen performans\u0131na dayan\u0131yor", tanim.mobil && /*#__PURE__*/React.createElement("span", null, " (diz\xFCst\xFC s\xFCr\xFCm \u2014 masa\xFCst\xFC ayn\u0131 isimli karttan yava\u015Ft\u0131r)"), ". \u0130\u015Flemci modelini taray\u0131c\u0131 vermedi\u011Fi i\xE7in hesaba kat\u0131lmad\u0131; i\u015Flemcin zay\u0131fsa ger\xE7ek sonu\xE7 bunun alt\u0131nda kal\u0131r.")) : /*#__PURE__*/React.createElement("p", {
+  }, adTemiz), " kart\u0131n\u0131n bilinen performans\u0131na dayan\u0131yor", tanim.mobil && /*#__PURE__*/React.createElement("span", null, " (diz\xFCst\xFC s\xFCr\xFCm: masa\xFCst\xFC ayn\u0131 isimli karttan yava\u015Ft\u0131r)"), ". \u0130\u015Flemci modelini taray\u0131c\u0131 vermedi\u011Fi i\xE7in hesaba kat\u0131lmad\u0131; i\u015Flemcin zay\u0131fsa ger\xE7ek sonu\xE7 bunun alt\u0131nda kal\u0131r.")) : /*#__PURE__*/React.createElement("p", {
     className: "text-[.9rem] text-dim leading-relaxed max-w-[58ch]"
   }, dev && dev.gpu ? /*#__PURE__*/React.createElement(React.Fragment, null, "Ekran kart\u0131n\u0131 ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
@@ -7683,7 +7736,7 @@ function DeviceTest({
     className: "num"
   }, res.res, "\xD7", res.res), " \xE7\xF6z\xFCn\xFCrl\xFCkte", ' ', /*#__PURE__*/React.createElement("span", {
     className: "num"
-  }, res.steps), " kademe y\xFCkte zorland\u0131 \u2014 kare s\xFCresi ", /*#__PURE__*/React.createElement("span", {
+  }, res.steps), " kademe y\xFCkte zorland\u0131, kare s\xFCresi ", /*#__PURE__*/React.createElement("span", {
     className: "num"
   }, res.ms, " ms"), " (", res.fps, " FPS)") : /*#__PURE__*/React.createElement(React.Fragment, null, "En a\u011F\u0131r kademeyi (", /*#__PURE__*/React.createElement("span", {
     className: "num"
@@ -7698,11 +7751,11 @@ function DeviceTest({
     style: {
       color: hz && res.fps >= hz ? '#2DE2E6' : '#ECEBF2'
     }
-  }, hz ? res.fps >= hz ? `Evet — bu ağır yükte bile ${hz} Hz ekranını besliyor.` : `Bu ağır yükte ${hz} Hz'in altına iniyor. Bu test kasten aşırı zorluyor, günlük kullanımda sorun değil.` : '—'))), sys && /*#__PURE__*/React.createElement("p", {
+  }, hz ? res.fps >= hz ? `Evet, bu ağır yükte bile ${hz} Hz ekranını besliyor.` : `Bu ağır yükte ${hz} Hz'in altına iniyor. Bu test kasten aşırı zorluyor, günlük kullanımda sorun değil.` : '·'))), sys && /*#__PURE__*/React.createElement("p", {
     className: "mt-7 text-[.88rem] text-dim leading-relaxed max-w-[60ch]"
   }, "Yukar\u0131da kurdu\u011Fumuz sistemin ekran kart\u0131 ", /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
-  }, sys.g.n), ". Bu test taray\u0131c\u0131 \xFCzerinden \xF6l\xE7t\xFC\u011F\xFC i\xE7in do\u011Frudan k\u0131yaslanamaz \u2014 ama elindeki cihaz zorlan\u0131yorsa, o sistem g\xF6zle g\xF6r\xFCl\xFCr bir s\u0131\xE7rama olur.")), res && res.stres && /*#__PURE__*/React.createElement("div", {
+  }, sys.g.n), ". Bu test taray\u0131c\u0131 \xFCzerinden \xF6l\xE7t\xFC\u011F\xFC i\xE7in do\u011Frudan k\u0131yaslanamaz, ama elindeki cihaz zorlan\u0131yorsa, o sistem g\xF6zle g\xF6r\xFCl\xFCr bir s\u0131\xE7rama olur.")), res && res.stres && /*#__PURE__*/React.createElement("div", {
     className: "mt-9 pt-8 border-t border-line"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "mt-0"
@@ -7724,9 +7777,9 @@ function DeviceTest({
     style: {
       color: res.stres.kisiliyor ? '#FF2D95' : '#ECEBF2'
     }
-  }, res.stres.kisiliyor ? `Testin ikinci yarısı ilk yarısından %${res.stres.dus} yavaş geçti. En yaygın sebebi ısınmadır: cihaz kızınca kendini korumak için yavaşlar — laptoplarda ve hava almayan kasalarda sık görülür. Ama tarayıcı testi olduğu için arka planda çalışan başka işler de bu düşüşü yaratabilir. Emin olmak için testi kapalı sekmelerle tekrarla.` : 'Performans test boyunca sabit kaldı — soğutma bu yükün altından kalkıyor. İyi haber.')))), /*#__PURE__*/React.createElement("p", {
+  }, res.stres.kisiliyor ? `Testin ikinci yarısı ilk yarısından %${res.stres.dus} yavaş geçti. En yaygın sebebi ısınmadır: cihaz kızınca kendini korumak için yavaşlar; laptoplarda ve hava almayan kasalarda sık görülür. Ama tarayıcı testi olduğu için arka planda çalışan başka işler de bu düşüşü yaratabilir. Emin olmak için testi kapalı sekmelerle tekrarla.` : 'Performans test boyunca sabit kaldı: soğutma bu yükün altından kalkıyor. İyi haber.')))), /*#__PURE__*/React.createElement("p", {
     className: "mt-7 text-[.72rem] text-dim leading-relaxed max-w-[64ch]"
-  }, "Bu test taray\u0131c\u0131n\u0131n ekran kart\u0131ndan ne kadar i\u015F \xE7\u0131karabildi\u011Fini \xF6l\xE7er; 3DMark gibi bir oyun testi de\u011Fildir. S\xFCr\xFCc\xFC, taray\u0131c\u0131 ve arka planda a\xE7\u0131k sekmeler sonucu etkiler. Ayn\u0131 cihazda tekrar \xE7al\u0131\u015Ft\u0131rd\u0131\u011F\u0131nda yak\u0131n sonu\xE7 al\u0131rs\u0131n \u2014 as\u0131l i\u015Fe yarayan budur."))));
+  }, "Bu test taray\u0131c\u0131n\u0131n ekran kart\u0131ndan ne kadar i\u015F \xE7\u0131karabildi\u011Fini \xF6l\xE7er; 3DMark gibi bir oyun testi de\u011Fildir. S\xFCr\xFCc\xFC, taray\u0131c\u0131 ve arka planda a\xE7\u0131k sekmeler sonucu etkiler. Ayn\u0131 cihazda tekrar \xE7al\u0131\u015Ft\u0131rd\u0131\u011F\u0131nda yak\u0131n sonu\xE7 al\u0131rs\u0131n; as\u0131l i\u015Fe yarayan budur."))));
 }
 
 /* ═══════════════════ MODÜL 06 — FORUM ═══════════════════
@@ -8038,8 +8091,8 @@ const zamanFarki = ts => {
 const TOHUM_KONULAR = [{
   id: 't1',
   kat: 'genel',
-  baslik: 'Buraya hoş geldin — forum nasıl çalışıyor?',
-  govde: 'Bu forum senin tarayıcında çalışıyor. Yazdıkların bu cihazda kalır, internete gitmez, başkası göremez.\n\nNeden böyle? Çünkü site tek bir HTML dosyası — arkasında sunucu yok. Bu sayede indirip çift tıklayınca çalışıyor, kayıt istemiyor, hiçbir veri toplamıyor.\n\nYazdıklarını arkadaşına göndermek istersen aşağıdaki "Dışa aktar" düğmesiyle dosya olarak alabilirsin; o da "İçe aktar" ile açar.',
+  baslik: 'Buraya hoş geldin: forum nasıl çalışıyor?',
+  govde: 'Bu forum senin tarayıcında çalışıyor. Yazdıkların bu cihazda kalır, internete gitmez, başkası göremez.\n\nNeden böyle? Çünkü site tek bir HTML dosyası, arkasında sunucu yok. Bu sayede indirip çift tıklayınca çalışıyor, kayıt istemiyor, hiçbir veri toplamıyor.\n\nYazdıklarını arkadaşına göndermek istersen aşağıdaki "Dışa aktar" düğmesiyle dosya olarak alabilirsin; o da "İçe aktar" ile açar.',
   yazar: 'SETUP HANE',
   renk: '#2DE2E6',
   ts: Date.now() - 86400000 * 3,
@@ -8050,7 +8103,7 @@ const TOHUM_KONULAR = [{
   id: 't2',
   kat: 'tavsiye',
   baslik: 'Sistem tavsiyesi isterken neleri yazmalısın?',
-  govde: 'İyi cevap almak için şunları yaz:\n\n1. Bütçen (kasa mı, ekranıyla birlikte mi?)\n2. Ne yapacaksın — hangi oyunlar, hangi programlar?\n3. Ekranın kaç Hz ve hangi çözünürlükte?\n4. Elinde ne var — parça devrederek bütçe artırabilir misin?\n\nYukarıdaki kurucudan çıkan sistemi gönderine tek tuşla ekleyebilirsin; herkes ne konuştuğunu görür.',
+  govde: 'İyi cevap almak için şunları yaz:\n\n1. Bütçen (kasa mı, ekranıyla birlikte mi?)\n2. Ne yapacaksın? Hangi oyunlar, hangi programlar?\n3. Ekranın kaç Hz ve hangi çözünürlükte?\n4. Elinde ne var? Parça devrederek bütçe artırabilir misin?\n\nYukarıdaki kurucudan çıkan sistemi gönderine tek tuşla ekleyebilirsin; herkes ne konuştuğunu görür.',
   yazar: 'SETUP HANE',
   renk: '#2DE2E6',
   ts: Date.now() - 86400000 * 2,
@@ -8153,7 +8206,7 @@ function GirisKarti({
   })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "fpin",
     className: "lbl text-dim block mb-2"
-  }, "PIN \u2014 \u0130STE\u011EE BA\u011ELI"), /*#__PURE__*/React.createElement("input", {
+  }, "PIN \xB7 \u0130STE\u011EE BA\u011ELI"), /*#__PURE__*/React.createElement("input", {
     id: "fpin",
     value: pin,
     onChange: e => setPin(e.target.value.replace(/\D/g, '').slice(0, 6)),
@@ -8189,7 +8242,7 @@ function GirisKarti({
     className: "mt-6 border border-cy text-cy px-6 py-3 lbl hover:bg-cy hover:text-bg transition-colors duration-300"
   }, "OTURUM A\xC7"), /*#__PURE__*/React.createElement("p", {
     className: "mt-4 text-[.78rem] text-dim leading-relaxed max-w-[52ch]"
-  }, "E-posta istemiyoruz, do\u011Frulama yok, hi\xE7bir \u015Fey sunucuya gitmiyor. PIN sadece ayn\u0131 bilgisayar\u0131 payla\u015F\u0131yorsan ba\u015Fkas\u0131 senin ad\u0131nla yazmas\u0131n diye \u2014 ger\xE7ek bir \u015Fifre de\u011Fil."));
+  }, "E-posta istemiyoruz, do\u011Frulama yok, hi\xE7bir \u015Fey sunucuya gitmiyor. PIN sadece ayn\u0131 bilgisayar\u0131 payla\u015F\u0131yorsan ba\u015Fkas\u0131 senin ad\u0131nla yazmas\u0131n diye. Ger\xE7ek bir \u015Fifre de\u011Fil."));
 }
 function YeniKonu({
   user,
@@ -8208,7 +8261,7 @@ function YeniKonu({
   const [hata, setHata] = useState('');
   const gonder = () => {
     if (baslik.trim().length < 8) {
-      setHata('Başlık en az 8 karakter olmalı — ne sorduğun anlaşılsın.');
+      setHata('Başlık en az 8 karakter olmalı ki ne sorduğun anlaşılsın.');
       return;
     }
     if (govde.trim().length < 15) {
@@ -8633,7 +8686,7 @@ function Forum({
         }));
         setBildirim(yeni.length + ' yeni konu eklendi.');
       } catch (err) {
-        setBildirim('Dosya okunamadı — SETUP HANE forum dosyası mı?');
+        setBildirim('Dosya okunamadı. SETUP HANE forum dosyası mı?');
       }
       setTimeout(() => setBildirim(''), 3500);
     };
@@ -8646,7 +8699,7 @@ function Forum({
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 06 \u2014 TOPLULUK"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 06 \xB7 TOPLULUK"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h1", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]"
@@ -8667,7 +8720,7 @@ function Forum({
     className: "text-[.88rem] text-ink/85 leading-relaxed"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-mg"
-  }, "Setup'\u0131n\u0131 / masa d\xFCzenini payla\u015F"), " \u2014 \"Kurulum g\xF6sterisi\" kategorisine ekle. Her ay en iyi 3 kurulumu Instagram'da (", /*#__PURE__*/React.createElement("a", {
+  }, "Setup'\u0131n\u0131 / masa d\xFCzenini payla\u015F"), " \xB7 \"Kurulum g\xF6sterisi\" kategorisine ekle. Her ay en iyi 3 kurulumu Instagram'da (", /*#__PURE__*/React.createElement("a", {
     href: "https://instagram.com/setuphane",
     target: "_blank",
     rel: "noopener noreferrer",
@@ -8697,7 +8750,7 @@ function Forum({
     className: "lbl text-dim hover:text-ink transition-colors"
   }, "\xC7IKI\u015E")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
     className: "text-[.88rem] text-dim"
-  }, "Okumak serbest \u2014 yazmak i\xE7in oturum a\xE7."), /*#__PURE__*/React.createElement("button", {
+  }, "Okumak serbest, yazmak i\xE7in oturum a\xE7."), /*#__PURE__*/React.createElement("button", {
     onClick: () => kimlikAcik ? setKimlikAcik(false) : oturumAc(),
     className: 'lbl px-4 py-2 border transition-colors ' + (kimlikAcik ? 'border-cy text-cy' : 'border-line text-dim hover:text-ink')
   }, kimlikAcik ? 'KAPAT' : 'OTURUM AÇ')))), !user && /*#__PURE__*/React.createElement("div", {
@@ -8735,7 +8788,7 @@ function Forum({
     className: "mt-4 text-[.82rem] text-dim leading-relaxed"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
-  }, "Buras\u0131 ortak alan"), " \u2014 yazd\u0131klar\u0131n\u0131 herkes g\xF6r\xFCr ve silinmez. Telefon, adres, sipari\u015F numaras\u0131 gibi ki\u015Fisel bilgi yazma.") : /*#__PURE__*/React.createElement("div", {
+  }, "Buras\u0131 ortak alan:"), " yazd\u0131klar\u0131n\u0131 herkes g\xF6r\xFCr ve silinmez. Telefon, adres, sipari\u015F numaras\u0131 gibi ki\u015Fisel bilgi yazma.") : /*#__PURE__*/React.createElement("div", {
     className: "mt-5 p-4 border border-cy/25 bg-cy/[.05] flex items-start gap-3"
   }, /*#__PURE__*/React.createElement("span", {
     className: "w-2 h-2 rotate-45 shrink-0 mt-1.5 bg-cy"
@@ -8913,7 +8966,7 @@ function EkranTesti() {
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 07 \u2014 EKRAN TEST\u0130"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 07 \xB7 EKRAN TEST\u0130"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h1", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]"
@@ -8921,7 +8974,7 @@ function EkranTesti() {
     className: "em"
   }, "sa\u011Flam"), " m\u0131?"), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]"
-  }, "\u0130kinci el monit\xF6r al\u0131rken ya da yeni ekran\u0131 kutudan \xE7\u0131kar\u0131nca ilk yap\u0131lacak i\u015F budur. D\xF6rt testi de yerinde \xE7al\u0131\u015Ft\u0131r \u2014 kusur varsa iade s\xFCresi dolmadan g\xF6r\xFCrs\xFCn.")), /*#__PURE__*/React.createElement(Reveal, {
+  }, "\u0130kinci el monit\xF6r al\u0131rken ya da yeni ekran\u0131 kutudan \xE7\u0131kar\u0131nca ilk yap\u0131lacak i\u015F budur. D\xF6rt testi de yerinde \xE7al\u0131\u015Ft\u0131r; kusur varsa iade s\xFCresi dolmadan g\xF6r\xFCrs\xFCn.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 110
   }, /*#__PURE__*/React.createElement(Card, {
     className: "mt-12 p-5 sm:p-9"
@@ -8937,7 +8990,7 @@ function EkranTesti() {
     className: "num text-[1.1rem] text-cy"
   }, hz === null ? 'ölçülemedi' : hz ? hz + ' Hz' : '…')), hz > 0 && /*#__PURE__*/React.createElement("p", {
     className: "text-[.85rem] text-dim leading-relaxed max-w-[38ch]"
-  }, hz >= 100 ? 'Yüksek yenileme hızlı ekran — hızlı oyunlarda avantaj.' : 'Standart 60 Hz sınıfı. Oyunda 60 FPS üstü kazanç sağlamaz.')), /*#__PURE__*/React.createElement("div", {
+  }, hz >= 100 ? 'Yüksek yenileme hızlı ekran: hızlı oyunlarda avantaj.' : 'Standart 60 Hz sınıfı. Oyunda 60 FPS üstü kazanç sağlamaz.')), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 gap-4"
   }, EKRAN_TESTLERI.map(t => /*#__PURE__*/React.createElement("div", {
     key: t.id,
@@ -9095,7 +9148,7 @@ function NisanOyunu() {
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 08 \u2014 N\u0130\u015EAN OYUNU"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 08 \xB7 N\u0130\u015EAN OYUNU"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h1", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]"
@@ -9103,7 +9156,7 @@ function NisanOyunu() {
     className: "em"
   }, "ka\xE7"), " milisaniye?"), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]"
-  }, "30 saniye, \xE7\u0131kan hedeflere t\u0131kla. Sonunda ortalama tepki s\xFCreni g\xF6receksin \u2014 ve o s\xFCrenin yan\u0131nda ekran\u0131n\u0131n ka\xE7 milisaniye geciktirdi\u011Fini.")), /*#__PURE__*/React.createElement(Reveal, {
+  }, "30 saniye, \xE7\u0131kan hedeflere t\u0131kla. Sonunda ortalama tepki s\xFCreni g\xF6receksin, yan\u0131nda da ekran\u0131n\u0131n ka\xE7 milisaniye geciktirdi\u011Fini.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 110
   }, /*#__PURE__*/React.createElement(Card, {
     className: "mt-12 p-5 sm:p-7"
@@ -9111,7 +9164,7 @@ function NisanOyunu() {
     className: "flex flex-wrap items-center justify-between gap-x-8 gap-y-4 mb-5"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex flex-wrap gap-x-8 gap-y-3"
-  }, [['SÜRE', kalan + ' sn'], ['VURUŞ', vurus], ['KAÇAN', kacan], ['ORTALAMA', ortalama ? ortalama + ' ms' : '—']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+  }, [['SÜRE', kalan + ' sn'], ['VURUŞ', vurus], ['KAÇAN', kacan], ['ORTALAMA', ortalama ? ortalama + ' ms' : '·']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
     key: k
   }, /*#__PURE__*/React.createElement("div", {
     className: "lbl text-dim mb-1"
@@ -9132,7 +9185,7 @@ function NisanOyunu() {
     className: "absolute inset-0 grid place-items-center text-center px-6"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-[.95rem] text-dim max-w-[34ch] leading-relaxed"
-  }, "Ba\u015Fla'ya bas. Hedefler rastgele belirecek \u2014 ne kadar h\u0131zl\u0131 t\u0131klarsan o kadar iyi. Bo\u015Fa t\u0131klamak puan k\u0131rar.")), hedef && durum === 'oynuyor' && /*#__PURE__*/React.createElement("button", {
+  }, "Ba\u015Fla'ya bas. Hedefler rastgele belirecek; ne kadar h\u0131zl\u0131 t\u0131klarsan o kadar iyi. Bo\u015Fa t\u0131klamak puan k\u0131rar.")), hedef && durum === 'oynuyor' && /*#__PURE__*/React.createElement("button", {
     key: hedef.id,
     onClick: vur,
     "aria-label": "Hedef",
@@ -9189,7 +9242,7 @@ function NisanOyunu() {
     className: "num text-cy"
   }, ortalama, " ms"), ".", ' ', hz, " Hz ekranda g\xF6r\xFCnt\xFC sana ortalama", ' ', /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
-  }, Math.round(1000 / hz / 2), " ms"), " gecikmeyle ula\u015F\u0131r \u2014 yani tepkinin yakla\u015F\u0131k ", /*#__PURE__*/React.createElement("span", {
+  }, Math.round(1000 / hz / 2), " ms"), " gecikmeyle ula\u015F\u0131r; yani tepkinin yakla\u015F\u0131k ", /*#__PURE__*/React.createElement("span", {
     className: "num"
   }, "%", Math.round(1000 / hz / 2 / ortalama * 100)), "'i kadar.", hz < 100 && ' 144 Hz ekranda bu gecikme yarıdan aza iner.'))))));
 }
@@ -9384,7 +9437,7 @@ function FpsTesti() {
     className: 'lbl text-center px-2 py-2.5 border transition-colors disabled:opacity-40 ' + (yog === y.id ? 'border-cy text-cy bg-cy/[.07]' : 'border-line text-dim hover:text-ink')
   }, y.n))))), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-5 pb-6 mb-6 border-b border-line"
-  }, [['ANLIK FPS', calisiyor ? anlik : son ? son.ort : '—'], ['YENİLEME HIZI', hz ? hz + ' Hz' : '—'], ['ORTALAMA', son ? son.ort : '—'], ['KALAN', kalan + ' sn']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+  }, [['ANLIK FPS', calisiyor ? anlik : son ? son.ort : '·'], ['YENİLEME HIZI', hz ? hz + ' Hz' : '·'], ['ORTALAMA', son ? son.ort : '·'], ['KALAN', kalan + ' sn']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
     key: k
   }, /*#__PURE__*/React.createElement("div", {
     className: "lbl text-dim mb-1.5 h-[13px] leading-[13px]"
@@ -9437,7 +9490,7 @@ function FpsTesti() {
     className: "text-[.9rem] leading-relaxed text-ink/85 max-w-[62ch]"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-cy"
-  }, "%1 d\xFC\u015F\xFCk"), " en k\xF6t\xFC kareleri g\xF6sterir ve tak\u0131lma hissini ortalamadan daha iyi anlat\u0131r. Ortalaman ", son.ort, ", %1 d\xFC\u015F\xFC\u011F\xFCn ", son.dusuk1, " \u2014 arada %", Math.round((1 - son.dusuk1 / son.ort) * 100), " fark var.", son.dusuk1 < son.ort * 0.55 ? ' Bu büyük bir uçurum: sayı akıcı görünse de gözüne belirgin takılma gelir.' : son.dusuk1 < son.ort * 0.75 ? ' Arada hissedilir takılmalar var, kritik anlarda göze çarpar.' : ' Akış dengeli — sayılar birbirine yakın, iyi.', ' ', "Tutarl\u0131l\u0131k %", son.tutar, ": ", son.tutar >= 90 ? 'kare süreleri çok düzenli.' : son.tutar >= 75 ? 'kabul edilebilir dalgalanma var.' : 'kare süreleri oynak, arka planda çalışan işleri kapatıp tekrar dene.')), gecmis.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, "%1 d\xFC\u015F\xFCk"), " en k\xF6t\xFC kareleri g\xF6sterir ve tak\u0131lma hissini ortalamadan daha iyi anlat\u0131r. Ortalaman ", son.ort, ", %1 d\xFC\u015F\xFC\u011F\xFCn ", son.dusuk1, ", arada %", Math.round((1 - son.dusuk1 / son.ort) * 100), " fark var.", son.dusuk1 < son.ort * 0.55 ? ' Bu büyük bir uçurum: sayı akıcı görünse de gözüne belirgin takılma gelir.' : son.dusuk1 < son.ort * 0.75 ? ' Arada hissedilir takılmalar var, kritik anlarda göze çarpar.' : ' Akış dengeli: sayılar birbirine yakın, iyi.', ' ', "Tutarl\u0131l\u0131k %", son.tutar, ": ", son.tutar >= 90 ? 'kare süreleri çok düzenli.' : son.tutar >= 75 ? 'kabul edilebilir dalgalanma var.' : 'kare süreleri oynak, arka planda çalışan işleri kapatıp tekrar dene.')), gecmis.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "mt-8 pt-7 border-t border-line"
   }, /*#__PURE__*/React.createElement("div", {
     className: "lbl text-dim mb-4"
@@ -9491,13 +9544,13 @@ function AkicilikTesti() {
     raf = requestAnimationFrame(tik);
     return () => cancelAnimationFrame(raf);
   }, []);
-  const etiket = ['15 FPS', '30 FPS', '60 FPS', hz ? hz + ' Hz — ekranın' : 'Ekranın kendi hızı'];
-  const aciklama = ['Kareler arası boşluk büyük — nesne adeta ışınlanıyor. Göz takip etmekte zorlanır.', 'Sinema seviyesi. İzlemeye yeter, nişan almaya yetmez.', 'Akıcı sayılan eşik. Çoğu oyuncunun hedefi burasıdır.', 'Ekranın verebildiği en iyisi. 60 FPS şeridiyle kıyasla.'];
+  const etiket = ['15 FPS', '30 FPS', '60 FPS', hz ? hz + ' Hz · ekranın' : 'Ekranın kendi hızı'];
+  const aciklama = ['Kareler arası boşluk büyük, nesne adeta ışınlanıyor. Göz takip etmekte zorlanır.', 'Sinema seviyesi. İzlemeye yeter, nişan almaya yetmez.', 'Akıcı sayılan eşik. Çoğu oyuncunun hedefi burasıdır.', 'Ekranın verebildiği en iyisi. 60 FPS şeridiyle kıyasla.'];
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     className: "text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-8"
   }, "D\xF6rt kutu da ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
-  }, "tamamen ayn\u0131 h\u0131zda"), " hareket ediyor \u2014 sadece g\xFCncellenme s\u0131kl\u0131klar\u0131 farkl\u0131. Aradaki fark\u0131 okumaya de\u011Fil, g\xF6rmeye \xE7al\u0131\u015F."), /*#__PURE__*/React.createElement("div", {
+  }, "tamamen ayn\u0131 h\u0131zda"), " hareket ediyor, sadece g\xFCncellenme s\u0131kl\u0131klar\u0131 farkl\u0131. Aradaki fark\u0131 okumaya de\u011Fil, g\xF6rmeye \xE7al\u0131\u015F."), /*#__PURE__*/React.createElement("div", {
     className: "space-y-6"
   }, HEDEF.map((h, i) => /*#__PURE__*/React.createElement("div", {
     key: i
@@ -9524,7 +9577,7 @@ function AkicilikTesti() {
     }
   }))))), /*#__PURE__*/React.createElement("p", {
     className: "mt-8 text-[.82rem] text-dim leading-relaxed max-w-[62ch]"
-  }, "Not: en alttaki \u015Ferit ekran\u0131n\u0131n yenileme h\u0131z\u0131nda \xE7al\u0131\u015F\u0131r. 60 Hz ekrandaysan alttaki iki \u015Ferit birbirinin ayn\u0131s\u0131 g\xF6r\xFCn\xFCr \u2014 fark g\xF6rmek i\xE7in 120 Hz \xFCst\xFC ekran gerekir."));
+  }, "Not: en alttaki \u015Ferit ekran\u0131n\u0131n yenileme h\u0131z\u0131nda \xE7al\u0131\u015F\u0131r. 60 Hz ekrandaysan alttaki iki \u015Ferit birbirinin ayn\u0131s\u0131 g\xF6r\xFCn\xFCr; fark g\xF6rmek i\xE7in 120 Hz \xFCst\xFC ekran gerekir."));
 }
 
 /* ═══════════════════ REFLEKS: TEPKİ SÜRESİ ═══════════════════ */
@@ -9563,7 +9616,7 @@ function TepkiTesti() {
     bekle: 'Başlamak için tıkla',
     hazirlan: 'Bekle… yeşili gör',
     simdi: 'ŞİMDİ! TIKLA',
-    erken: 'Çok erken — tekrar denemek için tıkla',
+    erken: 'Çok erken, tekrar denemek için tıkla',
     sonuc: sonuclar.length ? sonuclar[sonuclar.length - 1] + ' ms' : ''
   }[durum];
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
@@ -9668,7 +9721,7 @@ function CpsTesti() {
     className: "lbl text-dim block mt-3"
   }, durum === 'hazir' ? 'BAŞLAMAK İÇİN TIKLA' : durum === 'oynuyor' ? kalan.toFixed(1) + ' SN KALDI' : 'BİTTİ'))), /*#__PURE__*/React.createElement("div", {
     className: "mt-7 pt-6 border-t border-line grid grid-cols-3 gap-6"
-  }, [['Tıklama', say], ['CPS', cps || '—'], ['Rekorun', rekor || '—']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+  }, [['Tıklama', say], ['CPS', cps || '·'], ['Rekorun', rekor || '·']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
     key: k
   }, /*#__PURE__*/React.createElement("div", {
     className: "lbl text-dim mb-1.5"
@@ -9717,9 +9770,9 @@ function KlavyeTesti() {
   }, []);
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     className: "text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6"
-  }, "Tu\u015Flara bas \u2014 bas\u0131lan tu\u015F yanar, bir kez bas\u0131lm\u0131\u015F tu\u015F i\u015Faretli kal\u0131r. Hi\xE7 yanmayan tu\u015F ar\u0131zal\u0131d\u0131r. Ayn\u0131 anda ka\xE7 tu\u015F alg\u0131land\u0131\u011F\u0131n\u0131 da say\u0131yoruz (oyunda ayn\u0131 anda y\xFCr\xFC + z\u0131pla + ate\u015F i\xE7in \xF6nemli)."), /*#__PURE__*/React.createElement("div", {
+  }, "Tu\u015Flara bas: bas\u0131lan tu\u015F yanar, bir kez bas\u0131lm\u0131\u015F tu\u015F i\u015Faretli kal\u0131r. Hi\xE7 yanmayan tu\u015F ar\u0131zal\u0131d\u0131r. Ayn\u0131 anda ka\xE7 tu\u015F alg\u0131land\u0131\u011F\u0131n\u0131 da say\u0131yoruz (oyunda ayn\u0131 anda y\xFCr\xFC + z\u0131pla + ate\u015F i\xE7in \xF6nemli)."), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4 mb-6 pb-6 border-b border-line"
-  }, [['Şu an basılı', basili.size], ['Aynı anda en çok', enCok], ['Denenen tuş', gorulen.size], ['Son tuş', sonTus ? sonTus.code : '—']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
+  }, [['Şu an basılı', basili.size], ['Aynı anda en çok', enCok], ['Denenen tuş', gorulen.size], ['Son tuş', sonTus ? sonTus.code : '·']].map(([k, v]) => /*#__PURE__*/React.createElement("div", {
     key: k
   }, /*#__PURE__*/React.createElement("div", {
     className: "lbl text-dim mb-1.5"
@@ -9807,7 +9860,7 @@ function MouseTesti() {
     }
   }, /*#__PURE__*/React.createElement("span", {
     className: "lbl text-dim"
-  }, "TEST ALANI \u2014 TIKLA, KAYDIR, GEZD\u0130R")), /*#__PURE__*/React.createElement("div", {
+  }, "TEST ALANI \xB7 TIKLA, KAYDIR, GEZD\u0130R")), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5"
   }, [0, 1, 2, 3, 4].map(b => /*#__PURE__*/React.createElement("div", {
     key: b
@@ -9832,13 +9885,13 @@ function MouseTesti() {
     style: {
       color: ciftTik && ciftTik < 80 ? '#FF2D95' : '#ECEBF2'
     }
-  }, ciftTik ? ciftTik + ' ms' + (ciftTik < 80 ? ' — şüpheli' : '') : '—')), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, ciftTik ? ciftTik + ' ms' + (ciftTik < 80 ? ' · şüpheli' : '') : '·')), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "lbl text-dim mb-1.5"
   }, "Saniyedeki hareket"), /*#__PURE__*/React.createElement("div", {
     className: "num text-[1.05rem]"
-  }, hizOrn || '—'))), /*#__PURE__*/React.createElement("p", {
+  }, hizOrn || '·'))), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-[.78rem] text-dim leading-relaxed max-w-[60ch]"
-  }, "\"Saniyedeki hareket\" taray\u0131c\u0131n\u0131n ald\u0131\u011F\u0131 olay say\u0131s\u0131d\u0131r; farenin ger\xE7ek sorgulama h\u0131z\u0131 (polling) de\u011Fildir \u2014 taray\u0131c\u0131 bunu ekran yenilemesine s\u0131k\u0131\u015Ft\u0131r\u0131r. Kaba bir fikir verir."), /*#__PURE__*/React.createElement("button", {
+  }, "\"Saniyedeki hareket\" taray\u0131c\u0131n\u0131n ald\u0131\u011F\u0131 olay say\u0131s\u0131d\u0131r; farenin ger\xE7ek sorgulama h\u0131z\u0131 (polling) de\u011Fildir; taray\u0131c\u0131 bunu ekran yenilemesine s\u0131k\u0131\u015Ft\u0131r\u0131r. Kaba bir fikir verir."), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
       setTuslar({});
       setTekerlek(0);
@@ -9882,7 +9935,7 @@ function DpiTesti() {
     className: "num block text-[2.6rem] font-light text-cy leading-none"
   }, Math.round(suruklenen)), /*#__PURE__*/React.createElement("span", {
     className: "lbl text-dim block mt-3"
-  }, suruyor ? 'SÜRÜKLÜYORSUN' : 'PİKSEL — BASILI TUTUP YATAY KAYDIR'))), /*#__PURE__*/React.createElement("div", {
+  }, suruyor ? 'SÜRÜKLÜYORSUN' : 'PİKSEL · BASILI TUTUP YATAY KAYDIR'))), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-wrap items-end gap-5"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "dpicm",
@@ -9897,9 +9950,9 @@ function DpiTesti() {
     className: "lbl text-dim mb-2"
   }, "HESAPLANAN DPI"), /*#__PURE__*/React.createElement("div", {
     className: "num text-[2rem] font-light text-cy leading-none"
-  }, sonuc || '—'))), /*#__PURE__*/React.createElement("p", {
+  }, sonuc || '·'))), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-[.78rem] text-dim leading-relaxed max-w-[60ch]"
-  }, "Windows'ta imle\xE7 h\u0131zland\u0131rma (\"i\u015Faret\xE7i hassasiyetini art\u0131r\") a\xE7\u0131ksa sonu\xE7 \u015Fa\u015Far \u2014 \xF6l\xE7meden \xF6nce kapat. Sonu\xE7 farenin ayar\u0131ndaki DPI'a yak\u0131n \xE7\u0131kmal\u0131."));
+  }, "Windows'ta imle\xE7 h\u0131zland\u0131rma (\"i\u015Faret\xE7i hassasiyetini art\u0131r\") a\xE7\u0131ksa sonu\xE7 \u015Fa\u015Far; \xF6l\xE7meden \xF6nce kapat. Sonu\xE7 farenin ayar\u0131ndaki DPI'a yak\u0131n \xE7\u0131kmal\u0131."));
 }
 
 /* ═══════════════════ GİRDİ: GAMEPAD ═══════════════════ */
@@ -9926,7 +9979,7 @@ function GamepadTesti() {
     className: "text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6"
   }, "Kolu tak ve ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
-  }, "herhangi bir tu\u015Funa bas"), " \u2014 taray\u0131c\u0131 kolu ancak o zaman g\xF6r\xFCr. T\xFCm tu\u015Flara ve analoglara tek tek bas; tepki vermeyen varsa ar\u0131zal\u0131d\u0131r."), !pad ? /*#__PURE__*/React.createElement("div", {
+  }, "herhangi bir tu\u015Funa bas"), ", taray\u0131c\u0131 kolu ancak o zaman g\xF6r\xFCr. T\xFCm tu\u015Flara ve analoglara tek tek bas; tepki vermeyen varsa ar\u0131zal\u0131d\u0131r."), !pad ? /*#__PURE__*/React.createElement("div", {
     className: "p-8 border border-line text-center"
   }, /*#__PURE__*/React.createElement("p", {
     className: "text-[.95rem] text-dim"
@@ -9999,7 +10052,7 @@ function EkranBilgi() {
   const satirlar = [['Çözünürlük', en + '×' + boy], ['En-boy oranı', en / g + ':' + boy / g + '  ·  ' + ad], ['Yenileme hızı', hz === null ? 'ölçülemedi' : hz ? hz + ' Hz' : 'ölçülüyor…'], ['Piksel yoğunluğu', dpr + '×' + (dpr !== 1 ? '  (ölçeklenmiş)' : '')], ['Gerçek piksel', Math.round(en * dpr) + '×' + Math.round(boy * dpr)], ['Renk derinliği', screen.colorDepth + ' bit'], ['Tarayıcı penceresi', vp.w + '×' + vp.h]];
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     className: "text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-7"
-  }, "Ekran\u0131n\u0131n taray\u0131c\u0131ya bildirdi\u011Fi de\u011Ferler. Ald\u0131\u011F\u0131n monit\xF6r\xFCn kutusunda yazanlarla kar\u015F\u0131la\u015Ft\u0131r \u2014 tutmuyorsa ya s\xFCr\xFCc\xFC ya kablo ya da Windows ayar\u0131 yanl\u0131\u015Ft\u0131r."), /*#__PURE__*/React.createElement("dl", {
+  }, "Ekran\u0131n\u0131n taray\u0131c\u0131ya bildirdi\u011Fi de\u011Ferler. Ald\u0131\u011F\u0131n monit\xF6r\xFCn kutusunda yazanlarla kar\u015F\u0131la\u015Ft\u0131r; tutmuyorsa ya s\xFCr\xFCc\xFC ya kablo ya da Windows ayar\u0131 yanl\u0131\u015Ft\u0131r."), /*#__PURE__*/React.createElement("dl", {
     className: "grid sm:grid-cols-2 gap-x-10 gap-y-6"
   }, satirlar.map(([k, v]) => /*#__PURE__*/React.createElement("div", {
     key: k
@@ -10051,7 +10104,7 @@ const TESTLER = [{
   id: 'panel',
   kat: 'Ekran',
   n: 'Panel testleri',
-  d: 'Ölü piksel, hayalet iz, renk geçişi ve arka ışık sızması — dördü bir arada.',
+  d: 'Ölü piksel, hayalet iz, renk geçişi ve arka ışık sızması: dördü bir arada.',
   C: EkranTesti,
   tam: true
 }, {
@@ -10147,9 +10200,9 @@ function TestlerHub({
     className: "em"
   }, "ger\xE7ekten"), " \xF6l\xE7."), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]"
-  }, "Hepsi taray\u0131c\u0131da \xE7al\u0131\u015F\u0131r, kurulum istemez \u2014 ", /*#__PURE__*/React.createElement("span", {
+  }, "Hepsi taray\u0131c\u0131da \xE7al\u0131\u015F\u0131r, kurulum istemez. ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink/80"
-  }, "\xF6l\xE7\xFCm sonu\xE7lar\u0131n hi\xE7bir yere g\xF6nderilmez"), ", cihaz\u0131nda kal\u0131r. \u0130kinci el al\u0131rken, yeni \xFCr\xFCn\xFC kutudan \xE7\u0131kar\u0131nca ya da bir \u015Feyin bozuldu\u011Funu d\xFC\u015F\xFCnd\xFC\u011F\xFCnde buraya bak.")), TEST_KAT.map((kat, ki) => /*#__PURE__*/React.createElement(Reveal, {
+  }, "\xD6l\xE7\xFCm sonu\xE7lar\u0131n hi\xE7bir yere g\xF6nderilmez"), ", cihaz\u0131nda kal\u0131r. \u0130kinci el al\u0131rken, yeni \xFCr\xFCn\xFC kutudan \xE7\u0131kar\u0131nca ya da bir \u015Feyin bozuldu\u011Funu d\xFC\u015F\xFCnd\xFC\u011F\xFCnde buraya bak.")), TEST_KAT.map((kat, ki) => /*#__PURE__*/React.createElement(Reveal, {
     key: kat,
     delay: ki * 90
   }, /*#__PURE__*/React.createElement("div", {
@@ -10196,7 +10249,7 @@ function TestlerHub({
 const AKSESUAR_KATEGORILERI = [{
   id: 'mouse',
   ad: 'Mouse',
-  d: 'Kablosuz ve kablolu oyuncu mouse’ları — hafif gövde, yüksek DPI sensör.'
+  d: 'Kablosuz ve kablolu oyuncu mouse’ları: hafif gövde, yüksek DPI sensör.'
 }, {
   id: 'mousepad',
   ad: 'Mouse Pad & Deskpad',
@@ -10204,7 +10257,7 @@ const AKSESUAR_KATEGORILERI = [{
 }, {
   id: 'kablo',
   ad: 'Kablo Yönetimi',
-  d: 'Kablo örgüsü, klipsler ve USB hub’lar — masayı sadeleştir.'
+  d: 'Kablo örgüsü, klipsler ve USB hub’lar: masayı sadeleştir.'
 }, {
   id: 'klavye',
   ad: 'Klavye',
@@ -10704,7 +10757,7 @@ function AksesuarlarHub() {
     className: "em"
   }, "par\xE7a par\xE7a"), " tamamla."), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]"
-  }, "Mouse pad\u2019den kablo d\xFCzenine, RGB\u2019den masa dekoruna kadar \u2014 i\u015F birli\u011Fi yapt\u0131\u011F\u0131m\u0131z markalar\u0131n \xFCr\xFCnleri kategori kategori burada.", /*#__PURE__*/React.createElement("span", {
+  }, "Mouse pad\u2019den kablo d\xFCzenine, RGB\u2019den masa dekoruna kadar, i\u015F birli\u011Fi yapt\u0131\u011F\u0131m\u0131z markalar\u0131n \xFCr\xFCnleri kategori kategori burada.", /*#__PURE__*/React.createElement("span", {
     className: "text-ink/80"
   }, " Fiyat yazm\u0131yoruz"), ": ma\u011Fazada de\u011Fi\u015Fiyor, burada bayat kalmas\u0131n. Bir kategoriye t\u0131kla, \xFCr\xFCnlerini g\xF6r.")), /*#__PURE__*/React.createElement("div", {
     className: "mt-12 border-t border-line"
@@ -10770,7 +10823,7 @@ function AksesuarlarHub() {
     className: "text-[.9rem] text-dim leading-relaxed max-w-[62ch]"
   }, "Setup aksesuar\u0131 \xFCreten ya da satan bir marka m\u0131s\u0131n?", /*#__PURE__*/React.createElement("span", {
     className: "text-ink/80"
-  }, " \u0130\u015F birli\u011Fi i\xE7in bize ula\u015F"), " \u2014 \xFCr\xFCnlerin do\u011Fru kategoride, sade bir vitrinde yer als\u0131n.")))));
+  }, " \u0130\u015F birli\u011Fi i\xE7in bize ula\u015F"), ": \xFCr\xFCnlerin do\u011Fru kategoride, sade bir vitrinde yer als\u0131n.")))));
 }
 
 /* ═══════════════════ ÖNER — kural tabanlı ürün eşleştirme (deneme) ═══════════════════
@@ -10986,7 +11039,7 @@ function OnerHub() {
     className: "em"
   }, "biz e\u015Fle\u015Ftirelim"), "."), /*#__PURE__*/React.createElement("p", {
     className: "mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]"
-  }, "Yapay zeka de\u011Fil \u2014 b\xFCt\xE7e aral\u0131\u011F\u0131 ve yazd\u0131\u011F\u0131n kelimelere g\xF6re \xE7al\u0131\u015Fan basit bir e\u015Fle\u015Ftirme. ", /*#__PURE__*/React.createElement("span", {
+  }, "Yapay zeka de\u011Fil; b\xFCt\xE7e aral\u0131\u011F\u0131 ve yazd\u0131\u011F\u0131n kelimelere g\xF6re \xE7al\u0131\u015Fan basit bir e\u015Fle\u015Ftirme. ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink/80"
   }, "Baz\u0131 kategorilerde ger\xE7ek i\u015F birli\u011Fi \xFCr\xFCnleri var"), ", geri kalan\u0131 i\u015F birlikleri geldik\xE7e ger\xE7ek olacak.")), /*#__PURE__*/React.createElement(Reveal, {
     delay: 90
@@ -11025,7 +11078,7 @@ function OnerHub() {
     className: "mt-12 pt-8 border-t border-line"
   }, sonuc.length === 0 ? /*#__PURE__*/React.createElement("p", {
     className: "text-dim text-[.9rem]"
-  }, "E\u015Fle\u015Fme bulunamad\u0131 \u2014 b\xFCt\xE7eni art\u0131r\u0131p farkl\u0131 kelimelerle tekrar dene.") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Label, {
+  }, "E\u015Fle\u015Fme bulunamad\u0131. B\xFCt\xE7eni art\u0131r\u0131p farkl\u0131 kelimelerle tekrar dene.") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-5"
   }, "\xD6NER\u0130LER"), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 lg:grid-cols-3 gap-3"
@@ -11053,7 +11106,7 @@ function Kesfet() {
   const kartlar = [{
     href: '/aksesuarlar',
     t: 'Aksesuarlar',
-    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası — kategori kategori, iş birliği yaptığımız markalardan.',
+    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası. Kategori kategori, iş birliği yaptığımız markalardan.',
     e: 'VİTRİN'
   }, {
     href: '/oner',
@@ -11167,7 +11220,7 @@ function HakkimizdaSayfa() {
     baslik: "Bir ki\u015Finin kurdu\u011Fu, ciddiye al\u0131nan bir ara\xE7."
   }, /*#__PURE__*/React.createElement("p", null, "SETUP HANE, b\xFCt\xE7esine g\xF6re bilgisayar toplamak isteyenler i\xE7in \xFCcretsiz bir hesaplay\u0131c\u0131 olarak ba\u015Flad\u0131; \u015Fimdi donan\u0131m testleri, bir forum ve setup aksesuarlar\u0131 vitrinini de i\xE7eren bir ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
-  }, "ara\xE7 ve topluluk"), " platformu."), /*#__PURE__*/React.createElement("p", null, "Site tek ki\u015Fi taraf\u0131ndan geli\u015Ftiriliyor \u2014 arkas\u0131nda bir ajans veya \"edit\xF6r kadrosu\" yok. Bunu gizlemenin bir anlam\u0131 yok: k\xFC\xE7\xFCk olmak, \xF6zensiz olmak demek de\u011Fil. Her hesaplama mant\u0131\u011F\u0131 ekranda a\xE7\u0131k, kimseye komisyonla y\xF6nlendirme yap\u0131lm\u0131yor."), /*#__PURE__*/React.createElement("p", null, "Topluluk taraf\u0131 Instagram'da ", /*#__PURE__*/React.createElement("a", {
+  }, "ara\xE7 ve topluluk"), " platformu."), /*#__PURE__*/React.createElement("p", null, "Site tek ki\u015Fi taraf\u0131ndan geli\u015Ftiriliyor; arkas\u0131nda bir ajans veya \"edit\xF6r kadrosu\" yok. Bunu gizlemenin bir anlam\u0131 yok: k\xFC\xE7\xFCk olmak, \xF6zensiz olmak demek de\u011Fil. Her hesaplama mant\u0131\u011F\u0131 ekranda a\xE7\u0131k, kimseye komisyonla y\xF6nlendirme yap\u0131lm\u0131yor."), /*#__PURE__*/React.createElement("p", null, "Topluluk taraf\u0131 Instagram'da ", /*#__PURE__*/React.createElement("a", {
     href: "https://instagram.com/setuphane",
     target: "_blank",
     rel: "noopener noreferrer",
@@ -11194,7 +11247,7 @@ function IsBirlikleriSayfa() {
   return /*#__PURE__*/React.createElement(BasitSayfa, {
     etiket: "\u0130\u015E B\u0130RL\u0130KLER\u0130",
     baslik: "Markalarla i\u015F birli\u011Fi."
-  }, /*#__PURE__*/React.createElement("p", null, "SETUP HANE, PC/setup ekosistemindeki markalarla i\u015F birli\u011Fine a\xE7\u0131k. A\u015Fa\u011F\u0131dakiler \u015Fu an ger\xE7ekten sunabildi\u011Fim kanallar \u2014 burada olmayan bir \u015Feyi vaat etmiyorum."), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("p", null, "SETUP HANE, PC/setup ekosistemindeki markalarla i\u015F birli\u011Fine a\xE7\u0131k. A\u015Fa\u011F\u0131dakiler \u015Fu an ger\xE7ekten sunabildi\u011Fim kanallar; burada olmayan bir \u015Feyi vaat etmiyorum."), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-3 gap-4 not-prose py-2"
   }, hizmetler.map(h => /*#__PURE__*/React.createElement(Card, {
     key: h.t,
@@ -11203,7 +11256,7 @@ function IsBirlikleriSayfa() {
     className: "text-[1.02rem] text-ink mb-2"
   }, h.t), /*#__PURE__*/React.createElement("p", {
     className: "text-[.84rem] text-dim leading-relaxed"
-  }, h.d)))), /*#__PURE__*/React.createElement("p", null, "Takip\xE7i/eri\u015Fim rakamlar\u0131, kampanya baz\u0131nda ayr\u0131ca payla\u015F\u0131l\u0131yor \u2014 burada genel bir say\u0131 iddia etmiyorum; istersen do\u011Frudan sorabilirsin."), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("a", {
+  }, h.d)))), /*#__PURE__*/React.createElement("p", null, "Takip\xE7i/eri\u015Fim rakamlar\u0131, kampanya baz\u0131nda ayr\u0131ca payla\u015F\u0131l\u0131yor. Burada genel bir say\u0131 iddia etmiyorum; istersen do\u011Frudan sorabilirsin."), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("a", {
     href: "mailto:setuphane@gmail.com",
     className: "inline-block mt-2 border border-cy text-cy px-6 py-3.5 lbl hover:bg-cy hover:text-bg transition-colors duration-300"
   }, "\u0130\u015E B\u0130RL\u0130\u011E\u0130 \u0130\xC7\u0130N YAZ")));
@@ -11220,7 +11273,7 @@ function GizlilikSayfa() {
     className: "text-ink"
   }, "Cihaz\u0131nda kalan veriler:"), " Para birimi/dil tercihin, test ge\xE7mi\u015Fin ve forumdaki takma ad\u0131n taray\u0131c\u0131n\u0131n ", /*#__PURE__*/React.createElement("code", {
     className: "text-cy"
-  }, "localStorage"), "'\u0131nda durur \u2014 sunucuya g\xF6nderilmez, cihazlar aras\u0131 senkron olmaz."), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
+  }, "localStorage"), "'\u0131nda durur; sunucuya g\xF6nderilmez, cihazlar aras\u0131 senkron olmaz."), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
   }, "Forum:"), " Payla\u015Ft\u0131\u011F\u0131n konu/cevaplar Supabase \xFCzerindeki veritaban\u0131nda tutulur; kimli\u011Fini de\u011Fil, taray\u0131c\u0131 bazl\u0131 anonim bir cihaz kimli\u011Fini ta\u015F\u0131r. E-posta veya isim istenmez."), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
@@ -11481,7 +11534,7 @@ function PanelUrunForm({
     className: "text-[.75rem] text-dim/70 mt-2 leading-relaxed"
   }, "Virg\xFClle ay\u0131r. \xD6NER sayfas\u0131 kullan\u0131c\u0131n\u0131n yazd\u0131\u011F\u0131n\u0131 bu kelimelerle e\u015Fle\u015Ftiriyor.")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     className: "lbl text-dim mb-2 block"
-  }, "B\xDCT\xC7E ARALI\u011EI (\u20BA) \u2014 opsiyonel"), /*#__PURE__*/React.createElement("div", {
+  }, "B\xDCT\xC7E ARALI\u011EI (\u20BA) \xB7 OPS\u0130YONEL"), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-2 gap-3"
   }, /*#__PURE__*/React.createElement("input", {
     type: "number",
@@ -11499,7 +11552,7 @@ function PanelUrunForm({
     className: PANEL_INPUT
   })), /*#__PURE__*/React.createElement("p", {
     className: "text-[.75rem] text-dim/70 mt-2 leading-relaxed"
-  }, "Ziyaret\xE7iye hi\xE7bir yerde g\xF6sterilmez \u2014 yaln\u0131zca \xD6NER sayfas\u0131ndaki b\xFCt\xE7e filtresi i\xE7in. Bo\u015F b\u0131rak\u0131l\u0131rsa \xFCr\xFCn b\xFCt\xE7eden ba\u011F\u0131ms\u0131z \xF6nerilebilir (eski davran\u0131\u015F).")), /*#__PURE__*/React.createElement("div", {
+  }, "Ziyaret\xE7iye hi\xE7bir yerde g\xF6sterilmez; yaln\u0131zca \xD6NER sayfas\u0131ndaki b\xFCt\xE7e filtresi i\xE7in. Bo\u015F b\u0131rak\u0131l\u0131rsa \xFCr\xFCn b\xFCt\xE7eden ba\u011F\u0131ms\u0131z \xF6nerilebilir (eski davran\u0131\u015F).")), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 gap-4 items-end"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
     htmlFor: "pu-sira",
@@ -12737,7 +12790,7 @@ function PanelHatalar({
     className: "flex gap-3 items-center flex-wrap mb-5"
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-[.85rem] text-dim"
-  }, liste === null ? 'Yükleniyor…' : liste.length ? liste.length + ' kayıt · ' + gruplar.length + ' farklı hata' : 'Kayıtlı hata yok — iyi haber.'), !!(liste && liste.length) && /*#__PURE__*/React.createElement("button", {
+  }, liste === null ? 'Yükleniyor…' : liste.length ? liste.length + ' kayıt · ' + gruplar.length + ' farklı hata' : 'Kayıtlı hata yok. İyi haber.'), !!(liste && liste.length) && /*#__PURE__*/React.createElement("button", {
     onClick: temizle,
     disabled: mesgul,
     className: "ml-auto border border-line text-dim px-4 py-2 lbl hover:border-mg hover:text-mg transition-colors disabled:opacity-40"
@@ -12894,7 +12947,7 @@ function PanelSayfa() {
     className: 'mt-6 text-[.84rem] px-4 py-3 border ' + (tazelik.gun > 30 ? 'border-mg/50 text-mg' : tazelik.gun > 14 ? 'border-cy/40 text-cy' : 'border-line text-dim')
   }, "Fiyatlar en son ", /*#__PURE__*/React.createElement("span", {
     className: "num"
-  }, tazelik.gun), " g\xFCn \xF6nce g\xFCncellendi (", tazelik.tarih, ").", tazelik.gun > 30 && ' Site ziyaretçiye bir aydan eski uyarısı gösteriyor — tazelemek iyi olur.'), /*#__PURE__*/React.createElement("div", {
+  }, tazelik.gun), " g\xFCn \xF6nce g\xFCncellendi (", tazelik.tarih, ").", tazelik.gun > 30 && ' Site ziyaretçiye bir aydan eski uyarısı gösteriyor; tazelemek iyi olur.'), /*#__PURE__*/React.createElement("div", {
     className: "mt-8"
   }, sekme === 'aksesuar' && /*#__PURE__*/React.createElement(PanelAksesuar, {
     oturum: oturum,
@@ -12955,7 +13008,7 @@ function App() {
          görünmesini engelliyordu. Şimdi TESTLER'daki isim/açıklama kullanılıyor. */
       const testSub = r.route === 'testler' && r.sub ? TESTLER.find(x => x.id === r.sub) : null;
       const meta = testSub ? {
-        t: testSub.n + ' — Ücretsiz Online Araç | SETUP HANE',
+        t: testSub.n + ': Ücretsiz Online Araç | SETUP HANE',
         d: testSub.d
       } : ROTA_META[r.route] || ROTA_META.ana;
       document.title = meta.t;
@@ -13078,7 +13131,7 @@ function App() {
     className: "py-16 lg:py-24 scroll-mt-24"
   }, /*#__PURE__*/React.createElement(Reveal, null, /*#__PURE__*/React.createElement(Label, {
     className: "mb-4"
-  }, "MOD\xDCL 01 \u2014 CANLI HESAP"), /*#__PURE__*/React.createElement("div", {
+  }, "MOD\xDCL 01 \xB7 CANLI HESAP"), /*#__PURE__*/React.createElement("div", {
     className: "rule mb-10"
   }), /*#__PURE__*/React.createElement("h2", {
     className: "h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[15ch]"

@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SETUP HANE — Bütçene göre hangi parça neden, birlikte bakalım</title>
+<title>SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım</title>
 <meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz. SETUP HANE topluluğu.">
 <meta name="theme-color" content="#07070B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
-<meta property="og:title" content="SETUP HANE — Bütçene göre doğru bilgisayar">
-<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, komisyon yok — karar senin.">
+<meta property="og:title" content="SETUP HANE | Bütçene göre doğru bilgisayar">
+<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, komisyon yok. Karar senin.">
 <meta name="google-site-verification" content="xjJr_ENpCktifjswCPQF-lTrk-CSHy2Y3fguFi_aBWI">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://www.setuphane.com/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="SETUP HANE — Bütçeni söyle, hangi parça neden, birlikte bakalım">
+<meta property="og:image:alt" content="SETUP HANE: Bütçeni söyle, hangi parça neden, birlikte bakalım">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.setuphane.com/og.jpg">
 <!-- vercel.json'daki yakala-hepsini yönlendirmesi, tanımsız /favicon.ico isteğini
@@ -303,7 +303,7 @@ const PHOTOS = { gpu:'', cpu:'', ram:'', ssd:'', psu:'', mb:'', case:'', cooler:
    RTX 5080 %16 fazla; RX 9070 %16, RTX 5060 %13, RX 9060 XT %10 eksik
    gösteriliyordu. Yani hem üst segment NVIDIA şişirilmiş hem AMD ezilmişti. */
 const GPUS=[
- {id:'igpu',   n:'Dahili grafik (ayrı kart yok)', b:'—',      idx:12,  vram:0,  tdp:0,   p:0},
+ {id:'igpu',   n:'Dahili grafik (ayrı kart yok)', b:'·',      idx:12,  vram:0,  tdp:0,   p:0},
  /* Parantezdeki isim, fiyatın geldiği modelin ta kendisi (Epey, 20.08.2026,
     en az 3 satıcısı olan en ucuz ilan).
     psuMin: KARTIN KENDİ ÜRETİCİSİNİN önerdiği sistem gücü (W); pin8: 8-pin
@@ -503,7 +503,7 @@ const CASES=[
     O11 Dynamic EVO RGB: 11.699 TL, 6 satıcı; FANSIZ gelir, fan kapasitesi 10,
     radyatör 360, kart en fazla 455,7 mm, soğutucu 167 mm, 290×471×478 mm.
     Önü cam: ön fan yuvası yok; yuvalar alt (giriş) + üst (egzoz) + yan (giriş). */
- {n:'Premium hava akışlı kasa, 4 fanlı (Lian Li Lancool III)',p:9999,rad:360,gpuMax:435,formMax:'ATX',upTo:Infinity, cpuH:187, dis:[238,523,526], fan:4, fanKap:10, duzen:{on:3,arka:1}},
+ {n:'Premium hava akışlı kasa, 4 fanlı (Lian Li Lancool III)',p:9999,rad:360,gpuMax:435,formMax:'ATX',upTo:Infinity, cpuH:187, dis:[238,523,526], fan:4, fanKap:10, duzen:{on:3,arka:1}, yuva:{alt:3,ust:3}},
  {n:'Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)',p:11699,rad:360,gpuMax:455,formMax:'ATX',upTo:Infinity, cpuH:167, dis:[290,471,478], fan:0, fanKap:10, duzen:{}, yuva:{alt:3,ust:3,yan:3}},
 ];
 const GAMES=[
@@ -513,12 +513,12 @@ const GAMES=[
  {id:'pubg',    n:'PUBG',                        k:2.20,ck:2.4,vram:8, tag:'orta'},
  {id:'fortnite',n:'Fortnite',                    k:1.90,ck:2.2,vram:8, tag:'orta'},
  {id:'gta',     n:'Açık dünya (GTA tarzı)',      k:1.35,ck:1.6,vram:10,tag:'ağır'},
- {id:'cyber',   n:'Cyberpunk 2077 — yüksek ayar',k:0.86,ck:1.5,vram:10,tag:'çok ağır'},
+ {id:'cyber',   n:'Cyberpunk 2077 · yüksek ayar',k:0.86,ck:1.5,vram:10,tag:'çok ağır'},
 ];
 const RES=[
- {id:'1080',n:'1080p',full:'Full HD — 1920×1080',mul:1.00,cmp:'En yaygın ekran. Uygun fiyatlı ve oyunda en yüksek akıcılığı verir.'},
- {id:'1440',n:'1440p',full:'2K — 2560×1440',     mul:.66, cmp:'Gözle görülür daha net görüntü. Aynı sistemde performans yaklaşık üçte bir düşer.'},
- {id:'2160',n:'4K',   full:'4K — 3840×2160',     mul:.38, cmp:'Sinema netliği. Aynı görüntü için yaklaşık üç kat fazla güç ister.'},
+ {id:'1080',n:'1080p',full:'Full HD · 1920×1080',mul:1.00,cmp:'En yaygın ekran. Uygun fiyatlı ve oyunda en yüksek akıcılığı verir.'},
+ {id:'1440',n:'1440p',full:'2K · 2560×1440',     mul:.66, cmp:'Gözle görülür daha net görüntü. Aynı sistemde performans yaklaşık üçte bir düşer.'},
+ {id:'2160',n:'4K',   full:'4K · 3840×2160',     mul:.38, cmp:'Sinema netliği. Aynı görüntü için yaklaşık üç kat fazla güç ister.'},
 ];
 /* Bellek puanı: kapasite + HIZ. Hız bugün fark yaratmıyor (hepsi
    DDR5-6000) ama modelde olması şart. Ölçek 6000 MT/s temelli; her
@@ -685,15 +685,32 @@ const egzozVar=(cs,rad)=>{ const d=(cs&&cs.duzen); return !d || !!(d.arka||d.ust
    üç fan da dışarı üfler, karta taze hava gelmez (22.09.2026). Radyatör giriş
    sayılmaz: motor radyatörü üste (egzoz) yerleştiriyor. */
 const girisVar=cs=>{ const d=(cs&&cs.duzen); return !d || !!(d.on||d.alt||d.yan); };
+/* 23.09.2026 — kullanıcı: "1 egzoz + 3 radyatör fanı, 4 fanla bu sistem ayakta
+   durur mu?" Durmaz: O11'de üstteki 360 radyatör 3 fanla dışarı üflerken tek
+   120'lik giriş kalıyordu. Kasa sürekli negatif basınçta kalır, tozu her
+   delikten çeker ve karta yalnız ısınmış hava gider. Kural: GİRİŞ sayısı
+   EGZOZ sayısından az olamaz (radyatör fanları egzoza sayılır). */
+const fanSayim=(cs,rad)=>{ const d=(cs&&cs.duzen)||{};
+  return {giris:(d.on||0)+(d.alt||0)+(d.yan||0), egzoz:(d.arka||0)+(d.ust||0)+(rad||0)}; };
+/* Kasada ölçü yoksa (duzen bilinmiyor) denge kuralı uygulanmaz: uydurma
+   veriyle sistem elemek de kabul etmek kadar yanlış olur. */
+const fanDenge=(cs,rad)=>{
+  if(!cs || !cs.duzen) return {egzozEk:0, girisEk:0};
+  const {giris,egzoz}=fanSayim(cs,rad);
+  const egzozEk = egzoz?0:1;
+  return {egzozEk, girisEk: Math.max(0, (egzoz+egzozEk)-giris)};
+};
 /* yuva: kasanın BOŞ fan yuvaları, doldurma sırasıyla. Verilmezse standart
    kasa: 2 ön, 1 arka, 3 üst. O11 gibi önü cam kasada ön yuva yoktur. */
 const fanYerlesim=(cs,adet,rad)=>{  /* rad: üstte radyatör varsa üst dolu */
   const d=(cs&&cs.duzen)||{}, yer=[], yuva=(cs&&cs.yuva)||{on:2,arka:1,ust:3}, bos={};
   for(const k in yuva) bos[k]=(d[k]||(k==='ust'&&rad))?0:yuva[k];
-  if(adet>0 && !egzozVar(cs,rad)){ const e=bos.arka?'arka':'ust'; yer.push(e); bos[e]--; }   // önce egzoz
+  const {egzozEk,girisEk}=fanDenge(cs,rad);
+  if(adet>0 && egzozEk){ const e=bos.arka?'arka':'ust'; yer.push(e); bos[e]--; }   // önce egzoz
+  for(let i=0;i<girisEk && yer.length<adet;i++){                                   // sonra denge için giriş
+    const g=['on','alt','yan'].find(k=>bos[k]>0); if(!g) break; yer.push(g); bos[g]--; }
   for(const k in bos) while(bos[k]-- >0 && yer.length<adet) yer.push(k);
-  while(yer.length<adet) yer.push(rad?'on':'ust');
-  return yer;
+  return yer;   /* boş yuva bittiyse kısa döner; fanEk o kombinasyonu eler */
 };
 const fanYerMetni=(cs,adet,rad)=>{ const say={}; fanYerlesim(cs,adet,rad).forEach(k=>say[k]=(say[k]||0)+1);
   return Object.entries(say).map(([k,n])=>n+' '+FAN_YER[k]).join(' + '); };
@@ -702,7 +719,12 @@ const fanGerek = (g,c)=>{ const q=(g&&g.id!=='igpu'?g.tdp:0)+(c?c.tdp:0); return
 const fanEk = (g,c,cs,cl)=>{
   if(cs.fan==null) return 0;
   const rad=cl&&cl.rad?Math.round(cl.rad/120):0;
-  const ek=Math.max(fanGerek(g,c)-cs.fan-rad, (egzozVar(cs,rad)?0:1)+(girisVar(cs)?0:1), 0);
+  const {egzozEk,girisEk}=fanDenge(cs,rad);
+  const ek=Math.max(fanGerek(g,c)-cs.fan-rad, egzozEk+girisEk, 0);
+  /* Gereken fan kasanın boş yuvalarına sığmıyorsa bu kombinasyon kurulamaz. */
+  if(ek && cs.duzen){ const yer=fanYerlesim(cs,ek,rad);
+    if(yer.length<ek) return -1;
+    if(yer.filter(y=>y==='on'||y==='alt'||y==='yan').length<girisEk) return -1; }
   if(ek && cs.fanKap!=null && cs.fan+rad+ek>cs.fanKap) return -1;
   return ek;
 };   /* mm — kart ile kasa sınırı arasında en az bu kadar boşluk */
@@ -1000,7 +1022,7 @@ const fpsBar = f => Math.min(100, Math.sqrt(Math.min(f,260)/260)*100);
 function fpsVerdict(f){
   if(f<30) return {t:'Takılır, oynanmaz',        c:'#FF2D95'};
   if(f<45) return {t:'Zorlanır ama oynanır',     c:'#FF2D95'};
-  if(f<70) return {t:'Akıcı — sorunsuz',         c:'#ECEBF2'};
+  if(f<70) return {t:'Akıcı, sorunsuz',         c:'#ECEBF2'};
   if(f<110)return {t:'Çok akıcı',                c:'#2DE2E6'};
   if(f<170)return {t:'144 Hz ekranı doldurur',   c:'#2DE2E6'};
   return    {t:'Rekabetçi e-spor seviyesi',      c:'#2DE2E6'};
@@ -1061,9 +1083,9 @@ function balance(c,g,res){
       kisa: enIyisi ? `1080p'de %${loss} boşta` : `%${loss} kayıp`,
       t: enIyisi ? 'Bundan güçlü işlemci yok' : loss<12 ? 'Neredeyse dengeli' : 'İşlemci yetişemiyor',
       d: enIyisi
-        ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor — listedeki en güçlü işlemci sende. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır; yüksek çözünürlükte oynayacaksan sorun değil.`
+        ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor; listedeki en güçlü işlemci sende. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır; yüksek çözünürlükte oynayacaksan sorun değil.`
         : loss<12
-          ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss} — oyunda bunu fark etmezsin.`
+          ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss}, oyunda bunu fark etmezsin.`
           : `Ekran kartı hazır bekliyor ama işlemci sipariş yetiştiremiyor. Yaklaşık %${loss} performans boşa gidiyor.`};
   }
 
@@ -1075,7 +1097,7 @@ function balance(c,g,res){
     t: asiri ? 'İşlemciye fazla harcanmış' : 'Ekran kartı sınırlıyor',
     d: asiri
       ? `İşlemci bu ekran kartına göre çok güçlü. Aradaki paranın ekran kartına gitmesi oyunda çok daha fazla kazandırırdı.`
-      : `Oyunda sınırı ekran kartı koyuyor — bu normaldir. İşlemcinin %${bos} kadar yedek gücü var, yani ileride ekran kartını yükseltirsen işlemciyi değiştirmen gerekmez.`};
+      : `Oyunda sınırı ekran kartı koyuyor, bu normaldir. İşlemcinin %${bos} kadar yedek gücü var, yani ileride ekran kartını yükseltirsen işlemciyi değiştirmen gerekmez.`};
 }
 const bnColor = b => b.sev==='real' ? '#FF2D95' : b.sev==='minor' ? '#ECEBF2' : '#2DE2E6';
 const PREBUILT_MARGIN=.22, ASSEMBLY=3500;
@@ -1096,7 +1118,7 @@ function fiyatYasi(){
   const g=Math.floor((Date.now()-new Date(T+'T12:00:00').getTime())/86400000);
   const m=new Date(T+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   return {gun:Math.max(0,g), metin:m,
-          bayat:g>30, uyari:g>30?'Bir aydan eski — alım öncesi kendin de kontrol et.':null};
+          bayat:g>30, uyari:g>30?'Bir aydan eski. Alım öncesi kendin de kontrol et.':null};
 }
 
 /* Laptop ekran kartları masaüstü eşdeğerinden zayıftır; idx aynı ölçekte
@@ -1412,7 +1434,7 @@ function parcalariGetir(){
            Artık motorun okuduğu TÜM ölçü alanları korunuyor; kombinasyon
            denetimi de bu yolu ayrıca sınıyor (CANLI geçişi). */
         const gpuOnce=GPUS.slice();
-        koy(GPUS, koru(gpuOnce, grup('gpu').map(x=>({id:kimlik(x), n:x.ad, b:x.marka||'—',
+        koy(GPUS, koru(gpuOnce, grup('gpu').map(x=>({id:kimlik(x), n:x.ad, b:x.marka||'·',
           idx:x.idx||0, vram:x.vram||0, tdp:x.tdp||0, p:x.fiyat})),
           o=>o.id, ['r1440','r2160','boy','psuMin','pin8','p16','kal','yuk']));
         /* Güç tüketimi: veritabanındaki (çoğu zaman referans model) ile koddaki
@@ -1566,7 +1588,7 @@ function laptopAktif(l){
   const ks=kasaSinifi(l.name);
   return {kind:'laptop', gIdx:Math.round(l.idx*ks.k), kasa:ks.sinif,
           cIdx:laptopCpuIdx(l.cpu), total:l.price,
-          gName:(l.gpu||'').toUpperCase(), cName:l.cpu||'—',
+          gName:(l.gpu||'').toUpperCase(), cName:l.cpu||'·',
           vram:LAPTOP_VRAM[l.gpu]||8, lap:l};
 }
 const laptopFps=(l,game,res)=>activeFps(laptopAktif(l),game,res);
@@ -1904,30 +1926,30 @@ const SEKMELER=[
 /* Her rotanın kendi başlığı ve açıklaması — arama sonucunda ve paylaşımda
    doğru görünmesi için. */
 const ROTA_META={
-  ana:     {t:'SETUP HANE — Bütçene göre hangi parça neden, birlikte bakalım',
+  ana:     {t:'SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım',
             d:'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz.'},
   /* noindex kalktı: 10 kategorinin hepsinde gerçek iş birliği ürünü var,
      sayfa artık Google'ın "içeriksiz sayfa" saydığı durumda değil.
      Ürünler /panel'den yönetiliyor. */
-  aksesuarlar: {t:'Setup Aksesuarları — Kategorilere göre keşfet | SETUP HANE',
-            d:'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası — kategori kategori, karışıklık olmadan.'},
-  oner: {t:'Sana Göre Öner — Bütçene uygun setup aksesuarı | SETUP HANE',
+  aksesuarlar: {t:'Setup Aksesuarları: Kategorilere göre keşfet | SETUP HANE',
+            d:'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası. Kategori kategori, karışıklık olmadan.'},
+  oner: {t:'Sana Göre Öner: Bütçene uygun setup aksesuarı | SETUP HANE',
             d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim. Kayıt yok, kurulum yok.'},
   /* Yönetim ekranı: arama sonucunda yeri yok. Asıl koruma Supabase RLS'inde,
      noindex yalnızca gereksiz taramayı önlüyor. */
   panel: {t:'Panel | SETUP HANE',
             d:'Site yöneticisi için ürün yönetim ekranı.',
             noindex:true},
-  testler: {t:'Donanım Testleri — FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
+  testler: {t:'Donanım Testleri: FPS, ekran kartı, ölü piksel, klavye | SETUP HANE',
             d:'12 ücretsiz araç: FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri. Kurulum gerekmez.'},
-  forum:   {t:'Forum — Sistem tavsiyesi ve bilgisayar sorunları | SETUP HANE',
+  forum:   {t:'Forum: Sistem tavsiyesi ve bilgisayar sorunları | SETUP HANE',
             d:'Bütçene uygun sistem sor, kurulumunu paylaş, arızanı çöz. Kayıt için e-posta istenmez.'},
   hakkimizda: {t:'Hakkımızda | SETUP HANE',
-            d:'SETUP HANE nedir, kim yapıyor, hangi ilkelerle çalışıyor — kısaca.'},
+            d:'SETUP HANE nedir, kim yapıyor, hangi ilkelerle çalışıyor? Kısaca.'},
   isbirlikleri: {t:'İş Birlikleri | SETUP HANE',
             d:'Markalar ve iş birliği yapmak isteyenler için SETUP HANE hakkında bilgi ve iletişim.'},
   gizlilik: {t:'Gizlilik ve Çerez Politikası | SETUP HANE',
-            d:'Hangi veri tutulur, hangi çerezler kullanılır, kayıt gerekip gerekmediği — açıkça.'},
+            d:'Hangi veri tutulur, hangi çerezler kullanılır, kayıt gerekir mi? Açıkça.'},
 };
 
 function rotaCoz(){
@@ -1966,7 +1988,7 @@ function Nav({route}){
           kesiliyordu. Mobilde iki satır, masaüstünde tek satır. */}
       <div className="max-w-[1500px] mx-auto px-5 sm:px-8 lg:px-12">
         <div className="min-h-[60px] lg:min-h-[68px] py-2 lg:py-2.5 flex items-center justify-between gap-4">
-          <a href={route==='ana'?'#top':'/'} className="flex items-center gap-3" aria-label="SETUP HANE — ana sayfa">
+          <a href={route==='ana'?'#top':'/'} className="flex items-center gap-3" aria-label="SETUP HANE ana sayfa">
             <MarkSmall size={38}/>
             <span className="hidden sm:block"><Wordmark size={15} flicker={false}/></span>
           </a>
@@ -2084,14 +2106,14 @@ function Hero({budget,setBudget}){
         <div className="mt-10 lg:mt-14 max-w-[54ch]">
           <p className="text-[1.05rem] sm:text-[1.22rem] leading-[1.65] text-ink/85">
             Elindeki parayı ve ne yapacağını söyle. O paraya kurulabilecek
-            <span className="text-cy"> en dengeli sistemi parça parça</span> göstereyim —
-            her parçanın neden seçildiğini yazarak. Beğenmediğini değiştir;
+            <span className="text-cy"> en dengeli sistemi parça parça</span> göstereyim.
+            Her parçanın neden seçildiğini yazarak. Beğenmediğini değiştir;
             bu bir reçete değil, başlangıç noktası.
           </p>
           <p className="hidden sm:block mt-5 text-[.95rem] text-ink/70 leading-relaxed">
             Hiçbir şey satmıyoruz, komisyon almıyoruz, kimseye yönlendirmiyoruz.
             Kullandığımız bütün performans değerleri bağımsız ölçümlerden geliyor ve
-            kaynağı sayfada yazılı. Listeyi alıp istediğin yerden alırsın — ya da hiç almazsın.
+            kaynağı sayfada yazılı. Listeyi alıp istediğin yerden alırsın, ya da hiç almazsın.
           </p>
         </div>
       </Reveal>
@@ -2338,11 +2360,11 @@ function AmdIntelCompare({budget,prof,game,res}){
             ? <>Bu bütçede <span style={{color:BRAND[fpsWin]}}>{fpsWin}</span> önde: aynı parayla{' '}
                 <span className="num" style={{color:BRAND[fpsWin]}}>{diff} FPS</span> (%{pct}) daha fazla.</>
             : cheaper
-              ? <>İkisi de <span className="num">{fa} FPS</span> veriyor — ama{' '}
+              ? <>İkisi de <span className="num">{fa} FPS</span> veriyor, ama{' '}
                   <span style={{color:BRAND[cheaper]}}>{cheaper}</span> tarafı{' '}
                   <span className="num" style={{color:BRAND[cheaper]}}>{fmt(costDiff)}</span> daha ucuza aynı sonucu veriyor.
                   Aradaki fark cebinde kalır.</>
-              : <>Bu bütçede ikisi de aynı FPS'i aynı paraya veriyor — hangisini alsan fark etmez.</>}
+              : <>Bu bütçede ikisi de aynı FPS'i aynı paraya veriyor; hangisini alsan fark etmez.</>}
         </p>
       )}
     </Card>
@@ -2449,7 +2471,7 @@ function OemPicker({budget,setBudget,sel,setSel,game,res}){
                       garantiyi tek yerden alıyorsun.</>
                   ) : oemF>rivF*1.08 ? (
                     <>Bu hazır sistem, aynı paraya toplayacağın sistemden <span className="num text-cy">%{Math.round((oemF/rivF-1)*100)}</span> daha
-                      hızlı. Mağaza toplu alım avantajını fiyata yansıtmış — burada hazır almak mantıklı.</>
+                      hızlı. Mağaza toplu alım avantajını fiyata yansıtmış; burada hazır almak mantıklı.</>
                   ) : (
                     <>İkisi de aynı paraya neredeyse aynı performansı veriyor. Kurulumla uğraşmak istemiyorsan
                       hazır sistem makul bir tercih.</>
@@ -2467,9 +2489,9 @@ function OemPicker({budget,setBudget,sel,setSel,game,res}){
                     <Label className="mb-3">AYNISINI PARÇA PARÇA ALSAN</Label>
                     <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
                       <span className="num text-[1.8rem] font-light text-ink">{fmt(ik.toplam)}</span>
-                      {Math.abs(fark)<1000 ? <span className="text-dim text-[.85rem]">— hazır sistemle neredeyse aynı fiyat</span>
+                      {Math.abs(fark)<1000 ? <span className="text-dim text-[.85rem]">hazır sistemle neredeyse aynı fiyat</span>
                         : fark>0 ? <span className="text-cy text-[.9rem]"><span className="num">{fmt(fark)}</span> (%{oran}) daha ucuz</span>
-                        : <span className="text-mg text-[.9rem]"><span className="num">{fmt(-fark)}</span> (%{oran}) daha pahalı — burada hazır almak avantajlı</span>}
+                        : <span className="text-mg text-[.9rem]"><span className="num">{fmt(-fark)}</span> (%{oran}) daha pahalı; burada hazır almak avantajlı</span>}
                     </div>
                     <ul className="mt-4 divide-y divide-line text-[.8rem]">
                       {ik.parca.map(([tur,ad,fy])=>(
@@ -2489,7 +2511,7 @@ function OemPicker({budget,setBudget,sel,setSel,game,res}){
               })()}
               <a href={cur.link} target="_blank" rel="nofollow noopener noreferrer"
                  className="inline-block mt-5 text-[.85rem] text-cy hover:underline">
-                {cur.ad} — {cur.magaza}{/[aıou]$/i.test(cur.magaza)?"'da":"'ta"} gör →
+                {cur.ad} · {cur.magaza}{/[aıou]$/i.test(cur.magaza)?"'da":"'ta"} gör →
               </a>
               <p className="text-[.75rem] text-dim/70 mt-3 leading-relaxed max-w-[62ch]">
                 Bu bağlantıdan hiçbir kazancımız yok. Fiyatlar {OEM_TARIHI} tarihinde alındı.
@@ -2546,7 +2568,7 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
             return budget>enPahali*1.15 ? (
               <p className="text-[.82rem] text-dim leading-relaxed mb-4 max-w-[52ch]">
                 Elimizdeki listede en pahalı laptop <span className="num text-ink">{fmt(enPahali)}</span>.
-                Daha üst segment için veri henüz toplanmadı — bu bütçeyle masaüstü toplamak
+                Daha üst segment için veri henüz toplanmadı. Bu bütçeyle masaüstü toplamak
                 zaten açık ara daha mantıklı.
               </p>
             ) : null;
@@ -2605,14 +2627,14 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
                   <div className="lbl text-cy mb-3">AYNI PARAYA TOPLASAN</div>
                   <div className="num text-[2.1rem] font-light leading-none text-cy">{Math.round(rivF)}<span className="lbl text-dim ml-2">FPS</span></div>
                   <p className="text-[.8rem] text-dim mt-3 leading-relaxed">
-                    {rival? rival.g.n : '—'}
+                    {rival? rival.g.n : '·'}
                   </p>
                 </div>
               </div>
               <p className="mt-5 text-[.88rem] text-ink/80 leading-relaxed max-w-[58ch]">
                 {rivF>lapF
                   ? <>Aynı parayla topladığın masaüstü <span className="text-cy num">{Math.round(rivF/Math.max(1,lapF)*10)/10}×</span> daha hızlı.
-                      Laptop'un fazlası ekran, klavye, batarya ve taşınabilirlik — bunlara ihtiyacın varsa fark ettiğin para boşa gitmiyor.
+                      Laptop'un fazlası ekran, klavye, batarya ve taşınabilirlik. Bunlara ihtiyacın varsa fark ettiğin para boşa gitmiyor.
                       Yoksa masaüstü açık ara mantıklı.</>
                   : <>Bu bütçede laptop fena değil; taşınabilirlik cabası.</>}
               </p>
@@ -2625,7 +2647,7 @@ function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
         </>
       )}
       <p className="mt-6 text-[.72rem] text-dim leading-relaxed">
-        Laptop verisi Cimri.com'dan çekildi{lapTarih?<> · fiyatlar {new Date(lapTarih).toLocaleDateString('tr-TR',{day:'numeric',month:'long'})} tarihli{lapGun>7?<span className="text-mg"> ({lapGun} gün önce) — almadan önce güncel fiyata bak</span>:null}</>:null}. FPS değerleri mobil ekran kartı sınıfına göre tahmindir;
+        Laptop verisi Cimri.com'dan çekildi{lapTarih?<> · fiyatlar {new Date(lapTarih).toLocaleDateString('tr-TR',{day:'numeric',month:'long'})} tarihli{lapGun>7?<span className="text-mg"> ({lapGun} gün önce), almadan önce güncel fiyata bak</span>:null}</>:null}. FPS değerleri mobil ekran kartı sınıfına göre tahmindir;
         aynı isimli mobil kartlar masaüstü sürümünden belirgin şekilde yavaştır.
       </p>
     </Card>
@@ -2792,13 +2814,13 @@ function sistemAnaliz(sys){
       const kazanc=Math.round((x.idx/g.idx-1)*100);
       let not = psuTamam && kasaTamam ? 'mevcut güç kaynağı ve kasa yeterli'
         : [!psuTamam && ('güç kaynağı yetmez, en az '+gucGerek(x,c)+' W gerekir'), !kasaTamam && ('kasaya sığmaz ('+x.boy+' mm)')].filter(Boolean).join(' · ');
-      yuk.push({t:x.n+' — ~%'+kazanc+' daha güçlü', not, iyi:psuTamam&&kasaTamam});
+      yuk.push({t:x.n+' · ~%'+kazanc+' daha güçlü', not, iyi:psuTamam&&kasaTamam});
     });
   }
   const cpuUst=CPUS.filter(x=>x.plat===c.plat && x.g>c.g && !x.x4).sort((a,b)=>b.g-a.g)[0];
   if(cpuUst){
     const sogOk=cYeter(cl,cpuUst), psuOk=g.id==='igpu'||psuYeter(g,cpuUst,psu);
-    yuk.push({t:cpuUst.n+' — aynı '+c.plat+' soket, anakart değişmeden takılır',
+    yuk.push({t:cpuUst.n+' · aynı '+c.plat+' soket, anakart değişmeden takılır',
       not: sogOk&&psuOk ? 'mevcut soğutucu ve güç kaynağı yeterli'
         : [!sogOk&&'daha güçlü soğutucu gerekir', !psuOk&&'güç kaynağı yetmez'].filter(Boolean).join(' · '), iyi:sogOk&&psuOk});
   }
@@ -3179,9 +3201,9 @@ function parcaNeden(sys){
   }
   if(cl.cap && c.tdp) ek('cooler', 'İşlemci '+c.tdp+' W ısı üretir · soğutucu '+cl.cap+' W kaldırır'+
     (cl.rad&&cs.rad?' · kasa '+cs.rad+' mm radyatör alır':''));
-  if(sys.fan) ek('fan', (!girisVar(cs)?'Kasada hazır giriş fanı yok'+(cl.rad?' (üstteki radyatör havayı dışarı atar)':'')+' — karta taze hava gelmeli; sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, en az '+fanGerek(g,c)+' fan gerekir'
+  if(sys.fan) ek('fan', (fanDenge(cs,cl.rad?Math.round(cl.rad/120):0).girisEk?'İçeri hava alan fan, dışarı atandan az kalıyordu'+(cl.rad?' (üstteki radyatör 3 fanla dışarı üfler)':'')+': kasa negatif basınçta kalır, toz çeker ve kart ısınmış havayı solur. Sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, en az '+fanGerek(g,c)+' fan gerekir'
       : egzozVar(cs,cl.rad)?'Kasanın '+cs.fan+' hazır fanı yetmiyor: sistem ~'+((g.tdp||0)+(c.tdp||0))+' W ısı üretir, '+fanGerek(g,c)+' fan gerekir'
-      : 'Kasanın '+cs.fan+' hazır fanının hepsi hava içeri alıyor, egzoz yok — sıcak hava dışarı atılmalı')+' · takılacağı yer: '+fanYerMetni(cs,sys.fan.adet,!!cl.rad)+' · normal yönlü');
+      : 'Kasanın '+cs.fan+' hazır fanının hepsi hava içeri alıyor, egzoz yok: sıcak hava dışarı atılmalı')+' · takılacağı yer: '+fanYerMetni(cs,sys.fan.adet,!!cl.rad)+' · normal yönlü');
   if(cs.gpuMax && g.boy) ek('case', (cs.fan===0?'Fansız gelir, fanlar ayrıca eklenir · ':cs.fan!=null?cs.fan+' hazır fan'+(cs.duzen&&Object.keys(cs.duzen).length?' ('+Object.entries(cs.duzen).map(([k,n])=>n+' '+FAN_YER[k].split(' ')[0]).join(', ')+(cs.ters?', ters yönlü':'')+')':'')+' · ':'')+'Kart '+g.boy+' mm · kasa '+cs.gpuMax+' mm\'ye kadar alır'+
     (cs.formMax?' · '+cs.formMax+' anakart sığar':''));
   return n;
@@ -3297,7 +3319,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                   {(pick.cpu||pick.gpu)
                     ? <>Marka kısıtını gevşetmeyi dene ({[pick.cpu&&'işlemci: '+pick.cpu,pick.gpu&&'ekran kartı: '+pick.gpu].filter(Boolean).join(', ')}),
                         ya da bütçeyi biraz yukarı çek.</>
-                    : <>Ya bütçeyi biraz yukarı çek, ya da daha hafif bir amaç seç. Yarım yamalak sistem önermeyiz —
+                    : <>Ya bütçeyi biraz yukarı çek, ya da daha hafif bir amaç seç. Yarım yamalak sistem önermeyiz;
                         bir yıl sonra pişman olursun.</>}
                 </p>
                 {(()=>{
@@ -3316,8 +3338,8 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                 <div className="mb-7"><BottleneckBadge c={sys.c} g={sys.g.id==='igpu'?GPUS[1]:sys.g} res={res}/></div>
                 {budget-sys.total>=3000 && (
                   <p className="mb-7 text-[.88rem] text-dim leading-relaxed max-w-[52ch]">
-                    Bütçenden <span className="num text-cy">{fmt(budget-sys.total)}</span> kullanılmadı —
-                    bu parayı harcamak performansı artırmıyor.
+                    Bütçenden <span className="num text-cy">{fmt(budget-sys.total)}</span> kullanılmadı.
+                    Bu parayı harcamak performansı artırmıyor.
                     {ustButce ? <> Daha fazla {prof.needGpu?'FPS':'performans'} veren bir üst kademe sistem <span className="num text-cy">{fmt(ustButce)}</span>’den başlıyor.</> : null}
                     {' '}Cebinde kalsın, ya da bir üst kademe için biriktir.
                   </p>
@@ -3325,8 +3347,8 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                 {sys.hazir && (
                   <p className="mb-7 text-[.85rem] leading-relaxed max-w-[52ch] border-l-2 border-cy pl-3 text-ink/85">
                     <span className="text-cy">Yükseltmeye hazır:</span> güç kaynağı ve kasa, ileride
-                    {' '}<span className="text-ink">{sys.hazir.n}</span> takabileceğin şekilde seçildi —
-                    kartı değiştirirken ikinci kez güç kaynağı almazsın.
+                    {' '}<span className="text-ink">{sys.hazir.n}</span> takabileceğin şekilde seçildi.
+                    Kartı değiştirirken ikinci kez güç kaynağı almazsın.
                   </p>
                 )}
                 <div className="flex items-baseline justify-between mb-5 gap-4">
@@ -3407,14 +3429,14 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
   return (
     <section id="oyun" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 02 — CANLI HESAP</Label>
+        <Label className="mb-4">MODÜL 02 · CANLI HESAP</Label>
         <div className="rule mb-10"/>
         <h2 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Bu sistem <span className="em">kaç FPS</span> verir?
         </h2>
         <p className="mt-6 text-dim max-w-[54ch] leading-relaxed text-[.95rem]">
           <strong className="text-ink font-normal">FPS</strong>, ekrandaki görüntünün saniyede kaç kez yenilendiği.
-          Sinema filmi 24 FPS'tir. Oyunda 60'ın altına inince el hareketin ekrana geç yansır — işte o "takılma" hissi.
+          Sinema filmi 24 FPS'tir. Oyunda 60'ın altına inince el hareketin ekrana geç yansır. İşte o "takılma" hissi.
         </p>
         {/* Kaynağı göstermek, sayıları hesaplamak kadar önemli: hiçbir şey
             satmayan bir sitede ziyaretçinin tek dayanağı bu satır. */}
@@ -3441,7 +3463,7 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
             <div>
               <label htmlFor="gsel" className="lbl text-dim block mb-3">HANGİ OYUN</label>
               <select id="gsel" value={gid} onChange={e=>setGid(e.target.value)} className="w-full px-4 py-3.5 text-[.95rem]">
-                {GAMES.map(g=><option key={g.id} value={g.id}>{g.n} — {g.tag}</option>)}
+                {GAMES.map(g=><option key={g.id} value={g.id}>{g.n} · {g.tag}</option>)}
               </select>
             </div>
             <div>
@@ -3456,7 +3478,7 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
               degil, yukaridaki sistem onerisini de degistiriyor. Soylemezsek
               ziyaretci parca listesinin neden degistigini anlamaz. */}
           <p className="text-[.82rem] text-dim mt-1.5 leading-relaxed">
-            Bu seçim yukarıdaki <span className="text-ink/80">sistem önerisini de</span> değiştirir —
+            Bu seçim yukarıdaki <span className="text-ink/80">sistem önerisini de</span> değiştirir:
             rekabetçi oyunlar işlemciye, ağır oyunlar ekran kartına yaslanır.
           </p>
 
@@ -3497,10 +3519,10 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
                 <div>
                   <dt className="lbl text-dim mb-2">SINIRI KOYAN PARÇA · DARBOĞAZ</dt>
                   <dd className="text-[.92rem] leading-relaxed text-ink/85">
-                    {!act.cIdx ? <>Ekran kartı — <span className="text-cy">{act.gName}</span>{' '}
+                    {!act.cIdx ? <>Ekran kartı · <span className="text-cy">{act.gName}</span>{' '}
                                    <span className="text-dim">(laptopta değiştiremezsin)</span></>
-                     : cpuLimited ? <>İşlemci — <span className="text-mg">{act.cName}</span></>
-                                  : <>Ekran kartı — <span className="text-cy">{act.gName}</span></>}
+                     : cpuLimited ? <>İşlemci · <span className="text-mg">{act.cName}</span></>
+                                  : <>Ekran kartı · <span className="text-cy">{act.gName}</span></>}
                   </dd>
                 </div>
                 <div>
@@ -3527,7 +3549,7 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
                       <span className="num text-cy"> {fmt(tatli.tasarruf)}</span> daha ucuz hem de
                       <span className="num text-cy"> {tatli.ucuzFps} FPS</span> ile daha hızlı
                       (şu anki sistem <span className="num">{tatli.hedefFps} FPS</span>).
-                      Sebebi: bu bütçede daha güçlü ekran kartı seçiliyor ama işlemci geriliyor —
+                      Sebebi: bu bütçede daha güçlü ekran kartı seçiliyor ama işlemci geriliyor;
                       bu oyun işlemciye yaslandığı için sonuç düşüyor.
                     </p>
                   ) : (
@@ -3547,7 +3569,7 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
                     </>
                   )}
                   <p className="text-[.85rem] text-dim mt-5 leading-relaxed max-w-[62ch]">
-                    Bunlar çöp değil — daha fazla bellek ve disk ileride işine yarar, güçlü işlemci
+                    Bunlar çöp değil: daha fazla bellek ve disk ileride işine yarar, güçlü işlemci
                     daha ağır oyunlarda ve daha yüksek çözünürlükte fark eder. Ama <span className="text-ink/90">bu oyunda,
                     bu çözünürlükte</span> ekrana yansıyan bir karşılığı yok. Kararı sen ver.
                   </p>
@@ -3577,7 +3599,7 @@ function BalanceTest({sys}){
   return (
     <section id="denge" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 03 — DARBOĞAZ TESTİ · CANLI HESAP</Label>
+        <Label className="mb-4">MODÜL 03 · DARBOĞAZ TESTİ · CANLI HESAP</Label>
         <div className="rule mb-10"/>
         <h2 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           <span className="em">Darboğaz</span> var mı, ne kadar?
@@ -3586,7 +3608,7 @@ function BalanceTest({sys}){
           <strong className="text-ink font-normal">Darboğaz</strong>, bir parçanın diğerini bekletmesi.
           Bir restoranı düşün: <strong className="text-ink font-normal">işlemci</strong> siparişleri alıp mutfağa dağıtan garson,
           <strong className="text-ink font-normal"> ekran kartı</strong> ise yemeği pişiren şef.
-          Garson yavaşsa şef boş bekler, şef yavaşsa garson boş bekler. İkisi de para eder —
+          Garson yavaşsa şef boş bekler, şef yavaşsa garson boş bekler. İkisi de para eder,
           ama biri boşta kalıyorsa o parayı çöpe atmışsın demektir. İşte o boşa giden kısım darboğazdır.
         </p>
       </Reveal>
@@ -3663,31 +3685,31 @@ function BalanceTest({sys}){
 const GLOSSARY=[
  {k:'gpu',t:'Ekran kartı',one:'Oyunda gördüğün her şeyi çizen parça.',
   cmp:'Restoranın şefi. Yemeği pişiren o.',
-  d:'Oyunlarda performansı en çok belirleyen parça budur; bütçenin en büyük dilimi genellikle buraya gider. Üzerindeki "GB" yazısı kendi hafızasıdır — çözünürlük ve doku kalitesi arttıkça bu hafıza dolmaya başlar.',
+  d:'Oyunlarda performansı en çok belirleyen parça budur; bütçenin en büyük dilimi genellikle buraya gider. Üzerindeki "GB" yazısı kendi hafızasıdır; çözünürlük ve doku kalitesi arttıkça bu hafıza dolmaya başlar.',
   care:'Oyun oynayacaksan burayı kısma.'},
  {k:'cpu',t:'İşlemci',one:'Bilgisayarın beyni. Bütün kararları o verir.',
   cmp:'Siparişleri mutfağa dağıtan garson.',
   d:'Program açma, dosya işleme, oyundaki yapay zekâ ve fizik hesapları buradan geçer. Video kurgu ve yayın gibi işlerde ekran kartından bile önemli hale gelir.',
   care:'Video/render işi yapıyorsan öncelik burası.'},
- {k:'ram',t:'Bellek — RAM',one:'Aynı anda kaç işi açık tutabildiğin.',
+ {k:'ram',t:'Bellek · RAM',one:'Aynı anda kaç işi açık tutabildiğin.',
   cmp:'Çalışma masanın büyüklüğü. Masa küçükse her seferinde dolaba gidip gelirsin.',
   d:'RAM kapandığında içindekiler silinir, kalıcı depolama değildir. 16 GB bugün oyun için alt sınır, 32 GB rahat alan demektir. Video kurgu yapacaksan 32 GB neredeyse zorunlu.',
   care:'16 GB alt sınır, 32 GB huzur.'},
- {k:'ssd',t:'Disk — SSD',one:'Dosyaların, oyunların ve Windows’un durduğu yer.',
+ {k:'ssd',t:'Disk · SSD',one:'Dosyaların, oyunların ve Windows’un durduğu yer.',
   cmp:'Dolabın. Kapatınca içindekiler kaybolmaz.',
   d:'Eski mekanik disklerden 10-20 kat hızlıdır; bilgisayarın "hızlı açılma" hissinin asıl kaynağı budur. Modern bir oyun tek başına 80-150 GB yer kaplar, o yüzden 500 GB çabuk dolar.',
   care:'1 TB, birkaç yıl için doğru başlangıç.'},
  {k:'mb',t:'Anakart',one:'Bütün parçaların birbirine bağlandığı taban.',
   cmp:'Evin elektrik tesisatı. Görünmez ama olmazsa hiçbir şey çalışmaz.',
   d:'Performansa doğrudan katkısı yoktur; işi parçaları doğru bağlamak ve işlemciye stabil elektrik vermektir. Güçlü işlemci güçlü anakart ister, aksi halde işlemci tam hızına çıkamaz.',
-  care:'Pahalı olan hızlı yapmaz — uyumlu olan çalıştırır.'},
+  care:'Pahalı olan hızlı yapmaz, uyumlu olan çalıştırır.'},
  {k:'psu',t:'Güç kaynağı',one:'Prizdeki elektriği parçalara dağıtan kutu.',
   cmp:'Evin sigorta panosu. Ucuzuna kaçılacak tek yer burası değil.',
   d:'Kalitesiz güç kaynağı sadece kendi bozulmaz; bağlı olduğu ekran kartını ve anakartı da götürebilir. "80+ Bronze / Gold" yazısı verimlilik belgesidir, Gold daha az ısınır ve daha az elektrik yakar.',
   care:'Sistemi ateşe atmamak için tasarruf edilecek yer değil.'},
  {k:'cooler',t:'Soğutucu',one:'İşlemcinin ürettiği ısıyı dışarı atan parça.',
   cmp:'Mutfaktaki aspiratör.',
-  d:'İşlemci ısınınca kendini korumak için yavaşlar — buna "kısılma" denir ve performansı sessizce düşürür. Yeterli soğutma, aldığın gücü gerçekten kullanabilmen demektir.',
+  d:'İşlemci ısınınca kendini korumak için yavaşlar; buna "kısılma" denir ve performansı sessizce düşürür. Yeterli soğutma, aldığın gücü gerçekten kullanabilmen demektir.',
   care:'Sessizlik istiyorsan buraya biraz fazla ver.'},
  {k:'case',t:'Kasa',one:'Her şeyin içine yerleştiği kutu.',
   cmp:'Evin kendisi. Havalandırması kötüyse içeride oturulmaz.',
@@ -3700,13 +3722,13 @@ function Glossary(){
   return (
     <section id="sozluk" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 04 — PARÇA SÖZLÜĞÜ</Label>
+        <Label className="mb-4">MODÜL 04 · PARÇA SÖZLÜĞÜ</Label>
         <div className="rule mb-10"/>
         <h2 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Hangi parça <span className="em">ne yapar</span>, tek tek.
         </h2>
         <p className="mt-6 text-dim max-w-[52ch] leading-relaxed text-[.95rem]">
-          Teknik terim yok. Her parçayı günlük hayattan tanıdığın bir şeyle eşledik — çünkü insan bilmediği şeyi
+          Teknik terim yok. Her parçayı günlük hayattan tanıdığın bir şeyle eşledik, çünkü insan bilmediği şeyi
           ancak bildiği bir şeyle kıyaslayınca anlıyor.
         </p>
       </Reveal>
@@ -3760,7 +3782,7 @@ function Glossary(){
 /* ═══════════════════ ÖZET — sağ panel + mobil dock ═══════════════════ */
 function summaryText(sys,prof,plain){
   return [
-    'SETUP HANE — sistem listesi','Amaç: '+prof.n,'',
+    'SETUP HANE · sistem listesi','Amaç: '+prof.n,'',
     'Ekran kartı : '+sys.g.n,
     'İşlemci     : '+sys.c.n,
     'Anakart     : '+sys.mb.n,
@@ -3811,7 +3833,7 @@ function usePaylas(budget,prof,pick,gid,rid){
     const url='https://www.setuphane.com/sistem:'+sistemKodla(budget,prof.id,pick,gid,rid);
     /* Telefonda yerel paylaşım penceresi çok daha doğal; yoksa panoya kopyala. */
     if(navigator.share){
-      try{ await navigator.share({title:'SETUP HANE — kurduğum sistem',url}); olay('sistem_paylasildi',{yol:'native'}); return; }
+      try{ await navigator.share({title:'SETUP HANE · kurduğum sistem',url}); olay('sistem_paylasildi',{yol:'native'}); return; }
       catch(e){ if(e && e.name==='AbortError') return; }   /* kullanıcı vazgeçti */
     }
     await panoyaYaz(url);
@@ -3865,7 +3887,7 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
 
           <div className="mt-7 pt-6 border-t border-line space-y-3.5">
             {(isLap
-              ? [['Model',laptopAd(act.lap).model],['Ekran kartı',act.gName],['İşlemci',act.cName],['Bellek',(act.lap.ram||'—')+' GB']]
+              ? [['Model',laptopAd(act.lap).model],['Ekran kartı',act.gName],['İşlemci',act.cName],['Bellek',(act.lap.ram||'·')+' GB']]
               : [['Ekran kartı',sys.g.n],['İşlemci',sys.c.n],['Bellek',sys.r.n],['Disk',sys.s.n]]
             ).map(([a,b])=>(
               <div key={a} className="flex justify-between gap-4 text-[.83rem]">
@@ -3887,7 +3909,7 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
             <Label className="mb-3">DARBOĞAZ</Label>
             <div className="text-[.85rem]">
               {isLap
-                ? <span className="text-dim leading-relaxed">Laptopta parça değiştirilemez — darboğazı sonradan düzeltemezsin.</span>
+                ? <span className="text-dim leading-relaxed">Laptopta parça değiştirilemez; darboğazı sonradan düzeltemezsin.</span>
                 : <BottleneckBadge c={sys.c} g={sys.g.id==='igpu'?GPUS[1]:sys.g} res={res} compact/>}
             </div>
           </div>
@@ -3897,7 +3919,7 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
               <Label className="mb-3">HAZIR SİSTEME GÖRE</Label>
               <div className="num text-[1.7rem] font-light text-cy leading-none">{fmt(saveA)}</div>
               <div className="text-[.8rem] text-dim mt-2.5 leading-relaxed">
-                cebinde kalıyor — <span className="num text-cy">%{Math.round(pctA)}</span> daha ucuz.
+                cebinde kalıyor: <span className="num text-cy">%{Math.round(pctA)}</span> daha ucuz.
                 Hazır sistem fiyatı, parça tutarına ortalama %{Math.round(PREBUILT_MARGIN*100)} kâr payı
                 ve {fmt(ASSEMBLY)} montaj eklenerek hesaplandı.
               </div>
@@ -3916,7 +3938,7 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
             {isLap ? (act.lap.tarih ? <>Fiyat <span className="text-ink/80">{new Date(act.lap.tarih).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</span> tarihinde Cimri.com'dan çekildi.</> : <>Fiyat Cimri.com'dan çekildi.</>)
               : <>Fiyatlar <span className="text-ink/80">{fiyatYasi().metin}</span> tarihli · Epey.com, en az 3 satıcıda satılan modelin en ucuz ilanı.</>}
             {!isLap && fiyatYasi().bayat && <span className="block mt-1 text-mg">{fiyatYasi().uyari}</span>}
-            {isLap && act.lap.tarih && (Date.now()-new Date(act.lap.tarih).getTime())>7*86400000 && <span className="block mt-1 text-mg">Bir haftadan eski — alım öncesi güncel fiyata bak.</span>}
+            {isLap && act.lap.tarih && (Date.now()-new Date(act.lap.tarih).getTime())>7*86400000 && <span className="block mt-1 text-mg">Bir haftadan eski. Alım öncesi güncel fiyata bak.</span>}
           </p>
         </Card>
         )}
@@ -3954,11 +3976,11 @@ function MobileDock({sys,act,prof,game,res,budget,pick,gid,rid}){
         <div className="accIn">
           <div className="px-5 pt-5 space-y-3">
             {(isLap
-              ? [['Model',laptopAd(act.lap).model],['Seri',laptopAd(act.lap).seri||'—'],
+              ? [['Model',laptopAd(act.lap).model],['Seri',laptopAd(act.lap).seri||'·'],
                  ['Ekran kartı',act.gName],['İşlemci',act.cName],
-                 ['Bellek',(act.lap.ram||'—')+' GB'],
-                 ['Disk',act.lap.ssd?(act.lap.ssd>=1000?(act.lap.ssd/1000)+' TB':act.lap.ssd+' GB'):'—'],
-                 ['Ekran',(act.lap.inch||'—')+' inç'],['Satıcı',act.lap.offers+' mağaza']]
+                 ['Bellek',(act.lap.ram||'·')+' GB'],
+                 ['Disk',act.lap.ssd?(act.lap.ssd>=1000?(act.lap.ssd/1000)+' TB':act.lap.ssd+' GB'):'·'],
+                 ['Ekran',(act.lap.inch||'·')+' inç'],['Satıcı',act.lap.offers+' mağaza']]
               : [['Ekran kartı',sys.g.n],['İşlemci',sys.c.n],['Anakart',sys.mb.n],['Bellek',sys.r.n],
                  ['Disk',sys.s.n],['Güç kaynağı',sys.psu.n],['Soğutucu',sys.cl.n],['Kasa',sys.cs.n]]
             ).map(([a,b])=>(
@@ -4236,7 +4258,7 @@ function DeviceTest({sys}){
        sonraki kademeyi rapor ediyordu. */
     for(let i=0;i<YUK_MERDIVENI.length;i++){
       const lv=YUK_MERDIVENI[i];
-      setMsg(`Yük artırılıyor — ${lv.r}px · ${lv.s} kademe…`);
+      setMsg(`Yük artırılıyor · ${lv.r}px · ${lv.s} kademe…`);
       const ms=await runLevel(ctx,lv.r,lv.s,6);
       if(!alive.current) return;
       son={...lv, ms};
@@ -4294,14 +4316,14 @@ function DeviceTest({sys}){
   return (
     <section id="cihaz" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 05 — GERÇEK ÖLÇÜM</Label>
+        <Label className="mb-4">MODÜL 05 · GERÇEK ÖLÇÜM</Label>
         <div className="rule mb-10"/>
         {/* Kendi sayfasının tek başlığı — h1 olmalı */}
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Şu anki cihazın <span className="em">ne kadar</span> güçlü?
         </h1>
         <p className="mt-6 text-dim max-w-[56ch] leading-relaxed text-[.95rem]">
-          Bu sayfadaki her şey tahmindi — bu değil. Aşağıdaki test şu an kullandığın
+          Bu sayfadaki her şey tahmindi, bu değil. Aşağıdaki test şu an kullandığın
           cihazın ekran kartını gerçekten çalıştırır, yükü kırılana kadar artırır ve
           çıkan sonucu ölçer. Yükseltme düşünüyorsan önce elindekini bilmen gerekir.
         </p>
@@ -4314,7 +4336,7 @@ function DeviceTest({sys}){
           <dl className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
             {dev && [
               ['Ekran kartı', adTemiz || 'tarayıcı gizliyor'],
-              ['Üretici', dev.vendor ? dev.vendor.replace(/^Google Inc\.\s*/,'').replace(/[()]/g,'') : '—'],
+              ['Üretici', dev.vendor ? dev.vendor.replace(/^Google Inc\.\s*/,'').replace(/[()]/g,'') : '·'],
               ['İşlemci çekirdeği', dev.cores ? dev.cores+' mantıksal' : 'okunamadı'],
               ['Bellek', dev.mem ? dev.mem+' GB+' : 'okunamadı'],
               ['Ekran', `${dev.scrW}×${dev.scrH}${dev.dpr!==1?`  ·  ${dev.dpr}×`:''}`],
@@ -4336,7 +4358,7 @@ function DeviceTest({sys}){
                   <div>
                     <label htmlFor="dg" className="lbl text-dim block mb-3">HANGİ OYUN</label>
                     <select id="dg" value={gid} onChange={e=>setGid(e.target.value)} className="w-full px-4 py-3.5 text-[.95rem]">
-                      {GAMES.map(g=><option key={g.id} value={g.id}>{g.n} — {g.tag}</option>)}
+                      {GAMES.map(g=><option key={g.id} value={g.id}>{g.n} · {g.tag}</option>)}
                     </select>
                   </div>
                   <div>
@@ -4357,7 +4379,7 @@ function DeviceTest({sys}){
                 </div>
                 <p className="mt-5 text-[.86rem] text-dim leading-relaxed max-w-[60ch]">
                   Bu tahmin <span className="text-cy">{adTemiz}</span> kartının bilinen performansına dayanıyor
-                  {tanim.mobil && <span> (dizüstü sürüm — masaüstü aynı isimli karttan yavaştır)</span>}.
+                  {tanim.mobil && <span> (dizüstü sürüm: masaüstü aynı isimli karttan yavaştır)</span>}.
                   İşlemci modelini tarayıcı vermediği için hesaba katılmadı; işlemcin zayıfsa
                   gerçek sonuç bunun altında kalır.
                 </p>
@@ -4421,7 +4443,7 @@ function DeviceTest({sys}){
                   <div className="text-[.92rem] leading-relaxed text-ink/85">
                     {res.kirildi
                       ? <><span className="num">{res.res}×{res.res}</span> çözünürlükte{' '}
-                          <span className="num">{res.steps}</span> kademe yükte zorlandı —
+                          <span className="num">{res.steps}</span> kademe yükte zorlandı,
                           kare süresi <span className="num">{res.ms} ms</span> ({res.fps} FPS)</>
                       : <>En ağır kademeyi (<span className="num">{res.res}×{res.res}</span> ·{' '}
                           <span className="num">{res.steps}</span>) bile{' '}
@@ -4433,8 +4455,8 @@ function DeviceTest({sys}){
                   <div className="lbl text-dim mb-2">EKRANINI DOLDURUR MU</div>
                   <div className="text-[.92rem] leading-relaxed" style={{color:hz&&res.fps>=hz?'#2DE2E6':'#ECEBF2'}}>
                     {hz ? (res.fps>=hz
-                      ? `Evet — bu ağır yükte bile ${hz} Hz ekranını besliyor.`
-                      : `Bu ağır yükte ${hz} Hz'in altına iniyor. Bu test kasten aşırı zorluyor, günlük kullanımda sorun değil.`) : '—'}
+                      ? `Evet, bu ağır yükte bile ${hz} Hz ekranını besliyor.`
+                      : `Bu ağır yükte ${hz} Hz'in altına iniyor. Bu test kasten aşırı zorluyor, günlük kullanımda sorun değil.`) : '·'}
                   </div>
                 </div>
               </div>
@@ -4442,7 +4464,7 @@ function DeviceTest({sys}){
               {sys && (
                 <p className="mt-7 text-[.88rem] text-dim leading-relaxed max-w-[60ch]">
                   Yukarıda kurduğumuz sistemin ekran kartı <span className="text-cy">{sys.g.n}</span>.
-                  Bu test tarayıcı üzerinden ölçtüğü için doğrudan kıyaslanamaz — ama elindeki cihaz
+                  Bu test tarayıcı üzerinden ölçtüğü için doğrudan kıyaslanamaz, ama elindeki cihaz
                   zorlanıyorsa, o sistem gözle görülür bir sıçrama olur.
                 </p>
               )}
@@ -4468,8 +4490,8 @@ function DeviceTest({sys}){
                   <p className="mt-5 text-[.9rem] leading-relaxed max-w-[60ch]"
                      style={{color:res.stres.kisiliyor?'#FF2D95':'#ECEBF2'}}>
                     {res.stres.kisiliyor
-                      ? `Testin ikinci yarısı ilk yarısından %${res.stres.dus} yavaş geçti. En yaygın sebebi ısınmadır: cihaz kızınca kendini korumak için yavaşlar — laptoplarda ve hava almayan kasalarda sık görülür. Ama tarayıcı testi olduğu için arka planda çalışan başka işler de bu düşüşü yaratabilir. Emin olmak için testi kapalı sekmelerle tekrarla.`
-                      : 'Performans test boyunca sabit kaldı — soğutma bu yükün altından kalkıyor. İyi haber.'}
+                      ? `Testin ikinci yarısı ilk yarısından %${res.stres.dus} yavaş geçti. En yaygın sebebi ısınmadır: cihaz kızınca kendini korumak için yavaşlar; laptoplarda ve hava almayan kasalarda sık görülür. Ama tarayıcı testi olduğu için arka planda çalışan başka işler de bu düşüşü yaratabilir. Emin olmak için testi kapalı sekmelerle tekrarla.`
+                      : 'Performans test boyunca sabit kaldı: soğutma bu yükün altından kalkıyor. İyi haber.'}
                   </p>
                 </div>
               </div>
@@ -4479,7 +4501,7 @@ function DeviceTest({sys}){
           <p className="mt-7 text-[.72rem] text-dim leading-relaxed max-w-[64ch]">
             Bu test tarayıcının ekran kartından ne kadar iş çıkarabildiğini ölçer; 3DMark gibi bir
             oyun testi değildir. Sürücü, tarayıcı ve arka planda açık sekmeler sonucu etkiler.
-            Aynı cihazda tekrar çalıştırdığında yakın sonuç alırsın — asıl işe yarayan budur.
+            Aynı cihazda tekrar çalıştırdığında yakın sonuç alırsın; asıl işe yarayan budur.
           </p>
         </Card>
       </Reveal>
@@ -4710,11 +4732,11 @@ const zamanFarki = ts => {
    Sahte kullanıcı/sahte tartışma ÜRETİLMEDİ — olmayan bir topluluğu varmış
    gibi göstermek yanıltıcı olurdu. */
 const TOHUM_KONULAR=[
-  {id:'t1', kat:'genel', baslik:'Buraya hoş geldin — forum nasıl çalışıyor?',
-   govde:'Bu forum senin tarayıcında çalışıyor. Yazdıkların bu cihazda kalır, internete gitmez, başkası göremez.\n\nNeden böyle? Çünkü site tek bir HTML dosyası — arkasında sunucu yok. Bu sayede indirip çift tıklayınca çalışıyor, kayıt istemiyor, hiçbir veri toplamıyor.\n\nYazdıklarını arkadaşına göndermek istersen aşağıdaki "Dışa aktar" düğmesiyle dosya olarak alabilirsin; o da "İçe aktar" ile açar.',
+  {id:'t1', kat:'genel', baslik:'Buraya hoş geldin: forum nasıl çalışıyor?',
+   govde:'Bu forum senin tarayıcında çalışıyor. Yazdıkların bu cihazda kalır, internete gitmez, başkası göremez.\n\nNeden böyle? Çünkü site tek bir HTML dosyası, arkasında sunucu yok. Bu sayede indirip çift tıklayınca çalışıyor, kayıt istemiyor, hiçbir veri toplamıyor.\n\nYazdıklarını arkadaşına göndermek istersen aşağıdaki "Dışa aktar" düğmesiyle dosya olarak alabilirsin; o da "İçe aktar" ile açar.',
    yazar:'SETUP HANE', renk:'#2DE2E6', ts:Date.now()-86400000*3, sabit:true, cevaplar:[], begeni:0},
   {id:'t2', kat:'tavsiye', baslik:'Sistem tavsiyesi isterken neleri yazmalısın?',
-   govde:'İyi cevap almak için şunları yaz:\n\n1. Bütçen (kasa mı, ekranıyla birlikte mi?)\n2. Ne yapacaksın — hangi oyunlar, hangi programlar?\n3. Ekranın kaç Hz ve hangi çözünürlükte?\n4. Elinde ne var — parça devrederek bütçe artırabilir misin?\n\nYukarıdaki kurucudan çıkan sistemi gönderine tek tuşla ekleyebilirsin; herkes ne konuştuğunu görür.',
+   govde:'İyi cevap almak için şunları yaz:\n\n1. Bütçen (kasa mı, ekranıyla birlikte mi?)\n2. Ne yapacaksın? Hangi oyunlar, hangi programlar?\n3. Ekranın kaç Hz ve hangi çözünürlükte?\n4. Elinde ne var? Parça devrederek bütçe artırabilir misin?\n\nYukarıdaki kurucudan çıkan sistemi gönderine tek tuşla ekleyebilirsin; herkes ne konuştuğunu görür.',
    yazar:'SETUP HANE', renk:'#2DE2E6', ts:Date.now()-86400000*2, sabit:true, cevaplar:[], begeni:0},
 ];
 
@@ -4766,7 +4788,7 @@ function GirisKarti({user,setUser}){
             className="w-full px-4 py-3 bg-transparent border border-line text-ink text-[.95rem] placeholder:text-dim/50 focus:border-cy transition-colors"/>
         </div>
         <div>
-          <label htmlFor="fpin" className="lbl text-dim block mb-2">PIN — İSTEĞE BAĞLI</label>
+          <label htmlFor="fpin" className="lbl text-dim block mb-2">PIN · İSTEĞE BAĞLI</label>
           <input id="fpin" value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,'').slice(0,6))}
             inputMode="numeric" placeholder="4-6 rakam"
             className="w-full px-4 py-3 bg-transparent border border-line text-ink text-[.95rem] placeholder:text-dim/50 focus:border-cy transition-colors num"/>
@@ -4790,7 +4812,7 @@ function GirisKarti({user,setUser}){
       </button>
       <p className="mt-4 text-[.78rem] text-dim leading-relaxed max-w-[52ch]">
         E-posta istemiyoruz, doğrulama yok, hiçbir şey sunucuya gitmiyor. PIN sadece aynı
-        bilgisayarı paylaşıyorsan başkası senin adınla yazmasın diye — gerçek bir şifre değil.
+        bilgisayarı paylaşıyorsan başkası senin adınla yazmasın diye. Gerçek bir şifre değil.
       </p>
     </div>
   );
@@ -4806,7 +4828,7 @@ function YeniKonu({user,sys,prof,onEkle}){
   const [hata,setHata]=useState('');
 
   const gonder=()=>{
-    if(baslik.trim().length<8){ setHata('Başlık en az 8 karakter olmalı — ne sorduğun anlaşılsın.'); return; }
+    if(baslik.trim().length<8){ setHata('Başlık en az 8 karakter olmalı ki ne sorduğun anlaşılsın.'); return; }
     if(govde.trim().length<15){ setHata('Biraz daha detay yaz, tek cümleyle kimse yardım edemez.'); return; }
     let g=govde.trim();
     if(ekle && sys){
@@ -5082,7 +5104,7 @@ function Forum({sys,prof}){
         const yeni=g.konular.filter(k=>!mevcut.has(k.id));
         setData(d=>({...d, konular:[...yeni,...d.konular]}));
         setBildirim(yeni.length+' yeni konu eklendi.');
-      }catch(err){ setBildirim('Dosya okunamadı — SETUP HANE forum dosyası mı?'); }
+      }catch(err){ setBildirim('Dosya okunamadı. SETUP HANE forum dosyası mı?'); }
       setTimeout(()=>setBildirim(''),3500);
     };
     r.readAsText(f);
@@ -5095,7 +5117,7 @@ function Forum({sys,prof}){
   return (
     <section id="forum" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 06 — TOPLULUK</Label>
+        <Label className="mb-4">MODÜL 06 · TOPLULUK</Label>
         <div className="rule mb-10"/>
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Kafana takılanı <span className="em">sor</span>.
@@ -5113,7 +5135,7 @@ function Forum({sys,prof}){
         <div className="mt-8 p-5 sm:p-6 border border-mg/30 bg-mg/[.05] flex flex-col sm:flex-row sm:items-center gap-4">
           <span className="w-2 h-2 rotate-45 shrink-0 hidden sm:block mt-1" style={{background:'#FF2D95'}}/>
           <p className="text-[.88rem] text-ink/85 leading-relaxed">
-            <span className="text-mg">Setup'ını / masa düzenini paylaş</span> — "Kurulum gösterisi"
+            <span className="text-mg">Setup'ını / masa düzenini paylaş</span> · "Kurulum gösterisi"
             kategorisine ekle. Her ay en iyi 3 kurulumu Instagram'da
             (<a href="https://instagram.com/setuphane" target="_blank" rel="noopener noreferrer"
                 className="text-cy hover:underline underline-offset-4">@setuphane</a>) videoyla öne çıkarıyoruz.
@@ -5138,7 +5160,7 @@ function Forum({sys,prof}){
             </>
           ) : (
             <>
-              <span className="text-[.88rem] text-dim">Okumak serbest — yazmak için oturum aç.</span>
+              <span className="text-[.88rem] text-dim">Okumak serbest, yazmak için oturum aç.</span>
               <button onClick={()=>kimlikAcik?setKimlikAcik(false):oturumAc()}
                 className={'lbl px-4 py-2 border transition-colors '+(kimlikAcik?'border-cy text-cy':'border-line text-dim hover:text-ink')}>
                 {kimlikAcik?'KAPAT':'OTURUM AÇ'}
@@ -5171,7 +5193,7 @@ function Forum({sys,prof}){
           </div>
         ) : uzakVar() ? (
           <p className="mt-4 text-[.82rem] text-dim leading-relaxed">
-            <span className="text-cy">Burası ortak alan</span> — yazdıklarını herkes görür ve
+            <span className="text-cy">Burası ortak alan:</span> yazdıklarını herkes görür ve
             silinmez. Telefon, adres, sipariş numarası gibi kişisel bilgi yazma.
           </p>
         ) : (
@@ -5303,14 +5325,14 @@ function EkranTesti(){
   return (
     <section id="ekran" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 07 — EKRAN TESTİ</Label>
+        <Label className="mb-4">MODÜL 07 · EKRAN TESTİ</Label>
         <div className="rule mb-10"/>
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Ekranın <span className="em">sağlam</span> mı?
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
           İkinci el monitör alırken ya da yeni ekranı kutudan çıkarınca ilk yapılacak iş budur.
-          Dört testi de yerinde çalıştır — kusur varsa iade süresi dolmadan görürsün.
+          Dört testi de yerinde çalıştır; kusur varsa iade süresi dolmadan görürsün.
         </p>
       </Reveal>
 
@@ -5327,7 +5349,7 @@ function EkranTesti(){
             </div>
             {hz>0 && (
               <p className="text-[.85rem] text-dim leading-relaxed max-w-[38ch]">
-                {hz>=100 ? 'Yüksek yenileme hızlı ekran — hızlı oyunlarda avantaj.'
+                {hz>=100 ? 'Yüksek yenileme hızlı ekran: hızlı oyunlarda avantaj.'
                          : 'Standart 60 Hz sınıfı. Oyunda 60 FPS üstü kazanç sağlamaz.'}
               </p>
             )}
@@ -5447,14 +5469,14 @@ function NisanOyunu(){
   return (
     <section id="nisan" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 08 — NİŞAN OYUNU</Label>
+        <Label className="mb-4">MODÜL 08 · NİŞAN OYUNU</Label>
         <div className="rule mb-10"/>
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Refleksin <span className="em">kaç</span> milisaniye?
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
-          30 saniye, çıkan hedeflere tıkla. Sonunda ortalama tepki süreni göreceksin —
-          ve o sürenin yanında ekranının kaç milisaniye geciktirdiğini.
+          30 saniye, çıkan hedeflere tıkla. Sonunda ortalama tepki süreni göreceksin,
+          yanında da ekranının kaç milisaniye geciktirdiğini.
         </p>
       </Reveal>
 
@@ -5463,7 +5485,7 @@ function NisanOyunu(){
           <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 mb-5">
             <div className="flex flex-wrap gap-x-8 gap-y-3">
               {[['SÜRE',kalan+' sn'],['VURUŞ',vurus],['KAÇAN',kacan],
-                ['ORTALAMA',ortalama?ortalama+' ms':'—']].map(([k,v])=>(
+                ['ORTALAMA',ortalama?ortalama+' ms':'·']].map(([k,v])=>(
                 <div key={k}>
                   <div className="lbl text-dim mb-1">{k}</div>
                   <div className="num text-[1.25rem]">{v}</div>
@@ -5483,7 +5505,7 @@ function NisanOyunu(){
             {durum==='hazir' && (
               <div className="absolute inset-0 grid place-items-center text-center px-6">
                 <p className="text-[.95rem] text-dim max-w-[34ch] leading-relaxed">
-                  Başla'ya bas. Hedefler rastgele belirecek — ne kadar hızlı tıklarsan o kadar iyi.
+                  Başla'ya bas. Hedefler rastgele belirecek; ne kadar hızlı tıklarsan o kadar iyi.
                   Boşa tıklamak puan kırar.
                 </p>
               </div>
@@ -5533,7 +5555,7 @@ function NisanOyunu(){
                   <p className="text-[.9rem] leading-relaxed text-ink/85">
                     Tepkin <span className="num text-cy">{ortalama} ms</span>.
                     {' '}{hz} Hz ekranda görüntü sana ortalama{' '}
-                    <span className="num text-cy">{Math.round(1000/hz/2)} ms</span> gecikmeyle ulaşır —
+                    <span className="num text-cy">{Math.round(1000/hz/2)} ms</span> gecikmeyle ulaşır;
                     yani tepkinin yaklaşık <span className="num">%{Math.round((1000/hz/2)/ortalama*100)}</span>'i kadar.
                     {hz<100 && ' 144 Hz ekranda bu gecikme yarıdan aza iner.'}
                   </p>
@@ -5690,9 +5712,9 @@ function FpsTesti(){
       {/* Etiket kutuları sabit yükseklikte: "—" ile "180 Hz" farklı yükseklik
           verdiği için satırlar birbirine göre kayık duruyordu. */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-5 pb-6 mb-6 border-b border-line">
-        {[['ANLIK FPS',calisiyor?anlik:(son?son.ort:'—')],
-          ['YENİLEME HIZI',hz?hz+' Hz':'—'],
-          ['ORTALAMA',son?son.ort:'—'],
+        {[['ANLIK FPS',calisiyor?anlik:(son?son.ort:'·')],
+          ['YENİLEME HIZI',hz?hz+' Hz':'·'],
+          ['ORTALAMA',son?son.ort:'·'],
           ['KALAN',kalan+' sn']].map(([k,v])=>(
           <div key={k}>
             <div className="lbl text-dim mb-1.5 h-[13px] leading-[13px]">{k}</div>
@@ -5739,7 +5761,7 @@ function FpsTesti(){
           </div>
           <p className="text-[.9rem] leading-relaxed text-ink/85 max-w-[62ch]">
             <span className="text-cy">%1 düşük</span> en kötü kareleri gösterir ve takılma hissini
-            ortalamadan daha iyi anlatır. Ortalaman {son.ort}, %1 düşüğün {son.dusuk1} —
+            ortalamadan daha iyi anlatır. Ortalaman {son.ort}, %1 düşüğün {son.dusuk1},
             arada %{Math.round((1-son.dusuk1/son.ort)*100)} fark var.
             {/* Eşik gevşekti: 160'a karşı 83 "dengeli" sayılıyordu. Sektör kabulü,
                 %1 düşüğün ortalamanın ~%75'i üstünde kalmasıdır. */}
@@ -5747,7 +5769,7 @@ function FpsTesti(){
               ? ' Bu büyük bir uçurum: sayı akıcı görünse de gözüne belirgin takılma gelir.'
               : son.dusuk1 < son.ort*0.75
                 ? ' Arada hissedilir takılmalar var, kritik anlarda göze çarpar.'
-                : ' Akış dengeli — sayılar birbirine yakın, iyi.'}
+                : ' Akış dengeli: sayılar birbirine yakın, iyi.'}
             {' '}Tutarlılık %{son.tutar}: {son.tutar>=90?'kare süreleri çok düzenli.':son.tutar>=75?'kabul edilebilir dalgalanma var.':'kare süreleri oynak, arka planda çalışan işleri kapatıp tekrar dene.'}
           </p>
         </div>
@@ -5805,15 +5827,15 @@ function AkicilikTesti(){
     return()=>cancelAnimationFrame(raf);
   },[]);
 
-  const etiket=['15 FPS','30 FPS','60 FPS',hz?hz+' Hz — ekranın':'Ekranın kendi hızı'];
-  const aciklama=['Kareler arası boşluk büyük — nesne adeta ışınlanıyor. Göz takip etmekte zorlanır.',
+  const etiket=['15 FPS','30 FPS','60 FPS',hz?hz+' Hz · ekranın':'Ekranın kendi hızı'];
+  const aciklama=['Kareler arası boşluk büyük, nesne adeta ışınlanıyor. Göz takip etmekte zorlanır.',
                   'Sinema seviyesi. İzlemeye yeter, nişan almaya yetmez.',
                   'Akıcı sayılan eşik. Çoğu oyuncunun hedefi burasıdır.',
                   'Ekranın verebildiği en iyisi. 60 FPS şeridiyle kıyasla.'];
   return (
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-8">
-        Dört kutu da <span className="text-ink">tamamen aynı hızda</span> hareket ediyor — sadece
+        Dört kutu da <span className="text-ink">tamamen aynı hızda</span> hareket ediyor, sadece
         güncellenme sıklıkları farklı. Aradaki farkı okumaya değil, görmeye çalış.
       </p>
       <div className="space-y-6">
@@ -5832,7 +5854,7 @@ function AkicilikTesti(){
       </div>
       <p className="mt-8 text-[.82rem] text-dim leading-relaxed max-w-[62ch]">
         Not: en alttaki şerit ekranının yenileme hızında çalışır. 60 Hz ekrandaysan alttaki iki şerit
-        birbirinin aynısı görünür — fark görmek için 120 Hz üstü ekran gerekir.
+        birbirinin aynısı görünür; fark görmek için 120 Hz üstü ekran gerekir.
       </p>
     </div>
   );
@@ -5862,7 +5884,7 @@ function TepkiTesti(){
   const enIyi=sonuclar.length?Math.min.apply(null,sonuclar):0;
   const renk={bekle:'#0b0b12',hazirlan:'#7a1030',simdi:'#0d7a4a',erken:'#3a0f1c',sonuc:'#12121a'}[durum];
   const yazi={bekle:'Başlamak için tıkla',hazirlan:'Bekle… yeşili gör',simdi:'ŞİMDİ! TIKLA',
-              erken:'Çok erken — tekrar denemek için tıkla',sonuc:sonuclar.length?sonuclar[sonuclar.length-1]+' ms':''}[durum];
+              erken:'Çok erken, tekrar denemek için tıkla',sonuc:sonuclar.length?sonuclar[sonuclar.length-1]+' ms':''}[durum];
   return (
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6">
@@ -5942,7 +5964,7 @@ function CpsTesti(){
         </span>
       </button>
       <div className="mt-7 pt-6 border-t border-line grid grid-cols-3 gap-6">
-        {[['Tıklama',say],['CPS',cps||'—'],['Rekorun',rekor||'—']].map(([k,v])=>(
+        {[['Tıklama',say],['CPS',cps||'·'],['Rekorun',rekor||'·']].map(([k,v])=>(
           <div key={k}>
             <div className="lbl text-dim mb-1.5">{k}</div>
             <div className="num text-[1.4rem] text-cy">{v}</div>
@@ -5990,12 +6012,12 @@ function KlavyeTesti(){
   return (
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6">
-        Tuşlara bas — basılan tuş yanar, bir kez basılmış tuş işaretli kalır. Hiç yanmayan tuş
+        Tuşlara bas: basılan tuş yanar, bir kez basılmış tuş işaretli kalır. Hiç yanmayan tuş
         arızalıdır. Aynı anda kaç tuş algılandığını da sayıyoruz (oyunda aynı anda yürü + zıpla + ateş için önemli).
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4 mb-6 pb-6 border-b border-line">
         {[['Şu an basılı',basili.size],['Aynı anda en çok',enCok],['Denenen tuş',gorulen.size],
-          ['Son tuş',sonTus?sonTus.code:'—']].map(([k,v])=>(
+          ['Son tuş',sonTus?sonTus.code:'·']].map(([k,v])=>(
           <div key={k}>
             <div className="lbl text-dim mb-1.5">{k}</div>
             <div className="num text-[1.05rem] truncate">{v}</div>
@@ -6062,7 +6084,7 @@ function MouseTesti(){
       <div onMouseDown={bas} onContextMenu={e=>e.preventDefault()} onWheel={kaydir} onMouseMove={oynat}
         className="w-full h-[240px] border border-line grid place-items-center select-none mb-6"
         style={{background:'radial-gradient(120% 90% at 50% 0%, #14141d 0%, #0a0a10 70%)',cursor:'crosshair'}}>
-        <span className="lbl text-dim">TEST ALANI — TIKLA, KAYDIR, GEZDİR</span>
+        <span className="lbl text-dim">TEST ALANI · TIKLA, KAYDIR, GEZDİR</span>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
         {[0,1,2,3,4].map(b=>(
@@ -6082,17 +6104,17 @@ function MouseTesti(){
         <div>
           <div className="lbl text-dim mb-1.5">Çift tık aralığı</div>
           <div className="num text-[1.05rem]" style={{color:ciftTik&&ciftTik<80?'#FF2D95':'#ECEBF2'}}>
-            {ciftTik? ciftTik+' ms'+(ciftTik<80?' — şüpheli':'') : '—'}
+            {ciftTik? ciftTik+' ms'+(ciftTik<80?' · şüpheli':'') : '·'}
           </div>
         </div>
         <div>
           <div className="lbl text-dim mb-1.5">Saniyedeki hareket</div>
-          <div className="num text-[1.05rem]">{hizOrn||'—'}</div>
+          <div className="num text-[1.05rem]">{hizOrn||'·'}</div>
         </div>
       </div>
       <p className="mt-6 text-[.78rem] text-dim leading-relaxed max-w-[60ch]">
         "Saniyedeki hareket" tarayıcının aldığı olay sayısıdır; farenin gerçek sorgulama hızı (polling)
-        değildir — tarayıcı bunu ekran yenilemesine sıkıştırır. Kaba bir fikir verir.
+        değildir; tarayıcı bunu ekran yenilemesine sıkıştırır. Kaba bir fikir verir.
       </p>
       <button onClick={()=>{setTuslar({});setTekerlek(0);setCiftTik(null);}}
         className="mt-6 lbl px-5 py-2.5 border border-line text-dim hover:text-ink transition-colors">SIFIRLA</button>
@@ -6123,7 +6145,7 @@ function DpiTesti(){
         style={{background:'#0b0b12',cursor:'ew-resize',borderColor:suruyor?'#2DE2E6':'rgba(236,235,242,.10)'}}>
         <span className="text-center">
           <span className="num block text-[2.6rem] font-light text-cy leading-none">{Math.round(suruklenen)}</span>
-          <span className="lbl text-dim block mt-3">{suruyor?'SÜRÜKLÜYORSUN':'PİKSEL — BASILI TUTUP YATAY KAYDIR'}</span>
+          <span className="lbl text-dim block mt-3">{suruyor?'SÜRÜKLÜYORSUN':'PİKSEL · BASILI TUTUP YATAY KAYDIR'}</span>
         </span>
       </div>
       <div className="flex flex-wrap items-end gap-5">
@@ -6134,11 +6156,11 @@ function DpiTesti(){
         </div>
         <div>
           <div className="lbl text-dim mb-2">HESAPLANAN DPI</div>
-          <div className="num text-[2rem] font-light text-cy leading-none">{sonuc||'—'}</div>
+          <div className="num text-[2rem] font-light text-cy leading-none">{sonuc||'·'}</div>
         </div>
       </div>
       <p className="mt-6 text-[.78rem] text-dim leading-relaxed max-w-[60ch]">
-        Windows'ta imleç hızlandırma ("işaretçi hassasiyetini artır") açıksa sonuç şaşar — ölçmeden
+        Windows'ta imleç hızlandırma ("işaretçi hassasiyetini artır") açıksa sonuç şaşar; ölçmeden
         önce kapat. Sonuç farenin ayarındaki DPI'a yakın çıkmalı.
       </p>
     </div>
@@ -6163,7 +6185,7 @@ function GamepadTesti(){
   return (
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6">
-        Kolu tak ve <span className="text-ink">herhangi bir tuşuna bas</span> — tarayıcı kolu ancak
+        Kolu tak ve <span className="text-ink">herhangi bir tuşuna bas</span>, tarayıcı kolu ancak
         o zaman görür. Tüm tuşlara ve analoglara tek tek bas; tepki vermeyen varsa arızalıdır.
       </p>
       {!pad ? (
@@ -6233,7 +6255,7 @@ function EkranBilgi(){
   return (
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-7">
-        Ekranının tarayıcıya bildirdiği değerler. Aldığın monitörün kutusunda yazanlarla karşılaştır —
+        Ekranının tarayıcıya bildirdiği değerler. Aldığın monitörün kutusunda yazanlarla karşılaştır;
         tutmuyorsa ya sürücü ya kablo ya da Windows ayarı yanlıştır.
       </p>
       <dl className="grid sm:grid-cols-2 gap-x-10 gap-y-6">
@@ -6269,7 +6291,7 @@ const TESTLER=[
   {id:'ekranbilgi',kat:'Ekran',     n:'Ekran bilgisi',
    d:'Çözünürlük, yenileme hızı, piksel yoğunluğu, renk derinliği.', C:EkranBilgi},
   {id:'panel',    kat:'Ekran',      n:'Panel testleri',
-   d:'Ölü piksel, hayalet iz, renk geçişi ve arka ışık sızması — dördü bir arada.', C:EkranTesti, tam:true},
+   d:'Ölü piksel, hayalet iz, renk geçişi ve arka ışık sızması: dördü bir arada.', C:EkranTesti, tam:true},
   {id:'klavye',   kat:'Girdi',      n:'Klavye testi',
    d:'Hangi tuş çalışıyor, aynı anda kaç tuş algılanıyor?', C:KlavyeTesti},
   {id:'mouse',    kat:'Girdi',      n:'Mouse testi',
@@ -6326,7 +6348,7 @@ function TestlerHub({sub,sys}){
           Donanımını <span className="em">gerçekten</span> ölç.
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
-          Hepsi tarayıcıda çalışır, kurulum istemez — <span className="text-ink/80">ölçüm
+          Hepsi tarayıcıda çalışır, kurulum istemez. <span className="text-ink/80">Ölçüm
           sonuçların hiçbir yere gönderilmez</span>, cihazında kalır.
           İkinci el alırken, yeni ürünü kutudan çıkarınca ya da bir şeyin bozulduğunu
           düşündüğünde buraya bak.
@@ -6372,11 +6394,11 @@ function TestlerHub({sub,sys}){
    görünmesin diye foto yok, sade tipografik kart kullanıldı. */
 const AKSESUAR_KATEGORILERI=[
   {id:'mouse', ad:'Mouse',
-   d:'Kablosuz ve kablolu oyuncu mouse’ları — hafif gövde, yüksek DPI sensör.'},
+   d:'Kablosuz ve kablolu oyuncu mouse’ları: hafif gövde, yüksek DPI sensör.'},
   {id:'mousepad', ad:'Mouse Pad & Deskpad',
    d:'Kumaş, cam ve poron yüzeyler; masayı uçtan uca kaplayan XL altlıklar.'},
   {id:'kablo', ad:'Kablo Yönetimi',
-   d:'Kablo örgüsü, klipsler ve USB hub’lar — masayı sadeleştir.'},
+   d:'Kablo örgüsü, klipsler ve USB hub’lar: masayı sadeleştir.'},
   {id:'klavye', ad:'Klavye',
    d:'Mekanik ve manyetik switch tam klavyeler, kablolu ve kablosuz.'},
   {id:'tustakimi', ad:'Tuş Takımı & Anahtarlar',
@@ -6734,7 +6756,7 @@ function AksesuarlarHub(){
           Setup’ını <span className="em">parça parça</span> tamamla.
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
-          Mouse pad’den kablo düzenine, RGB’den masa dekoruna kadar — iş birliği
+          Mouse pad’den kablo düzenine, RGB’den masa dekoruna kadar, iş birliği
           yaptığımız markaların ürünleri kategori kategori burada.
           <span className="text-ink/80"> Fiyat yazmıyoruz</span>: mağazada
           değişiyor, burada bayat kalmasın. Bir kategoriye tıkla, ürünlerini gör.
@@ -6785,7 +6807,7 @@ function AksesuarlarHub(){
           <Card className="p-6 sm:p-8">
             <p className="text-[.9rem] text-dim leading-relaxed max-w-[62ch]">
               Setup aksesuarı üreten ya da satan bir marka mısın?
-              <span className="text-ink/80"> İş birliği için bize ulaş</span> —
+              <span className="text-ink/80"> İş birliği için bize ulaş</span>:
               ürünlerin doğru kategoride, sade bir vitrinde yer alsın.
             </p>
           </Card>
@@ -6949,7 +6971,7 @@ function OnerHub(){
           Bütçeni ve ne istediğini yaz, <span className="em">biz eşleştirelim</span>.
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
-          Yapay zeka değil — bütçe aralığı ve yazdığın kelimelere göre çalışan basit
+          Yapay zeka değil; bütçe aralığı ve yazdığın kelimelere göre çalışan basit
           bir eşleştirme. <span className="text-ink/80">Bazı kategorilerde gerçek iş
           birliği ürünleri var</span>, geri kalanı iş birlikleri geldikçe gerçek olacak.
         </p>
@@ -6984,7 +7006,7 @@ function OnerHub(){
           <div className="mt-12 pt-8 border-t border-line">
             {sonuc.length===0 ? (
               <p className="text-dim text-[.9rem]">
-                Eşleşme bulunamadı — bütçeni artırıp farklı kelimelerle tekrar dene.
+                Eşleşme bulunamadı. Bütçeni artırıp farklı kelimelerle tekrar dene.
               </p>
             ) : (
               <>
@@ -7017,7 +7039,7 @@ function OnerHub(){
 /* ═══════════════════ KEŞFET — diğer sekmelere köprü ═══════════════════ */
 function Kesfet(){
   const kartlar=[
-    {href:'/aksesuarlar', t:'Aksesuarlar', d:'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası — kategori kategori, iş birliği yaptığımız markalardan.', e:'VİTRİN'},
+    {href:'/aksesuarlar', t:'Aksesuarlar', d:'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası. Kategori kategori, iş birliği yaptığımız markalardan.', e:'VİTRİN'},
     {href:'/oner', t:'Sana Göre Öner', d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim.', e:'DENEME'},
     {href:'/testler', t:'Testler', d:'FPS, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu, refleks… On iki test, hepsi tarayıcıda çalışır.', e:'12 ARAÇ'},
     {href:'/forum', t:'Forum', d:'Kafana takılanı sor, kurduğun sistemi paylaş, başkalarının kurulumlarına bak. Kullanıcı adı seçmen yeterli.', e:'TOPLULUK'},
@@ -7099,7 +7121,7 @@ function HakkimizdaSayfa(){
         aksesuarları vitrinini de içeren bir <span className="text-ink">araç ve topluluk</span> platformu.
       </p>
       <p>
-        Site tek kişi tarafından geliştiriliyor — arkasında bir ajans veya "editör
+        Site tek kişi tarafından geliştiriliyor; arkasında bir ajans veya "editör
         kadrosu" yok. Bunu gizlemenin bir anlamı yok: küçük olmak, özensiz olmak
         demek değil. Her hesaplama mantığı ekranda açık, kimseye komisyonla
         yönlendirme yapılmıyor.
@@ -7130,7 +7152,7 @@ function IsBirlikleriSayfa(){
     <BasitSayfa etiket="İŞ BİRLİKLERİ" baslik="Markalarla iş birliği.">
       <p>
         SETUP HANE, PC/setup ekosistemindeki markalarla iş birliğine açık.
-        Aşağıdakiler şu an gerçekten sunabildiğim kanallar — burada olmayan bir
+        Aşağıdakiler şu an gerçekten sunabildiğim kanallar; burada olmayan bir
         şeyi vaat etmiyorum.
       </p>
       <div className="grid sm:grid-cols-3 gap-4 not-prose py-2">
@@ -7142,7 +7164,7 @@ function IsBirlikleriSayfa(){
         ))}
       </div>
       <p>
-        Takipçi/erişim rakamları, kampanya bazında ayrıca paylaşılıyor — burada
+        Takipçi/erişim rakamları, kampanya bazında ayrıca paylaşılıyor. Burada
         genel bir sayı iddia etmiyorum; istersen doğrudan sorabilirsin.
       </p>
       <p>
@@ -7168,7 +7190,7 @@ function GizlilikSayfa(){
       <p>
         <span className="text-ink">Cihazında kalan veriler:</span> Para birimi/dil tercihin,
         test geçmişin ve forumdaki takma adın tarayıcının <code className="text-cy">localStorage</code>'ında
-        durur — sunucuya gönderilmez, cihazlar arası senkron olmaz.
+        durur; sunucuya gönderilmez, cihazlar arası senkron olmaz.
       </p>
       <p>
         <span className="text-ink">Forum:</span> Paylaştığın konu/cevaplar Supabase üzerindeki
@@ -7348,7 +7370,7 @@ function PanelUrunForm({deger,setDeger,onKaydet,onIptal,mesgul}){
         </p>
       </div>
       <div>
-        <label className="lbl text-dim mb-2 block">BÜTÇE ARALIĞI (₺) — opsiyonel</label>
+        <label className="lbl text-dim mb-2 block">BÜTÇE ARALIĞI (₺) · OPSİYONEL</label>
         <div className="grid grid-cols-2 gap-3">
           <input type="number" min="0" placeholder="En ucuz varyant" value={deger.mintl}
                  onChange={e=>alan('mintl',e.target.value)} className={PANEL_INPUT}/>
@@ -7356,7 +7378,7 @@ function PanelUrunForm({deger,setDeger,onKaydet,onIptal,mesgul}){
                  onChange={e=>alan('maxtl',e.target.value)} className={PANEL_INPUT}/>
         </div>
         <p className="text-[.75rem] text-dim/70 mt-2 leading-relaxed">
-          Ziyaretçiye hiçbir yerde gösterilmez — yalnızca ÖNER sayfasındaki
+          Ziyaretçiye hiçbir yerde gösterilmez; yalnızca ÖNER sayfasındaki
           bütçe filtresi için. Boş bırakılırsa ürün bütçeden bağımsız
           önerilebilir (eski davranış).
         </p>
@@ -8114,7 +8136,7 @@ function PanelHatalar({oturum, yakala}){
     <div>
       <div className="flex gap-3 items-center flex-wrap mb-5">
         <span className="text-[.85rem] text-dim">
-          {liste===null?'Yükleniyor…':(liste.length?liste.length+' kayıt · '+gruplar.length+' farklı hata':'Kayıtlı hata yok — iyi haber.')}
+          {liste===null?'Yükleniyor…':(liste.length?liste.length+' kayıt · '+gruplar.length+' farklı hata':'Kayıtlı hata yok. İyi haber.')}
         </span>
         {!!(liste&&liste.length) && (
           <button onClick={temizle} disabled={mesgul}
@@ -8257,7 +8279,7 @@ function PanelSayfa(){
         <p className={'mt-6 text-[.84rem] px-4 py-3 border '+
           (tazelik.gun>30?'border-mg/50 text-mg':tazelik.gun>14?'border-cy/40 text-cy':'border-line text-dim')}>
           Fiyatlar en son <span className="num">{tazelik.gun}</span> gün önce güncellendi ({tazelik.tarih}).
-          {tazelik.gun>30 && ' Site ziyaretçiye bir aydan eski uyarısı gösteriyor — tazelemek iyi olur.'}
+          {tazelik.gun>30 && ' Site ziyaretçiye bir aydan eski uyarısı gösteriyor; tazelemek iyi olur.'}
         </p>
       )}
 
@@ -8309,7 +8331,7 @@ function App(){
          görünmesini engelliyordu. Şimdi TESTLER'daki isim/açıklama kullanılıyor. */
       const testSub=(r.route==='testler'&&r.sub)?TESTLER.find(x=>x.id===r.sub):null;
       const meta=testSub
-        ? {t:testSub.n+' — Ücretsiz Online Araç | SETUP HANE', d:testSub.d}
+        ? {t:testSub.n+': Ücretsiz Online Araç | SETUP HANE', d:testSub.d}
         : (ROTA_META[r.route]||ROTA_META.ana);
       document.title=meta.t;
       const md=document.querySelector('meta[name="description"]');
@@ -8429,7 +8451,7 @@ function App(){
           <div className="min-w-0">
             <section id="builder" className="py-16 lg:py-24 scroll-mt-24">
               <Reveal>
-                <Label className="mb-4">MODÜL 01 — CANLI HESAP</Label>
+                <Label className="mb-4">MODÜL 01 · CANLI HESAP</Label>
                 <div className="rule mb-10"/>
                 <h2 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[15ch]">
                   Paranın <span className="em">tamamı</span> işe yarasın.
