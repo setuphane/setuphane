@@ -490,3 +490,11 @@ Açık: laptop listesinin yenilenmesi (elle, panelden) — kullanıcı kararı.
 - **index.html'in <head> bölümü derlemede ÜRETİLMİYOR** (build yalnız <style id="tw"> ve <script> bloklarını gömüyor). Yazı tipi/meta değişiklikleri hem src/setuphane.html hem index.html içinde yapılmalı. Tailwind token'ları scripts/build.mjs içinde.
 - Yazı tipleri kendi sunucumuzda: scripts/yazitipi-indir.mjs → vendor/font/. Google'a bağlantı yok. Newsreader yalnız vurgu harfleriyle indiriliyor (238 KB → ~6 KB). Toplam yazı tipi indirmesi 338 KB'dan **83 KB**'a düştü.
 - vercel.json: woff2/js 1 yıl immutable, yazitipi.css 1 gün (adı sabit olduğu için).
+
+## 23.09.2026 (3) — YÜKSELTME ARACI (/yukselt)
+Kullanıcı isteği: "elindekini ne yapsam" aracı; eski parçalar da dahil.
+- **ESKI_GPU (45 kart):** GTX 1060–RTX 4070 Super, RX 570–RX 7800 XT, Arc A750/A770. idx bizim ölçeğimizde (RTX 5070 = 100), kaynak katalogla AYNI: TechPowerUp "Relative Performance" (kart sayfasındaki RTX 5070 yüzdesi; idx = 10000/yüzde). curl'e bot doğrulaması çıkıyor, veriler gerçek tarayıcıyla okundu.
+- **ESKI_CPU (37 işlemci) + KATALOG_OYUN:** Tom's Hardware 1080p oyun tablosu. Eski nesiller arşivden: 2023→güncel ×0.865 (9 ortak, 0.847–0.918), 2021→2023 ×0.657 (3 ortak, 0.640–0.660). **Bizim g ölçeğimize ÇEVRİLMEZ** (katsayı 1.23–1.45 arası oynuyor, %15 pay) — bu yüzden FPS hesabına girmez, yalnız "besler mi" sorusunda kullanılır ve karşılaştırmanın iki tarafı da aynı tablodan alınır.
+- Sayfa üç yol gösterir: yalnız kart (kazanç %, VRAM, PSU watt/kablo, kasa uzunluğu), işlemci durumu (ağır oyun ve rekabetçi oyun AYRI — tek senaryo yanıltıyordu), komple yeni sistem (motorun kendisi; kart elindekinden zayıfsa açıkça uyarır).
+- i5-10400F gibi ölçümü bulunamayan işlemciler listeye alınmadı; "bilmiyorum" seçeneği var.
+- Derleme notu: kod 500 KB'ı aşınca Babel compact moda geçip yer tutucuları bozdu → build.mjs'e `compact:false` eklendi.
