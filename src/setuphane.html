@@ -2491,7 +2491,96 @@ function AmdIntelCompare({budget,prof,game,res}){
    çıkardı? Hazır sistem bazen kazanır (tek elden garanti, kurulum yok),
    bazen kaybeder. İkisini de dürüstçe yazıyoruz — sitenin tarafsızlığı
    iddia edilen değil, gösterilen bir şey olmalı. */
-function OemPicker({budget,setBudget,sel,setSel,game,res}){
+/* 23.09.2026 — Kullanıcı kararı: hazır sistem ve laptop listelerini ziyaretçiye
+   göstermeyi bıraktık. Sebep: bu iki tarafta fiyatı günlük doğrulayamıyoruz,
+   eski fiyatla tavsiye vermek doğru değil. Veriler silinmedi; Supabase'de ve
+   kodda duruyor, kural sağlandığı gün geri açılacak.
+   Yerine ÖRNEK ALAN var: bir marka ya da mağaza ile çalışırsak ürününü burada
+   nasıl göstereceğimizi baştan görsün diye. */
+function OrnekKart({tur}){
+  const laptop = tur==='laptop';
+  return (
+    <div className="border border-dashed border-line p-5 sm:p-6">
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <span className="lbl text-dim">ÖRNEK GÖRÜNÜM</span>
+        <span className="lbl text-dim/70">GERÇEK ÜRÜN DEĞİL</span>
+      </div>
+      <div className="flex gap-4 items-start">
+        <div className="w-[76px] h-[76px] border border-line flex items-center justify-center text-dim text-[.7rem] shrink-0">görsel</div>
+        <div className="min-w-0">
+          <div className="text-ink text-[1.02rem]">Marka · Model adı</div>
+          <div className="text-[.84rem] text-dim mt-1">
+            {laptop ? 'Ekran kartı · İşlemci · Bellek · Disk · Ekran boyutu ve yenileme hızı'
+                    : 'Ekran kartı · İşlemci · Anakart · Bellek · Disk · Güç kaynağı · Kasa'}
+          </div>
+          <div className="num text-ink mt-3">00 000 ₺</div>
+          <div className="text-[.78rem] text-dim mt-1">fiyat kaç satıcıda görüldü · hangi tarihte alındı</div>
+        </div>
+      </div>
+      <div className="mt-5 pt-4 border-t border-line grid sm:grid-cols-2 gap-4 text-[.84rem] text-dim leading-relaxed">
+        <div>
+          <div className="text-ink mb-1">Ne yazacağız</div>
+          {laptop ? 'Bu laptobun ölçülmüş oyun performansı ve aynı paraya toplanacak masaüstüyle farkı.'
+                  : 'Bu sistemin parçalarını tek tek alsan ne tutardı, aradaki fark ne kadar.'}
+        </div>
+        <div>
+          <div className="text-ink mb-1">Ne yazmayacağız</div>
+          Ölçmediğimiz bir performans iddiası ve doğrulamadığımız bir fiyat.
+        </div>
+      </div>
+    </div>
+  );
+}
+function BosBolum({tur}){
+  const laptop = tur==='laptop';
+  return (
+    <Card className="mt-6 p-5 sm:p-9">
+      <div className="mb-6 border border-cy/35 bg-cy/[.04] p-5">
+        <div className="lbl text-cy mb-2">BU BÖLÜM ŞU AN KAPALI</div>
+        <div className="text-ink text-[1.05rem] mb-3">
+          {laptop ? 'Laptop listesini kaldırdık.' : 'Hazır sistem listesini kaldırdık.'}
+        </div>
+        <div className="text-[.88rem] text-dim leading-relaxed space-y-2">
+          <p>
+            Sistem kur bölümünde her parçanın fiyatını her gün kontrol ediyoruz ve bir fiyatı
+            ancak en az üç satıcıda gördüysek yazıyoruz.
+            {laptop ? ' Laptoplarda bunu yapamıyorduk: fiyatları elle giriyorduk ve listedeki fiyatlar aylarca eskiyordu.'
+                    : ' Hazır sistemlerde de bunu yapamıyorduk: mağaza listelerini elle tarıyorduk.'}
+          </p>
+          <p>
+            Eski fiyata bakarak alınan kararın geri dönüşü yok. Bu yüzden listeyi düzeltene kadar
+            burada tutmak yerine kaldırdık. Aynı kuralı burada da işletebildiğimiz gün geri gelecek.
+          </p>
+          <p>
+            {laptop ? 'Bu arada laptop yerine masaüstü düşünüyorsan, ' : 'Bu arada hazır sistem yerine kendin toplamayı düşünüyorsan, '}
+            <a href="/" className="text-cy hover:underline underline-offset-4">Sistem kur</a>{' '}
+            bölümü her gün güncel çalışıyor.
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <Label className="mb-2">MARKALAR VE MAĞAZALAR İÇİN</Label>
+        <p className="text-[.88rem] text-dim leading-relaxed max-w-[62ch]">
+          {laptop ? 'Bir laptop markasıyla' : 'Bir mağaza veya sistem toplayıcıyla'} çalışırsak ürün burada
+          aşağıdaki gibi görünecek. Bize ödeme yapılması ürünün burada çıkmasını sağlamaz; ürünün
+          burada çıkması için bizim onu ölçmemiz ve fiyatını doğrulamamız gerekir. Ödeme yapılan
+          işler ayrı durur ve üstünde açıkça yazar.
+        </p>
+      </div>
+      <OrnekKart tur={tur}/>
+      <p className="mt-5 text-[.82rem] text-dim leading-relaxed">
+        Çalışmak isteyen marka veya mağaza:{' '}
+        <a href="/isbirlikleri" className="text-cy hover:underline underline-offset-4">İş birlikleri</a>{' '}
+        sayfasından ulaşabilir. Nasıl karar verdiğimiz{' '}
+        <a href="/yontem" className="text-cy hover:underline underline-offset-4">Yöntem</a> sayfasında yazıyor.
+      </p>
+    </Card>
+  );
+}
+function OemPicker(){ return <BosBolum tur="oem"/>; }
+/* Eski liste bileşeni (veri geri açılınca kullanılacak) */
+function OemPickerEski({budget,setBudget,sel,setSel,game,res}){
   const {fmt}=useCur();
   const SIS=OEM_SISTEMLER;
   const list=useMemo(()=>SIS.filter(o=>o.fiyat<=budget).sort((x,y)=>y.idx-x.idx || x.fiyat-y.fiyat),[budget,SIS]);
@@ -2644,7 +2733,9 @@ function OemPicker({budget,setBudget,sel,setSel,game,res}){
   );
 }
 
-function LaptopPicker({budget,setBudget,sel,setSel,game,res}){
+function LaptopPicker(){ return <BosBolum tur="laptop"/>; }
+/* Eski liste bileşeni (veri geri açılınca kullanılacak) */
+function LaptopPickerEski({budget,setBudget,sel,setSel,game,res}){
   const {fmt}=useCur();
   const LAP=useLaptoplar();
   const list=useMemo(()=>LAP.filter(l=>l.price<=budget).sort((x,y)=>y.idx-x.idx || x.price-y.price),[budget,LAP]);
@@ -7451,75 +7542,83 @@ function YontemSayfa(){
   return (
     <BasitSayfa etiket="YÖNTEM" baslik="Nasıl karar veriyoruz, neyi kabul etmiyoruz.">
       <p>
-        Burada çalışan tek kişi var ve o kişi de senin gibi kendi parasıyla bilgisayar topluyor.
-        Elimizde sonsuz kaynak yok; olan tek şey, kuralları baştan yazmak ve onlara uymak.
-        Bu sayfa o kuralları açık ediyor ki bize körü körüne güvenmek zorunda kalma.
+        Bu siteyi tek kişi yapıyor ve o kişi de senin gibi kendi parasıyla bilgisayar topluyor.
+        Büyük bir firma değiliz, arkamızda kimse yok. Elimizdeki tek şey kurallarımız.
+        Aşağıda hepsi yazıyor; böylece bize öylesine güvenmek zorunda kalmazsın, kontrol edersin.
       </p>
 
       <div className="grid gap-4 not-prose py-2">
         <Kural baslik="Performans rakamları ölçümden gelir">
           <p>
-            Sitedeki FPS ve güç değerleri bağımsız ölçümlere dayanır. Bir parçanın güvenilir ölçümü
-            yoksa o parça listeye hiç eklenmez. Yeni çıktı diye tahminle sıralama yapmayız.
+            Sitedeki FPS değerleri bizim uydurduğumuz sayılar değil, donanım test eden bağımsız
+            sitelerin ölçümlerinden geliyor. Bir parçanın ölçümü yoksa o parçayı listeye koymuyoruz.
+            "Yeni çıktı, herhalde hızlıdır" diye tahmin yürütmüyoruz.
           </p>
         </Kural>
         <Kural baslik="Fiyat, tek bir mağazanın vitrin fiyatı değildir">
           <p>
-            Bir modelin fiyatı, <span className="text-ink">en az üç farklı satıcıda</span> satıldığı
-            durumda ve en ucuz ilanı üzerinden yazılır. Tek mağazanın stok bitmiş "kampanya" fiyatı
-            bizim için fiyat sayılmaz. Fiyatlar her gün yenilenir, tarihi sayfada yazar.
+            Bir parçanın fiyatını yazmamız için o parçanın <span className="text-ink">en az üç farklı
+            satıcıda</span> satılıyor olması gerekiyor; sonra da en ucuzunu yazıyoruz. Tek bir
+            mağazada görünen, stoğu olmayan ucuz ilan bizim için fiyat değildir. Fiyatlar her gün
+            yenileniyor ve hangi tarihte alındığı sayfanın altında yazıyor.
           </p>
         </Kural>
         <Kural baslik="Uymayan kombinasyonu hiç göstermeyiz">
           <p>
-            Güç kaynağının wattı ve kabloları, kartın kasaya sığması, soğutucunun işlemciyi
-            kaldırması, kasanın içeri aldığı ve dışarı attığı hava dengesi: bunların hepsi sert
-            kuraldır. Bir kombinasyon bu kurallardan kalıyorsa sana hiç önerilmez, "ucuz olsun"
-            diye gösterilmez.
+            Güç kaynağı o ekran kartını kaldırıyor mu, kablosu var mı, kart kasaya sığıyor mu,
+            soğutucu işlemciyi soğutabiliyor mu, kasa yeterince hava alıyor mu: bunları tek tek
+            kontrol ediyoruz. Biri bile tutmuyorsa o sistem sana hiç gösterilmiyor. Ucuz görünsün
+            diye kurulamayacak sistem önermiyoruz.
           </p>
         </Kural>
         <Kural baslik="Neden seçildiğini yazarız">
           <p>
-            Her parçanın yanında gerekçesi vardır. Kabul etmek zorunda değilsin; listeyi alıp
-            istediğin parçayı değiştirebilirsin. Amacımız senin yerine karar vermek değil,
-            kararını kendin verebilesin diye hesabı önüne koymak.
+            Her parçanın yanında neden onu seçtiğimiz yazıyor. Katılmak zorunda değilsin, listeyi
+            alıp istediğin parçayı değiştirebilirsin. Senin yerine karar vermeye çalışmıyoruz,
+            hesabı önüne koyuyoruz.
           </p>
         </Kural>
       </div>
 
-      <h2 className="text-[1.25rem] text-ink pt-4">Para nereden gelirse gelsin, öneriyi değiştirmez</h2>
+      <h2 className="text-[1.25rem] text-ink pt-4">Bu siteden para kazanıyor muyuz?</h2>
       <p>
-        Bugün hiçbir gelirimiz yok. İleride olursa da kural şudur: <span className="text-ink">gelir,
-        öneri motorunun dışından gelir.</span> Bir markanın ödeme yapması, o markanın parçasının
-        listede yukarı çıkmasını sağlayamaz. Böyle bir teklif gelirse reddederiz; çünkü bunu bir kez
-        yaparsak buradaki her sayının değeri sıfırlanır.
+        Şu an hayır. Site kimseden para almıyor, hiçbir mağazadan komisyon almıyoruz, satış da
+        yapmıyoruz. İleride bir marka (ürün üreten firma) ya da bir mağaza bize reklam veya tanıtım
+        için ödeme yapabilir. O gün geldiğinde kural şu:
+      </p>
+      <p className="text-ink">
+        Bize para veren marka, sistem önerilerinde daha yukarı çıkamaz.
+      </p>
+      <p>
+        Yani "şu ekran kartını önerin" diye ödeme teklif eden olursa kabul etmiyoruz. Reklam ayrı bir
+        yerde durur, üstünde "bu bir reklamdır" yazar; hangi parçanın önerileceğini ise yalnızca ölçüm
+        sonuçları ve fiyat belirler. Bunu bir kez bozarsak sitedeki bütün sayılar anlamını kaybeder.
       </p>
       <div className="grid sm:grid-cols-2 gap-4 not-prose py-2">
         <div className="border border-cy/40 p-5">
           <div className="lbl text-cy mb-3">KABUL EDİLEBİLİR</div>
           <ul className="text-[.88rem] text-dim leading-relaxed space-y-2">
-            <li>· Açıkça etiketlenmiş, öneri listesinden ayrı duran sponsorlu alan</li>
-            <li>· Test için gönderilen ürün: ölçüm ne çıkarsa o yazılır</li>
-            <li>· Marka içeriği, üstünde kimin ödediği yazmak şartıyla</li>
+            <li>· Reklam alanı: öneri listesinin dışında durur, üstünde reklam olduğu yazar</li>
+            <li>· Marka test için ürün gönderir, ölçüm sonucu ne çıkarsa onu yazarız</li>
+            <li>· Tanıtım içeriği, hangi markanın ödediğini açıkça yazmak şartıyla</li>
           </ul>
         </div>
         <div className="border border-mg/40 p-5">
           <div className="lbl text-mg mb-3">ASLA</div>
           <ul className="text-[.88rem] text-dim leading-relaxed space-y-2">
-            <li>· Para karşılığı sıralamada üst sıra</li>
-            <li>· Ölçümde kaybeden ürünü "en iyi" diye göstermek</li>
-            <li>· Olumsuz sonucu yayınlamama sözü vermek</li>
-            <li>· Sana haber vermeden komisyonlu bağlantı koymak</li>
+            <li>· Para karşılığı bir ürünü listede yukarı çıkarmak</li>
+            <li>· Testte kaybeden ürüne "en iyi" demek</li>
+            <li>· "Kötü çıkarsa yayınlamayın" sözü vermek</li>
+            <li>· Sana söylemeden, tıklayınca bize para kazandıran bağlantı koymak</li>
           </ul>
         </div>
       </div>
 
       <h2 className="text-[1.25rem] text-ink pt-4">Bitmeyen işleri saklamayız</h2>
       <p>
-        Sitede beklemede olan bölümler var ve bunu üstlerinde açıkça yazıyoruz. Laptop ve hazır
-        sistem tarafında, masaüstünde uyguladığımız kuralların aynısını uygulayabilecek hale
-        gelmeden yeni model eklemiyoruz. Eksik veriyle dolu bir liste, boş bir listeden daha
-        zararlıdır: yanlış fiyata bakarak alınan karar geri alınamıyor.
+        Laptop ve hazır sistem bölümlerini şimdilik kapattık. Sebebi basit: oradaki fiyatları her gün
+        kontrol edemiyorduk ve liste eskiyordu. Yanlış fiyata bakıp alışveriş yapan kişi parasını geri
+        alamıyor. Bu yüzden düzeltene kadar kaldırdık; sayfada da bunu yazdık. Eksiği saklamıyoruz.
       </p>
       <p className="text-[.85rem] text-dim">
         Bir hata görürsen ya da bir kuralın çiğnendiğini düşünürsen{' '}

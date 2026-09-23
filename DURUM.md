@@ -505,3 +505,9 @@ Kullanıcı: "ziyaretçi bize güvensin ve bizi onlardan biri olarak görsün; f
 - **BeklemedeKart**: laptop ve hazır sistem bölümlerinin başında. Laptop kartı son güncelleme tarihini veriden okuyor (şu an 19 Ağustos). Eksiği gizlemek yerine ilan ediyoruz.
 - İş Birlikleri sayfasına sınır cümlesi ve /yontem bağlantısı eklendi.
 Not: Laptop verisini tazeleme kararı kullanıcıya bırakıldı; bu kartlar o güne kadar doğru bilgi veriyor.
+
+## 23.09.2026 (5) — Laptop ve hazır sistem listeleri kaldırıldı
+Kullanıcı kararı: iki bölümdeki gerçek ürünler ziyaretçiye gösterilmeyecek; yerine ÖRNEK ALAN.
+- `OemPicker` ve `LaptopPicker` artık `BosBolum` döndürüyor. Eski liste bileşenleri `OemPickerEski` / `LaptopPickerEski` olarak duruyor (veri geri açılınca kullanılacak); Supabase'deki laptop satırları ve OEM verisi SİLİNMEDİ.
+- BosBolum: neden kapalı olduğunu sade dille anlatır + markalar için "ürün burada böyle görünecek" örnek kartı (üstünde GERÇEK ÜRÜN DEĞİL yazar).
+- /yontem metinleri sadeleştirildi (kullanıcı: "yapay zeka dilinden uzaklaş"). "Gelir öneri motorunun dışından gelir" gibi anlaşılmayan cümleler yerine: "Bu siteden para kazanıyor muyuz? Şu an hayır... Bize para veren marka, sistem önerilerinde daha yukarı çıkamaz."
