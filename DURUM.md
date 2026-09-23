@@ -484,3 +484,9 @@ Açık: laptop listesinin yenilenmesi (elle, panelden) — kullanıcı kararı.
 - 197.500 ₺ sistemi: O11 + 360 radyatör → 3 alt giriş fanı (3 giriş / 3 egzoz).
 - **Uzun tire (—) metinlerden kaldırıldı** (kullanıcı: "hiç profesyonel bir adım değil"): 130 yer. Cümlelerde nokta/virgül/iki nokta, ayraçlarda ·, sayfa başlıklarında : ve |, boş değerlerde ·. Kodda yalnızca 3 açıklama satırında kaldı.
 - Denetim temiz (11.282 sistem), gün sonu testi değişmedi (oyun 0 düşüş).
+
+## 23.09.2026 (2) — Yazı tipi: Geist
+- Space Grotesk → **Geist**, JetBrains Mono → **Geist Mono**; vurgu yazı tipi Newsreader italik korundu.
+- **index.html'in <head> bölümü derlemede ÜRETİLMİYOR** (build yalnız <style id="tw"> ve <script> bloklarını gömüyor). Yazı tipi/meta değişiklikleri hem src/setuphane.html hem index.html içinde yapılmalı. Tailwind token'ları scripts/build.mjs içinde.
+- Yazı tipleri kendi sunucumuzda: scripts/yazitipi-indir.mjs → vendor/font/. Google'a bağlantı yok. Newsreader yalnız vurgu harfleriyle indiriliyor (238 KB → ~6 KB). Toplam yazı tipi indirmesi 338 KB'dan **83 KB**'a düştü.
+- vercel.json: woff2/js 1 yıl immutable, yazitipi.css 1 gün (adı sabit olduğu için).
