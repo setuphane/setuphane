@@ -7,7 +7,7 @@
 # Yalnız fiyat dosyaları değiştiyse (günlük bot) test çalışmaz: fiyatlar
 # kombinasyon kurallarını etkilemez ve bot her sabah beklemesin.
 
-YALNIZ_FIYAT='^(fiyatlar\.json|scripts/fiyat-durum\.json|scripts/model-durum\.json)$'
+YALNIZ_FIYAT='^(fiyatlar\.json|fiyat-gecmis\.json|scripts/fiyat-durum\.json|scripts/model-durum\.json)$'
 sifir=0000000000000000000000000000000000000000
 degisen=""
 while read yerel_ref yerel_sha uzak_ref uzak_sha; do

@@ -3494,6 +3494,40 @@ function ParcaGorsel({k,sys,ad}){
     </span>
   );
 }
+/* Fiyat geçmişi rozeti (24.09.2026). Veri: /fiyat-gecmis.json (günlük bot,
+   fiyatlar.json'un git geçmişinden). Uydurma yok:
+   - en az ASGARI_GUN günlük veri yoksa hiçbir şey gösterilmez,
+   - geçmişteki model adı ekrandakiyle aynı değilse gösterilmez (model değişince
+     eski ürünün fiyatıyla "en düşük" demek yanlış olur). */
+const ASGARI_GUN=14, GECMIS_GUN=30;
+let _gecmisSozu=null;
+function useFiyatGecmis(){
+  const [v,setV]=useState(null);
+  useEffect(()=>{
+    if(!_gecmisSozu) _gecmisSozu=fetch('/fiyat-gecmis.json',{cache:'no-cache'}).then(x=>x.ok?x.json():null).catch(()=>null);
+    let iptal=false; _gecmisSozu.then(d=>{ if(!iptal) setV(d); });
+    return()=>{ iptal=true; };
+  },[]);
+  return v;
+}
+function FiyatGecmisi({anahtar,ad,fiyat}){
+  const {fmt}=useCur();
+  const g=useFiyatGecmis();
+  const p=g&&g.parcalar&&g.parcalar[anahtar];
+  if(!p || !fiyat || (ad && p.ad && p.ad!==ad)) return null;
+  const son=p.noktalar.slice(-GECMIS_GUN);
+  if(son.length<ASGARI_GUN) return null;
+  const enDusuk=Math.min(...son.map(x=>x[1])), enYuksek=Math.max(...son.map(x=>x[1]));
+  /* Fiyat dönem boyunca %3'ten az oynadıysa "en düşük" demek anlamsız: her
+     parçada aynı rozet çıkıp listeyi dolduruyordu. */
+  if(enYuksek<enDusuk*1.03) return null;
+  if(fiyat<=enDusuk*1.005)
+    return <div className="text-[.7rem] text-cy/90 mt-1">Son {son.length} günün en düşük fiyatı</div>;
+  if(fiyat>=enDusuk*1.05)
+    return <div className="text-[.7rem] text-dim mt-1">Son {son.length} günde en düşük <span className="num">{fmt(enDusuk)}</span> idi</div>;
+  return null;
+}
+
 function parcaAnahtari(k,sys){
   switch(k){
     case 'gpu': return 'gpu:'+sys.g.id;
@@ -3632,6 +3666,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                             Fiyat karşılaştır ↗
                           </a>
                         )}
+                        {price>0 && <FiyatGecmisi anahtar={parcaAnahtari(k,sys)} ad={name} fiyat={price}/>}
                       </div>
                       <div className="num text-[.85rem] sm:text-[.98rem] text-dim group-hover:text-ink transition-colors">
                         {price===0 ? 'dahil' : fmt(price)}

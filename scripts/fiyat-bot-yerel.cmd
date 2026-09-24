@@ -1,5 +1,5 @@
 @echo off
-rem Gunluk fiyat botu ? Windows Gorev Zamanlayicisi bunu calistirir.
+rem Gunluk fiyat botu - Windows Gorev Zamanlayicisi bunu calistirir.
 rem Epey, GitHub'in sunucularini engelliyor (21.09.2026: 44 sayfanin hepsi
 rem engel sayfasi dondu); bu yuzden bot bu bilgisayarda calisiyor.
 rem Akis: guncel kodu cek -> botu calistir -> fiyatlar.json'u gonder -> Vercel yayinlar.
@@ -14,7 +14,9 @@ if errorlevel 1 echo BOT HATA VERDI >> "%LOG%"
 rem 24.09.2026: model izleme (3 gun kurali, yalniz rapor) - bkz. scripts\model-izle.mjs
 "C:\Program Files\nodejs\node.exe" scripts\model-izle.mjs >> "%LOG%" 2>&1
 if errorlevel 1 echo MODEL IZLEME HATA VERDI >> "%LOG%"
-"C:\Program Files\Git\cmd\git.exe" add fiyatlar.json scripts\fiyat-durum.json scripts\model-durum.json >> "%LOG%" 2>&1
+rem 24.09.2026: fiyat gecmisi (git gecmisinden gunluk seri) - bkz. scripts\fiyat-gecmis.mjs
+"C:\Program Files\nodejs\node.exe" scripts\fiyat-gecmis.mjs >> "%LOG%" 2>&1
+"C:\Program Files\Git\cmd\git.exe" add fiyatlar.json scripts\fiyat-durum.json scripts\model-durum.json fiyat-gecmis.json >> "%LOG%" 2>&1
 "C:\Program Files\Git\cmd\git.exe" diff --cached --quiet && goto :son
 "C:\Program Files\Git\cmd\git.exe" commit -q -m "fiyat-botu: gunluk fiyat guncellemesi" >> "%LOG%" 2>&1
 "C:\Program Files\Git\cmd\git.exe" push -q >> "%LOG%" 2>&1
