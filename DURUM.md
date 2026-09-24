@@ -39,12 +39,12 @@ KONUYA göre dağınık; bu tablo tek doğru özet.
 5. ~~Yayın öncesi otomatik test~~ (24.09 yapıldı: .githooks/pre-push)
 6. ~~`index.html`'i derlemede baştan üretmek~~ (24.09 yapıldı; canlıda eski kalmış animasyon ve og etiketi düzeldi)
 7. Tasarım kimliği: kullanıcı "Claude ile yapılmış sitelerden farklı, bize özgü, premium, samimi" istiyor; üç yön hazırlanıp kullanıcıya gösterilecek
-8. Oyuna duyarlı motor (açık karar)
-9. Fiyat geçmişi ("son 30 günün en düşüğü"): veri `fiyatlar.json`'un git geçmişinde zaten var
-10. Alternatif sistemler (en iyi 2. ve 3. sistem)
-11. Aksesuarlar / Öner: kodda "örnek içerik" notu var; laptop'taki dürüstlük kuralı uygulanmalı
+8. ~~Yayın profilinde FPS düşüşü~~ (24.09: çoklu çekirdeğe tavan, donanım kodlayıcı varsayımı sitede yazıyor; yayın 15 -> 0). Tasarım profilinde 34 düşüş BİLİNÇLİ bırakıldı (render > oyun FPS)
+9. ~~Fiyat geçmişi~~ (24.09: `fiyat-gecmis.mjs` + rozet; 14 günlük veri birikince, ~08.10'da görünmeye başlar)
+10. ~~Alternatifler~~ (24.09: 'Aynı paraya NVIDIA mı AMD mi' karşılaştırması eklendi; işlemci karşılaştırması zaten vardı)
+11. ~~Aksesuarlar / Öner~~ (24.09: örnek ürünler kaldırıldı; Öner'in bütçe filtresi ve eşleştirmesi düzeltildi)
 12. Analitiğe bakmak (Vercel Analytics olayları: kasa_3b_acildi, aciklama_acildi, hizli_butce, fiyat_karsilastir, yukselt_kart, en_az_butce)
-13. Marka filtresine Intel (Arc B580 ilk Intel kartı)
+13. ~~Intel ekran kartı filtresi~~ (24.09)
 14. Canlı forumdaki iki deneme yazısı ("selam selam selam", "ssssıeeoeoeo") kullanıcı tarafından panelden silinmeli
 
 ### 22.09.2026 — Kasa hava akışı (fan) kuralı
@@ -545,3 +545,15 @@ Kullanıcı kararı: iki bölümdeki gerçek ürünler ziyaretçiye gösterilmey
 - Hata bildiriminde /_vercel/ kaynaklı hatalar artık kaydedilmiyor (yerelde analitik betiği yok, canlı hata tablosunu kirletiyordu).
 - Önceki nesil kartlar (RX 7800 XT, RTX 4070 Super, RX 7700 XT...) Türkiye'de 3+ satıcıda bulunamadı: kural gereği eklenmedi.
 - Kontroller: 13.673 kombinasyon temiz, oyun profilinde FPS düşüşü 0, 22 sayfada konsol hatası ve kırık görsel yok, 57 parçanın hepsinin görseli var.
+
+
+## 24.09.2026 — Opus 5.5 analizi ve uygulaması
+Kullanıcı projeyi baştan analiz ettirdi, tasarım dışında her şeyi uygulattı (tasarım: "eski haliyle kalsın").
+- **Komisyon tutarsızlığı (önemli):** Aksesuarlar'daki 93 üründen 91'i Ulugames komisyonlu bağlantısı (bg_ref), ama site 8 yerde "komisyon almıyoruz" diyordu. Metinler gerçeğe uyduruldu: sistem önerileri komisyonsuz; aksesuar sayfasında görünür açıklama + her karta "İş birliği bağlantısı". Bağlantıları tutma/kaldırma KARARI kullanıcıda.
+- Forum/gizlilik metinlerinde "sunucuya gitmez" yanlışları düzeltildi; gizlilik sayfasına hata kayıtları eklendi.
+- Model freni (`model-izle.mjs`, 3 gün), bot bildirimi (`bildirim.ps1`), fiyat eskime eşiği 3 gün.
+- Yayın kapısı (`.githooks/pre-push`), index.html tamamen src'den üretiliyor (canlıda eski animasyon kalmıştı).
+- FPS testi yalnız ilk 6 düşüşü sayıyordu; gerçek sayı 49'du. Yayın profili düzeltildi (49 -> 34, hepsi tasarım).
+- Logo yazısı: iç çizgiler (paint-order) ve küçük boyutta taşma (26 px altı dolu renk).
+- Öner: örnek ürünler kaldırıldı, bütçe filtresi ters çalışıyordu (düzeltildi), en uzun eşleşme kazanır.
+- Kullanıcıdan beklenen: forumdaki 2 deneme yazısını silmek; Vercel Analytics'e erişim (olaylara bakmak için).
