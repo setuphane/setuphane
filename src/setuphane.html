@@ -707,7 +707,12 @@ const PROFILES=[
      yüksek bütçede artan para hiçbir şeye gitmiyor, 1 TB'de kalıyorduk. */
   score:(g,c,r,s,E,game,res)=> (.62*E + .20*c.g + .12*Math.min(92,ramS(r)) + .06*ssdS(s)) * balPenalty(g,c,null,game,res)},
  {id:'yayin',n:'Yayın / video çekeceğim',sub:'Aynı anda oyun + kayıt',needGpu:true,minRam:32,minSsd:1000,
-  score:(g,c,r,s,E,game,res)=> (.42*E + .38*c.m + .12*ramS(r) + .08*ssdS(s)) * balPenalty(g,c,null,game,res)},
+  /* 24.09.2026: çoklu çekirdek katkısına tavan (8 çekirdekli üst seviye, m=110).
+     Yayıncıların neredeyse tamamı görüntüyü ekran kartının donanım kodlayıcısıyla
+     (NVENC / AMF) kodluyor; 8 çekirdek oyun + OBS için yeter. Tavan yokken motor
+     16 çekirdek için ekran kartını bir alta indiriyor, bütçe artınca oyun FPS'i
+     düşüyordu (129.7 bin -> 134.2 bin: 9070 XT -> 9070, CS2 398 -> 371 FPS). */
+  score:(g,c,r,s,E,game,res)=> (.42*E + .38*Math.min(c.m,110) + .12*ramS(r) + .08*ssdS(s)) * balPenalty(g,c,null,game,res)},
  {id:'tasarim',n:'Video / tasarım işi yapacağım',sub:'Render ve kurgu hızı',needGpu:true,minRam:32,minSsd:1000,
   /* Tasarimda islemci agirligi dogru ama sinirsiz degil: ekran kartina
      gore asiri kacan eslesmeler (9950X3D + RTX 5060 gibi) cezalandiriliyor.
@@ -3384,6 +3389,15 @@ function SistemAciklama({sys,budget,prof,pick,game,res}){
             Kalan <span className="num text-cy">{sayi(sayim.uygun)}</span> sistem “{prof.n.toLowerCase()}” amacına göre puanlandı;
             puanı birbirine çok yakın olanlar arasından {prof.needGpu ? <>{game?game.n:'oyunda'}{res?' '+res.n:''} için en yüksek FPS’i veren</> : 'en hızlısı'} seçildi.
           </p>
+          {prof.id==='yayin' && (
+            /* 24.09.2026: yayın profilinde çoklu çekirdeğe tavan kondu; varsayım gizli kalmasın. */
+            <p className="mt-2 text-dim">
+              Yayını ekran kartının donanım kodlayıcısıyla (NVIDIA’da NVENC, AMD’de AMF) yaptığını varsayıyoruz;
+              bugün yayıncıların çoğu böyle yapıyor. Bu durumda 8 çekirdek oyun ve OBS için yeter, o yüzden
+              16 çekirdek için ekran kartından kısmıyoruz. Görüntüyü işlemciyle (x264) kodluyorsan
+              “Video / tasarım” amacını seçmen daha doğru olur.
+            </p>
+          )}
           <ul className="mt-3 text-[.78rem] text-dim grid sm:grid-cols-2 gap-x-6 gap-y-1">
             {[['Kasaya sığmayan (kart, anakart ya da soğutucu)',sayim.kasa],['Güç kaynağı yetmeyen',sayim.guc],['Soğutması yetersiz',sayim.sogutma],
               ['Soket/hat uyumsuzluğu',sayim.platform],['Bellek türü uymayan',sayim.ram],['Amaca göre RAM/disk az',sayim.ihtiyac]]

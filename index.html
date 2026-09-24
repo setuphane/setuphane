@@ -1539,7 +1539,12 @@ const PROFILES = [
   needGpu: true,
   minRam: 32,
   minSsd: 1000,
-  score: (g, c, r, s, E, game, res) => (.42 * E + .38 * c.m + .12 * ramS(r) + .08 * ssdS(s)) * balPenalty(g, c, null, game, res)
+  /* 24.09.2026: çoklu çekirdek katkısına tavan (8 çekirdekli üst seviye, m=110).
+     Yayıncıların neredeyse tamamı görüntüyü ekran kartının donanım kodlayıcısıyla
+     (NVENC / AMF) kodluyor; 8 çekirdek oyun + OBS için yeter. Tavan yokken motor
+     16 çekirdek için ekran kartını bir alta indiriyor, bütçe artınca oyun FPS'i
+     düşüyordu (129.7 bin -> 134.2 bin: 9070 XT -> 9070, CS2 398 -> 371 FPS). */
+  score: (g, c, r, s, E, game, res) => (.42 * E + .38 * Math.min(c.m, 110) + .12 * ramS(r) + .08 * ssdS(s)) * balPenalty(g, c, null, game, res)
 }, {
   id: 'tasarim',
   n: 'Video / tasarım işi yapacağım',
@@ -6533,7 +6538,12 @@ function SistemAciklama({
     className: "num"
   }, sayi(sayim.butce)), " tanesi b\xFCt\xE7eyi a\u015Ft\u0131\u011F\u0131 i\xE7in elendi. Kalan ", /*#__PURE__*/React.createElement("span", {
     className: "num text-cy"
-  }, sayi(sayim.uygun)), " sistem \u201C", prof.n.toLowerCase(), "\u201D amac\u0131na g\xF6re puanland\u0131; puan\u0131 birbirine \xE7ok yak\u0131n olanlar aras\u0131ndan ", prof.needGpu ? /*#__PURE__*/React.createElement(React.Fragment, null, game ? game.n : 'oyunda', res ? ' ' + res.n : '', " i\xE7in en y\xFCksek FPS\u2019i veren") : 'en hızlısı', " se\xE7ildi."), /*#__PURE__*/React.createElement("ul", {
+  }, sayi(sayim.uygun)), " sistem \u201C", prof.n.toLowerCase(), "\u201D amac\u0131na g\xF6re puanland\u0131; puan\u0131 birbirine \xE7ok yak\u0131n olanlar aras\u0131ndan ", prof.needGpu ? /*#__PURE__*/React.createElement(React.Fragment, null, game ? game.n : 'oyunda', res ? ' ' + res.n : '', " i\xE7in en y\xFCksek FPS\u2019i veren") : 'en hızlısı', " se\xE7ildi."), prof.id === 'yayin' &&
+  /*#__PURE__*/
+  /* 24.09.2026: yayın profilinde çoklu çekirdeğe tavan kondu; varsayım gizli kalmasın. */
+  React.createElement("p", {
+    className: "mt-2 text-dim"
+  }, "Yay\u0131n\u0131 ekran kart\u0131n\u0131n donan\u0131m kodlay\u0131c\u0131s\u0131yla (NVIDIA\u2019da NVENC, AMD\u2019de AMF) yapt\u0131\u011F\u0131n\u0131 varsay\u0131yoruz; bug\xFCn yay\u0131nc\u0131lar\u0131n \xE7o\u011Fu b\xF6yle yap\u0131yor. Bu durumda 8 \xE7ekirdek oyun ve OBS i\xE7in yeter, o y\xFCzden 16 \xE7ekirdek i\xE7in ekran kart\u0131ndan k\u0131sm\u0131yoruz. G\xF6r\xFCnt\xFCy\xFC i\u015Flemciyle (x264) kodluyorsan \u201CVideo / tasar\u0131m\u201D amac\u0131n\u0131 se\xE7men daha do\u011Fru olur."), /*#__PURE__*/React.createElement("ul", {
     className: "mt-3 text-[.78rem] text-dim grid sm:grid-cols-2 gap-x-6 gap-y-1"
   }, [['Kasaya sığmayan (kart, anakart ya da soğutucu)', sayim.kasa], ['Güç kaynağı yetmeyen', sayim.guc], ['Soğutması yetersiz', sayim.sogutma], ['Soket/hat uyumsuzluğu', sayim.platform], ['Bellek türü uymayan', sayim.ram], ['Amaca göre RAM/disk az', sayim.ihtiyac]].filter(([, v]) => v > 0).map(([t, v]) => /*#__PURE__*/React.createElement("li", {
     key: t

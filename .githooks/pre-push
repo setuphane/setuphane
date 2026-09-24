@@ -36,10 +36,12 @@ if ! grep -q "UYUMSUZLUK BULUNAMADI" /tmp/kapi-denetim.txt || grep -q "OLCU KAYB
   echo "DENETİM GEÇMEDİ:"; sed -n '1,30p' /tmp/kapi-denetim.txt; exit 1
 fi
 
-echo "[yayın kapısı] FPS tutarlılığı (oyun profili)..."
+echo "[yayın kapısı] FPS tutarlılığı (oyun ve yayın profili)..."
 node scripts/gun-sonu-testi.mjs > /tmp/kapi-gunsonu.txt 2>&1
-if grep -q "performans-dususu :: oyun/" /tmp/kapi-gunsonu.txt; then
-  echo "OYUN PROFİLİNDE BÜTÇE ARTINCA FPS DÜŞÜYOR:"; grep "performans-dususu :: oyun/" /tmp/kapi-gunsonu.txt | head -10; exit 1
+# Tasarım profilinde render uğruna oyun FPS'inin biraz düşmesi bilinçli bir takas;
+# oyun ve yayın profilinde ise bütçe artınca FPS düşmemeli (24.09.2026'dan beri 0).
+if grep -Eq "dusus bulundu:.*(oyun|yayin) [0-9]" /tmp/kapi-gunsonu.txt; then
+  echo "BÜTÇE ARTINCA FPS DÜŞÜYOR:"; grep -E "dusus bulundu|performans-dususu ::" /tmp/kapi-gunsonu.txt | head -10; exit 1
 fi
 
 echo "[yayın kapısı] geçti."

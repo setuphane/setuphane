@@ -34,7 +34,7 @@ const markalar = [['',''],['AMD',''],['Intel',''],['','NVIDIA'],['','AMD'],['AMD
 
 // 1. Butce artinca performans dusuyor mu? Gorunur ve utandirici hata sinifi.
 console.log('1) Butce artinca performans dusuyor mu?');
-let dusus = 0;
+let dusus = 0; const profilDusus = {};
 for (const prof of PROFILES) {
   if (!prof.needGpu) continue;
   for (const [pc,pg] of markalar)
@@ -48,7 +48,10 @@ for (const prof of PROFILES) {
           if (!x) continue;
           const f = fps(x.g, x.c, oyun, res);
           if (f < oncekiF - 0.5) {
-            dusus++;
+            dusus++; profilDusus[prof.id] = (profilDusus[prof.id] || 0) + 1;
+            /* 24.09.2026: eskiden yalnız ilk 6 düşüş kaydediliyordu ve özet hep
+               "6 bulgu" diyordu; gerçek sayı 49'du. Artık hepsi sayılıyor, özette
+               profil başına toplam var, listede ilk 6 örnek. */
             if (dusus <= 6) not('performans-dususu',
               prof.id+'/'+(pc||'-')+'+'+(pg||'-')+'/'+oyun.id+'/'+res.id+': '+
               tl(oncekiB)+' -> '+tl(b)+' arasinda '+oncekiF+' FPS iken '+f+' FPS');
@@ -57,7 +60,8 @@ for (const prof of PROFILES) {
         }
       }
 }
-console.log(dusus ? '   '+dusus+' dusus bulundu' : '   temiz');
+console.log(dusus ? '   '+dusus+' dusus bulundu: '+Object.entries(profilDusus).map(([k,v])=>k+' '+v).join(', ') : '   temiz');
+if (dusus > 6) not('performans-dususu-toplam', dusus+' dusus (' + Object.entries(profilDusus).map(([k,v])=>k+' '+v).join(', ') + '); ilk 6 ornek asagida');
 
 // 2. Ekranda yazan FPS, min(kart siniri, islemci siniri) ile ayni mi?
 console.log('2) FPS hesabi tutarli mi?');
