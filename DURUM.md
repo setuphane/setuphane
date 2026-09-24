@@ -1,25 +1,50 @@
-# Durum — 22.09.2026
+# Durum — 24.09.2026
 
-Çalışmaya devam eden herkes (ve yeni bir Claude oturumu) için özet.
-Kalıcı kurallar `CLAUDE.md`'nin sonundaki "SETUP HANE" bölümünde.
+Çalışmaya devam eden herkes (ve yeni bir Claude oturumu) için özet. Önce bunu,
+sonra en alttaki tarihli bölümleri oku. Tarihli bölümler eskiden yeniye değil,
+KONUYA göre dağınık; bu tablo tek doğru özet.
 
 ## Şu an ne durumdayız
 
 | Alan | Durum |
 |---|---|
-| 46 parça fiyatı (Epey, 3+ satıcı kuralı) | doğrulandı, **kod ve veritabanı senkron** (09.09, 46/46 REST'ten teyitli) |
-| Masaüstü kart ve işlemci gücü (TechPowerUp) | ölçüme bağlandı |
-| Çözünürlük katsayıları, kart bazlı (r1440/r2160) | ölçüme bağlandı |
-| 45 laptop fiyatı + satıcı sayısı (Cimri) | doğrulandı (21.08, bu turda dokunulmadı) |
-| Laptop kart gücü (NotebookCheck oyun testleri) | ölçüme bağlandı |
-| 93 aksesuar ürünü, 11 kategori | canlıda (24.08: 80 yeni ürün + Mouse/Klavye eklendi, Bilek+Dekor birleşti) |
-| 9 OEM hazır sistem (İncehesap) + karşılaştırma | canlıda |
-| Sert kurallar | soket, watt, radyatör-kasa, PCIe x4, **kart-kasa (artık gerçekten ölçülü)**, anakart-kasa, bellek türü, VRAM, RAM, disk |
-| Denetim | 11.303 kombinasyon, **uyumsuzluk yok** (09.09: yeni kart uzunlukları elemeyi biraz daha sıkılaştırdı) |
+| PC parça fiyatları | 58 parça, Epey, **en az 3 satıcı**, her gün 10:00'da bot (PC'de Görev Zamanlayıcı). Canlı fiyat `fiyatlar.json`; kod yedek fiyatları `kod-fiyat-senkron.mjs` ile eşitleniyor |
+| Model seçimi | Her yonga için 3+ satıcılı en ucuz model. **Model ancak 3 gün üst üste en ucuzsa değişir** (`model-izle.mjs`, yalnız rapor verir) |
+| Performans | Ekran kartı ve işlemci TechPowerUp ölçümü (RTX 5070 = 100). Ölçümü olmayan parça eklenmez |
+| Sert kurallar | soket, watt + üretici önerisi + kablo, kart-kasa (15 mm pay), soğutucu sınıfı/yüksekliği, radyatör-kasa, hava akışı (fan sayısı, **giriş ≥ egzoz**), bellek türü, form |
+| Denetim | `kombinasyon-denetimi.mjs`: 13.673 kombinasyon, uyumsuzluk yok; CANLI VERİ YOLU bölümü yükleyiciyi de sınıyor |
+| Sayfalar | Sistem kur, **Yükselt** (45 eski kart + 37 işlemci), Yöntem, Testler, Forum, Aksesuarlar, Öner, Hakkımızda, İş birlikleri, Gizlilik |
+| Laptop / hazır sistem | **Kapalı** (23.09, kullanıcı kararı). Yerine "neden kapalı" açıklaması + markalar için örnek kart. Veriler silinmedi (`LaptopPickerEski`, `OemPickerEski`, Supabase `laptoplar`) |
+| Tasarım | Koyu tema, Geist + Geist Mono + Newsreader italik (vurgu), yazı tipleri kendi sunucumuzda (`vendor/font`) |
+| Uyarılar | Fiyat 3 günden eskiyse ziyaretçi uyarı görür. Bot sorunlarında bilgisayarda Windows bildirimi (`bildirim.ps1`) |
 
-Veritabanı: `parcalar` 46, `laptoplar` 45, `urunler` 93 satır — kodla eşitli
-(11 kalem 24.08'de REST API'den doğrulanarak güncellendi; `urunler` aynı
-gün 12'den 93'e çıktı, bkz. aşağıdaki Ulugames genişletmesi).
+## Bilinmesi gereken tuzaklar
+
+- **`index.html`'in `<head>` bölümü derlemede üretilmez.** Yazı tipi, meta, başlık değişikliği hem `src/setuphane.html` hem `index.html` içinde yapılmalı. Tailwind token'ları `scripts/build.mjs`'de.
+- Veri üç yerde: kod (yedek + fiziksel ölçüler), Supabase `parcalar` (panel), `fiyatlar.json` (bot). Yükleyici ölçü alanlarını KODDAN korur; yeni ölçü alanı eklenince `koru` listesine ve denetimin `OLCU` listesine eklenmeli.
+- Yeni ekran kartı eklenince denetimin bağımsız tablolarına da (`URETICI_PSU`, `KART_KABLO`) eklenmeli; yoksa denetim hata verir (bu bilinçli).
+- Babel 500 KB üstünde compact moda geçiyordu; `build.mjs`'de `compact:false` sabit.
+
+## Açık karar
+
+**Motoru seçilen oyuna duyarlı hale getirmek.** Yayın profilinde 6 bütçe noktasında bütçe artınca FPS düşüyor (oyun profilinde 0). Kök neden tek denge sabiti (1.32). Kullanıcıya 24.09'da tekrar önerildi.
+
+## Yapılacaklar (24.09.2026 analizi, sırayla)
+
+1. ~~Forum/gizlilik metinlerindeki yanlış "sunucuya gitmez" ifadeleri~~ (24.09 yapıldı)
+2. ~~Model değişikliğine 3 gün freni~~ (24.09 yapıldı)
+3. ~~Bot bildirimi + fiyat eskime eşiği 3 gün~~ (24.09 yapıldı)
+4. ~~DURUM.md özetini yenile~~ (24.09 yapıldı)
+5. Yayın öncesi otomatik test (git pre-push kancası: build + denetim + gün sonu)
+6. `index.html`'i derlemede baştan üretmek (head tuzağını kaldırmak)
+7. Tasarım kimliği: kullanıcı "Claude ile yapılmış sitelerden farklı, bize özgü, premium, samimi" istiyor; üç yön hazırlanıp kullanıcıya gösterilecek
+8. Oyuna duyarlı motor (açık karar)
+9. Fiyat geçmişi ("son 30 günün en düşüğü"): veri `fiyatlar.json`'un git geçmişinde zaten var
+10. Alternatif sistemler (en iyi 2. ve 3. sistem)
+11. Aksesuarlar / Öner: kodda "örnek içerik" notu var; laptop'taki dürüstlük kuralı uygulanmalı
+12. Analitiğe bakmak (Vercel Analytics olayları: kasa_3b_acildi, aciklama_acildi, hizli_butce, fiyat_karsilastir, yukselt_kart, en_az_butce)
+13. Marka filtresine Intel (Arc B580 ilk Intel kartı)
+14. Canlı forumdaki iki deneme yazısı ("selam selam selam", "ssssıeeoeoeo") kullanıcı tarafından panelden silinmeli
 
 ### 22.09.2026 — Kasa hava akışı (fan) kuralı
 
@@ -400,7 +425,7 @@ tek bir sayısal skorun gerçek dünya yeterliliğinin tamamını yakalayamamas�
 Kullanıcı kararı gerekirse ayrı ele alınmalı, bu turun kapsamı dışında
 tutuldu çünkü halihazırda belgelenmiş ve gerekçeli.
 
-## Açık karar — kullanıcıya soruldu, cevap bekliyor
+### (Arşiv) Açık karar — ilk not
 
 **Motoru seçilen oyuna duyarlı hale getirmek.**
 Şu an motor "ortalama bir oyun" için optimize ediyor; ziyaretçi ise belirli
@@ -421,9 +446,9 @@ eşiğe bakmadan uyarıyor. Ziyaretçi yanlış sistemle baş başa kalmıyor.
 Kalıcı çözüm öneri davranışını bütün sitede değiştireceği için kullanıcının
 kararı bekleniyor.
 
-## Yapılacaklar
+### (Arşiv) Eski yapılacaklar — çoğu tamamlandı
 
-- **"Elimde sistem var, neyi yükselteyim"**: eski kartlar (GTX 1060, RTX 3060…)
+- **"Elimde sistem var, neyi yükselteyim"** (23.09 yapıldı: /yukselt): eski kartlar (GTX 1060, RTX 3060…)
   için ölçülü performans verisi yok; uydurma idx ile FPS göstermek BİRİNCİ
   KURAL ihlali olur. Önce TechPowerUp göreli performans tablosu toplanmalı.
 

@@ -1,0 +1,46 @@
+#!/bin/sh
+# Yayın öncesi kapı (24.09.2026). Vercel her push'ta yayınlıyor; bu kanca
+# bozuk bir sistemi ya da bozuk bir derlemeyi yayına çıkmadan durdurur.
+#   Kurulum (bir kez): git config core.hooksPath .githooks
+#   Acil durumda atlamak: git push --no-verify   (yalnızca sebebini bilerek)
+#
+# Yalnız fiyat dosyaları değiştiyse (günlük bot) test çalışmaz: fiyatlar
+# kombinasyon kurallarını etkilemez ve bot her sabah beklemesin.
+
+YALNIZ_FIYAT='^(fiyatlar\.json|scripts/fiyat-durum\.json|scripts/model-durum\.json)$'
+sifir=0000000000000000000000000000000000000000
+degisen=""
+while read yerel_ref yerel_sha uzak_ref uzak_sha; do
+  [ "$yerel_sha" = "$sifir" ] && continue
+  if [ "$uzak_sha" = "$sifir" ]; then aralik="$yerel_sha"; else aralik="$uzak_sha..$yerel_sha"; fi
+  degisen="$degisen
+$(git diff --name-only $aralik)"
+done
+degisen=$(printf '%s\n' "$degisen" | sed '/^$/d' | sort -u)
+[ -z "$degisen" ] && exit 0
+if ! printf '%s\n' "$degisen" | grep -Evq "$YALNIZ_FIYAT"; then
+  exit 0
+fi
+
+echo "[yayın kapısı] derleme kontrol ediliyor..."
+node scripts/build.mjs > /tmp/kapi-build.txt 2>&1 || { echo "DERLEME HATASI:"; tail -15 /tmp/kapi-build.txt; exit 1; }
+if ! git diff --quiet -- index.html; then
+  echo "index.html, src/setuphane.html ile eşleşmiyor. 'node scripts/build.mjs' çalıştırıp index.html'i commit'le."
+  git checkout -- index.html 2>/dev/null
+  exit 1
+fi
+
+echo "[yayın kapısı] kombinasyon denetimi..."
+node scripts/kombinasyon-denetimi.mjs > /tmp/kapi-denetim.txt 2>&1
+if ! grep -q "UYUMSUZLUK BULUNAMADI" /tmp/kapi-denetim.txt || grep -q "OLCU KAYBOLUYOR" /tmp/kapi-denetim.txt; then
+  echo "DENETİM GEÇMEDİ:"; sed -n '1,30p' /tmp/kapi-denetim.txt; exit 1
+fi
+
+echo "[yayın kapısı] FPS tutarlılığı (oyun profili)..."
+node scripts/gun-sonu-testi.mjs > /tmp/kapi-gunsonu.txt 2>&1
+if grep -q "performans-dususu :: oyun/" /tmp/kapi-gunsonu.txt; then
+  echo "OYUN PROFİLİNDE BÜTÇE ARTINCA FPS DÜŞÜYOR:"; grep "performans-dususu :: oyun/" /tmp/kapi-gunsonu.txt | head -10; exit 1
+fi
+
+echo "[yayın kapısı] geçti."
+exit 0
