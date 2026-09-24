@@ -14,6 +14,8 @@ KONUYA göre dağınık; bu tablo tek doğru özet.
 | Sert kurallar | soket, watt + üretici önerisi + kablo, kart-kasa (15 mm pay), soğutucu sınıfı/yüksekliği, radyatör-kasa, hava akışı (fan sayısı, **giriş ≥ egzoz**), bellek türü, form |
 | Denetim | `kombinasyon-denetimi.mjs`: 13.673 kombinasyon, uyumsuzluk yok; CANLI VERİ YOLU bölümü yükleyiciyi de sınıyor |
 | Sayfalar | Sistem kur, **Yükselt** (45 eski kart + 37 işlemci), Yöntem, Testler, Forum, Aksesuarlar, Öner, Hakkımızda, İş birlikleri, Gizlilik |
+| Aksesuarlar / Öner | **Askıda** (24.09, kullanıcı kararı: sıfır reklam). Menüden kalktı, noindex; sayfalar markalar için iş birliği kurallarını anlatıyor (`AskidaSayfa`). Eski bileşenler (`AksesuarlarHub`, `OnerHub`) ve Supabase `urunler` silinmedi |
+| Gelir | **Yok.** Sitede reklam, satış, komisyonlu bağlantı yok |
 | Laptop / hazır sistem | **Kapalı** (23.09, kullanıcı kararı). Yerine "neden kapalı" açıklaması + markalar için örnek kart. Veriler silinmedi (`LaptopPickerEski`, `OemPickerEski`, Supabase `laptoplar`) |
 | Tasarım | Koyu tema, Geist + Geist Mono + Newsreader italik (vurgu), yazı tipleri kendi sunucumuzda (`vendor/font`) |
 | Uyarılar | Fiyat 3 günden eskiyse ziyaretçi uyarı görür. Bot sorunlarında bilgisayarda Windows bildirimi (`bildirim.ps1`) |
@@ -557,3 +559,9 @@ Kullanıcı projeyi baştan analiz ettirdi, tasarım dışında her şeyi uygula
 - Logo yazısı: iç çizgiler (paint-order) ve küçük boyutta taşma (26 px altı dolu renk).
 - Öner: örnek ürünler kaldırıldı, bütçe filtresi ters çalışıyordu (düzeltildi), en uzun eşleşme kazanır.
 - Kullanıcıdan beklenen: forumdaki 2 deneme yazısını silmek; Vercel Analytics'e erişim (olaylara bakmak için).
+
+### 24.09.2026 (akşam) — Aksesuarlar ve Öner askıya alındı
+Kullanıcı: "öneri ve aksesuarlar kısmını da askıya alalım, sıfır reklama indirelim; oralarda iş birliklerine özgü bilgiler paylaşabiliriz."
+- Menüden kalktı; /aksesuarlar ve /oner `AskidaSayfa` gösteriyor (neden kapalı + markalar için 4 kural: önce test, her zaman etiketli, sıralama satılmaz, bilgisayar önerisi ayrı kalır). noindex, sitemap'ten çıktı.
+- Ana sayfadaki "Bunları da dene" kartları: Yükselt, Yöntem, Testler, Forum.
+- "Komisyon almıyoruz" artık her yerde doğru; Yöntem'deki gelir bölümü "Hayır" diye yeniden yazıldı. 9 sayfada komisyonlu bağlantı sayısı 0 (tarayıcıda doğrulandı).

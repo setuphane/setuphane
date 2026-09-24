@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım</title>
-<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, sistem önerileri komisyonsuz. SETUP HANE topluluğu.">
+<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz. SETUP HANE topluluğu.">
 <meta name="theme-color" content="#07070B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SETUP HANE | Bütçene göre doğru bilgisayar">
-<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, öneriler komisyonsuz. Karar senin.">
+<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, komisyon yok. Karar senin.">
 <meta name="google-site-verification" content="xjJr_ENpCktifjswCPQF-lTrk-CSHy2Y3fguFi_aBWI">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
@@ -4639,16 +4639,6 @@ const SEKMELER = [{
   t: 'YÜKSELT',
   kisa: 'YÜKSELT'
 }, {
-  id: 'aksesuarlar',
-  href: '/aksesuarlar',
-  t: 'AKSESUARLAR',
-  kisa: 'AKSESUAR'
-}, {
-  id: 'oner',
-  href: '/oner',
-  t: 'ÖNER',
-  kisa: 'ÖNER'
-}, {
   id: 'testler',
   href: '/testler',
   t: 'TESTLER',
@@ -4665,18 +4655,20 @@ const SEKMELER = [{
 const ROTA_META = {
   ana: {
     t: 'SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım',
-    d: 'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, sistem önerileri komisyonsuz.'
+    d: 'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz.'
   },
   /* noindex kalktı: 10 kategorinin hepsinde gerçek iş birliği ürünü var,
      sayfa artık Google'ın "içeriksiz sayfa" saydığı durumda değil.
      Ürünler /panel'den yönetiliyor. */
   aksesuarlar: {
-    t: 'Setup Aksesuarları: Kategorilere göre keşfet | SETUP HANE',
-    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası. Kategori kategori, karışıklık olmadan.'
+    t: 'Aksesuarlar (askıda) | SETUP HANE',
+    d: 'Aksesuar vitrini askıya alındı; sitede reklam ve komisyonlu bağlantı yok. Markalar için iş birliği kuralları.',
+    noindex: true
   },
   oner: {
-    t: 'Sana Göre Öner: Bütçene uygun setup aksesuarı | SETUP HANE',
-    d: 'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim. Kayıt yok, kurulum yok.'
+    t: 'Öneri aracı (askıda) | SETUP HANE',
+    d: 'Aksesuar öneri aracı askıya alındı; sitede reklam ve komisyonlu bağlantı yok.',
+    noindex: true
   },
   /* Yönetim ekranı: arama sonucunda yeri yok. Asıl koruma Supabase RLS'inde,
      noindex yalnızca gereksiz taramayı önlüyor. */
@@ -4926,7 +4918,7 @@ function Hero({
     className: "text-cy"
   }, " en dengeli sistemi par\xE7a par\xE7a"), " g\xF6stereyim. Her par\xE7an\u0131n neden se\xE7ildi\u011Fini yazarak. Be\u011Fenmedi\u011Fini de\u011Fi\u015Ftir; bu bir re\xE7ete de\u011Fil, ba\u015Flang\u0131\xE7 noktas\u0131."), /*#__PURE__*/React.createElement("p", {
     className: "hidden sm:block mt-5 text-[.95rem] text-ink/70 leading-relaxed"
-  }, "Hi\xE7bir \u015Fey satm\u0131yoruz. Sistem \xF6nerilerinde komisyon yok, kimseyi bir ma\u011Fazaya y\xF6nlendirmiyoruz. Kulland\u0131\u011F\u0131m\u0131z b\xFCt\xFCn performans de\u011Ferleri ba\u011F\u0131ms\u0131z \xF6l\xE7\xFCmlerden geliyor ve kayna\u011F\u0131 sayfada yaz\u0131l\u0131. Listeyi al\u0131p istedi\u011Fin yerden al\u0131rs\u0131n, ya da hi\xE7 almazs\u0131n."))), /*#__PURE__*/React.createElement(Reveal, {
+  }, "Hi\xE7bir \u015Fey satm\u0131yoruz, komisyon alm\u0131yoruz, kimseyi bir ma\u011Fazaya y\xF6nlendirmiyoruz. Kulland\u0131\u011F\u0131m\u0131z b\xFCt\xFCn performans de\u011Ferleri ba\u011F\u0131ms\u0131z \xF6l\xE7\xFCmlerden geliyor ve kayna\u011F\u0131 sayfada yaz\u0131l\u0131. Listeyi al\u0131p istedi\u011Fin yerden al\u0131rs\u0131n, ya da hi\xE7 almazs\u0131n."))), /*#__PURE__*/React.createElement(Reveal, {
     delay: 260
   }, /*#__PURE__*/React.createElement("div", {
     className: "mt-8 flex flex-wrap items-center gap-x-8 gap-y-4"
@@ -11628,15 +11620,15 @@ function OnerHub() {
 /* ═══════════════════ KEŞFET — diğer sekmelere köprü ═══════════════════ */
 function Kesfet() {
   const kartlar = [{
-    href: '/aksesuarlar',
-    t: 'Aksesuarlar',
-    d: 'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası. Kategori kategori, iş birliği yaptığımız markalardan.',
-    e: 'VİTRİN'
+    href: '/yukselt',
+    t: 'Yükselt',
+    d: 'Elindeki kartı ve işlemciyi seç: yalnız kart mı, işlemciyle birlikte mi, komple yeni sistem mi? Ölçülmüş verilerle.',
+    e: 'YENİ'
   }, {
-    href: '/oner',
-    t: 'Sana Göre Öner',
-    d: 'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim.',
-    e: 'DENEME'
+    href: '/yontem',
+    t: 'Yöntem',
+    d: 'Performans nereden geliyor, fiyat nasıl seçiliyor, neyi kabul etmiyoruz? Kurallarımızın tamamı.',
+    e: 'GÜVEN'
   }, {
     href: '/testler',
     t: 'Testler',
@@ -11690,7 +11682,7 @@ function Kesfet() {
 function Trust() {
   const items = [{
     t: 'Hiçbir şey satmıyoruz',
-    d: 'Sistem önerilerinde komisyon yok, kimseye yönlendirmiyoruz. Listeyi alıp istediğin yerden alırsın.'
+    d: 'Komisyon almıyoruz, kimseye yönlendirmiyoruz. Listeyi alıp istediğin yerden alırsın.'
   }, {
     t: 'Hesap açıkta',
     d: 'Her sonuç ekrandaki formülden çıkıyor. Hangi parçanın seni sınırladığını da açıkça yazıyoruz.'
@@ -11984,7 +11976,7 @@ function YontemSayfa() {
   return /*#__PURE__*/React.createElement(BasitSayfa, {
     etiket: "Y\xD6NTEM",
     baslik: "Nas\u0131l karar veriyoruz, neyi kabul etmiyoruz."
-  }, /*#__PURE__*/React.createElement("p", null, "Biz bir firma de\u011Filiz, ticari ama\xE7 g\xFCtm\xFCyoruz. Bu site, kendi paras\u0131yla bilgisayar toplayan birinin ayn\u0131 ara\u015Ft\u0131rmay\u0131 defalarca yapmaktan s\u0131k\u0131l\u0131p oturup yazd\u0131\u011F\u0131 bir ara\xE7. Kimseye bir \u015Fey satm\u0131yoruz ve sistem \xF6nerilerinde hi\xE7bir ma\u011Fazadan komisyon alm\u0131yoruz. Yapt\u0131\u011F\u0131m\u0131z i\u015F, kurallar\u0131 belirleyip onlara uymak. Hepsi a\u015Fa\u011F\u0131da yaz\u0131yor: bize g\xFCvenmek zorunda de\u011Filsin, kontrol edebilirsin."), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("p", null, "Biz bir firma de\u011Filiz, ticari ama\xE7 g\xFCtm\xFCyoruz. Bu site, kendi paras\u0131yla bilgisayar toplayan birinin ayn\u0131 ara\u015Ft\u0131rmay\u0131 defalarca yapmaktan s\u0131k\u0131l\u0131p oturup yazd\u0131\u011F\u0131 bir ara\xE7. Kimseye bir \u015Fey satm\u0131yoruz, hi\xE7bir ma\u011Fazadan komisyon alm\u0131yoruz ve sitede reklam yok. Yapt\u0131\u011F\u0131m\u0131z i\u015F, kurallar\u0131 belirleyip onlara uymak. Hepsi a\u015Fa\u011F\u0131da yaz\u0131yor: bize g\xFCvenmek zorunda de\u011Filsin, kontrol edebilirsin."), /*#__PURE__*/React.createElement("div", {
     className: "grid gap-4 not-prose py-2"
   }, /*#__PURE__*/React.createElement(Kural, {
     baslik: "Performans rakamlar\u0131 \xF6l\xE7\xFCmden gelir"
@@ -11998,10 +11990,7 @@ function YontemSayfa() {
     baslik: "Neden se\xE7ildi\u011Fini yazar\u0131z"
   }, /*#__PURE__*/React.createElement("p", null, "Her par\xE7an\u0131n yan\u0131nda neden onu se\xE7ti\u011Fimiz yaz\u0131yor. Kat\u0131lmak zorunda de\u011Filsin, listeyi al\u0131p istedi\u011Fin par\xE7ay\u0131 de\u011Fi\u015Ftirebilirsin. Senin yerine karar vermeye \xE7al\u0131\u015Fm\u0131yoruz, hesab\u0131 \xF6n\xFCne koyuyoruz."))), /*#__PURE__*/React.createElement("h2", {
     className: "text-[1.25rem] text-ink pt-4"
-  }, "Bu siteden para kazan\u0131yor muyuz?"), /*#__PURE__*/React.createElement("p", null, "Sistem kur, Y\xFCkselt ve Testler b\xF6l\xFCmlerinden hi\xE7 para kazanm\u0131yoruz; oradaki hi\xE7bir ba\u011Flant\u0131 komisyonlu de\u011Fil. Tek gelirimiz ", /*#__PURE__*/React.createElement("a", {
-    href: "/aksesuarlar",
-    className: "text-cy hover:underline underline-offset-4"
-  }, "Aksesuarlar"), ' ', "sayfas\u0131ndaki Ulugames i\u015F birli\u011Fi ba\u011Flant\u0131lar\u0131: oradan al\u0131\u015Fveri\u015F yaparsan Ulugames bize k\xFC\xE7\xFCk bir komisyon \xF6der, senin \xF6dedi\u011Fin fiyat de\u011Fi\u015Fmez. Bu ba\u011Flant\u0131lar\u0131n her birinin \xFCst\xFCnde \"i\u015F birli\u011Fi ba\u011Flant\u0131s\u0131\" yazar. \u0130leride ba\u015Fka bir marka ya da ma\u011Faza da reklam veya tan\u0131t\u0131m i\xE7in \xF6deme yapabilir. Hangisi olursa olsun kural \u015Fu:"), /*#__PURE__*/React.createElement("p", {
+  }, "Bu siteden para kazan\u0131yor muyuz?"), /*#__PURE__*/React.createElement("p", null, "Hay\u0131r. Sitede reklam, sat\u0131\u015F ya da komisyonlu ba\u011Flant\u0131 yok. Eskiden aksesuar sayfas\u0131nda bir ma\u011Fazan\u0131n komisyonlu ba\u011Flant\u0131lar\u0131 vard\u0131; tavsiye veren bir sitede bunu do\u011Fru bulmad\u0131\u011F\u0131m\u0131z i\xE7in o b\xF6l\xFCm\xFC kapatt\u0131k. \u0130leride bir marka ya da ma\u011Faza bize reklam veya tan\u0131t\u0131m i\xE7in \xF6deme yapabilir. O g\xFCn geldi\u011Finde kural \u015Fu:"), /*#__PURE__*/React.createElement("p", {
     className: "text-ink"
   }, "Bize para veren marka, sistem \xF6nerilerinde daha yukar\u0131 \xE7\u0131kamaz."), /*#__PURE__*/React.createElement("p", null, "Yani \"\u015Fu ekran kart\u0131n\u0131 \xF6nerin\" diye \xF6deme teklif eden olursa kabul etmiyoruz. Reklam ayr\u0131 bir yerde durur, \xFCst\xFCnde \"bu bir reklamd\u0131r\" yazar; hangi par\xE7an\u0131n \xF6nerilece\u011Fini ise yaln\u0131zca \xF6l\xE7\xFCm sonu\xE7lar\u0131 ve fiyat belirler. Bunu bir kez bozarsak sitedeki b\xFCt\xFCn say\u0131lar anlam\u0131n\u0131 kaybeder."), /*#__PURE__*/React.createElement("div", {
     className: "grid sm:grid-cols-2 gap-4 not-prose py-2"
@@ -12026,13 +12015,68 @@ function YontemSayfa() {
     className: "text-cy hover:underline underline-offset-4"
   }, "forumdan"), " yaz. D\xFCzeltmek, savunmaktan \xF6nce gelir."));
 }
+/* 24.09.2026 — Kullanıcı kararı: Aksesuarlar ve Öner askıya alındı, sitede
+   SIFIR reklam / komisyonlu bağlantı. Eski bileşenler (AksesuarlarHub, OnerHub,
+   AksesuarUrunKart) silinmedi, yalnız gösterilmiyor; Supabase'deki ürünler
+   duruyor. Bu sayfalar artık markalara iş birliğinin nasıl işleyeceğini
+   anlatıyor. */
+function AskidaSayfa({
+  tur
+}) {
+  const aksesuar = tur === 'aksesuarlar';
+  const Madde = ({
+    baslik,
+    children
+  }) => /*#__PURE__*/React.createElement("div", {
+    className: "border border-line p-5"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-ink text-[1rem] mb-2"
+  }, baslik), /*#__PURE__*/React.createElement("div", {
+    className: "text-[.86rem] text-dim leading-relaxed"
+  }, children));
+  return /*#__PURE__*/React.createElement(BasitSayfa, {
+    etiket: aksesuar ? 'AKSESUARLAR' : 'ÖNER',
+    baslik: aksesuar ? 'Aksesuar vitrinini askıya aldık.' : 'Öneri aracını askıya aldık.'
+  }, /*#__PURE__*/React.createElement("p", null, aksesuar ? 'Bu sayfada mouse pad, klavye, kablo düzeni gibi setup ürünlerini gösteriyorduk. Bağlantıların çoğu bir mağazanın komisyonlu bağlantısıydı.' : 'Bu sayfa bütçene ve yazdığın kelimelere göre setup aksesuarı öneriyordu. Önerilen ürünlerin bağlantıları bir mağazanın komisyonlu bağlantısıydı.', ' ', "A\xE7\u0131k\xE7a belirtiyorduk, ama yine de bir tavsiye sitesinde komisyonlu ba\u011Flant\u0131 olmas\u0131n\u0131 do\u011Fru bulmad\u0131k. O y\xFCzden bu b\xF6l\xFCm\xFC kapatt\u0131k: \u015Fu an sitede ", /*#__PURE__*/React.createElement("span", {
+    className: "text-ink"
+  }, "hi\xE7bir reklam, sat\u0131\u015F ya da komisyonlu ba\u011Flant\u0131 yok.")), /*#__PURE__*/React.createElement("p", null, "Bilgisayar taraf\u0131 oldu\u011Fu gibi \xE7al\u0131\u015F\u0131yor:", ' ', /*#__PURE__*/React.createElement("a", {
+    href: "/",
+    className: "text-cy hover:underline underline-offset-4"
+  }, "Sistem kur"), ",", ' ', /*#__PURE__*/React.createElement("a", {
+    href: "/yukselt",
+    className: "text-cy hover:underline underline-offset-4"
+  }, "Y\xFCkselt"), " ve", ' ', /*#__PURE__*/React.createElement("a", {
+    href: "/testler",
+    className: "text-cy hover:underline underline-offset-4"
+  }, "Testler"), " her g\xFCn g\xFCncel."), /*#__PURE__*/React.createElement("h2", {
+    className: "text-[1.2rem] text-ink pt-4"
+  }, "Markalar ve ma\u011Fazalar i\xE7in"), /*#__PURE__*/React.createElement("p", null, "Bu b\xF6l\xFCm\xFC ileride bir i\u015F birli\u011Fiyle yeniden a\xE7abiliriz. A\xE7arsak \u015Fu kurallarla a\xE7ar\u0131z:"), /*#__PURE__*/React.createElement("div", {
+    className: "grid sm:grid-cols-2 gap-4 not-prose py-1"
+  }, /*#__PURE__*/React.createElement(Madde, {
+    baslik: "\xD6nce test, sonra vitrin"
+  }, aksesuar ? 'Ürünü önce biz kullanırız. Ölçülebilen bir şey varsa (mouse sensörü, tepki süresi, ses) sitedeki testlerle ölçer, sonucu olduğu gibi yazarız.' : 'Öneri aracı yalnızca gerçekten denediğimiz ürünleri önerir. Denemediğimiz ürün öneri listesine girmez.'), /*#__PURE__*/React.createElement(Madde, {
+    baslik: "Her zaman etiketli"
+  }, "\u0130\u015F birli\u011Fiyle gelen her \xFCr\xFCn\xFCn ve ba\u011Flant\u0131n\u0131n \xFCst\xFCnde kimle \xE7al\u0131\u015Ft\u0131\u011F\u0131m\u0131z a\xE7\u0131k\xE7a yazar. Ziyaret\xE7i neyin reklam oldu\u011Funu aramak zorunda kalmaz."), /*#__PURE__*/React.createElement(Madde, {
+    baslik: "S\u0131ralama sat\u0131lmaz"
+  }, "\xD6deme yapan marka listede yukar\u0131 \xE7\u0131kmaz, rakibi a\u015Fa\u011F\u0131 itilmez. S\u0131ralamay\u0131 yaln\u0131zca test sonu\xE7lar\u0131 belirler."), /*#__PURE__*/React.createElement(Madde, {
+    baslik: "Bilgisayar \xF6nerisi ayr\u0131 kal\u0131r"
+  }, "Sistem kur ve Y\xFCkselt b\xF6l\xFCmlerindeki par\xE7a \xF6nerileri hi\xE7bir i\u015F birli\u011Finden etkilenmez; orada komisyonlu ba\u011Flant\u0131 olmayacak.")), /*#__PURE__*/React.createElement("p", {
+    className: "text-[.9rem]"
+  }, "Bu kurallarla \xE7al\u0131\u015Fmak isteyen bir marka ya da ma\u011Fazaysan", ' ', /*#__PURE__*/React.createElement("a", {
+    href: "/isbirlikleri",
+    className: "text-cy hover:underline underline-offset-4"
+  }, "\u0130\u015F birlikleri"), ' ', "sayfas\u0131ndan ula\u015Fabilirsin. Nas\u0131l karar verdi\u011Fimiz", ' ', /*#__PURE__*/React.createElement("a", {
+    href: "/yontem",
+    className: "text-cy hover:underline underline-offset-4"
+  }, "Y\xF6ntem"), " sayfas\u0131nda yaz\u0131yor."));
+}
 function HakkimizdaSayfa() {
   return /*#__PURE__*/React.createElement(BasitSayfa, {
     etiket: "HAKKIMIZDA",
     baslik: "Bir ki\u015Finin kurdu\u011Fu, ciddiye al\u0131nan bir ara\xE7."
   }, /*#__PURE__*/React.createElement("p", null, "SETUP HANE, b\xFCt\xE7esine g\xF6re bilgisayar toplamak isteyenler i\xE7in \xFCcretsiz bir hesaplay\u0131c\u0131 olarak ba\u015Flad\u0131; \u015Fimdi donan\u0131m testleri, bir forum ve setup aksesuarlar\u0131 vitrinini de i\xE7eren bir ", /*#__PURE__*/React.createElement("span", {
     className: "text-ink"
-  }, "ara\xE7 ve topluluk"), " platformu."), /*#__PURE__*/React.createElement("p", null, "SETUP HANE bir firma de\u011Fil, ticari bir i\u015F de de\u011Fil. Buray\u0131, kendi bilgisayar\u0131n\u0131 toplarken ayn\u0131 hesaplar\u0131 defalarca yapan biri kurdu; sonra ayn\u0131 hesab\u0131 herkes kullanabilsin diye siteye ta\u015F\u0131d\u0131. \xDCr\xFCn satm\u0131yoruz, sistem \xF6nerilerinde komisyon alm\u0131yoruz, kimseyi bir ma\u011Fazaya y\xF6nlendirmiyoruz. Her hesab\u0131n mant\u0131\u011F\u0131 ekranda a\xE7\u0131k duruyor; kat\u0131lmad\u0131\u011F\u0131n yeri de\u011Fi\u015Ftirebilirsin."), /*#__PURE__*/React.createElement("p", null, "Topluluk taraf\u0131 Instagram'da ", /*#__PURE__*/React.createElement("a", {
+  }, "ara\xE7 ve topluluk"), " platformu."), /*#__PURE__*/React.createElement("p", null, "SETUP HANE bir firma de\u011Fil, ticari bir i\u015F de de\u011Fil. Buray\u0131, kendi bilgisayar\u0131n\u0131 toplarken ayn\u0131 hesaplar\u0131 defalarca yapan biri kurdu; sonra ayn\u0131 hesab\u0131 herkes kullanabilsin diye siteye ta\u015F\u0131d\u0131. \xDCr\xFCn satm\u0131yoruz, komisyon alm\u0131yoruz, kimseyi bir ma\u011Fazaya y\xF6nlendirmiyoruz. Her hesab\u0131n mant\u0131\u011F\u0131 ekranda a\xE7\u0131k duruyor; kat\u0131lmad\u0131\u011F\u0131n yeri de\u011Fi\u015Ftirebilirsin."), /*#__PURE__*/React.createElement("p", null, "Topluluk taraf\u0131 Instagram'da ", /*#__PURE__*/React.createElement("a", {
     href: "https://instagram.com/setuphane",
     target: "_blank",
     rel: "noopener noreferrer",
@@ -12050,8 +12094,8 @@ function IsBirlikleriSayfa() {
     t: 'İçerik & tanıtım',
     d: 'Instagram\'da düzenli, organik paylaşılan setup/PC içeriği içinde ürün veya marka tanıtımı.'
   }, {
-    t: 'Site içi vitrin',
-    d: 'setuphane.com/aksesuarlar üzerindeki kategori vitrininde ürün gösterimi.'
+    t: 'Ürün testi',
+    d: 'Ürünü kullanır, ölçülebilen yanlarını sitedeki testlerle ölçer, sonucu olduğu gibi yazarız. Aksesuar vitrini şu an askıda; yeniden açılırsa iş birliği ürünleri etiketli olur.'
   }, {
     t: 'Ürün odaklı içerik',
     d: 'Kurulum/inceleme tarzı paylaşımlarla ürünün gerçek kullanımının gösterilmesi.'
@@ -13911,10 +13955,14 @@ function App() {
   }), route === 'aksesuarlar' && /*#__PURE__*/React.createElement("main", {
     id: "main",
     className: "max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]"
-  }, /*#__PURE__*/React.createElement(AksesuarlarHub, null), /*#__PURE__*/React.createElement(Footer, null)), route === 'oner' && /*#__PURE__*/React.createElement("main", {
+  }, /*#__PURE__*/React.createElement(AskidaSayfa, {
+    tur: "aksesuarlar"
+  }), /*#__PURE__*/React.createElement(Footer, null)), route === 'oner' && /*#__PURE__*/React.createElement("main", {
     id: "main",
     className: "max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]"
-  }, /*#__PURE__*/React.createElement(OnerHub, null), /*#__PURE__*/React.createElement(Footer, null)), route === 'testler' && /*#__PURE__*/React.createElement("main", {
+  }, /*#__PURE__*/React.createElement(AskidaSayfa, {
+    tur: "oner"
+  }), /*#__PURE__*/React.createElement(Footer, null)), route === 'testler' && /*#__PURE__*/React.createElement("main", {
     id: "main",
     className: "max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]"
   }, /*#__PURE__*/React.createElement(TestlerHub, {

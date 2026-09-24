@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım</title>
-<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, sistem önerileri komisyonsuz. SETUP HANE topluluğu.">
+<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz. SETUP HANE topluluğu.">
 <meta name="theme-color" content="#07070B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SETUP HANE | Bütçene göre doğru bilgisayar">
-<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, öneriler komisyonsuz. Karar senin.">
+<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, komisyon yok. Karar senin.">
 <meta name="google-site-verification" content="xjJr_ENpCktifjswCPQF-lTrk-CSHy2Y3fguFi_aBWI">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
@@ -2057,8 +2057,6 @@ function Shot({kind,ratio='4/3',sm=false,className=''}){
 const SEKMELER=[
   {id:'ana',        href:'/',           t:'SİSTEM KUR',   kisa:'SİSTEM'},
   {id:'yukselt',    href:'/yukselt',    t:'YÜKSELT',      kisa:'YÜKSELT'},
-  {id:'aksesuarlar',href:'/aksesuarlar',t:'AKSESUARLAR',  kisa:'AKSESUAR'},
-  {id:'oner',       href:'/oner',       t:'ÖNER',         kisa:'ÖNER'},
   {id:'testler',    href:'/testler',    t:'TESTLER',      kisa:'TESTLER'},
   {id:'forum',      href:'/forum',      t:'FORUM',        kisa:'FORUM'},
 ];
@@ -2067,14 +2065,14 @@ const SEKMELER=[
    doğru görünmesi için. */
 const ROTA_META={
   ana:     {t:'SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım',
-            d:'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, sistem önerileri komisyonsuz.'},
+            d:'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz.'},
   /* noindex kalktı: 10 kategorinin hepsinde gerçek iş birliği ürünü var,
      sayfa artık Google'ın "içeriksiz sayfa" saydığı durumda değil.
      Ürünler /panel'den yönetiliyor. */
-  aksesuarlar: {t:'Setup Aksesuarları: Kategorilere göre keşfet | SETUP HANE',
-            d:'Mouse pad, kablo düzeni, RGB, tuş takımı, standlar ve daha fazlası. Kategori kategori, karışıklık olmadan.'},
-  oner: {t:'Sana Göre Öner: Bütçene uygun setup aksesuarı | SETUP HANE',
-            d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim. Kayıt yok, kurulum yok.'},
+  aksesuarlar: {t:'Aksesuarlar (askıda) | SETUP HANE',
+            d:'Aksesuar vitrini askıya alındı; sitede reklam ve komisyonlu bağlantı yok. Markalar için iş birliği kuralları.', noindex:true},
+  oner: {t:'Öneri aracı (askıda) | SETUP HANE',
+            d:'Aksesuar öneri aracı askıya alındı; sitede reklam ve komisyonlu bağlantı yok.', noindex:true},
   /* Yönetim ekranı: arama sonucunda yeri yok. Asıl koruma Supabase RLS'inde,
      noindex yalnızca gereksiz taramayı önlüyor. */
   panel: {t:'Panel | SETUP HANE',
@@ -2257,7 +2255,7 @@ function Hero({budget,setBudget}){
             bu bir reçete değil, başlangıç noktası.
           </p>
           <p className="hidden sm:block mt-5 text-[.95rem] text-ink/70 leading-relaxed">
-            Hiçbir şey satmıyoruz. Sistem önerilerinde komisyon yok, kimseyi bir mağazaya yönlendirmiyoruz.
+            Hiçbir şey satmıyoruz, komisyon almıyoruz, kimseyi bir mağazaya yönlendirmiyoruz.
             Kullandığımız bütün performans değerleri bağımsız ölçümlerden geliyor ve
             kaynağı sayfada yazılı. Listeyi alıp istediğin yerden alırsın, ya da hiç almazsın.
           </p>
@@ -7353,8 +7351,8 @@ function OnerHub(){
 /* ═══════════════════ KEŞFET — diğer sekmelere köprü ═══════════════════ */
 function Kesfet(){
   const kartlar=[
-    {href:'/aksesuarlar', t:'Aksesuarlar', d:'Mouse pad, kablo düzeni, RGB, tuş takımı ve daha fazlası. Kategori kategori, iş birliği yaptığımız markalardan.', e:'VİTRİN'},
-    {href:'/oner', t:'Sana Göre Öner', d:'Bütçeni ve ne aradığını yaz, sana uygun setup ürünlerini önerelim.', e:'DENEME'},
+    {href:'/yukselt', t:'Yükselt', d:'Elindeki kartı ve işlemciyi seç: yalnız kart mı, işlemciyle birlikte mi, komple yeni sistem mi? Ölçülmüş verilerle.', e:'YENİ'},
+    {href:'/yontem', t:'Yöntem', d:'Performans nereden geliyor, fiyat nasıl seçiliyor, neyi kabul etmiyoruz? Kurallarımızın tamamı.', e:'GÜVEN'},
     {href:'/testler', t:'Testler', d:'FPS, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu, refleks… On iki test, hepsi tarayıcıda çalışır.', e:'12 ARAÇ'},
     {href:'/forum', t:'Forum', d:'Kafana takılanı sor, kurduğun sistemi paylaş, başkalarının kurulumlarına bak. Kullanıcı adı seçmen yeterli.', e:'TOPLULUK'},
   ];
@@ -7387,7 +7385,7 @@ function Kesfet(){
 /* ═══════════════════ GÜVEN + FOOTER ═══════════════════ */
 function Trust(){
   const items=[
-    {t:'Hiçbir şey satmıyoruz',d:'Sistem önerilerinde komisyon yok, kimseye yönlendirmiyoruz. Listeyi alıp istediğin yerden alırsın.'},
+    {t:'Hiçbir şey satmıyoruz',d:'Komisyon almıyoruz, kimseye yönlendirmiyoruz. Listeyi alıp istediğin yerden alırsın.'},
     {t:'Hesap açıkta',d:'Her sonuç ekrandaki formülden çıkıyor. Hangi parçanın seni sınırladığını da açıkça yazıyoruz.'},
     {t:'Topluluk verisi',d:'Fiyatlar ve seçimler @setuphane topluluğunun paylaştığı gerçek kurulumlarla güncelleniyor.'},
   ];
@@ -7638,7 +7636,7 @@ function YontemSayfa(){
       <p>
         Biz bir firma değiliz, ticari amaç gütmüyoruz. Bu site, kendi parasıyla bilgisayar toplayan
         birinin aynı araştırmayı defalarca yapmaktan sıkılıp oturup yazdığı bir araç. Kimseye bir şey
-        satmıyoruz ve sistem önerilerinde hiçbir mağazadan komisyon almıyoruz. Yaptığımız iş, kuralları
+        satmıyoruz, hiçbir mağazadan komisyon almıyoruz ve sitede reklam yok. Yaptığımız iş, kuralları
         belirleyip onlara uymak.
         Hepsi aşağıda yazıyor: bize güvenmek zorunda değilsin, kontrol edebilirsin.
       </p>
@@ -7678,12 +7676,10 @@ function YontemSayfa(){
 
       <h2 className="text-[1.25rem] text-ink pt-4">Bu siteden para kazanıyor muyuz?</h2>
       <p>
-        Sistem kur, Yükselt ve Testler bölümlerinden hiç para kazanmıyoruz; oradaki hiçbir bağlantı
-        komisyonlu değil. Tek gelirimiz <a href="/aksesuarlar" className="text-cy hover:underline underline-offset-4">Aksesuarlar</a>{' '}
-        sayfasındaki Ulugames iş birliği bağlantıları: oradan alışveriş yaparsan Ulugames bize küçük
-        bir komisyon öder, senin ödediğin fiyat değişmez. Bu bağlantıların her birinin üstünde
-        "iş birliği bağlantısı" yazar. İleride başka bir marka ya da mağaza da reklam veya tanıtım
-        için ödeme yapabilir. Hangisi olursa olsun kural şu:
+        Hayır. Sitede reklam, satış ya da komisyonlu bağlantı yok. Eskiden aksesuar sayfasında bir
+        mağazanın komisyonlu bağlantıları vardı; tavsiye veren bir sitede bunu doğru bulmadığımız için
+        o bölümü kapattık. İleride bir marka ya da mağaza bize reklam veya tanıtım için ödeme
+        yapabilir. O gün geldiğinde kural şu:
       </p>
       <p className="text-ink">
         Bize para veren marka, sistem önerilerinde daha yukarı çıkamaz.
@@ -7727,6 +7723,70 @@ function YontemSayfa(){
     </BasitSayfa>
   );
 }
+/* 24.09.2026 — Kullanıcı kararı: Aksesuarlar ve Öner askıya alındı, sitede
+   SIFIR reklam / komisyonlu bağlantı. Eski bileşenler (AksesuarlarHub, OnerHub,
+   AksesuarUrunKart) silinmedi, yalnız gösterilmiyor; Supabase'deki ürünler
+   duruyor. Bu sayfalar artık markalara iş birliğinin nasıl işleyeceğini
+   anlatıyor. */
+function AskidaSayfa({tur}){
+  const aksesuar = tur==='aksesuarlar';
+  const Madde=({baslik,children})=>(
+    <div className="border border-line p-5">
+      <div className="text-ink text-[1rem] mb-2">{baslik}</div>
+      <div className="text-[.86rem] text-dim leading-relaxed">{children}</div>
+    </div>
+  );
+  return (
+    <BasitSayfa etiket={aksesuar?'AKSESUARLAR':'ÖNER'}
+                baslik={aksesuar?'Aksesuar vitrinini askıya aldık.':'Öneri aracını askıya aldık.'}>
+      <p>
+        {aksesuar
+          ? 'Bu sayfada mouse pad, klavye, kablo düzeni gibi setup ürünlerini gösteriyorduk. Bağlantıların çoğu bir mağazanın komisyonlu bağlantısıydı.'
+          : 'Bu sayfa bütçene ve yazdığın kelimelere göre setup aksesuarı öneriyordu. Önerilen ürünlerin bağlantıları bir mağazanın komisyonlu bağlantısıydı.'}
+        {' '}Açıkça belirtiyorduk, ama yine de bir tavsiye sitesinde komisyonlu bağlantı olmasını
+        doğru bulmadık. O yüzden bu bölümü kapattık: şu an sitede <span className="text-ink">hiçbir
+        reklam, satış ya da komisyonlu bağlantı yok.</span>
+      </p>
+      <p>
+        Bilgisayar tarafı olduğu gibi çalışıyor:{' '}
+        <a href="/" className="text-cy hover:underline underline-offset-4">Sistem kur</a>,{' '}
+        <a href="/yukselt" className="text-cy hover:underline underline-offset-4">Yükselt</a> ve{' '}
+        <a href="/testler" className="text-cy hover:underline underline-offset-4">Testler</a> her gün güncel.
+      </p>
+
+      <h2 className="text-[1.2rem] text-ink pt-4">Markalar ve mağazalar için</h2>
+      <p>
+        Bu bölümü ileride bir iş birliğiyle yeniden açabiliriz. Açarsak şu kurallarla açarız:
+      </p>
+      <div className="grid sm:grid-cols-2 gap-4 not-prose py-1">
+        <Madde baslik="Önce test, sonra vitrin">
+          {aksesuar
+            ? 'Ürünü önce biz kullanırız. Ölçülebilen bir şey varsa (mouse sensörü, tepki süresi, ses) sitedeki testlerle ölçer, sonucu olduğu gibi yazarız.'
+            : 'Öneri aracı yalnızca gerçekten denediğimiz ürünleri önerir. Denemediğimiz ürün öneri listesine girmez.'}
+        </Madde>
+        <Madde baslik="Her zaman etiketli">
+          İş birliğiyle gelen her ürünün ve bağlantının üstünde kimle çalıştığımız açıkça yazar.
+          Ziyaretçi neyin reklam olduğunu aramak zorunda kalmaz.
+        </Madde>
+        <Madde baslik="Sıralama satılmaz">
+          Ödeme yapan marka listede yukarı çıkmaz, rakibi aşağı itilmez. Sıralamayı yalnızca
+          test sonuçları belirler.
+        </Madde>
+        <Madde baslik="Bilgisayar önerisi ayrı kalır">
+          Sistem kur ve Yükselt bölümlerindeki parça önerileri hiçbir iş birliğinden etkilenmez;
+          orada komisyonlu bağlantı olmayacak.
+        </Madde>
+      </div>
+      <p className="text-[.9rem]">
+        Bu kurallarla çalışmak isteyen bir marka ya da mağazaysan{' '}
+        <a href="/isbirlikleri" className="text-cy hover:underline underline-offset-4">İş birlikleri</a>{' '}
+        sayfasından ulaşabilirsin. Nasıl karar verdiğimiz{' '}
+        <a href="/yontem" className="text-cy hover:underline underline-offset-4">Yöntem</a> sayfasında yazıyor.
+      </p>
+    </BasitSayfa>
+  );
+}
+
 function HakkimizdaSayfa(){
   return (
     <BasitSayfa etiket="HAKKIMIZDA" baslik="Bir kişinin kurduğu, ciddiye alınan bir araç.">
@@ -7738,7 +7798,7 @@ function HakkimizdaSayfa(){
       <p>
         SETUP HANE bir firma değil, ticari bir iş de değil. Burayı, kendi bilgisayarını
         toplarken aynı hesapları defalarca yapan biri kurdu; sonra aynı hesabı herkes
-        kullanabilsin diye siteye taşıdı. Ürün satmıyoruz, sistem önerilerinde komisyon almıyoruz, kimseyi
+        kullanabilsin diye siteye taşıdı. Ürün satmıyoruz, komisyon almıyoruz, kimseyi
         bir mağazaya yönlendirmiyoruz. Her hesabın mantığı ekranda açık duruyor;
         katılmadığın yeri değiştirebilirsin.
       </p>
@@ -7761,7 +7821,7 @@ function HakkimizdaSayfa(){
 function IsBirlikleriSayfa(){
   const hizmetler=[
     {t:'İçerik & tanıtım',d:'Instagram\'da düzenli, organik paylaşılan setup/PC içeriği içinde ürün veya marka tanıtımı.'},
-    {t:'Site içi vitrin',d:'setuphane.com/aksesuarlar üzerindeki kategori vitrininde ürün gösterimi.'},
+    {t:'Ürün testi',d:'Ürünü kullanır, ölçülebilen yanlarını sitedeki testlerle ölçer, sonucu olduğu gibi yazarız. Aksesuar vitrini şu an askıda; yeniden açılırsa iş birliği ürünleri etiketli olur.'},
     {t:'Ürün odaklı içerik',d:'Kurulum/inceleme tarzı paylaşımlarla ürünün gerçek kullanımının gösterilmesi.'},
   ];
   return (
@@ -9020,14 +9080,14 @@ function App(){
 
       {route==='aksesuarlar' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
-          <AksesuarlarHub/>
+          <AskidaSayfa tur="aksesuarlar"/>
           <Footer/>
         </main>
       )}
 
       {route==='oner' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
-          <OnerHub/>
+          <AskidaSayfa tur="oner"/>
           <Footer/>
         </main>
       )}

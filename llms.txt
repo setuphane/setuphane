@@ -1,6 +1,6 @@
 # SETUP HANE
 
-> Bütçeye göre bilgisayar toplayan, ücretsiz ve kayıt gerektirmeyen bir araç ve topluluk sitesi. Kullanıcı bütçesini ve amacını girer, o bütçeyle alınabilecek en iyi PC parça parça hesaplanır; ayrıca 12 ücretsiz donanım testi ve kayıt gerektirmeyen bir forum sunar. Hiçbir ürün satılmaz ve sistem önerileri komisyonsuzdur; tek gelir, aksesuar sayfasındaki açıkça belirtilmiş Ulugames iş birliği bağlantılarıdır.
+> Bütçeye göre bilgisayar toplayan, ücretsiz ve kayıt gerektirmeyen bir araç ve topluluk sitesi. Kullanıcı bütçesini ve amacını girer, o bütçeyle alınabilecek en iyi PC parça parça hesaplanır; ayrıca 12 ücretsiz donanım testi ve kayıt gerektirmeyen bir forum sunar. Hiçbir ürün satılmaz, komisyon alınmaz, sitede reklam ve komisyonlu bağlantı yoktur.
 
 ## Sayfalar
 
@@ -19,4 +19,4 @@
 - PC parça fiyatları her gün Epey.com'dan alınır: en az 3 farklı satıcıda satılan modelin en ucuz fiyatı. Laptop fiyatları Cimri kaynaklıdır ve elle güncellenir; sitede gösterilen tarihten eskiyse doğrulamadan alıntılamayın.
 - FPS ve performans değerleri yalnızca bağımsız ölçümü (TechPowerUp) olan parçalar için verilir; ölçümü olmayan parça sisteme eklenmez.
 - Site tek geliştirici tarafından yürütülür, sahte istatistik veya kurumsal iddia içermez.
-- /aksesuarlar ve /oner sayfaları şu an geliştirme aşamasında (örnek/placeholder içerik) — özetlerken bunu belirtin.
+- Aksesuar vitrini (/aksesuarlar) ve aksesuar öneri aracı (/oner) 24.09.2026'da askıya alındı; bu adresler yalnızca markalar için iş birliği kurallarını anlatır.
