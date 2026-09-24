@@ -20,7 +20,8 @@ KONUYA göre dağınık; bu tablo tek doğru özet.
 
 ## Bilinmesi gereken tuzaklar
 
-- **`index.html`'in `<head>` bölümü derlemede üretilmez.** Yazı tipi, meta, başlık değişikliği hem `src/setuphane.html` hem `index.html` içinde yapılmalı. Tailwind token'ları `scripts/build.mjs`'de.
+- **`index.html` elle düzenlenmez.** 24.09'dan beri derleme onu `src/setuphane.html`'den baştan üretiyor (head dahil); Tailwind ayarları da src'deki `tailwind.config`'ten okunuyor. Önceden head elle tutuluyordu ve ayrı düşmüştü.
+- **Yayın kapısı:** `.githooks/pre-push` (kurulum: `git config core.hooksPath .githooks`). Kod değişen her push'ta derleme + denetim + oyun FPS testi (~70 sn); yalnız fiyat dosyası değişen bot push'larında atlanır.
 - Veri üç yerde: kod (yedek + fiziksel ölçüler), Supabase `parcalar` (panel), `fiyatlar.json` (bot). Yükleyici ölçü alanlarını KODDAN korur; yeni ölçü alanı eklenince `koru` listesine ve denetimin `OLCU` listesine eklenmeli.
 - Yeni ekran kartı eklenince denetimin bağımsız tablolarına da (`URETICI_PSU`, `KART_KABLO`) eklenmeli; yoksa denetim hata verir (bu bilinçli).
 - Babel 500 KB üstünde compact moda geçiyordu; `build.mjs`'de `compact:false` sabit.
@@ -35,8 +36,8 @@ KONUYA göre dağınık; bu tablo tek doğru özet.
 2. ~~Model değişikliğine 3 gün freni~~ (24.09 yapıldı)
 3. ~~Bot bildirimi + fiyat eskime eşiği 3 gün~~ (24.09 yapıldı)
 4. ~~DURUM.md özetini yenile~~ (24.09 yapıldı)
-5. Yayın öncesi otomatik test (git pre-push kancası: build + denetim + gün sonu)
-6. `index.html`'i derlemede baştan üretmek (head tuzağını kaldırmak)
+5. ~~Yayın öncesi otomatik test~~ (24.09 yapıldı: .githooks/pre-push)
+6. ~~`index.html`'i derlemede baştan üretmek~~ (24.09 yapıldı; canlıda eski kalmış animasyon ve og etiketi düzeldi)
 7. Tasarım kimliği: kullanıcı "Claude ile yapılmış sitelerden farklı, bize özgü, premium, samimi" istiyor; üç yön hazırlanıp kullanıcıya gösterilecek
 8. Oyuna duyarlı motor (açık karar)
 9. Fiyat geçmişi ("son 30 günün en düşüğü"): veri `fiyatlar.json`'un git geçmişinde zaten var

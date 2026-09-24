@@ -1,8 +1,8 @@
 // src/setuphane.html -> index.html
 // JSX kaynağını Babel ile React.createElement'e çevirir, Tailwind CLI ile
-// kullanılan sınıflardan CSS üretir, ikisini index.html'in derlenmiş
-// <style id="tw"> ve <script> bloklarına gömer. README'deki "yeniden derle"
-// adımı budur: `node scripts/build.mjs`.
+// kullanılan sınıflardan CSS üretir ve index.html'i src'den BAŞTAN üretir
+// (24.09.2026'dan beri <head> dahil; index.html elle düzenlenmez).
+// README'deki "yeniden derle" adımı budur: `node scripts/build.mjs`.
 import { readFile, writeFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -52,20 +52,12 @@ if (!code.includes('const PARCA_GORSEL3B = [];')) throw new Error('PARCA_GORSEL3
 code = code.replace('const PARCA_GORSEL3B = [];', 'const PARCA_GORSEL3B = ' + JSON.stringify(gorsel3b) + ';');
 
 // 2) Tailwind CSS: kullanılan sınıfları src/setuphane.html içeriğinden tarar.
+//    24.09.2026: renk ve yazı tipi ayarları src'deki tailwind.config'ten okunur.
+//    Önceden burada bir kopyası vardı; ikisi ayrı düşebiliyordu.
+const twAyar = src.match(/tailwind\.config\s*=\s*(\{[\s\S]*?\n\})\s*\r?\n<\/script>/);
+if (!twAyar) throw new Error('src içinde tailwind.config bulunamadı');
 const tmp = await mkdtemp(path.join(tmpdir(), 'sh-tw-'));
-const twConfig = `
-module.exports = {
-  content: [${JSON.stringify(srcPath)}],
-  theme: { extend: {
-    colors: { bg:'#07070B', bg2:'#0E0E15', ink:'#ECEBF2', dim:'#8B88A0',
-              cy:'#2DE2E6', mg:'#FF2D95', line:'rgba(236,235,242,.10)' },
-    fontFamily: {
-      display:['"Geist"','system-ui','sans-serif'],
-      serif:['Newsreader','Georgia','serif'],
-      mono:['"Geist Mono"','ui-monospace','monospace']
-    }
-  } }
-};`;
+const twConfig = `module.exports = Object.assign(${twAyar[1]}, { content: [${JSON.stringify(srcPath)}] });`;
 const twInput = '@tailwind base;\n@tailwind components;\n@tailwind utilities;\n';
 const configPath = path.join(tmp, 'tailwind.config.cjs');
 const inputPath = path.join(tmp, 'in.css');
@@ -77,15 +69,27 @@ execFileSync(process.execPath, [twCli, '-c', configPath, '-i', inputPath, '-o', 
 const twCss = (await readFile(outCssPath, 'utf8')).trim();
 await rm(tmp, { recursive: true, force: true });
 
-// 3) index.html'e göm.
-let out = await readFile(outPath, 'utf8');
-out = out.replace(
-  /<style id="tw">[\s\S]*?<\/style>/,
-  `<style id="tw">\n${twCss}\n</style>`
-);
-out = out.replace(
-  /(<script>\r?\n)[\s\S]*?(\r?\n<\/script>\r?\n<\/body>)/,
-  (_, a, b) => `${a}${code}${b}`
-);
+// 3) index.html'i src'den BAŞTAN üret (24.09.2026).
+//    Önceden yalnızca iki blok gömülüyordu; <head> elle tutuluyordu ve src ile
+//    ayrı düşüyordu (canlıda eski kayma animasyonu ve eski og:image:alt kalmıştı).
+//    Yapılanlar: geliştirme için Tailwind CDN'i ve ayar bloğu çıkarılır, yerine
+//    derlenmiş CSS; tarayıcıda JSX çeviren Babel çıkarılır, yerine derlenmiş kod.
+const cikar = (metin, desen, ad) => {
+  if (!desen.test(metin)) throw new Error(ad + ' src içinde bulunamadı; derleme durduruldu');
+  return metin.replace(desen, '');
+};
+let out = src.replace(/^﻿/, '');
+out = cikar(out, /[ \t]*<link rel="preconnect" href="https:\/\/cdn\.tailwindcss\.com"[^>]*>\r?\n/, 'Tailwind preconnect');
+out = cikar(out, /[ \t]*<script src="https:\/\/cdn\.tailwindcss\.com[^"]*"><\/script>\r?\n/, 'Tailwind CDN');
+out = cikar(out, /[ \t]*<script>\r?\ntailwind\.config\s*=[\s\S]*?\n<\/script>\r?\n/, 'Tailwind ayar bloğu');
+out = cikar(out, /[ \t]*<script src="https:\/\/unpkg\.com\/@babel\/standalone[^"]*"><\/script>\r?\n/, 'Babel standalone');
+const ilkStilSonu = out.indexOf('</style>');
+if (ilkStilSonu < 0) throw new Error('ana <style> bloğu bulunamadı');
+out = out.slice(0, ilkStilSonu + 8) + '\n<style id="tw">\n' + twCss + '\n</style>' + out.slice(ilkStilSonu + 8);
+const jsx = /<script type="text\/babel" data-presets="react">\r?\n[\s\S]*?\r?\n<\/script>/;
+if (!jsx.test(out)) throw new Error('JSX bloğu çıktıda bulunamadı');
+out = out.replace(jsx, () => '<script>\n' + code + '\n</script>');
+for (const yasak of ['cdn.tailwindcss.com', 'babel/standalone', 'text/babel'])
+  if (out.includes(yasak)) throw new Error('çıktıda geliştirme kalıntısı var: ' + yasak);
 await writeFile(outPath, out);
-console.log('index.html güncellendi.');
+console.log("index.html güncellendi (src'den baştan üretildi).");
