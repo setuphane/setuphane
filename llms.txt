@@ -1,10 +1,10 @@
 # SETUP HANE
 
-> Bütçeye göre bilgisayar toplayan, ücretsiz ve kayıt gerektirmeyen bir araç ve topluluk sitesi. Kullanıcı bütçesini ve amacını girer, o bütçeyle alınabilecek en iyi PC parça parça hesaplanır; ayrıca 12 ücretsiz donanım testi ve kayıt gerektirmeyen bir forum sunar. Hiçbir ürün satılmaz, komisyon alınmaz.
+> Bütçeye göre bilgisayar toplayan, ücretsiz ve kayıt gerektirmeyen bir araç ve topluluk sitesi. Kullanıcı bütçesini ve amacını girer, o bütçeyle alınabilecek en iyi PC parça parça hesaplanır; ayrıca 12 ücretsiz donanım testi ve kayıt gerektirmeyen bir forum sunar. Hiçbir ürün satılmaz ve sistem önerileri komisyonsuzdur; tek gelir, aksesuar sayfasındaki açıkça belirtilmiş Ulugames iş birliği bağlantılarıdır.
 
 ## Sayfalar
 
-- [Sistem Kur](https://www.setuphane.com/): Bütçe ve kullanım amacına göre canlı PC parça hesaplayıcı (AMD/Intel, NVIDIA/AMD karşılaştırması dahil). Her sistem için parça seçim gerekçeleri, güç kaynağı/kasa/soğutma/fan uyumluluk kontrolleri, gerçek ürün görselleriyle 3D kasa görünümü, mağazaların hazır sistemleriyle "parça parça alsan" fiyat karşılaştırması ve hazır laptop karşılaştırması.
+- [Sistem Kur](https://www.setuphane.com/): Bütçe ve kullanım amacına göre canlı PC parça hesaplayıcı (AMD/Intel, NVIDIA/AMD karşılaştırması dahil). Her sistem için parça seçim gerekçeleri, güç kaynağı/kasa/soğutma/fan uyumluluk kontrolleri ve gerçek ürün görselleriyle 3D kasa görünümü. Laptop ve hazır sistem bölümleri, fiyatları her gün doğrulanana kadar kapalıdır.
 - Paylaşım linkleri: https://www.setuphane.com/sistem:<bütçe>-<amaç>-... biçimindeki adresler belirli bir bütçe ve amaç için hesaplanan sistemi açar.
 - [Yükseltme](https://www.setuphane.com/yukselt): Elindeki ekran kartını ve işlemcini seç, bütçeni gir; yalnız kart mı, işlemciyle birlikte mi, yoksa komple yeni sistem mi daha mantıklı, ölçülmüş verilerle karşılaştırır.
 - [Testler](https://www.setuphane.com/testler): FPS testi, ekran kartı gücü, ölü piksel, hayalet iz, klavye, mouse, DPI, oyun kolu ve refleks ölçümleri — 12 tarayıcı içi araç.

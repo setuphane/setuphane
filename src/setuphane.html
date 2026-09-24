@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım</title>
-<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz. SETUP HANE topluluğu.">
+<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, sistem önerileri komisyonsuz. SETUP HANE topluluğu.">
 <meta name="theme-color" content="#07070B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SETUP HANE | Bütçene göre doğru bilgisayar">
-<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, komisyon yok. Karar senin.">
+<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, öneriler komisyonsuz. Karar senin.">
 <meta name="google-site-verification" content="xjJr_ENpCktifjswCPQF-lTrk-CSHy2Y3fguFi_aBWI">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
@@ -2062,7 +2062,7 @@ const SEKMELER=[
    doğru görünmesi için. */
 const ROTA_META={
   ana:     {t:'SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım',
-            d:'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz.'},
+            d:'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, sistem önerileri komisyonsuz.'},
   /* noindex kalktı: 10 kategorinin hepsinde gerçek iş birliği ürünü var,
      sayfa artık Google'ın "içeriksiz sayfa" saydığı durumda değil.
      Ürünler /panel'den yönetiliyor. */
@@ -2252,7 +2252,7 @@ function Hero({budget,setBudget}){
             bu bir reçete değil, başlangıç noktası.
           </p>
           <p className="hidden sm:block mt-5 text-[.95rem] text-ink/70 leading-relaxed">
-            Hiçbir şey satmıyoruz, komisyon almıyoruz, kimseye yönlendirmiyoruz.
+            Hiçbir şey satmıyoruz. Sistem önerilerinde komisyon yok, kimseyi bir mağazaya yönlendirmiyoruz.
             Kullandığımız bütün performans değerleri bağımsız ölçümlerden geliyor ve
             kaynağı sayfada yazılı. Listeyi alıp istediğin yerden alırsın, ya da hiç almazsın.
           </p>
@@ -2629,7 +2629,7 @@ function OemPickerEski({budget,setBudget,sel,setSel,game,res}){
     <Card className="mt-6 p-5 sm:p-9">
       <BeklemedeKart baslik="Burada amacımız seni bir mağazaya göndermek değil.">
         <p>Mağazaların hazır sistemlerini alıp aynı parçaları tek tek toplasan ne tutardı, onu
-           gösteriyoruz. Kimseden komisyon almıyoruz, hiçbir mağazaya yönlendirme yapmıyoruz;
+           gösteriyoruz. Bu bölümde komisyon yok, hiçbir mağazaya yönlendirme yapmıyoruz;
            bağlantılar yalnızca fiyatı kendin görebilesin diye var.</p>
         <p>Bu bölüm de beklemede: mağaza listeleri elle taranıyor, günlük değil. Sayıyı büyütmeden
            önce bunu otomatik ve doğrulanabilir hale getireceğiz.</p>
@@ -3556,7 +3556,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
             <BrandRow label="İŞLEMCİ MARKASI" value={pick.cpu} onPick={v=>setPick(p=>({...p,cpu:v}))}
               options={[{v:'',t:'Fark etmez'},{v:'AMD',t:'AMD'},{v:'Intel',t:'Intel'}]}/>
             <BrandRow label="EKRAN KARTI MARKASI" value={pick.gpu} onPick={v=>setPick(p=>({...p,gpu:v}))}
-              options={[{v:'',t:'Fark etmez'},{v:'NVIDIA',t:'NVIDIA'},{v:'AMD',t:'AMD'}]}/>
+              options={[{v:'',t:'Fark etmez'},{v:'NVIDIA',t:'NVIDIA'},{v:'AMD',t:'AMD'},{v:'Intel',t:'Intel'}]}/>
           </div>
 
           <div className="mt-10 pt-8 border-t border-line">
@@ -6989,6 +6989,7 @@ function AksesuarUrunKart({u,kat}){
       <div className="absolute inset-x-0 bottom-0 p-2.5 bg-gradient-to-t from-bg/95 via-bg/70 to-transparent">
         <div className="text-[.74rem] text-ink/90 leading-snug line-clamp-2">{u.ad}</div>
         <div className="lbl text-[.6rem] text-cy/80 mt-1">{u.kaynak.toLocaleUpperCase('tr')} · İNCELE →</div>
+        {/[?&](bg_ref|ref)=/.test(u.link||'') && <div className="text-[.6rem] text-dim/80 mt-0.5">İş birliği bağlantısı</div>}
       </div>
     </a>
   );
@@ -7013,6 +7014,12 @@ function AksesuarlarHub(){
           yaptığımız markaların ürünleri kategori kategori burada.
           <span className="text-ink/80"> Fiyat yazmıyoruz</span>: mağazada
           değişiyor, burada bayat kalmasın. Bir kategoriye tıkla, ürünlerini gör.
+        </p>
+        <p className="mt-4 max-w-[62ch] text-[.86rem] leading-relaxed border-l-2 border-mg/60 pl-3 text-ink/85">
+          <span className="text-ink">Açıkça söyleyelim:</span> bu sayfadaki bağlantıların çoğu Ulugames iş birliği
+          bağlantısı. Bu bağlantılardan alışveriş yaparsan Ulugames bize küçük bir komisyon öder; senin
+          ödediğin fiyat değişmez. Sitenin tek geliri bu. Sistem kur, Yükselt ve Testler bölümlerinde
+          komisyonlu bağlantı yok ve bu gelir oradaki önerileri etkilemez.
         </p>
       </Reveal>
 
@@ -7326,7 +7333,7 @@ function Kesfet(){
 /* ═══════════════════ GÜVEN + FOOTER ═══════════════════ */
 function Trust(){
   const items=[
-    {t:'Hiçbir şey satmıyoruz',d:'Komisyon almıyoruz, kimseye yönlendirmiyoruz. Listeyi alıp istediğin yerden alırsın.'},
+    {t:'Hiçbir şey satmıyoruz',d:'Sistem önerilerinde komisyon yok, kimseye yönlendirmiyoruz. Listeyi alıp istediğin yerden alırsın.'},
     {t:'Hesap açıkta',d:'Her sonuç ekrandaki formülden çıkıyor. Hangi parçanın seni sınırladığını da açıkça yazıyoruz.'},
     {t:'Topluluk verisi',d:'Fiyatlar ve seçimler @setuphane topluluğunun paylaştığı gerçek kurulumlarla güncelleniyor.'},
   ];
@@ -7577,7 +7584,8 @@ function YontemSayfa(){
       <p>
         Biz bir firma değiliz, ticari amaç gütmüyoruz. Bu site, kendi parasıyla bilgisayar toplayan
         birinin aynı araştırmayı defalarca yapmaktan sıkılıp oturup yazdığı bir araç. Kimseye bir şey
-        satmıyoruz, kimseden komisyon almıyoruz. Yaptığımız iş, kuralları belirleyip onlara uymak.
+        satmıyoruz ve sistem önerilerinde hiçbir mağazadan komisyon almıyoruz. Yaptığımız iş, kuralları
+        belirleyip onlara uymak.
         Hepsi aşağıda yazıyor: bize güvenmek zorunda değilsin, kontrol edebilirsin.
       </p>
 
@@ -7616,9 +7624,12 @@ function YontemSayfa(){
 
       <h2 className="text-[1.25rem] text-ink pt-4">Bu siteden para kazanıyor muyuz?</h2>
       <p>
-        Şu an hayır. Site kimseden para almıyor, hiçbir mağazadan komisyon almıyoruz, satış da
-        yapmıyoruz. İleride bir marka (ürün üreten firma) ya da bir mağaza bize reklam veya tanıtım
-        için ödeme yapabilir. O gün geldiğinde kural şu:
+        Sistem kur, Yükselt ve Testler bölümlerinden hiç para kazanmıyoruz; oradaki hiçbir bağlantı
+        komisyonlu değil. Tek gelirimiz <a href="/aksesuarlar" className="text-cy hover:underline underline-offset-4">Aksesuarlar</a>{' '}
+        sayfasındaki Ulugames iş birliği bağlantıları: oradan alışveriş yaparsan Ulugames bize küçük
+        bir komisyon öder, senin ödediğin fiyat değişmez. Bu bağlantıların her birinin üstünde
+        "iş birliği bağlantısı" yazar. İleride başka bir marka ya da mağaza da reklam veya tanıtım
+        için ödeme yapabilir. Hangisi olursa olsun kural şu:
       </p>
       <p className="text-ink">
         Bize para veren marka, sistem önerilerinde daha yukarı çıkamaz.
@@ -7673,7 +7684,7 @@ function HakkimizdaSayfa(){
       <p>
         SETUP HANE bir firma değil, ticari bir iş de değil. Burayı, kendi bilgisayarını
         toplarken aynı hesapları defalarca yapan biri kurdu; sonra aynı hesabı herkes
-        kullanabilsin diye siteye taşıdı. Ürün satmıyoruz, komisyon almıyoruz, kimseyi
+        kullanabilsin diye siteye taşıdı. Ürün satmıyoruz, sistem önerilerinde komisyon almıyoruz, kimseyi
         bir mağazaya yönlendirmiyoruz. Her hesabın mantığı ekranda açık duruyor;
         katılmadığın yeri değiştirebilirsin.
       </p>

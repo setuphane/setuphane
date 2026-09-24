@@ -30,7 +30,7 @@ const not = (baslik, metin) => hatalar.push(baslik + ' :: ' + metin);
 
 const butceler = [];
 for (let i=0;i<=120;i++) butceler.push(Math.round(18000*Math.pow(1000000/18000, i/120)));
-const markalar = [['',''],['AMD',''],['Intel',''],['','NVIDIA'],['','AMD'],['AMD','AMD'],['Intel','NVIDIA']];
+const markalar = [['',''],['AMD',''],['Intel',''],['','NVIDIA'],['','AMD'],['AMD','AMD'],['Intel','NVIDIA'],['','Intel']];
 
 // 1. Butce artinca performans dusuyor mu? Gorunur ve utandirici hata sinifi.
 console.log('1) Butce artinca performans dusuyor mu?');
