@@ -7458,45 +7458,128 @@ function kartiBeslerMi(kart, oyunId){
     .sort((a,b)=>KATALOG_OYUN[a.id]-KATALOG_OYUN[b.id]);
   return uygun[0]||null;
 }
-/* Kullanıcının işlemcisi o senaryoda kartı besliyor mu? Karşılaştırmanın iki
-   tarafı da Tom's tablosundan: ölçek karışmıyor. */
+/* Kullanıcının işlemcisi o senaryoda kartı besliyor mu?
+   24.09.2026 (2): Eski yöntem kullanıcının işlemcisini yalnız "kartı boğmayan en
+   zayıf KATALOG işlemcisi" ile kıyaslıyordu. Katalogdaki en zayıf işlemci Ryzen 5
+   7600 olduğu için ondan zayıf her işlemci, en ucuz kartta bile "bekletir"
+   çıkıyordu (Ryzen 5 3600 + RX 9060 XT -> "yetmez"; gerçekte yeter).
+   Yeni yöntem sitenin kendi FPS modelini (effPerf) kullanıyor: kartın o oyunda
+   istediği işlemci gücü  idx·resKat·k·mul / ck. Katalog işlemcisinin gücü (g)
+   biliniyor; eski işlemcinin gücü Ryzen 5 7600'a oranla tahmin ediliyor
+   (Tom's tablosu, ±%15 belirsizlik). Bu yüzden sonuç sayı değil üç bant ve
+   belirsiz bölge "sınırda": %15'ten fazla yetiyorsa besler, %15'ten fazla
+   eksikse bekletir. */
 function cpuBant(cpu, kart, oyunId){
-  const gerek=kartiBeslerMi(kart, oyunId);
-  if(!cpu || !gerek) return null;
-  const g=KATALOG_OYUN[gerek.id];
-  return {gereken:gerek, d: cpu.oyun>=g ? 'iyi' : cpu.oyun>=g*0.9 ? 'sinirda' : 'kotu'};
+  if(!cpu || !kart) return null;
+  const oyun=GAMES.find(x=>x.id===oyunId)||GAMES[0], res=RES.find(x=>x.id==='1080')||RES[0];
+  const gerekG=kart.idx*resKat(kart,res)*oyun.k*res.mul/oyun.ck;
+  const kat=CPUS.find(c=>c.n===cpu.n);
+  const ref=CPUS.find(c=>c.id==='7600');
+  const tahminG=kat ? kat.g : (ref && KATALOG_OYUN['7600'] ? ref.g*cpu.oyun/KATALOG_OYUN['7600'] : null);
+  if(tahminG==null) return null;
+  const d = tahminG>=gerekG*1.15 ? 'iyi' : tahminG<gerekG*0.85 ? 'kotu' : 'sinirda';
+  return {gereken:kartiBeslerMi(kart, oyunId), d, tahmini:!kat};
 }
 function YukseltSayfa(){
+  /* 24.09.2026 (2) — kullanıcı: "yükselt kısmı çok zayıf; RAM vs seçimlerle
+     performans puanlaması, dolu ve kullanışlı bir alan". Yeniden yazıldı.
+     ÖLÇÜ DİSİPLİNİ (BİRİNCİ KURAL) değişmedi:
+     · Kart gücü: ESKI_GPU + katalog, aynı TechPowerUp ölçeği (RTX 5070 = 100).
+     · İşlemci: Tom's ölçeği, yalnız "besler mi" bantları; FPS'e girmez.
+     · RAM, güç kaynağı, görüntü belleği: sitenin motorda zaten uyguladığı
+       kurallar (oyunda en az 16 GB; 110+ güçte kart için 32 GB; kartın üretici
+       güç önerisi; oyunların görüntü belleği ihtiyacı). Yeni bir sayı uydurulmadı.
+     · Fiyatlar katalogdan (günlük, 3+ satıcı). */
   const {fmt}=useCur();
   const kartlar=useMemo(elimdekiKartlar,[]);
   const islemciler=useMemo(elimdekiIslemciler,[]);
   const [kartAd,setKartAd]=useState('');
   const [cpuAd,setCpuAd]=useState('');
+  const [ramGb,setRamGb]=useState(16);
+  const [ramTip,setRamTip]=useState('DDR4');
+  const [psuW,setPsuW]=useState(0);            // 0 = bilmiyorum
+  const [disk,setDisk]=useState('ssd');
+  const [resId,setResId]=useState('1080');
   const [budget,setBudget]=useState(40000);
   const eski=kartlar.find(x=>x.n===kartAd)||null;
   const cpu=islemciler.find(x=>x.n===cpuAd)||null;
+  const res=RES.find(r=>r.id===resId)||RES[0];
 
-  /* Bütçeye sığan, elindekinden hızlı EN İYİ kart. Fiyat karta ait; kasa,
-     güç kaynağı gibi ek masraflar ayrıca uyarı olarak yazılıyor. */
-  const yeni=useMemo(()=>{
-    if(!eski) return null;
-    return GPUS.filter(g=>g.id!=='igpu' && g.idx>eski.idx*1.05 && g.p<=budget)
-               .sort((a,b)=>b.idx-a.idx)[0]||null;
-  },[eski,budget]);
-  const enUcuzUst=useMemo(()=>eski?GPUS.filter(g=>g.id!=='igpu'&&g.idx>eski.idx*1.05).sort((a,b)=>a.p-b.p)[0]:null,[eski]);
-  const kazanc=(eski&&yeni)?Math.round((yeni.idx/eski.idx-1)*100):0;
-  const agir   = (yeni&&cpu) ? cpuBant(cpu,yeni,'cyber') : null;   // ağır oyun, 1080p
-  const rekabet= (yeni&&cpu) ? cpuBant(cpu,yeni,'cs2')   : null;   // rekabetçi oyun, 1080p
-  const metin={iyi:'besler', sinirda:'sınırda kalır', kotu:'kartı bekletir'};
+  /* Kartın istediği güç kaynağı sende yoksa en ucuz uygun güç kaynağı plana eklenir. */
+  const psuEk=g=>{
+    if(!psuW || !g.psuMin || psuW>=g.psuMin) return null;
+    return PSUS.filter(p=>p.w>=g.psuMin).sort((a,b)=>a.p-b.p)[0]||null;
+  };
+  const secenekler=useMemo(()=>{
+    if(!eski) return [];
+    return GPUS.filter(g=>g.id!=='igpu' && g.idx>=eski.idx*1.15)
+      .map(g=>{ const ps=psuEk(g); const maliyet=g.p+(ps?ps.p:0);
+        const kazanc=Math.round((g.idx/eski.idx-1)*100);
+        return {g, ps, maliyet, kazanc, verim:kazanc/(maliyet/10000)}; })
+      .sort((a,b)=>a.maliyet-b.maliyet);
+  },[eski,psuW]);
+  const butceIci=secenekler.filter(s=>s.maliyet<=budget);
+  const enGuclu=[...butceIci].sort((a,b)=>b.g.idx-a.g.idx)[0]||null;
+  const enVerimli=[...butceIci].sort((a,b)=>b.verim-a.verim)[0]||null;
+  /* İşlemci biliniyorsa varsayılan öneri, işlemcinin ağır oyunda RAHATÇA
+     beslediği ("iyi" bandı) en güçlü kart: sitenin dengeli sistem ilkesi.
+     Yoksa zincir büyüyor: daha güçlü kart -> daha büyük güç kaynağı -> 32 GB ->
+     yeni platform, üstelik işlemci kartı yine bekletiyor. Daha güçlüleri
+     tabloda "işlemci sınırda" notuyla duruyor. */
+  const besler=cpu?butceIci.filter(s=>{ const b=cpuBant(cpu,s.g,'cyber'); return !b || b.d==='iyi'; }):butceIci;
+  const secim=[...besler].sort((a,b)=>b.g.idx-a.g.idx)[0]||enGuclu;
+  const dahaGuclu=(cpu&&enGuclu&&secim&&enGuclu.g.idx>secim.g.idx)?enGuclu:null;
+  const yeni=secim?secim.g:null;
+  const agir   = (yeni&&cpu) ? cpuBant(cpu,yeni,'cyber') : null;
+  const rekabet= (yeni&&cpu) ? cpuBant(cpu,yeni,'cs2')   : null;
   const komple=useMemo(()=>buildSystem(budget,PROFILES[0],{cpu:'',gpu:''}),[budget]);
 
-  const Kutu=({etiket,baslik,children,vurgu})=>(
-    <div className={'p-5 sm:p-6 border '+(vurgu?'border-cy/60 bg-cy/[.04]':'border-line')}>
+  /* Karne referansları: bugün satılan kartlardan. */
+  const refKart=GPUS.find(g=>g.id==='5060')||GPUS.find(g=>g.id==='5070');
+  const refCpuOyun=KATALOG_OYUN['7600'];
+  const vramEksik=eski?GAMES.filter(o=>eski.vram && eski.vram<o.vram):[];
+  const ram16=RAMS.find(r=>r.gb===16), ram32=RAMS.find(r=>r.gb===32);
+  const ssd1=SSDS.find(s=>s.gb===1000);
+
+  /* Önce ne yapmalı: sıralı plan. Zorunlu olan önce. */
+  const plan=[];
+  if(secim && secim.ps) plan.push({t:'Güç kaynağı: '+secim.ps.n, fiyat:secim.ps.p, neden:'Önerdiğimiz kart en az '+secim.g.psuMin+' W istiyor, seninki '+psuW+' W. Bu olmadan kart güvenle çalışmaz.', zorunlu:true});
+  if(ramGb<16) plan.push({t:'Belleği 16 GB’a çıkar', fiyat:ramTip==='DDR5'&&ram16?ram16.p:null, neden:'16 GB’ın altında bugünün oyunları takılır; sistem kur bölümümüz oyun bilgisayarını 16 GB’ın altında hiç kurmaz.'});
+  if(disk==='hdd') plan.push({t:'SSD’ye geç: '+(ssd1?ssd1.n:'1 TB NVMe'), fiyat:ssd1?ssd1.p:null, neden:'Oyun ve Windows açılışı belirgin şekilde hızlanır. FPS’i değiştirmez ama en çok hissedilen ucuz yükseltmedir. Anakartında M.2 yuvası yoksa SATA SSD al.'});
+  if(secim) plan.push({t:'Ekran kartı: '+secim.g.n, fiyat:secim.g.p, neden:'%'+secim.kazanc+' daha fazla kare hızı (elindeki kartla aynı ölçüm kaynağı).'+(dahaGuclu?' İşlemcini değiştirmeden alabileceğin en güçlü kart bu.':'')});
+  if(yeni && yeni.idx>=110 && ramGb<32) plan.push({t:'Belleği 32 GB’a çıkar', fiyat:ramTip==='DDR5'&&ram32?ram32.p:null, neden:'Bu güçte bir kartı sistem kur bölümümüz 32 GB’ın altında önermiyor; 16 GB kartı yeni oyunlarda bekletir.'});
+  if(agir && agir.d==='kotu') plan.push({t:'İşlemci + anakart + bellek (platform)', fiyat:null, neden:'İşlemcin bu kartın hakkını veremez; en az '+agir.gereken.n+' seviyesi gerekir. Aşağıdaki "komple sistem" seçeneğine de bak.'});
+  const planToplam=plan.reduce((t,x)=>t+(x.fiyat||0),0);
+  const fiyatsiz=plan.some(x=>x.fiyat==null);
+
+  const Secim=({etiket,deger,ayarla,secenekler:ops})=>(
+    <div>
       <div className="lbl text-dim mb-2">{etiket}</div>
-      <div className="text-[1.05rem] text-ink mb-3">{baslik}</div>
-      <div className="text-[.85rem] text-dim leading-relaxed space-y-2">{children}</div>
+      <div className="flex flex-wrap gap-2">
+        {ops.map(([v,t])=>(
+          <button key={String(v)} type="button" onClick={()=>ayarla(v)} aria-pressed={deger===v}
+            className={'px-3 py-2 text-[.85rem] border transition-colors '+(deger===v?'border-cy text-cy bg-cy/[.06]':'border-line text-ink/80 hover:border-cy/40')}>
+            {t}</button>
+        ))}
+      </div>
     </div>
   );
+  const Cubuk=({oran,renk})=>(
+    <div className="h-2 bg-line/60 relative overflow-hidden mt-2">
+      <div className="absolute inset-y-0 left-0" style={{width:Math.max(3,Math.min(100,oran))+'%',background:renk||'#2DE2E6'}}/>
+    </div>
+  );
+  const Karne=({baslik,puan,cubuk,renk,children})=>(
+    <div className="border border-line p-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="lbl text-dim">{baslik}</span>
+        {puan!=null && <span className="num text-[1.05rem] text-ink">{puan}</span>}
+      </div>
+      {cubuk!=null && <Cubuk oran={cubuk} renk={renk}/>}
+      <div className="text-[.82rem] text-dim leading-relaxed mt-2.5">{children}</div>
+    </div>
+  );
+  const metinBant={iyi:'besler', sinirda:'sınırda kalır', kotu:'kartı bekletir'};
 
   return (
     <div className="pb-24">
@@ -7505,16 +7588,17 @@ function YukseltSayfa(){
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.2rem)] max-w-[20ch]">
           Elindekini atma. <span className="em">Neyi</span> değiştirmen gerektiğini gör.
         </h1>
-        <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
-          Kartını ve işlemcini seç, bütçeni söyle. Aynı paraya üç yol var: yalnız ekran kartı,
-          işlemciyle birlikte, ya da komple yeni sistem. Hangisinin ne kazandırdığını yazıyoruz.
+        <p className="mt-6 text-dim max-w-[60ch] leading-relaxed text-[.95rem]">
+          Sistemini tanıt, bütçeni söyle. Karneni çıkaralım, önce neyi değiştirmen gerektiğini
+          fiyatıyla sıralayalım ve aynı paraya komple yeni sistemle karşılaştıralım.
         </p>
       </Reveal>
 
       <Card className="mt-10 p-5 sm:p-9">
+        <Label className="mb-5">1 · ELİNDEKİ SİSTEM</Label>
         <div className="grid sm:grid-cols-2 gap-5">
           <div>
-            <label htmlFor="ykart" className="lbl text-dim block mb-2">ELİMDEKİ EKRAN KARTI</label>
+            <label htmlFor="ykart" className="lbl text-dim block mb-2">EKRAN KARTI</label>
             <select id="ykart" value={kartAd} onChange={e=>{setKartAd(e.target.value); olay('yukselt_kart',{kart:e.target.value});}}
                     className="w-full px-3 py-3 text-[.9rem]">
               <option value="">Seç…</option>
@@ -7522,7 +7606,7 @@ function YukseltSayfa(){
             </select>
           </div>
           <div>
-            <label htmlFor="ycpu" className="lbl text-dim block mb-2">ELİMDEKİ İŞLEMCİ</label>
+            <label htmlFor="ycpu" className="lbl text-dim block mb-2">İŞLEMCİ</label>
             <select id="ycpu" value={cpuAd} onChange={e=>setCpuAd(e.target.value)}
                     className="w-full px-3 py-3 text-[.9rem]">
               <option value="">Bilmiyorum / listede yok</option>
@@ -7530,77 +7614,161 @@ function YukseltSayfa(){
             </select>
           </div>
         </div>
+        <div className="grid sm:grid-cols-2 gap-5 mt-6">
+          <Secim etiket="BELLEK (RAM)" deger={ramGb} ayarla={setRamGb} secenekler={[[8,'8 GB'],[16,'16 GB'],[32,'32 GB'],[64,'64 GB+']]}/>
+          <Secim etiket="BELLEK TÜRÜ" deger={ramTip} ayarla={setRamTip} secenekler={[['DDR4','DDR4'],['DDR5','DDR5'],['?','Bilmiyorum']]}/>
+          <Secim etiket="GÜÇ KAYNAĞI" deger={psuW} ayarla={setPsuW} secenekler={[[500,'500 W ve altı'],[550,'550 W'],[650,'650 W'],[750,'750 W'],[850,'850 W'],[1000,'1000 W+'],[0,'Bilmiyorum']]}/>
+          <Secim etiket="DİSK" deger={disk} ayarla={setDisk} secenekler={[['hdd','HDD (mekanik)'],['sata','SATA SSD'],['ssd','NVMe SSD']]}/>
+          <Secim etiket="EKRANIN" deger={resId} ayarla={setResId} secenekler={RES.map(r=>[r.id,r.n])}/>
+        </div>
         <div className="mt-7"><BudgetSlider id="ybud" label="YÜKSELTMEYE AYIRDIĞIN BÜTÇE" budget={budget} setBudget={setBudget}/></div>
-
-        {!eski ? (
-          <p className="mt-8 text-[.9rem] text-dim">Kartını seçince üç yolu da hesaplayacağım.</p>
-        ) : (
-          <div className="mt-9 space-y-4">
-            <Kutu etiket="YOL 1 · SADECE EKRAN KARTI" vurgu={!!yeni}
-                  baslik={yeni? yeni.n : 'Bu bütçede elindekinden hızlı kart çıkmıyor'}>
-              {yeni ? (<>
-                <p><span className="num text-cy text-[1.5rem]">%{kazanc}</span>{' '}
-                  daha fazla kare hızı. Ölçüm kaynağı elindeki kartla aynı, o yüzden bu oran gerçek bir karşılaştırma.</p>
-                <p className="num text-ink">{fmt(yeni.p)}</p>
-                {eski.vram<yeni.vram && <p>Bellek {eski.vram} GB’dan {yeni.vram} GB’a çıkıyor: doku ayarlarını kısmak zorunda kalmazsın.</p>}
-                <p>Takmadan önce iki şeyi ölç: güç kaynağın <span className="text-ink">en az {yeni.psuMin} W</span> olmalı
-                   {yeni.p16? ' ve kartın istediği 12V-2x6 kablosu bulunmalı':(yeni.pin8?' ve '+yeni.pin8+' adet 8 pinli kablosu olmalı':'')};
-                   kasanda kart için <span className="text-ink">{yeni.boy+KART_PAY} mm</span> boş uzunluk gerekir.</p>
-              </>) : (
-                <p>{enUcuzUst? <>Elindekinden hızlı en ucuz kart <span className="num text-ink">{fmt(enUcuzUst.p)}</span> ({enUcuzUst.n}).
-                     Bütçeni buraya çekmeden kart değiştirmek anlamlı değil.</> : 'Elindeki kart, listemizdeki her karttan hızlı.'}</p>
-              )}
-            </Kutu>
-
-            <Kutu etiket="YOL 2 · İŞLEMCİ DE DEĞİŞSİN"
-                  baslik={!yeni? 'Önce kart kararını ver' : !cpu? 'İşlemcini seçersen bu soruyu yanıtlayabilirim'
-                          : (agir&&agir.d==='iyi'&&rekabet&&rekabet.d==='iyi') ? 'Gerek yok: işlemcin bu kartı besliyor'
-                          : (agir&&agir.d==='kotu') ? 'Gerekli: işlemcin bu kartın hakkını veremez'
-                          : 'Oyuna göre değişiyor'}>
-              {yeni && cpu && agir && rekabet && (<>
-                <p><span className="text-ink">Ağır oyunlarda</span> (Cyberpunk gibi, 1080p) işlemcin bu kartı{' '}
-                   <span className={agir.d==='iyi'?'text-cy':'text-mg'}>{metin[agir.d]}</span>.
-                   {agir.d!=='iyi' && <> Bunun için en az <span className="text-ink">{agir.gereken.n}</span> seviyesi gerekiyor.</>}</p>
-                <p><span className="text-ink">Rekabetçi oyunlarda</span> (CS2 gibi, yüksek kare hızı) işlemcin{' '}
-                   <span className={rekabet.d==='iyi'?'text-cy':'text-mg'}>{metin[rekabet.d]}</span>.
-                   {rekabet.d!=='iyi' && <> Burada sınırı işlemci koyar: kart daha fazlasını verebilir ama işlemci yetişemez.</>}</p>
-                {agir.d==='kotu' && <p>İşlemciyi değiştirmek anakart ve belleği de değiştirmek demek; soket ve bellek türü uyuşmuyor.
-                   Bu durumda komple yeni sistem çoğu zaman daha mantıklı: aşağıdaki üçüncü yola bak.</p>}
-                <p className="text-[.78rem]">İşlemci karşılaştırması ayrı bir ölçüm tablosundan geliyor ve yaklaşık %5 pay taşıyor;
-                   bu yüzden burada FPS sayısı vermiyoruz, yalnızca besleyip beslemediğini söylüyoruz.</p>
-              </>)}
-              {yeni && !cpu && <p>Listede yoksa da sorun değil: kartı alıp deneyebilirsin. Ama kartın gücü arttıkça
-                 eski bir işlemcinin onu bekletme ihtimali artar.</p>}
-            </Kutu>
-
-            <Kutu etiket="YOL 3 · KOMPLE YENİ SİSTEM"
-                  baslik={komple? komple.g.n+' + '+komple.c.n : 'Bu bütçeye sistem çıkmıyor'}>
-              {komple ? (<>
-                {komple.g.idx<eski.idx ? (
-                  /* Bu bütçede komple sistemin kartı, kullanıcının elindekinden
-                     zayıf kalıyor: söylemezsek ziyaretçi geriye gider. */
-                  <p className="text-mg">Dikkat: bu bütçedeki komple sistemin ekran kartı
-                    ({komple.g.n}) elindekinden <span className="num">%{Math.round((1-komple.g.idx/eski.idx)*100)}</span> daha yavaş.
-                    Bu parayla sıfırdan kurmak seni geriye götürür; yalnız kartı değiştirmek daha mantıklı.</p>
-                ) : (
-                  <p>Aynı parayla sıfırdan kurulacak en dengeli sistem. Her parçası ölçülmüş,
-                     güç kaynağı ve kasa uyumu kontrol edilmiş.
-                     {komple.g.idx>eski.idx && <> Kartı da elindekinden <span className="num text-cy">%{Math.round((komple.g.idx/eski.idx-1)*100)}</span> hızlı.</>}</p>
-                )}
-                <p className="num text-ink">{fmt(komple.total)}</p>
-                <a href={'/sistem:'+budget+'-oyun-x-x-cs2-1080'} className="inline-block mt-1 text-cy underline underline-offset-4">
-                  Sistemin tamamını gör →
-                </a>
-              </>) : <p>Bütçeyi biraz yukarı çekersen komple sistem seçeneği de açılır.</p>}
-            </Kutu>
-          </div>
-        )}
       </Card>
 
-      <p className="mt-6 text-[.72rem] text-dim leading-relaxed max-w-[62ch]">
-        Kart karşılaştırmaları TechPowerUp’ın ölçümlerine, işlemci karşılaştırmaları Tom’s Hardware’in
-        1080p oyun tablosuna dayanır. Ölçümü bulunmayan hiçbir parça listeye eklenmedi.
-      </p>
+      {!eski ? (
+        <p className="mt-8 text-[.9rem] text-dim">Ekran kartını seçince karneni ve planını çıkaracağım.</p>
+      ) : (<>
+        <Card className="mt-6 p-5 sm:p-9">
+          <Label className="mb-5">2 · SİSTEM KARNESİ</Label>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Karne baslik="EKRAN KARTI" puan={eski.idx} cubuk={eski.idx/1.68}>
+              {refKart && <>Bugün {fmt(refKart.p)} olan {refKart.n.split(' (')[0]} ile kıyaslarsak gücü{' '}
+                <span className="text-ink">%{Math.round(eski.idx/refKart.idx*100)}</span>.</>}
+              {' '}Puan ölçeği: RTX 5070 = 100.
+            </Karne>
+            <Karne baslik="GÖRÜNTÜ BELLEĞİ" puan={eski.vram?eski.vram+' GB':'?'} cubuk={eski.vram?Math.min(100,eski.vram/16*100):null}
+                   renk={vramEksik.length?'#FF2D95':undefined}>
+              {vramEksik.length
+                ? <>Şu oyunlarda yetmez: <span className="text-ink">{vramEksik.map(o=>o.n.split(' ·')[0]).join(', ')}</span>. Bunlarda doku ayarını düşürmen gerekir.</>
+                : 'Listemizdeki bütün oyunlar için yeterli.'}
+            </Karne>
+            <Karne baslik="İŞLEMCİ" puan={cpu?'~%'+Math.round(cpu.oyun/refCpuOyun*100):null} cubuk={cpu?cpu.oyun:null}>
+              {cpu
+                ? <>Bugün satılan en giriş seviyesi işlemciyle (Ryzen 5 7600) kıyaslarsak oyun gücü yaklaşık{' '}
+                    <span className="text-ink">%{Math.round(cpu.oyun/refCpuOyun*100)}</span>.
+                    {cpu.oyun<refCpuOyun*0.8 ? ' Üst seviye kartlarda sınır koyar; hangi kartı rahat beslediği aşağıdaki planda.' : ''}</>
+                : 'İşlemcini seçersen yeni kartı besleyip beslemediğini söyleyebilirim.'}
+            </Karne>
+            <Karne baslik="BELLEK" puan={ramGb+' GB'} cubuk={Math.min(100,ramGb/32*100)} renk={ramGb<16?'#FF2D95':undefined}>
+              {ramGb<16 ? 'Oyun için az: 16 GB’ın altında bugünün oyunları takılır.'
+                : ramGb<32 ? 'Oyun için yeterli. Çok güçlü bir kart ya da yayın için 32 GB önerilir.'
+                : 'Rahat. Bellek sınır koymaz.'}
+              {ramTip==='DDR4' ? ' DDR4: yeni nesil işlemciye geçersen bellek de değişir (DDR5).' : ''}
+            </Karne>
+            <Karne baslik="GÜÇ KAYNAĞI" puan={psuW?psuW+' W':'?'} cubuk={psuW?Math.min(100,psuW/1000*100):null}>
+              {psuW ? (yeni ? (psuW>=(yeni.psuMin||0) ? 'Önerdiğimiz kartı taşır.' : 'Önerdiğimiz kart için yetmez; plana eklendi.')
+                            : 'Kart seçeneklerinde her kart için ayrıca kontrol ediliyor.')
+                    : 'Watt değerini güç kaynağının üstündeki etikette görebilirsin; bilmeden kart almak riskli.'}
+            </Karne>
+            <Karne baslik="DİSK" puan={disk==='hdd'?'HDD':disk==='sata'?'SATA SSD':'NVMe'} cubuk={disk==='hdd'?25:disk==='sata'?70:100}
+                   renk={disk==='hdd'?'#FF2D95':undefined}>
+              {disk==='hdd' ? 'Açılışlar ve yüklemeler yavaş; en ucuz, en hissedilir yükseltme SSD.'
+                : disk==='sata' ? 'İyi. Oyunlarda NVMe ile fark çok küçük.' : 'En hızlı sınıf.'}
+            </Karne>
+          </div>
+          <p className="mt-4 text-[.72rem] text-dim leading-relaxed max-w-[70ch]">
+            Kart puanı TechPowerUp ölçümlerinden, işlemci karşılaştırması Tom’s Hardware 1080p oyun tablosundan
+            (yaklaşık, ±%15; bu yüzden işlemci için sayı değil üç bant veriyoruz). Bellek ve güç kaynağı değerlendirmesi sistem kur bölümümüzün kullandığı kurallarla aynı.
+          </p>
+        </Card>
+
+        <Card className="mt-6 p-5 sm:p-9">
+          <div className="flex items-baseline justify-between gap-4 flex-wrap mb-5">
+            <Label>3 · ÖNCE NE YAPMALI</Label>
+            {plan.length>0 && <span className="num text-ink">{fmt(planToplam)}{fiyatsiz?' +':''}</span>}
+          </div>
+          {plan.length===0 ? (
+            <p className="text-[.9rem] text-dim">
+              {secenekler.length ? 'Bu bütçede elindekinden belirgin hızlı bir kart çıkmıyor. En ucuz anlamlı yükseltme '+fmt(secenekler[0].maliyet)+'.' : 'Elindeki kart, listemizdeki kartların hepsinden güçlü ya da onlara çok yakın.'}
+            </p>
+          ) : (
+            <ol className="space-y-3">
+              {plan.map((x,i)=>(
+                <li key={i} className={'flex gap-4 p-4 border '+(x.zorunlu?'border-mg/50':'border-line')}>
+                  <span className="num text-cy text-[1.1rem] w-6 shrink-0">{i+1}</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                      <span className="text-ink">{x.t}{x.zorunlu && <span className="lbl text-mg ml-2">ZORUNLU</span>}</span>
+                      <span className="num text-ink/85">{x.fiyat!=null?fmt(x.fiyat):'fiyatı listemizde yok'}</span>
+                    </div>
+                    <div className="text-[.82rem] text-dim leading-relaxed mt-1">{x.neden}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+          {agir && rekabet && (
+            <p className="mt-4 text-[.82rem] text-dim leading-relaxed">
+              İşlemcin bu kartı ağır oyunlarda <span className={agir.d==='iyi'?'text-cy':'text-mg'}>{metinBant[agir.d]}</span>,
+              rekabetçi oyunlarda (yüksek kare hızı) <span className={rekabet.d==='iyi'?'text-cy':'text-mg'}>{metinBant[rekabet.d]}</span>.
+            </p>
+          )}
+          {dahaGuclu && (
+            <p className="mt-4 text-[.85rem] leading-relaxed border-l-2 border-mg/60 pl-3 text-ink/85">
+              Bütçen daha güçlü bir karta da yetiyor: <span className="text-ink">{dahaGuclu.g.n.split(' (')[0]}</span>{' '}
+              (+%{dahaGuclu.kazanc}). Ama işlemcin ağır oyunlarda o karta yetişemez ya da sınırda kalır; kartın
+              gücünün bir kısmı boşa gider. Tam verim istiyorsan işlemci, anakart ve belleği de değiştirmen gerekir;
+              bu durumda aşağıdaki komple sistem seçeneği çoğu zaman daha mantıklı.
+            </p>
+          )}
+          {fiyatsiz && <p className="mt-2 text-[.75rem] text-dim">Fiyatını tutmadığımız kalemler (DDR4 bellek gibi) toplama dahil değil.</p>}
+        </Card>
+
+        {secenekler.length>0 && (
+          <Card className="mt-6 p-5 sm:p-9">
+            <Label className="mb-2">4 · KART SEÇENEKLERİ</Label>
+            <p className="text-[.82rem] text-dim mb-5">Elindekinden en az %15 hızlı kartlar, ucuzdan pahalıya. Güç kaynağın yetmiyorsa gerekeni fiyata ekledik.</p>
+            <div className="overflow-x-auto -mx-1">
+              <table className="w-full text-[.85rem] min-w-[560px]">
+                <thead><tr className="text-left lbl text-dim border-b border-line">
+                  <th className="py-2 px-1 font-normal">KART</th><th className="py-2 px-1 font-normal text-right">KAZANÇ</th>
+                  <th className="py-2 px-1 font-normal text-right">MALİYET</th><th className="py-2 px-1 font-normal text-right">10 BİN ₺ BAŞINA KAZANÇ</th>
+                  <th className="py-2 px-1 font-normal">GÜÇ KAYNAĞI</th></tr></thead>
+                <tbody>
+                  {secenekler.slice(0,8).map(s=>{
+                    const disari=s.maliyet>budget;
+                    return (
+                      <tr key={s.g.id} className={'border-b border-line/60 '+(disari?'opacity-45':'')}>
+                        <td className="py-2.5 px-1">
+                          <span className="text-ink">{s.g.n.split(' (')[0]}</span>
+                          {s===enVerimli && <span className="lbl text-cy ml-2">EN VERİMLİ</span>}
+                          {s===secim && <span className="lbl text-ink ml-2">ÖNERİMİZ</span>}
+                          {s===dahaGuclu && <span className="lbl text-mg ml-2">İŞLEMCİN SINIRDA</span>}
+                          <div className="text-[.72rem] text-dim">{s.g.vram} GB · {s.g.boy?s.g.boy+' mm':''}</div>
+                        </td>
+                        <td className="py-2.5 px-1 text-right num text-cy">+%{s.kazanc}</td>
+                        <td className="py-2.5 px-1 text-right num">{fmt(s.maliyet)}</td>
+                        <td className="py-2.5 px-1 text-right num">%{Math.round(s.verim)}</td>
+                        <td className="py-2.5 px-1 text-[.78rem]">
+                          {!psuW ? <span className="text-dim">en az {s.g.psuMin} W</span>
+                            : s.ps ? <span className="text-mg">yetmez, +{s.ps.w} W dahil</span>
+                            : <span className="text-cy">yeter</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-[.72rem] text-dim">Soluk satırlar bütçenin üstünde. Kartı almadan kasandaki boş uzunluğu ölç: kart uzunluğu + 15 mm gerekir.</p>
+          </Card>
+        )}
+
+        <Card className="mt-6 p-5 sm:p-9">
+          <Label className="mb-3">5 · YA DA KOMPLE YENİ SİSTEM</Label>
+          {komple ? (<>
+            <div className="text-ink text-[1.02rem]">{komple.g.n} + {komple.c.n}</div>
+            <div className="num text-ink mt-1">{fmt(komple.total)}</div>
+            {komple.g.idx<eski.idx ? (
+              <p className="text-mg text-[.85rem] mt-2">Bu bütçedeki komple sistemin ekran kartı elindekinden
+                %{Math.round((1-komple.g.idx/eski.idx)*100)} daha yavaş. Sıfırdan kurmak seni geriye götürür.</p>
+            ) : (
+              <p className="text-dim text-[.85rem] mt-2">Aynı parayla sıfırdan kurulan en dengeli sistem; kartı elindekinden
+                %{Math.round((komple.g.idx/eski.idx-1)*100)} hızlı ve bütün parçaları yeni.</p>
+            )}
+            <a href={'/sistem:'+budget+'-oyun-x-x-cs2-'+resId} className="inline-block mt-3 text-cy underline underline-offset-4 text-[.9rem]">Sistemin tamamını gör →</a>
+          </>) : <p className="text-dim text-[.9rem]">Bu bütçeye komple sistem çıkmıyor; bütçeyi artırırsan bu seçenek açılır.</p>}
+        </Card>
+      </>)}
     </div>
   );
 }

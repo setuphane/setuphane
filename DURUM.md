@@ -565,3 +565,11 @@ Kullanıcı: "öneri ve aksesuarlar kısmını da askıya alalım, sıfır rekla
 - Menüden kalktı; /aksesuarlar ve /oner `AskidaSayfa` gösteriyor (neden kapalı + markalar için 4 kural: önce test, her zaman etiketli, sıralama satılmaz, bilgisayar önerisi ayrı kalır). noindex, sitemap'ten çıktı.
 - Ana sayfadaki "Bunları da dene" kartları: Yükselt, Yöntem, Testler, Forum.
 - "Komisyon almıyoruz" artık her yerde doğru; Yöntem'deki gelir bölümü "Hayır" diye yeniden yazıldı. 9 sayfada komisyonlu bağlantı sayısı 0 (tarayıcıda doğrulandı).
+
+### 24.09.2026 (gece) — Yükselt sayfası yeniden yazıldı
+Kullanıcı: "yükselt kısmı çok zayıf; RAM vs seçimlerle performans puanlaması, dolu ve kullanışlı olsun".
+- Girdiler: kart, işlemci, RAM (miktar + DDR4/DDR5), güç kaynağı (W), disk (HDD/SATA/NVMe), ekran çözünürlüğü, bütçe.
+- 5 bölüm: sistem karnesi (6 kart), önce ne yapmalı (sıralı, fiyatlı plan; zorunlu olan önce), kart seçenekleri tablosu (kazanç, maliyet, 10 bin TL başına kazanç, güç kaynağı yeter mi; yetmezse PSU fiyata eklenir), komple sistem.
+- Uydurma sayı yok: kart puanı TechPowerUp; RAM/güç/görüntü belleği kuralları motorla aynı; fiyatlar katalogdan.
+- **cpuBant düzeltildi:** eski yöntem Ryzen 5 7600'dan zayıf her işlemciye "bekletir" diyordu (katalogdaki en zayıf referans o). Yeni yöntem sitenin FPS modelini kullanıyor: gereken g = idx·resKat·k·mul/ck; eski işlemcinin g'si 7600'a oranla tahmin (±%15), sonuç üç bant.
+- Varsayılan öneri: işlemcinin ağır oyunda RAHAT beslediği en güçlü kart (3600 -> RTX 5060 Ti; 13600K -> RX 9070 XT + 850 W + 32 GB). Daha güçlüsü "İŞLEMCİN SINIRDA" etiketiyle.
