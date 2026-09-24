@@ -2437,18 +2437,22 @@ function BrandRow({label,value,options,onPick}){
   );
 }
 
-function AmdIntelCompare({budget,prof,game,res}){
+/* 24.09.2026: aynı bileşen ekran kartı markası için de çalışıyor (tur="gpu":
+   NVIDIA mı AMD mi). Ziyaretçinin en sık sorduğu soru buydu. */
+function AmdIntelCompare({budget,prof,game,res,tur='cpu'}){
   const {fmt}=useCur();
-  const a=useMemo(()=>buildSystem(budget,prof,{cpu:'AMD',gpu:''},game,res),[budget,prof,game,res]);
-  const i=useMemo(()=>buildSystem(budget,prof,{cpu:'Intel',gpu:''},game,res),[budget,prof,game,res]);
+  const [A,B]=tur==='gpu'?['NVIDIA','AMD']:['AMD','Intel'];
+  const secim=m=>tur==='gpu'?{cpu:'',gpu:m}:{cpu:m,gpu:''};
+  const a=useMemo(()=>buildSystem(budget,prof,secim(A),game,res),[budget,prof,game,res,tur]);
+  const i=useMemo(()=>buildSystem(budget,prof,secim(B),game,res),[budget,prof,game,res,tur]);
   const fa=a?fps(a.g,a.c,game,res):0, fi=i?fps(i.g,i.c,game,res):0;
   const faA=useCount(fa), fiA=useCount(fi);
   if(!a && !i) return null;
 
   /* FPS eşitse fiyat belirler — aksi halde "fark etmez" deyip 5 bin lira
      farkı görmezden geliyorduk. */
-  const fpsWin  = fa>fi ? 'AMD' : fi>fa ? 'Intel' : null;
-  const cheaper = (a&&i) ? (a.total<i.total ? 'AMD' : i.total<a.total ? 'Intel' : null) : null;
+  const fpsWin  = fa>fi ? A : fi>fa ? B : null;
+  const cheaper = (a&&i) ? (a.total<i.total ? A : i.total<a.total ? B : null) : null;
   const win = fpsWin || cheaper;
   const diff = Math.abs(fa-fi);
   const pct = Math.round(100*diff/Math.max(1,Math.min(fa,fi)||1));
@@ -2483,7 +2487,7 @@ function AmdIntelCompare({budget,prof,game,res}){
         </>
       ) : (
         <p className="text-[.85rem] text-dim leading-relaxed">
-          Bu bütçeye uyan {t} sistemi çıkmıyor. {t==='Intel' ? 'Intel tarafında en ucuz işlemci + anakart ikilisi daha pahalı başlıyor.' : ''}
+          Bu bütçeye uyan {t} sistemi çıkmıyor. {tur==='cpu' && t==='Intel' ? 'Intel tarafında en ucuz işlemci + anakart ikilisi daha pahalı başlıyor.' : ''}
         </p>
       )}
     </div>
@@ -2493,12 +2497,12 @@ function AmdIntelCompare({budget,prof,game,res}){
   return (
     <Card className="mt-6 p-5 sm:p-7">
       <div className="flex items-baseline justify-between gap-4 mb-5 flex-wrap">
-        <Label>AYNI PARAYA AMD Mİ, INTEL Mİ?</Label>
+        <Label>{tur==='gpu' ? 'AYNI PARAYA NVIDIA MI, AMD Mİ?' : 'AYNI PARAYA AMD Mİ, INTEL Mİ?'}</Label>
         <span className="lbl text-dim">{game.n.toUpperCase()} · {res.n}</span>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
-        <Col t="AMD"   b={a} f={fa} fA={faA} best={win==='AMD'}/>
-        <Col t="Intel" b={i} f={fi} fA={fiA} best={win==='Intel'}/>
+        <Col t={A} b={a} f={fa} fA={faA} best={win===A}/>
+        <Col t={B} b={i} f={fi} fA={fiA} best={win===B}/>
       </div>
       {a && i && (
         <p className="mt-5 text-[.88rem] text-ink/80 leading-relaxed max-w-[58ch]">
@@ -9109,6 +9113,7 @@ function App(){
                       <Builder budget={budget} setBudget={setBudget} prof={prof} setProf={setProf} res={res}
                                sys={sys} pick={pick} setPick={setPick} gid={gid} rid={rid} game={game}/>
                       <AmdIntelCompare budget={budget} prof={prof} game={game} res={res}/>
+                      {prof.needGpu && <AmdIntelCompare budget={budget} prof={prof} game={game} res={res} tur="gpu"/>}
                     </>
                   : mode==='oem'
                   ? <OemPicker budget={budget} setBudget={setBudget} sel={oem} setSel={setOem}
