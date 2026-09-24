@@ -7136,35 +7136,7 @@ function AksesuarlarHub(){
    tarayıcıda çalışıyor — sitenin "bağımsızlık" prensibiyle uyumlu.
    ÜRÜNLER şu an örnek/placeholder — gerçek iş birlikleri geldikçe burası
    güncellenecek, motorun kendisi (oneriUret) aynı kalabilir. */
-const ONERI_URUNLER=[
-  {id:'op1', kat:'mousepad', ad:'XL Kumaş Mouse Pad (Örnek)',
-   aciklama:'Masayı uçtan uca kaplayan, kaymaz tabanlı kumaş yüzey.',
-   minTL:0, maxTL:1000, anahtar:['mousepad','mouse pad','mouse','fare','fare pedi','altlık','masa','xl','kumaş']},
-  {id:'op2', kat:'mousepad', ad:'Cam Yüzey Mouse Pad (Örnek)',
-   aciklama:'Düşük sürtünme isteyen rekabetçi oyuncular için sert cam yüzey.',
-   minTL:500, maxTL:2000, anahtar:['mousepad','mouse','fare','cam','hassas','rekabetçi','fps','nişan']},
-  {id:'op3', kat:'kablo', ad:'Kablo Örgüsü + Klips Seti (Örnek)',
-   aciklama:'Masa altını toparlayan örgü ve klips seti.',
-   minTL:0, maxTL:800, anahtar:['kablo','düzen','toparla','karmaşa','klips']},
-  {id:'op4', kat:'rgb', ad:'Senkronize LED Şerit (Örnek)',
-   aciklama:'Masa/kasa arkasına ambiyans ışığı, uygulamadan renk kontrolü.',
-   minTL:400, maxTL:2500, anahtar:['rgb','led','ışık','ambiyans','aydınlatma','neon']},
-  {id:'op5', kat:'dekor', ad:'Jel Bilek Desteği (Örnek)',
-   aciklama:'Uzun oturumlarda bilek ağrısını azaltan jel destek.',
-   minTL:0, maxTL:600, anahtar:['bilek','ağrı','konfor','destek','uzun oturum']},
-  {id:'op6', kat:'standlar', ad:'Ayarlanabilir Monitör Standı (Örnek)',
-   aciklama:'Yükseklik/açı ayarlı, masada yer açan monitör ayağı.',
-   minTL:800, maxTL:4000, anahtar:['monitör','stand','ayak','yükseklik','boyun','ergonomi']},
-  {id:'op7', kat:'sesgoruntu', ad:'Esnek Mikrofon Kolu (Örnek)',
-   aciklama:'Yayın/toplantı için masaya sabitlenen mikrofon kolu.',
-   minTL:500, maxTL:2500, anahtar:['mikrofon','yayın','stream','podcast','kayıt','ses']},
-  {id:'op8', kat:'tustakimi', ad:'PBT Keycap Seti (Örnek)',
-   aciklama:'Solmayan PBT malzemeli, Türkçe baskılı tuş takımı.',
-   minTL:600, maxTL:3000, anahtar:['klavye','keycap','tuş takımı','mekanik','özelleştir']},
-  {id:'op9', kat:'dekor', ad:'Masaüstü LED Figür (Örnek)',
-   aciklama:'Masanı kişiselleştiren küçük ışıklı dekor objesi.',
-   minTL:200, maxTL:1200, anahtar:['dekor','figür','kişisel','estetik','görünüm']},
-];
+/* 24.09.2026: ONERI_URUNLER ("(Örnek)" ürünler) kaldırıldı; öneriler yalnız gerçek ürünlerden. */
 
 /* İki kelime arasındaki düzenleme mesafesi (Levenshtein) — "mause"/"mouse"
    gibi yazım hatalarını yakalamak için. Kelimeler kısa (site içi anahtar
@@ -7195,7 +7167,7 @@ function benzerKelime(a,b){
 }
 
 /* Öner artık iki kaynağı birleştirip tarıyor: gerçek iş birliği ürünleri
-   (AKSESUAR_URUNLERI) VE hâlâ boş kategoriler için örnek veri (ONERI_URUNLER).
+   (AKSESUAR_URUNLERI). Ürünü olmayan kategoride öneri yok.
    Bir kategoride gerçek ürün varsa (şu an: mousepad) o kategorinin örnek
    verisi otomatik devre dışı kalır — kullanıcı gerçek ürünle örnek ürünü
    aynı anda görmesin. Kategori dolunca burada elle bir şey değiştirmeye
@@ -7204,8 +7176,10 @@ function oneriKaynaklari(urunler){
   urunler=urunler||AKSESUAR_URUNLERI;
   const gercekKatlar=Object.keys(urunler).filter(k=>urunler[k].length>0);
   const gercek=gercekKatlar.flatMap(kat=>urunler[kat].map(u=>({...u, kat, gercek:true})));
-  const ornek=ONERI_URUNLER.filter(u=>!gercekKatlar.includes(u.kat));
-  return [...gercek, ...ornek];
+  /* 24.09.2026: "(Örnek)" ürünler artık önerilmiyor. RGB ve stand kategorilerinde
+     gerçek ürün yokken ziyaretçiye var olmayan ürün öneriliyordu. Ürünü olmayan
+     kategoride öneri çıkmaz; sayfa bunu açıkça söyler. */
+  return gercek;
 }
 
 function oneriUret(butce, istek, urunler){
@@ -7239,22 +7213,34 @@ function oneriUret(butce, istek, urunler){
      eski güvenli davranışa dönülüyor: ürün elenmez. */
   return oneriKaynaklari(urunler)
     .map(u=>{
-      let skor=u.gercek?1:0, eslesenVar=false;
+      let skor=u.gercek?1:0, eslesenVar=false, enUzun=0;
       for(const k of u.anahtar){
-        if(metin.includes(sadelestir(k))){ skor+=3; eslesenVar=true; continue; }
+        const ks=sadelestir(k);
+        if(ks && metin.includes(ks)){ skor+=3; eslesenVar=true; enUzun=Math.max(enUzun,ks.length); continue; }
         for(const kt of kelimelere(k)){
           if(kullaniciKelimeleri.some(uk=>benzerKelime(uk,kt))){ skor+=2; eslesenVar=true; }
         }
       }
       const butceBiliniyor = u.minTL!=null && u.maxTL!=null;
-      const butceUyumlu = butceBiliniyor ? (butce>0 && butce>=u.minTL && butce<=u.maxTL) : true;
+      /* 24.09.2026: bütçe "en fazla bu kadar" demek. Eskiden ürünün fiyat aralığı
+         bütçeyi KAPSAMALIYDI (butce<=maxTL); 2.000 TL yazana 500 TL'lik mouse pad
+         "bütçe dışı" diye eleniyor, yerine mouse öneriliyordu. Artık en ucuz
+         seçeneği bütçeye sığan ürün uygun. */
+      const butceUyumlu = butceBiliniyor ? (butce>0 && u.minTL<=butce) : true;
       if(butceUyumlu) skor+=1;
-      return {...u, skor, eslesti:eslesenVar, butceUyumlu};
+      return {...u, skor, eslesti:eslesenVar, enUzun, butceUyumlu};
     })
     /* Ikisi de girildiyse ikisi de saglanmali. Onceki halde metin girilince
        butce TAMAMEN atlaniyordu ("rampage" + 1500 TL yazan biri, fiyati
        3.699 TL olan bir urunu goruyordu) — kelime eslesmesi zorunlu olsun
        isteniyordu ama bu, butceyi sifirlamak anlamina gelmemeliydi. */
+    /* Tam ifade eşleşen ürün varsa ("mouse pad" -> mousepad) yalnız "mouse"
+       kelimesine gevşek eşleşenleri (mouse'lar) listeden çıkar. Bu kontrol
+       BÜTÇEDEN ÖNCE: 300 TL'ye mouse pad yoksa cevap "yok" olmalı, mouse
+       ayak bandı değil. */
+    /* "En uzun" eşleşme kazanır: "mousepad" sorgusunda "mouse" anahtarı da
+       sorgunun içinde geçiyor; 8 harfli eşleşme 5 harfliyi eler. */
+    .filter((u,_,hepsi)=>{ const m=Math.max(0,...hepsi.map(x=>x.enUzun)); return m===0 || u.enUzun===m; })
     .filter(u=>{
       const metinTamam = !metinVar || u.eslesti;
       const butceTamam = butce<=0 || u.butceUyumlu;
@@ -7264,6 +7250,12 @@ function oneriUret(butce, istek, urunler){
     .slice(0,5);
 }
 
+const RGB_ISIK_RE=/(şerit|serit|ışık|isik|aydınlatma|aydinlatma|led)/i;
+const STAND_RE=/(stand|askı|aski|tutucu|monitör kolu|monitor kolu|kulaklık askı)/i;
+const BOS_KATEGORI_RE=new RegExp(RGB_ISIK_RE.source+'|'+STAND_RE.source,'i');
+/* "RGB ışıklı klavye" gibi sorgular ürünü OLAN kategoriye aittir; boş sayılmaz. */
+const VAR_KATEGORI_RE=/(klavye|mouse|fare|pad|kulaklık|kulaklik|mikrofon|kablo|keycap|tuş|tus|kamera)/i;
+const bosKategori=s=>BOS_KATEGORI_RE.test(s)&&!VAR_KATEGORI_RE.test(s);
 function OnerHub(){
   const [butce,setButce]=useState('');
   const [istek,setIstek]=useState('');
@@ -7272,6 +7264,10 @@ function OnerHub(){
 
   const ara=e=>{
     e.preventDefault();
+    /* Ürünümüz olmayan kategoriler: gevşek eşleşme alakasız ürün (şerit ışığa
+       RGB kablo, monitör standına mouse) getiriyordu. Bunlarda doğrudan boş sonuç
+       ve "henüz ürün yok" mesajı. */
+    if(bosKategori(istek)){ setSonuc([]); return; }
     setSonuc(oneriUret(Number(butce)||0, istek, urunler));
   };
 
@@ -7285,8 +7281,9 @@ function OnerHub(){
         </h1>
         <p className="mt-6 text-dim max-w-[58ch] leading-relaxed text-[.95rem]">
           Yapay zeka değil; bütçe aralığı ve yazdığın kelimelere göre çalışan basit
-          bir eşleştirme. <span className="text-ink/80">Bazı kategorilerde gerçek iş
-          birliği ürünleri var</span>, geri kalanı iş birlikleri geldikçe gerçek olacak.
+          bir eşleştirme. <span className="text-ink/80">Yalnızca gerçek ürünler önerilir</span>;
+          henüz ürün eklemediğimiz kategorilerde (RGB aydınlatma, standlar) öneri çıkmaz.
+          Önerilen ürünlerin bağlantıları Ulugames iş birliği bağlantısıdır.
         </p>
       </Reveal>
 
@@ -7319,7 +7316,11 @@ function OnerHub(){
           <div className="mt-12 pt-8 border-t border-line">
             {sonuc.length===0 ? (
               <p className="text-dim text-[.9rem]">
-                Eşleşme bulunamadı. Bütçeni artırıp farklı kelimelerle tekrar dene.
+                {bosKategori(istek) && RGB_ISIK_RE.test(istek)
+                  ? 'RGB aydınlatma kategorisinde henüz ürün yok; eklediğimizde burada görünecek.'
+                  : bosKategori(istek) && STAND_RE.test(istek)
+                  ? 'Stand kategorisinde henüz ürün yok; eklediğimizde burada görünecek.'
+                  : 'Eşleşme bulunamadı. Farklı kelimelerle ya da daha yüksek bir bütçeyle tekrar dene.'}
               </p>
             ) : (
               <>
