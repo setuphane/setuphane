@@ -327,7 +327,10 @@ const GPUS=[
     uydurma bir değer girmiyoruz. */
  {id:'b580',   n:'Arc B580 12 GB (Intel)',                       b:'Intel',  idx:55,  vram:12, tdp:190, p:18199, boy:272, psuMin:450,  pin8:1, kal:45, yuk:115},
  {id:'5050',   n:'GeForce RTX 5050 8 GB (Asus Dual OC)',           b:'NVIDIA', idx:51,  r1440:0.96, r2160:0.90, vram:8,  tdp:130, p:18999, boy:203, psuMin:550,  pin8:1, kal:40, yuk:120},
- {id:'5060',   n:'GeForce RTX 5060 8 GB (MSI Shadow 2X OC Max)',   b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:22900, boy:197, psuMin:550,  pin8:1, kal:40, yuk:120},
+ /* 24.09.2026: MSI Shadow 2X OC Max'in 22.900'lük fiyatı tek günlüktü (ertesi gün
+    27.498). Ders: model tek günlük fiyata göre değişmez -> scripts/model-izle.mjs.
+    Asus Dual OC: 23.399 TL, 12 satıcı; 228 mm, 2.5 yuva, 1x8 pin. */
+ {id:'5060',   n:'GeForce RTX 5060 8 GB (Asus Dual OC)',   b:'NVIDIA', idx:67,  r1440:0.96, r2160:0.86, vram:8,  tdp:145, p:23399, boy:228, psuMin:550,  pin8:1, kal:50, yuk:123},
  {id:'9060xt', n:'Radeon RX 9060 XT 16 GB (Asus Dual)',           b:'AMD',    idx:71,  r1440:0.99, r2160:0.97, vram:16, tdp:160, p:28830, boy:202, psuMin:550,  pin8:1, kal:49, yuk:120},
  {id:'5060ti', n:'GeForce RTX 5060 Ti 16 GB (Asus Dual OC)',        b:'NVIDIA', idx:74,  r1440:0.99, r2160:0.99, vram:16, tdp:180, p:40894, boy:229, psuMin:550,  pin8:1, kal:50, yuk:120},
  {id:'9070',   n:'Radeon RX 9070 16 GB (Gigabyte Gaming OC)',     b:'AMD',    idx:109, r1440:1.01, r2160:1.04, vram:16, tdp:220, p:40999, boy:288, psuMin:750,  pin8:2, kal:50, yuk:132},
@@ -1233,8 +1236,10 @@ function fiyatYasi(){
   const T=(typeof PARCA_FIYAT_TARIHI!=='undefined' && PARCA_FIYAT_TARIHI) || FIYAT_TARIHI;
   const g=Math.floor((Date.now()-new Date(T+'T12:00:00').getTime())/86400000);
   const m=new Date(T+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+  /* 24.09.2026: eşik 30 günden 3 güne indi. Bot her gün çalışıyor; 3 günden
+     eski fiyat bir şeyin bozulduğu anlamına gelir ve ziyaretçi bunu bilmeli. */
   return {gun:Math.max(0,g), metin:m,
-          bayat:g>30, uyari:g>30?'Bir aydan eski. Alım öncesi kendin de kontrol et.':null};
+          bayat:g>3, uyari:g>3?'Fiyatlar '+g+' gün önce güncellendi. Alım öncesi kendin de kontrol et.':null};
 }
 
 /* Laptop ekran kartları masaüstü eşdeğerinden zayıftır; idx aynı ölçekte
@@ -4967,7 +4972,7 @@ const zamanFarki = ts => {
    gibi göstermek yanıltıcı olurdu. */
 const TOHUM_KONULAR=[
   {id:'t1', kat:'genel', baslik:'Buraya hoş geldin: forum nasıl çalışıyor?',
-   govde:'Bu forum senin tarayıcında çalışıyor. Yazdıkların bu cihazda kalır, internete gitmez, başkası göremez.\n\nNeden böyle? Çünkü site tek bir HTML dosyası, arkasında sunucu yok. Bu sayede indirip çift tıklayınca çalışıyor, kayıt istemiyor, hiçbir veri toplamıyor.\n\nYazdıklarını arkadaşına göndermek istersen aşağıdaki "Dışa aktar" düğmesiyle dosya olarak alabilirsin; o da "İçe aktar" ile açar.',
+   govde:'Bu forum herkese açık. Yazdığın konu ve cevaplar, seçtiğin kullanıcı adıyla birlikte kaydedilir ve siteye giren herkes görebilir.\n\nE-posta, telefon ya da şifre istemiyoruz. Kullanıcı adın ve isteğe bağlı PIN kodun yalnızca bu tarayıcıda tutulur; tarayıcı verilerini silersen yeniden seçmen gerekir.\n\nTelefon numarası, adres, tam adın gibi kişisel bilgileri yazma. Kaldırılmasını istediğin bir yazı olursa Instagram üzerinden (@setuphane) yaz, biz kaldıralım.',
    yazar:'SETUP HANE', renk:'#2DE2E6', ts:Date.now()-86400000*3, sabit:true, cevaplar:[], begeni:0},
   {id:'t2', kat:'tavsiye', baslik:'Sistem tavsiyesi isterken neleri yazmalısın?',
    govde:'İyi cevap almak için şunları yaz:\n\n1. Bütçen (kasa mı, ekranıyla birlikte mi?)\n2. Ne yapacaksın? Hangi oyunlar, hangi programlar?\n3. Ekranın kaç Hz ve hangi çözünürlükte?\n4. Elinde ne var? Parça devrederek bütçe artırabilir misin?\n\nYukarıdaki kurucudan çıkan sistemi gönderine tek tuşla ekleyebilirsin; herkes ne konuştuğunu görür.',
@@ -5045,8 +5050,9 @@ function GirisKarti({user,setUser}){
         OTURUM AÇ
       </button>
       <p className="mt-4 text-[.78rem] text-dim leading-relaxed max-w-[52ch]">
-        E-posta istemiyoruz, doğrulama yok, hiçbir şey sunucuya gitmiyor. PIN sadece aynı
-        bilgisayarı paylaşıyorsan başkası senin adınla yazmasın diye. Gerçek bir şifre değil.
+        E-posta ya da şifre istemiyoruz. Yazdıkların kullanıcı adınla birlikte kaydedilir ve herkes
+        görür. PIN bu tarayıcıda kalır, sunucuya gönderilmez; aynı bilgisayarı başkasıyla
+        paylaşıyorsan senin adınla yazılmasın diye var.
       </p>
     </div>
   );
@@ -7728,13 +7734,19 @@ function GizlilikSayfa(){
       </p>
       <p>
         <span className="text-ink">Cihazında kalan veriler:</span> Para birimi/dil tercihin,
-        test geçmişin ve forumdaki takma adın tarayıcının <code className="text-cy">localStorage</code>'ında
-        durur; sunucuya gönderilmez, cihazlar arası senkron olmaz.
+        test geçmişin, forum kullanıcı adın ve PIN'in tarayıcının <code className="text-cy">localStorage</code>'ında
+        durur. Bunlar sunucuya gönderilmez, cihazlar arası senkron olmaz.
       </p>
       <p>
-        <span className="text-ink">Forum:</span> Paylaştığın konu/cevaplar Supabase üzerindeki
-        veritabanında tutulur; kimliğini değil, tarayıcı bazlı anonim bir cihaz kimliğini
-        taşır. E-posta veya isim istenmez.
+        <span className="text-ink">Forum:</span> Bir konu ya da cevap yazdığında; yazının başlığı,
+        metni, seçtiğin kullanıcı adı ve rastgele üretilmiş bir cihaz kimliği veritabanımıza
+        kaydedilir ve herkes görebilir. Cihaz kimliği seni tanımlamaz, yalnızca aynı yazıyı iki kez
+        beğenmeyi engellemek için var. E-posta, telefon veya gerçek isim istemiyoruz.
+      </p>
+      <p>
+        <span className="text-ink">Hata kayıtları:</span> Sitede bir hata oluşursa hatanın metni, hangi
+        sayfada olduğu, tarayıcı türü ve aynı rastgele cihaz kimliği kaydedilir. Amaç hatayı bulup
+        düzeltmek; kişisel bilgi içermez.
       </p>
       <p>
         <span className="text-ink">Üçüncü taraflara satış yok.</span> Hiçbir veri reklam

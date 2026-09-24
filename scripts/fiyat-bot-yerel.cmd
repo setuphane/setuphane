@@ -10,9 +10,15 @@ set LOG=C:\dev\setuphane\.fiyat-bot.log
 echo ==== %date% %time% ==== > "%LOG%"
 "C:\Program Files\Git\cmd\git.exe" pull -q --no-rebase >> "%LOG%" 2>&1
 "C:\Program Files\nodejs\node.exe" scripts\fiyat-bot.mjs --yaz >> "%LOG%" 2>&1
-"C:\Program Files\Git\cmd\git.exe" add fiyatlar.json scripts\fiyat-durum.json >> "%LOG%" 2>&1
+if errorlevel 1 echo BOT HATA VERDI >> "%LOG%"
+rem 24.09.2026: model izleme (3 gun kurali, yalniz rapor) - bkz. scripts\model-izle.mjs
+"C:\Program Files\nodejs\node.exe" scripts\model-izle.mjs >> "%LOG%" 2>&1
+if errorlevel 1 echo MODEL IZLEME HATA VERDI >> "%LOG%"
+"C:\Program Files\Git\cmd\git.exe" add fiyatlar.json scripts\fiyat-durum.json scripts\model-durum.json >> "%LOG%" 2>&1
 "C:\Program Files\Git\cmd\git.exe" diff --cached --quiet && goto :son
 "C:\Program Files\Git\cmd\git.exe" commit -q -m "fiyat-botu: gunluk fiyat guncellemesi" >> "%LOG%" 2>&1
 "C:\Program Files\Git\cmd\git.exe" push -q >> "%LOG%" 2>&1
 :son
 echo ==== bitti %time% ==== >> "%LOG%"
+rem 24.09.2026: hata ya da elle karar gerekiyorsa Windows bildirimi
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File scripts\bildirim.ps1
