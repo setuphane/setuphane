@@ -16,19 +16,19 @@
    "tarih": "2026-09-22T13:04:07.308Z"
   },
   "gpu:9070": {
-   "fiyat": 40999,
+   "fiyat": 41418,
    "ad": "Radeon RX 9070 16 GB (Gigabyte Gaming OC)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "gpu:5070": {
-   "fiyat": 47781,
+   "fiyat": 52418,
    "ad": "GeForce RTX 5070 12 GB (MSI Ventus 3X OC)",
-   "tarih": "2026-09-23T14:02:55.978Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "gpu:9070xt": {
-   "fiyat": 47775,
+   "fiyat": 48594,
    "ad": "Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)",
-   "tarih": "2026-09-23T14:02:55.978Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "gpu:5090": {
    "fiyat": 335999,
@@ -36,9 +36,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "cpu:8500g": {
-   "fiyat": 7851,
+   "fiyat": 7371,
    "ad": "Ryzen 5 8500G",
-   "tarih": "2026-09-22T08:26:58.352Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "cpu:7500f": {
    "fiyat": 6726,
@@ -81,9 +81,9 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "cpu:9800x3d": {
-   "fiyat": 21828,
+   "fiyat": 21985,
    "ad": "Ryzen 7 9800X3D",
-   "tarih": "2026-09-23T07:01:40.586Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "ram:16": {
    "fiyat": 13599,
@@ -111,9 +111,9 @@
    "tarih": "2026-09-21T13:00:24.051Z"
   },
   "psu:650": {
-   "fiyat": 2538,
+   "fiyat": 2499,
    "ad": "650 W 80+ (MSI MAG A650BNL)",
-   "tarih": "2026-09-22T08:26:58.352Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "psu:750": {
    "fiyat": 3703,
@@ -141,9 +141,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "sogutucu:aio360p": {
-   "fiyat": 4499,
+   "fiyat": 4409,
    "ad": "360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)",
-   "tarih": "2026-09-23T14:02:55.978Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "anakart:AM5-0": {
    "fiyat": 4939,
@@ -216,9 +216,9 @@
    "tarih": "2026-09-22T07:32:31.519Z"
   },
   "gpu:5050": {
-   "fiyat": 18999,
+   "fiyat": 19510,
    "ad": "GeForce RTX 5050 8 GB (Asus Dual OC)",
-   "tarih": "2026-09-23T14:02:55.978Z"
+   "tarih": "2026-09-24T07:01:25.672Z"
   },
   "cpu:245kf": {
    "fiyat": 8635,
@@ -264,7 +264,17 @@
    "fiyat": 11699,
    "ad": "Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)",
    "tarih": "2026-09-23T07:01:40.586Z"
+  },
+  "cpu:285k": {
+   "fiyat": 29999,
+   "ad": "Core Ultra 9 285K",
+   "tarih": "2026-09-24T07:01:25.672Z"
+  },
+  "gpu:b580": {
+   "fiyat": 18199,
+   "ad": "Arc B580 12 GB (Intel)",
+   "tarih": "2026-09-24T07:01:25.672Z"
   }
  },
- "guncelleme": "2026-09-23T14:02:55.978Z"
+ "guncelleme": "2026-09-24T07:01:25.672Z"
 }
