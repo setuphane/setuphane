@@ -73,8 +73,13 @@ body{
 /* ── neon logo ────────────────────────────────────────────────────── */
 .neonSvg{filter:drop-shadow(0 0 5px rgba(45,226,230,.55)) drop-shadow(0 0 18px rgba(255,45,149,.30))}
 .neonWord{
-  font-family:"Geist",sans-serif;font-weight:600;letter-spacing:.015em;
-  color:transparent;-webkit-text-stroke-width:.055em;-webkit-text-stroke-color:var(--cy);
+  /* 24.09.2026: dış çizgi harfin ARKASINDA (paint-order), içi zemin rengiyle
+     dolu. Şeffaf dolguda değişken yazı tipinin üst üste binen iç parçaları da
+     çiziliyor, harf içinde kayma gibi çizgiler çıkıyordu; P ile H de birbirine
+     değiyordu (kullanıcı fark etti). Çizgi yarısı gizlendiği için iki kat kalın. */
+  font-family:"Geist",sans-serif;font-weight:600;letter-spacing:.04em;
+  color:var(--bg);-webkit-text-stroke-width:.11em;-webkit-text-stroke-color:var(--cy);
+  paint-order:stroke fill;
   text-shadow:0 0 .12em rgba(45,226,230,.75),0 0 .42em rgba(45,226,230,.40);
   white-space:nowrap;line-height:1;
 }
