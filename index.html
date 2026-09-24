@@ -83,6 +83,9 @@ body{
   text-shadow:0 0 .12em rgba(45,226,230,.75),0 0 .42em rgba(45,226,230,.40);
   white-space:nowrap;line-height:1;
 }
+.neonWord.dolu{color:var(--cy);-webkit-text-stroke-width:0;letter-spacing:.02em;
+  text-shadow:0 0 .35em rgba(45,226,230,.35)}
+.neonWord.dolu .hn{color:var(--mg);text-shadow:0 0 .35em rgba(255,45,149,.35)}
 .neonWord .hn{
   -webkit-text-stroke-color:var(--mg);
   text-shadow:0 0 .12em rgba(255,45,149,.8),0 0 .42em rgba(255,45,149,.45);
@@ -4274,12 +4277,17 @@ function NeonScene({
     d: "M231 164v4"
   }, s(MG, w * 1.7))));
 }
+/* 24.09.2026: 26 pikselin altında dış çizgi, harf arasındaki boşluktan kalın
+   kalıyor; P ile H'nin çizgisi ve parlaması üst üste biniyor (kullanıcı "H'de
+   taşma" dedi). Küçük boyutta yazı DOLU renk (camgöbeği SETUP, pembe HANE),
+   dış çizgili neon tabela yalnız büyük boyutta. */
 function Wordmark({
   size = 28,
   flicker = true
 }) {
+  const dolu = size < 26;
   return /*#__PURE__*/React.createElement("span", {
-    className: 'neonWord ' + (flicker ? 'flicker' : ''),
+    className: 'neonWord ' + (dolu ? 'dolu ' : '') + (flicker ? 'flicker' : ''),
     style: {
       fontSize: size
     }
