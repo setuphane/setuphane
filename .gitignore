@@ -18,3 +18,6 @@ Thumbs.db
 .itopya.json
 .incehesap.json
 .oem-ikiz.json
+
+# tasarım denemeleri, yayına çıkmaz
+tasarim/
