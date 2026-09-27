@@ -11,14 +11,14 @@
    "tarih": "2026-09-23T14:02:55.978Z"
   },
   "gpu:5060ti": {
-   "fiyat": 41699,
+   "fiyat": 42699,
    "ad": "GeForce RTX 5060 Ti 16 GB (Asus Dual OC)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "gpu:9070": {
-   "fiyat": 41418,
+   "fiyat": 42885,
    "ad": "Radeon RX 9070 16 GB (Gigabyte Gaming OC)",
-   "tarih": "2026-09-24T07:01:25.672Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "gpu:5070": {
    "fiyat": 52489,
@@ -26,14 +26,14 @@
    "tarih": "2026-09-25T07:01:24.383Z"
   },
   "gpu:9070xt": {
-   "fiyat": 49368,
+   "fiyat": 49550,
    "ad": "Radeon RX 9070 XT 16 GB (XFX Swift Triple Fan)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "gpu:5090": {
-   "fiyat": 341999,
+   "fiyat": 360859,
    "ad": "GeForce RTX 5090 32 GB (MSI Ventus 3X OC)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "cpu:8500g": {
    "fiyat": 7371,
@@ -51,9 +51,9 @@
    "tarih": "2026-09-22T07:32:31.519Z"
   },
   "cpu:245k": {
-   "fiyat": 10999,
+   "fiyat": 11312,
    "ad": "Core Ultra 5 245K",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "cpu:9600x": {
    "fiyat": 8999,
@@ -116,9 +116,9 @@
    "tarih": "2026-09-25T07:01:24.383Z"
   },
   "psu:750": {
-   "fiyat": 3785,
+   "fiyat": 3716,
    "ad": "750 W 80+ (MSI MAG A750BN PCIE5 II)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "psu:850": {
    "fiyat": 5778,
@@ -136,9 +136,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "sogutucu:air": {
-   "fiyat": 1314,
+   "fiyat": 1322,
    "ad": "Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "sogutucu:aio360p": {
    "fiyat": 4523,
@@ -146,9 +146,9 @@
    "tarih": "2026-09-25T07:01:24.383Z"
   },
   "anakart:AM5-0": {
-   "fiyat": 4939,
+   "fiyat": 4445,
    "ad": "MSI Pro A620AM-G Evo WiFi (A620)",
-   "tarih": "2026-09-22T06:46:43.055Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "anakart:AM5-1": {
    "fiyat": 6632,
@@ -156,24 +156,24 @@
    "tarih": "2026-09-22T06:46:43.055Z"
   },
   "anakart:AM5-2": {
-   "fiyat": 10009,
+   "fiyat": 9764,
    "ad": "Asus B650E Max Gaming WiFi W (B650E)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "anakart:LGA1851-0": {
-   "fiyat": 7299,
+   "fiyat": 5999,
    "ad": "MSI Pro B860M-E (B860)",
-   "tarih": "2026-09-23T14:02:55.978Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "anakart:LGA1851-1": {
-   "fiyat": 11199,
+   "fiyat": 10655,
    "ad": "MSI Pro Z890-S WiFi6E (Z890)",
-   "tarih": "2026-09-21T12:35:53.436Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "kasa:0": {
-   "fiyat": 2632,
+   "fiyat": 2499,
    "ad": "Hava akışlı standart kasa (MSI MAG Forge M100A)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "kasa:2": {
    "fiyat": 8730,
@@ -186,9 +186,9 @@
    "tarih": "2026-09-25T07:01:24.383Z"
   },
   "gpu:5070ti": {
-   "fiyat": 75432,
+   "fiyat": 76999,
    "ad": "GeForce RTX 5070 Ti 16 GB (Gigabyte Windforce OC V2)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "gpu:5080": {
    "fiyat": 85100,
@@ -206,9 +206,9 @@
    "tarih": "2026-09-22T06:49:07.968Z"
   },
   "ram:96": {
-   "fiyat": 72800,
+   "fiyat": 76999,
    "ad": "96 GB DDR5-5600 (2×48) (Crucial Pro)",
-   "tarih": "2026-09-22T07:32:31.519Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "ssd:4t": {
    "fiyat": 36398,
@@ -216,9 +216,9 @@
    "tarih": "2026-09-22T07:32:31.519Z"
   },
   "gpu:5050": {
-   "fiyat": 19510,
+   "fiyat": 19929,
    "ad": "GeForce RTX 5050 8 GB (Asus Dual OC)",
-   "tarih": "2026-09-24T07:01:25.672Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "cpu:245kf": {
    "fiyat": 8749,
@@ -261,9 +261,9 @@
    "tarih": "2026-09-23T07:01:40.586Z"
   },
   "kasa:5": {
-   "fiyat": 13194,
+   "fiyat": 11899,
    "ad": "Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)",
-   "tarih": "2026-09-25T07:01:24.383Z"
+   "tarih": "2026-09-27T20:27:26.014Z"
   },
   "cpu:285k": {
    "fiyat": 29999,
@@ -281,5 +281,5 @@
    "tarih": "2026-09-25T07:01:24.383Z"
   }
  },
- "guncelleme": "2026-09-25T07:01:24.383Z"
+ "guncelleme": "2026-09-27T20:27:26.014Z"
 }
