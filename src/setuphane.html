@@ -1219,8 +1219,8 @@ function balance(c,g,res){
       d: enIyisi
         ? `Bu ekran kartını 1080p'de tam besleyecek işlemci üretilmiyor; listedeki en güçlü işlemci sende. 1440p ve 4K'da yük ekran kartına geçtiği için bu fark kapanır; yüksek çözünürlükte oynayacaksan sorun değil.`
         : loss<12
-          ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss}, oyunda bunu fark etmezsin.`
-          : `Ekran kartı hazır bekliyor ama işlemci sipariş yetiştiremiyor. Yaklaşık %${loss} performans boşa gidiyor.`};
+          ? `İşlemci ekran kartının biraz gerisinde ama fark %${loss}; oyunda pek hissedilmez.`
+          : `İşlemci ekran kartına yetişemiyor; ekran kartının gücünün yaklaşık %${loss} kadarı kullanılmıyor.`};
   }
 
   /* oran > 1.55 — ekran kartı sınırlıyor. Bu KAYIP değil, yedek güç. */
@@ -1254,7 +1254,7 @@ function fiyatYasi(){
   /* 24.09.2026: eşik 30 günden 3 güne indi. Bot her gün çalışıyor; 3 günden
      eski fiyat bir şeyin bozulduğu anlamına gelir ve ziyaretçi bunu bilmeli. */
   return {gun:Math.max(0,g), metin:m,
-          bayat:g>3, uyari:g>3?'Fiyatlar '+g+' gün önce güncellendi. Alım öncesi kendin de kontrol et.':null};
+          bayat:g>3, uyari:g>3?'Fiyatlar '+g+' gün önce güncellendi. Almadan önce güncel fiyata bakmanı öneririz.':null};
 }
 
 /* Laptop ekran kartları masaüstü eşdeğerinden zayıftır; idx aynı ölçekte
@@ -2251,15 +2251,15 @@ function Hero({budget,setBudget}){
       <Reveal delay={170}>
         <div className="mt-10 lg:mt-14 max-w-[54ch]">
           <p className="text-[1.05rem] sm:text-[1.22rem] leading-[1.65] text-ink/85">
-            Elindeki parayı ve ne yapacağını söyle. O paraya kurulabilecek
-            <span className="text-cy"> en dengeli sistemi parça parça</span> göstereyim.
-            Her parçanın neden seçildiğini yazarak. Beğenmediğini değiştir;
-            bu bir reçete değil, başlangıç noktası.
+            Bütçeni ve bilgisayarı ne için kullanacağını seç. O paraya kurulabilecek
+            <span className="text-cy"> en dengeli sistemi parça parça</span>, her parçanın
+            neden seçildiğiyle birlikte gösterelim. Beğenmediğin parçayı değiştirebilirsin;
+            bu liste kesin bir reçete değil, bir başlangıç noktası.
           </p>
           <p className="hidden sm:block mt-5 text-[.95rem] text-ink/70 leading-relaxed">
             Hiçbir şey satmıyoruz, komisyon almıyoruz, kimseyi bir mağazaya yönlendirmiyoruz.
-            Kullandığımız bütün performans değerleri bağımsız ölçümlerden geliyor ve
-            kaynağı sayfada yazılı. Listeyi alıp istediğin yerden alırsın, ya da hiç almazsın.
+            Performans değerleri bağımsız ölçümlerden geliyor ve kaynakları sayfada yazılı.
+            Listeyi dilediğin yerde araştırabilirsin.
           </p>
         </div>
       </Reveal>
@@ -2286,9 +2286,9 @@ function Hero({budget,setBudget}){
 /* ═══════════════════ NASIL ÇALIŞIR ═══════════════════ */
 function How(){
   const steps=[
-    {n:'01',t:'Bütçeni ve ne yapacağını söyle',d:'Kaç liran var, bu bilgisayarla ne yapacaksın? Tek çubuk ve dört seçenek, hepsi bu.'},
-    {n:'02',t:'Bütün kombinasyonları deneyelim',d:'O bütçedeki her birleşim tek tek kuruluyor, birbiriyle uyumsuz olanlar eleniyor, en dengelisi kalıyor. Neyin neden seçildiği yazıyor.'},
-    {n:'03',t:'Listeyi al, kararı sen ver',d:'İstediğin yerde araştır, beğenmediğin parçayı değiştir. Elinde referans olsun; kimse seni fazladan konuşturamasın.'},
+    {n:'01',t:'Bütçeni ve amacını seç',d:'Ne kadar ayırabileceğini ve bilgisayarı ne için kullanacağını seçmen yeterli.'},
+    {n:'02',t:'Uygun birleşimleri deniyoruz',d:'O bütçedeki her birleşim tek tek kuruluyor, birbiriyle uyumsuz olanlar eleniyor, en dengelisi kalıyor. Neyin neden seçildiği yanında yazıyor.'},
+    {n:'03',t:'Karar senin',d:'Listeyi dilediğin yerde araştır, istemediğin parçayı değiştir. Alışverişe çıkarken elinde bir referans olsun.'},
   ];
   return (
     <section id="nasil" className="py-20 lg:py-28 scroll-mt-24">
@@ -2514,7 +2514,7 @@ function AmdIntelCompare({budget,prof,game,res,tur='cpu'}){
                   <span style={{color:BRAND[cheaper]}}>{cheaper}</span> tarafı{' '}
                   <span className="num" style={{color:BRAND[cheaper]}}>{fmt(costDiff)}</span> daha ucuza aynı sonucu veriyor.
                   Aradaki fark cebinde kalır.</>
-              : <>Bu bütçede ikisi de aynı FPS'i aynı paraya veriyor; hangisini alsan fark etmez.</>}
+              : <>Bu bütçede ikisi de aynı FPS'i aynı paraya veriyor; aralarında fark yok.</>}
         </p>
       )}
     </Card>
@@ -3427,7 +3427,7 @@ function SistemAciklama({sys,budget,prof,pick,game,res}){
           ) : <p className="text-dim">Bu sistemde uyumlu daha üst seçenek yok.</p>}
           <p className="mt-2 text-[.75rem] text-dim">Bunların hepsi yukarıdaki uyumluluk kurallarından geçiyor.</p>
           <div className="mt-4 text-[.8rem]">
-            <div className="text-mg mb-1.5">Başka parça alacaksan dikkat:</div>
+            <div className="text-mg mb-1.5">Başka bir parça seçersen dikkat edilecekler:</div>
             <ul className="space-y-1.5 text-ink/80">
               {a.dikkat.map(t=><li key={t} className="flex gap-2"><span className="text-mg shrink-0">!</span><span>{t}</span></li>)}
             </ul>
@@ -3614,13 +3614,13 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
           <div className="mt-10 pt-8 border-t border-line">
             {!sys ? (
               <div className="py-6">
-                <div className="text-mg text-lg font-light">Bu bütçeyle bu iş için sağlam bir sistem çıkmıyor.</div>
+                <div className="text-mg text-lg font-light">Bu bütçeyle bu iş için dengeli bir sistem çıkmıyor.</div>
                 <p className="text-sm text-dim mt-3 max-w-[46ch] leading-relaxed">
                   {(pick.cpu||pick.gpu)
-                    ? <>Marka kısıtını gevşetmeyi dene ({[pick.cpu&&'işlemci: '+pick.cpu,pick.gpu&&'ekran kartı: '+pick.gpu].filter(Boolean).join(', ')}),
-                        ya da bütçeyi biraz yukarı çek.</>
-                    : <>Ya bütçeyi biraz yukarı çek, ya da daha hafif bir amaç seç. Yarım yamalak sistem önermeyiz;
-                        bir yıl sonra pişman olursun.</>}
+                    ? <>Marka seçimini "Fark etmez" yapmayı ({[pick.cpu&&'işlemci: '+pick.cpu,pick.gpu&&'ekran kartı: '+pick.gpu].filter(Boolean).join(', ')})
+                        ya da bütçeyi biraz artırmayı deneyebilirsin.</>
+                    : <>Bütçeyi biraz artırmayı ya da daha hafif bir amaç seçmeyi deneyebilirsin. Kısa sürede
+                        yetersiz kalacak bir sistem önermek istemiyoruz.</>}
                 </p>
                 {(()=>{
                   const az=enAzButce(prof,pick);
@@ -3641,14 +3641,14 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                     Bütçenden <span className="num text-cy">{fmt(budget-sys.total)}</span> kullanılmadı.
                     Bu parayı harcamak performansı artırmıyor.
                     {ustButce ? <> Daha fazla {prof.needGpu?'FPS':'performans'} veren bir üst kademe sistem <span className="num text-cy">{fmt(ustButce)}</span>’den başlıyor.</> : null}
-                    {' '}Cebinde kalsın, ya da bir üst kademe için biriktir.
+                    {' '}Kalan parayı başka bir ihtiyacına ayırabilirsin.
                   </p>
                 )}
                 {sys.hazir && (
                   <p className="mb-7 text-[.85rem] leading-relaxed max-w-[52ch] border-l-2 border-cy pl-3 text-ink/85">
                     <span className="text-cy">Yükseltmeye hazır:</span> güç kaynağı ve kasa, ileride
                     {' '}<span className="text-ink">{sys.hazir.n}</span> takabileceğin şekilde seçildi.
-                    Kartı değiştirirken ikinci kez güç kaynağı almazsın.
+                    Kartı değiştirdiğinde güç kaynağını yenilemen gerekmez.
                   </p>
                 )}
                 <div className="flex items-baseline justify-between mb-5 gap-4">
@@ -3742,19 +3742,13 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
         {/* Kaynağı göstermek, sayıları hesaplamak kadar önemli: hiçbir şey
             satmayan bir sitede ziyaretçinin tek dayanağı bu satır. */}
         <p className="mt-4 text-[.8rem] text-dim/70 max-w-[54ch] leading-relaxed">
-          Ekran kartı ve işlemci güç değerleri ölçüme dayanıyor, tahmine değil:
-          masaüstü parçalar{' '}
+          Ekran kartı ve işlemci güç değerleri{' '}
           <a href="https://www.techpowerup.com/review/sapphire-radeon-rx-9070-gre-pulse/32.html"
              target="_blank" rel="noopener noreferrer" className="text-dim hover:text-cy underline underline-offset-2">
             TechPowerUp
           </a>{' '}
-          (kartlar üç çözünürlük için ayrı ayrı, işlemciler 720p oyun ve uygulama
-          testlerinden), laptop kartları{' '}
-          <a href="https://www.notebookcheck.net/Mobile-Graphics-Cards-Benchmark-List.844.0.html"
-             target="_blank" rel="noopener noreferrer" className="text-dim hover:text-cy underline underline-offset-2">
-            NotebookCheck
-          </a>{' '}
-          oyun testlerinden. 20.08.2026. Ölçümü olmayan parçayı listeye almıyoruz.
+          ölçümlerinden geliyor (kartlar üç çözünürlük için ayrı ayrı, işlemciler 720p oyun ve
+          uygulama testlerinden). Ölçümü olmayan parçayı listeye almıyoruz.
         </p>
       </Reveal>
 
@@ -3790,7 +3784,7 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
                   {Math.round(shown)}
                 </div>
                 <div className="pb-3">
-                  <div className="lbl text-dim mb-2">FPS · {act.kind.toUpperCase()}</div>
+                  <div className="lbl text-dim mb-2">FPS</div>
                   <div className="text-[1.05rem] leading-snug" style={{color:v.c}}>{v.t}</div>
                 </div>
               </div>
@@ -3838,7 +3832,7 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
               {tatli && (
                 <div className="mt-10 p-5 sm:p-6 border border-cy/40 bg-cy/[.05]">
                   <Label className="mb-3 text-cy">
-                    {tatli.dahaHizli ? "DAHA UCUZU DAHA HIZLI" : "O KADAR HARCAMANA GEREK YOK"}
+                    {tatli.dahaHizli ? "DAHA UCUZU DAHA HIZLI" : "DAHA AZ PARAYA AYNI FPS"}
                   </Label>
                   {tatli.dahaHizli ? (
                     /* Bütçe arttıkça motor güçlü işlemciyi bırakıp güçlü karta
@@ -3858,7 +3852,7 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
                       Seçtiğin oyun ve çözünürlükte{' '}
                       <span className="num text-cy">{fmt(tatli.ucuz.total)}</span>'lik bir sistem de
                       aynı <span className="num text-cy">{tatli.ucuzFps} FPS</span>'i veriyor.
-                      Fazladan <span className="num text-cy">{fmt(tatli.tasarruf)}</span> sana kare kazandırmıyor.
+                      Aradaki <span className="num text-cy">{fmt(tatli.tasarruf)}</span> bu oyunda daha fazla FPS getirmiyor.
                     </p>
                   )}
                   {tatli.fark.length>0 && (
@@ -3870,9 +3864,9 @@ function GameTest({act,gid,setGid,rid,setRid,budget,prof,pick,mode}){
                     </>
                   )}
                   <p className="text-[.85rem] text-dim mt-5 leading-relaxed max-w-[62ch]">
-                    Bunlar çöp değil: daha fazla bellek ve disk ileride işine yarar, güçlü işlemci
+                    Bu parçalar boşa değil: daha fazla bellek ve disk ileride işine yarar, güçlü işlemci
                     daha ağır oyunlarda ve daha yüksek çözünürlükte fark eder. Ama <span className="text-ink/90">bu oyunda,
-                    bu çözünürlükte</span> ekrana yansıyan bir karşılığı yok. Kararı sen ver.
+                    bu çözünürlükte</span> ekrana yansıyan bir karşılığı yok. Karar senin.
                   </p>
                 </div>
               )}
@@ -3909,8 +3903,8 @@ function BalanceTest({sys}){
           <strong className="text-ink font-normal">Darboğaz</strong>, bir parçanın diğerini bekletmesi.
           Bir restoranı düşün: <strong className="text-ink font-normal">işlemci</strong> siparişleri alıp mutfağa dağıtan garson,
           <strong className="text-ink font-normal"> ekran kartı</strong> ise yemeği pişiren şef.
-          Garson yavaşsa şef boş bekler, şef yavaşsa garson boş bekler. İkisi de para eder,
-          ama biri boşta kalıyorsa o parayı çöpe atmışsın demektir. İşte o boşa giden kısım darboğazdır.
+          Garson yavaşsa şef boş bekler, şef yavaşsa garson boş bekler. İkisine de para veriyorsun;
+          biri boşta kalıyorsa o parçanın gücünün bir kısmı kullanılmıyor demektir. Buna darboğaz denir.
         </p>
       </Reveal>
 
@@ -3963,8 +3957,8 @@ function BalanceTest({sys}){
                   <p className="mt-4 text-[.88rem] text-dim leading-relaxed max-w-[46ch]">
                     <span className="text-cy">Öneri:</span>{' '}
                     {b.k==='cpu'
-                      ? 'Aynı bütçede bir alt ekran kartına inip üstüne daha güçlü bir işlemci al. Oyunda daha fazla FPS alırsın.'
-                      : 'İşlemciyi bir kademe düşürüp farkı ekran kartına ver. Oyundaki kazancı anında görürsün.'}
+                      ? 'Aynı bütçede bir alt ekran kartı ve daha güçlü bir işlemci seçmek oyunda daha fazla FPS getirir.'
+                      : 'İşlemciyi bir kademe düşürüp aradaki parayı ekran kartına ayırmak oyunda daha fazla FPS getirir.'}
                   </p>
                 )}
               </div>
@@ -3987,7 +3981,7 @@ const GLOSSARY=[
  {k:'gpu',t:'Ekran kartı',one:'Oyunda gördüğün her şeyi çizen parça.',
   cmp:'Restoranın şefi. Yemeği pişiren o.',
   d:'Oyunlarda performansı en çok belirleyen parça budur; bütçenin en büyük dilimi genellikle buraya gider. Üzerindeki "GB" yazısı kendi hafızasıdır; çözünürlük ve doku kalitesi arttıkça bu hafıza dolmaya başlar.',
-  care:'Oyun oynayacaksan burayı kısma.'},
+  care:'Oyun için bütçenin en büyük payı burada kalmalı.'},
  {k:'cpu',t:'İşlemci',one:'Bilgisayarın beyni. Bütün kararları o verir.',
   cmp:'Siparişleri mutfağa dağıtan garson.',
   d:'Program açma, dosya işleme, oyundaki yapay zekâ ve fizik hesapları buradan geçer. Video kurgu ve yayın gibi işlerde ekran kartından bile önemli hale gelir.',
@@ -4005,9 +3999,9 @@ const GLOSSARY=[
   d:'Performansa doğrudan katkısı yoktur; işi parçaları doğru bağlamak ve işlemciye stabil elektrik vermektir. Güçlü işlemci güçlü anakart ister, aksi halde işlemci tam hızına çıkamaz.',
   care:'Pahalı olan hızlı yapmaz, uyumlu olan çalıştırır.'},
  {k:'psu',t:'Güç kaynağı',one:'Prizdeki elektriği parçalara dağıtan kutu.',
-  cmp:'Evin sigorta panosu. Ucuzuna kaçılacak tek yer burası değil.',
+  cmp:'Evin sigorta panosu.',
   d:'Kalitesiz güç kaynağı sadece kendi bozulmaz; bağlı olduğu ekran kartını ve anakartı da götürebilir. "80+ Bronze / Gold" yazısı verimlilik belgesidir, Gold daha az ısınır ve daha az elektrik yakar.',
-  care:'Sistemi ateşe atmamak için tasarruf edilecek yer değil.'},
+  care:'Bütçeden kısılacaksa burası son tercih olmalı.'},
  {k:'cooler',t:'Soğutucu',one:'İşlemcinin ürettiği ısıyı dışarı atan parça.',
   cmp:'Mutfaktaki aspiratör.',
   d:'İşlemci ısınınca kendini korumak için yavaşlar; buna "kısılma" denir ve performansı sessizce düşürür. Yeterli soğutma, aldığın gücü gerçekten kullanabilmen demektir.',
@@ -4029,8 +4023,8 @@ function Glossary(){
           Hangi parça <span className="em">ne yapar</span>, tek tek.
         </h2>
         <p className="mt-6 text-dim max-w-[52ch] leading-relaxed text-[.95rem]">
-          Teknik terim yok. Her parçayı günlük hayattan tanıdığın bir şeyle eşledik, çünkü insan bilmediği şeyi
-          ancak bildiği bir şeyle kıyaslayınca anlıyor.
+          Teknik terimlere boğmadan anlatıyoruz. Her parçayı günlük hayattan tanıdık bir şeye benzettik;
+          bilmediğimiz bir şey, bildiğimiz bir şeyle kıyaslayınca daha kolay anlaşılıyor.
         </p>
       </Reveal>
 
@@ -4149,11 +4143,7 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
   const isLap  = act && act.kind==='laptop';
   const total  = act?act.total:0;
   const f      = activeFps(act,game,res);
-  const prebuilt = (sys && !isLap)?Math.round(sys.total*(1+PREBUILT_MARGIN)+ASSEMBLY):0;
-  const save   = prebuilt-total;
-  const savePct= prebuilt?Math.round(save/prebuilt*100):0;
-
-  const totalA=useCount(total), fA=useCount(f), saveA=useCount(save), pctA=useCount(savePct);
+  const totalA=useCount(total), fA=useCount(f);
   const [copied,copy]=useCopy(sys,prof,plain);
   const [kopya,paylas]=usePaylas(budget,prof,pick,gid,rid);
 
@@ -4215,17 +4205,9 @@ function Panel({sys,act,prof,game,res,budget,pick,gid,rid}){
             </div>
           </div>
 
-          {!isLap && (
-            <div className="mt-7 pt-6 border-t border-line">
-              <Label className="mb-3">HAZIR SİSTEME GÖRE</Label>
-              <div className="num text-[1.7rem] font-light text-cy leading-none">{fmt(saveA)}</div>
-              <div className="text-[.8rem] text-dim mt-2.5 leading-relaxed">
-                cebinde kalıyor: <span className="num text-cy">%{Math.round(pctA)}</span> daha ucuz.
-                Hazır sistem fiyatı, parça tutarına ortalama %{Math.round(PREBUILT_MARGIN*100)} kâr payı
-                ve {fmt(ASSEMBLY)} montaj eklenerek hesaplandı.
-              </div>
-            </div>
-          )}
+          {/* 28.09.2026: "HAZIR SİSTEME GÖRE" tasarrufu kaldırıldı. Varsayılan
+              %22 kâr payı + montajla hesaplanıyordu, yani ölçüm değil tahmindi;
+              hazır sistem bölümü de kapalı. */}
 
           {isLap && (
             <a href={act.lap.url} target="_blank" rel="noopener noreferrer" onClick={()=>laptopTik(act.lap)}
@@ -4268,7 +4250,6 @@ function MobileDock({sys,act,prof,game,res,budget,pick,gid,rid}){
   if(!act) return null;
 
   const f=activeFps(act,game,res);
-  const save=sys?Math.round(sys.total*PREBUILT_MARGIN)+ASSEMBLY:0;
   const bn=(!isLap && sys)?balance(sys.c, sys.g.id==='igpu'?GPUS[1]:sys.g, res):null;
 
   return (
@@ -4301,12 +4282,6 @@ function MobileDock({sys,act,prof,game,res,budget,pick,gid,rid}){
                          </span>}
               </span>
             </div>
-            {!isLap && (
-              <div className="flex justify-between gap-4 text-[.8rem]">
-                <span className="text-dim">Hazır sisteme göre kârın</span>
-                <span className="num text-cy">{fmt(save)}</span>
-              </div>
-            )}
             {!isLap
               ? <div className="grid grid-cols-2 gap-2 mt-1">
                   <button onClick={copy}
@@ -4617,16 +4592,16 @@ function DeviceTest({sys}){
   return (
     <section id="cihaz" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 05 · GERÇEK ÖLÇÜM</Label>
+        <Label className="mb-4">PERFORMANS · ÖLÇÜM</Label>
         <div className="rule mb-10"/>
         {/* Kendi sayfasının tek başlığı — h1 olmalı */}
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Şu anki cihazın <span className="em">ne kadar</span> güçlü?
         </h1>
         <p className="mt-6 text-dim max-w-[56ch] leading-relaxed text-[.95rem]">
-          Bu sayfadaki her şey tahmindi, bu değil. Aşağıdaki test şu an kullandığın
-          cihazın ekran kartını gerçekten çalıştırır, yükü kırılana kadar artırır ve
-          çıkan sonucu ölçer. Yükseltme düşünüyorsan önce elindekini bilmen gerekir.
+          Aşağıdaki test, şu an kullandığın cihazın ekran kartını tarayıcı üzerinden
+          çalıştırır, yükü adım adım artırır ve sonucu ölçer. Yükseltme düşünüyorsan
+          önce elindekinin ne kadar güçlü olduğunu görmek işe yarar.
         </p>
       </Reveal>
 
@@ -4764,7 +4739,7 @@ function DeviceTest({sys}){
 
               {sys && (
                 <p className="mt-7 text-[.88rem] text-dim leading-relaxed max-w-[60ch]">
-                  Yukarıda kurduğumuz sistemin ekran kartı <span className="text-cy">{sys.g.n}</span>.
+                  Sistem kur bölümünde son seçilen ekran kartı <span className="text-cy">{sys.g.n}</span>.
                   Bu test tarayıcı üzerinden ölçtüğü için doğrudan kıyaslanamaz, ama elindeki cihaz
                   zorlanıyorsa, o sistem gözle görülür bir sıçrama olur.
                 </p>
@@ -5041,7 +5016,7 @@ const TOHUM_KONULAR=[
    govde:'Bu forum herkese açık. Yazdığın konu ve cevaplar, seçtiğin kullanıcı adıyla birlikte kaydedilir ve siteye giren herkes görebilir.\n\nE-posta, telefon ya da şifre istemiyoruz. Kullanıcı adın ve isteğe bağlı PIN kodun yalnızca bu tarayıcıda tutulur; tarayıcı verilerini silersen yeniden seçmen gerekir.\n\nTelefon numarası, adres, tam adın gibi kişisel bilgileri yazma. Kaldırılmasını istediğin bir yazı olursa Instagram üzerinden (@setuphane) yaz, biz kaldıralım.',
    yazar:'SETUP HANE', renk:'#2DE2E6', ts:Date.now()-86400000*3, sabit:true, cevaplar:[], begeni:0},
   {id:'t2', kat:'tavsiye', baslik:'Sistem tavsiyesi isterken neleri yazmalısın?',
-   govde:'İyi cevap almak için şunları yaz:\n\n1. Bütçen (kasa mı, ekranıyla birlikte mi?)\n2. Ne yapacaksın? Hangi oyunlar, hangi programlar?\n3. Ekranın kaç Hz ve hangi çözünürlükte?\n4. Elinde ne var? Parça devrederek bütçe artırabilir misin?\n\nYukarıdaki kurucudan çıkan sistemi gönderine tek tuşla ekleyebilirsin; herkes ne konuştuğunu görür.',
+   govde:'İyi cevap almak için şunları yaz:\n\n1. Bütçen (kasa mı, ekranıyla birlikte mi?)\n2. Ne yapacaksın? Hangi oyunlar, hangi programlar?\n3. Ekranın kaç Hz ve hangi çözünürlükte?\n4. Elinde ne var? Parça devrederek bütçe artırabilir misin?\n\nSistem kur bölümünde çıkan sistemi gönderine tek tuşla ekleyebilirsin; böylece herkes aynı listeye bakarak konuşur.',
    yazar:'SETUP HANE', renk:'#2DE2E6', ts:Date.now()-86400000*2, sabit:true, cevaplar:[], begeni:0},
 ];
 
@@ -5135,7 +5110,7 @@ function YeniKonu({user,sys,prof,onEkle}){
 
   const gonder=()=>{
     if(baslik.trim().length<8){ setHata('Başlık en az 8 karakter olmalı ki ne sorduğun anlaşılsın.'); return; }
-    if(govde.trim().length<15){ setHata('Biraz daha detay yaz, tek cümleyle kimse yardım edemez.'); return; }
+    if(govde.trim().length<15){ setHata('Biraz daha ayrıntı yazarsan sana daha iyi yardım edilebilir.'); return; }
     let g=govde.trim();
     if(ekle && sys){
       g += '\n\n--- SİSTEMİM ---\n'+summaryText(sys,prof,plain);
@@ -5184,7 +5159,7 @@ function YeniKonu({user,sys,prof,onEkle}){
           <input type="checkbox" checked={ekle} onChange={e=>setEkle(e.target.checked)}
             className="mt-1 w-4 h-4 accent-cy shrink-0"/>
           <span className="text-[.88rem] text-dim group-hover:text-ink transition-colors leading-snug">
-            Yukarıda kurduğum sistemi gönderiye ekle
+            Sistem kur bölümündeki sistemimi gönderiye ekle
             <span className="block text-[.78rem] text-dim/70 mt-0.5">{sys.g.n} + {sys.c.n} · {summaryText(sys,prof,plain).match(/TOPLAM.*/)?.[0]?.replace(/TOPLAM\s*:\s*/,'')}</span>
           </span>
         </label>
@@ -5423,14 +5398,14 @@ function Forum({sys,prof}){
   return (
     <section id="forum" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 06 · TOPLULUK</Label>
+        <Label className="mb-4">FORUM · TOPLULUK</Label>
         <div className="rule mb-10"/>
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Kafana takılanı <span className="em">sor</span>.
         </h1>
         <p className="mt-6 text-dim max-w-[56ch] leading-relaxed text-[.95rem]">
-          Kurucu sana bir sistem verir ama her sorunun cevabı formülde yoktur.
-          Bir kullanıcı adı seç, konu aç, kurduğun sistemi tek tuşla gönderine ekle.
+          Sistem kur bölümü bir öneri çıkarır, ama her sorunun cevabı hesapta yoktur.
+          Bir kullanıcı adı seç, konu aç; istersen kurduğun sistemi tek tuşla gönderine ekle.
         </p>
       </Reveal>
 
@@ -5499,8 +5474,8 @@ function Forum({sys,prof}){
           </div>
         ) : uzakVar() ? (
           <p className="mt-4 text-[.82rem] text-dim leading-relaxed">
-            <span className="text-cy">Burası ortak alan:</span> yazdıklarını herkes görür ve
-            silinmez. Telefon, adres, sipariş numarası gibi kişisel bilgi yazma.
+            <span className="text-cy">Burası ortak alan:</span> yazdıklarını herkes görür.
+            Telefon, adres, sipariş numarası gibi kişisel bilgileri paylaşmamanı rica ederiz.
           </p>
         ) : (
           <div className="mt-5 p-4 border border-cy/25 bg-cy/[.05] flex items-start gap-3">
@@ -5631,7 +5606,7 @@ function EkranTesti(){
   return (
     <section id="ekran" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 07 · EKRAN TESTİ</Label>
+        <Label className="mb-4">EKRAN · TESTLER</Label>
         <div className="rule mb-10"/>
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Ekranın <span className="em">sağlam</span> mı?
@@ -5775,7 +5750,7 @@ function NisanOyunu(){
   return (
     <section id="nisan" className="py-16 lg:py-24 scroll-mt-24">
       <Reveal>
-        <Label className="mb-4">MODÜL 08 · NİŞAN OYUNU</Label>
+        <Label className="mb-4">REFLEKS · OYUN</Label>
         <div className="rule mb-10"/>
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.4rem)] max-w-[16ch]">
           Refleksin <span className="em">kaç</span> milisaniye?
@@ -6319,7 +6294,7 @@ function KlavyeTesti(){
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6">
         Tuşlara bas: basılan tuş yanar, bir kez basılmış tuş işaretli kalır. Hiç yanmayan tuş
-        arızalıdır. Aynı anda kaç tuş algılandığını da sayıyoruz (oyunda aynı anda yürü + zıpla + ateş için önemli).
+        arızalı olabilir. Aynı anda kaç tuş algılandığını da sayıyoruz (oyunda aynı anda yürü + zıpla + ateş için önemli).
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4 mb-6 pb-6 border-b border-line">
         {[['Şu an basılı',basili.size],['Aynı anda en çok',enCok],['Denenen tuş',gorulen.size],
@@ -6384,7 +6359,7 @@ function MouseTesti(){
   return (
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6">
-        Aşağıdaki alanda tüm tuşlara bas, tekerleği çevir, fareyi gezdir. Basılmayan tuş arızalıdır.
+        Aşağıdaki alanda tüm tuşlara bas, tekerleği çevir, fareyi gezdir. Tepki vermeyen tuş arızalı olabilir.
         Tek tıkta iki kez sayıyorsa mikro anahtar yıpranmıştır.
       </p>
       <div onMouseDown={bas} onContextMenu={e=>e.preventDefault()} onWheel={kaydir} onMouseMove={oynat}
@@ -6492,7 +6467,7 @@ function GamepadTesti(){
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-6">
         Kolu tak ve <span className="text-ink">herhangi bir tuşuna bas</span>, tarayıcı kolu ancak
-        o zaman görür. Tüm tuşlara ve analoglara tek tek bas; tepki vermeyen varsa arızalıdır.
+        o zaman görür. Tüm tuşlara ve analoglara tek tek bas; tepki vermeyen varsa arızalı olabilir.
       </p>
       {!pad ? (
         <div className="p-8 border border-line text-center">
@@ -6562,7 +6537,7 @@ function EkranBilgi(){
     <div>
       <p className="text-[.95rem] text-dim leading-relaxed max-w-[62ch] mb-7">
         Ekranının tarayıcıya bildirdiği değerler. Aldığın monitörün kutusunda yazanlarla karşılaştır;
-        tutmuyorsa ya sürücü ya kablo ya da Windows ayarı yanlıştır.
+        tutmuyorsa sürücüyü, kabloyu ve Windows ekran ayarını kontrol etmekte fayda var.
       </p>
       <dl className="grid sm:grid-cols-2 gap-x-10 gap-y-6">
         {satirlar.map(([k,v])=>(
@@ -7387,13 +7362,15 @@ function Kesfet(){
 /* ═══════════════════ GÜVEN + FOOTER ═══════════════════ */
 function Trust(){
   const items=[
-    {t:'Hiçbir şey satmıyoruz',d:'Komisyon almıyoruz, kimseye yönlendirmiyoruz. Listeyi alıp istediğin yerden alırsın.'},
-    {t:'Hesap açıkta',d:'Her sonuç ekrandaki formülden çıkıyor. Hangi parçanın seni sınırladığını da açıkça yazıyoruz.'},
-    {t:'Topluluk verisi',d:'Fiyatlar ve seçimler @setuphane topluluğunun paylaştığı gerçek kurulumlarla güncelleniyor.'},
+    {t:'Hiçbir şey satmıyoruz',d:'Komisyon almıyoruz, kimseyi bir mağazaya yönlendirmiyoruz. Listeyi dilediğin yerde araştırabilirsin.'},
+    {t:'Hesap açıkta',d:'Her sonucun nasıl hesaplandığı sayfada yazıyor. Sistemi hangi parçanın sınırladığını da açıkça gösteriyoruz.'},
+    /* 28.09.2026: eski "Topluluk verisi" maddesi fiyatların topluluk
+       kurulumlarından geldiğini söylüyordu; fiyatlar Epey'den, günlük botla geliyor. */
+    {t:'Fiyatlar her gün yenilenir',d:'Her parçanın fiyatı, en az üç satıcıda satılan modelin en ucuz ilanından alınır ve her gün güncellenir.'},
   ];
   return (
     <section className="py-20 lg:py-28">
-      <Reveal><Label className="mb-4">NEDEN BURAYA GÜVENESİN</Label><div className="rule mb-12"/></Reveal>
+      <Reveal><Label className="mb-4">İLKELERİMİZ</Label><div className="rule mb-12"/></Reveal>
       <div className="grid sm:grid-cols-3 gap-x-10 gap-y-10">
         {items.map((it,i)=>(
           <Reveal key={it.t} delay={i*110}>
@@ -7588,7 +7565,7 @@ function YukseltSayfa(){
       <Reveal>
         <Label className="mb-4">YÜKSELTME</Label>
         <h1 className="h-xl text-[clamp(2rem,6.4vw,4.2rem)] max-w-[20ch]">
-          Elindekini atma. <span className="em">Neyi</span> değiştirmen gerektiğini gör.
+          Elindekini değerlendir, <span className="em">önce neyin</span> değişmesi gerektiğini gör.
         </h1>
         <p className="mt-6 text-dim max-w-[60ch] leading-relaxed text-[.95rem]">
           Sistemini tanıt, bütçeni söyle. Karneni çıkaralım, önce neyi değiştirmen gerektiğini
@@ -7627,7 +7604,7 @@ function YukseltSayfa(){
       </Card>
 
       {!eski ? (
-        <p className="mt-8 text-[.9rem] text-dim">Ekran kartını seçince karneni ve planını çıkaracağım.</p>
+        <p className="mt-8 text-[.9rem] text-dim">Ekran kartını seçtiğinde sistem karnen ve yükseltme planın burada görünecek.</p>
       ) : (<>
         <Card className="mt-6 p-5 sm:p-9">
           <Label className="mb-5">2 · SİSTEM KARNESİ</Label>
@@ -7648,7 +7625,7 @@ function YukseltSayfa(){
                 ? <>Bugün satılan en giriş seviyesi işlemciyle (Ryzen 5 7600) kıyaslarsak oyun gücü yaklaşık{' '}
                     <span className="text-ink">%{Math.round(cpu.oyun/refCpuOyun*100)}</span>.
                     {cpu.oyun<refCpuOyun*0.8 ? ' Üst seviye kartlarda sınır koyar; hangi kartı rahat beslediği aşağıdaki planda.' : ''}</>
-                : 'İşlemcini seçersen yeni kartı besleyip beslemediğini söyleyebilirim.'}
+                : 'İşlemcini de seçersen yeni kartı besleyip beslemediğini gösterebiliriz.'}
             </Karne>
             <Karne baslik="BELLEK" puan={ramGb+' GB'} cubuk={Math.min(100,ramGb/32*100)} renk={ramGb<16?'#FF2D95':undefined}>
               {ramGb<16 ? 'Oyun için az: 16 GB’ın altında bugünün oyunları takılır.'
@@ -7659,7 +7636,7 @@ function YukseltSayfa(){
             <Karne baslik="GÜÇ KAYNAĞI" puan={psuW?psuW+' W':'?'} cubuk={psuW?Math.min(100,psuW/1000*100):null}>
               {psuW ? (yeni ? (psuW>=(yeni.psuMin||0) ? 'Önerdiğimiz kartı taşır.' : 'Önerdiğimiz kart için yetmez; plana eklendi.')
                             : 'Kart seçeneklerinde her kart için ayrıca kontrol ediliyor.')
-                    : 'Watt değerini güç kaynağının üstündeki etikette görebilirsin; bilmeden kart almak riskli.'}
+                    : 'Watt değerini güç kaynağının üstündeki etikette görebilirsin; yeni kart almadan önce bakmanı öneririz.'}
             </Karne>
             <Karne baslik="DİSK" puan={disk==='hdd'?'HDD':disk==='sata'?'SATA SSD':'NVMe'} cubuk={disk==='hdd'?25:disk==='sata'?70:100}
                    renk={disk==='hdd'?'#FF2D95':undefined}>
@@ -7762,7 +7739,7 @@ function YukseltSayfa(){
             <div className="num text-ink mt-1">{fmt(komple.total)}</div>
             {komple.g.idx<eski.idx ? (
               <p className="text-mg text-[.85rem] mt-2">Bu bütçedeki komple sistemin ekran kartı elindekinden
-                %{Math.round((1-komple.g.idx/eski.idx)*100)} daha yavaş. Sıfırdan kurmak seni geriye götürür.</p>
+                %{Math.round((1-komple.g.idx/eski.idx)*100)} daha yavaş. Bu bütçede yükseltmek, sıfırdan kurmaktan daha mantıklı.</p>
             ) : (
               <p className="text-dim text-[.85rem] mt-2">Aynı parayla sıfırdan kurulan en dengeli sistem; kartı elindekinden
                 %{Math.round((komple.g.idx/eski.idx-1)*100)} hızlı ve bütün parçaları yeni.</p>
@@ -7869,7 +7846,7 @@ function YontemSayfa(){
           </ul>
         </div>
         <div className="border border-mg/40 p-5">
-          <div className="lbl text-mg mb-3">ASLA</div>
+          <div className="lbl text-mg mb-3">YAPMAYACAKLARIMIZ</div>
           <ul className="text-[.88rem] text-dim leading-relaxed space-y-2">
             <li>· Para karşılığı bir ürünü listede yukarı çıkarmak</li>
             <li>· Testte kaybeden ürüne "en iyi" demek</li>
@@ -7881,9 +7858,9 @@ function YontemSayfa(){
 
       <h2 className="text-[1.25rem] text-ink pt-4">Bitmeyen işleri saklamayız</h2>
       <p>
-        Laptop ve hazır sistem bölümlerini şimdilik kapattık. Sebebi basit: oradaki fiyatları her gün
-        kontrol edemiyorduk ve liste eskiyordu. Yanlış fiyata bakıp alışveriş yapan kişi parasını geri
-        alamıyor. Bu yüzden düzeltene kadar kaldırdık; sayfada da bunu yazdık. Eksiği saklamıyoruz.
+        Laptop ve hazır sistem listelerini şimdilik kaldırdık. Oradaki fiyatları her gün kontrol
+        edemiyorduk ve liste eskiyordu; eski bir fiyata bakarak alışveriş yapılmasını istemedik.
+        Fiyatları aynı kuralla doğrulayabildiğimiz gün bu bölümler geri gelebilir.
       </p>
       <p className="text-[.85rem] text-dim">
         Bir hata görürsen ya da bir kuralın çiğnendiğini düşünürsen{' '}
@@ -7959,14 +7936,14 @@ function AskidaSayfa({tur}){
 
 function HakkimizdaSayfa(){
   return (
-    <BasitSayfa etiket="HAKKIMIZDA" baslik="Bir kişinin kurduğu, ciddiye alınan bir araç.">
+    <BasitSayfa etiket="HAKKIMIZDA" baslik="Bilgisayar toplamak isteyenler için ücretsiz bir araç.">
       <p>
         SETUP HANE, bütçesine göre bilgisayar toplamak isteyenler için ücretsiz bir
-        hesaplayıcı olarak başladı; şimdi donanım testleri, bir forum ve setup
-        aksesuarları vitrinini de içeren bir <span className="text-ink">araç ve topluluk</span> platformu.
+        hesaplayıcı olarak başladı. Bugün sistem kurma ve yükseltme araçları, donanım
+        testleri ve bir forumdan oluşuyor.
       </p>
       <p>
-        SETUP HANE bir firma değil, ticari bir iş de değil. Burayı, kendi bilgisayarını
+        Biz bir firma değiliz, ticari bir amaç gütmüyoruz. Burayı, kendi bilgisayarını
         toplarken aynı hesapları defalarca yapan biri kurdu; sonra aynı hesabı herkes
         kullanabilsin diye siteye taşıdı. Ürün satmıyoruz, komisyon almıyoruz, kimseyi
         bir mağazaya yönlendirmiyoruz. Her hesabın mantığı ekranda açık duruyor;
@@ -7997,12 +7974,12 @@ function IsBirlikleriSayfa(){
   return (
     <BasitSayfa etiket="İŞ BİRLİKLERİ" baslik="Markalarla iş birliği.">
       <p>
-        SETUP HANE, PC/setup ekosistemindeki markalarla iş birliğine açık.
-        Aşağıdakiler şu an gerçekten sunabildiğim kanallar; burada olmayan bir
-        şeyi vaat etmiyorum.
+        SETUP HANE, bilgisayar ve setup alanındaki markalarla iş birliğine açık.
+        Aşağıdakiler şu an sunabildiğimiz kanallar; burada olmayan bir şeyi
+        vaat etmiyoruz.
       </p>
       <p>
-        Bir sınır var ve pazarlığa açık değil: <span className="text-ink">ödeme, sitedeki hiçbir
+        Değişmeyen bir kuralımız var: <span className="text-ink">ödeme, sitedeki hiçbir
         öneriyi veya sıralamayı değiştirmez.</span> Sponsorlu alan ayrı durur ve üstünde kimin
         ödediği yazar. Ayrıntısı{' '}
         <a href="/yontem" className="text-cy hover:underline underline-offset-4">Yöntem sayfasında</a>.
@@ -8017,8 +7994,8 @@ function IsBirlikleriSayfa(){
         ))}
       </div>
       <p>
-        Takipçi/erişim rakamları, kampanya bazında ayrıca paylaşılıyor. Burada
-        genel bir sayı iddia etmiyorum; istersen doğrudan sorabilirsin.
+        Takipçi ve erişim rakamlarını kampanya bazında ayrıca paylaşıyoruz. Burada
+        genel bir sayı vermiyoruz; istersen doğrudan sorabilirsin.
       </p>
       <p>
         <a href="mailto:setuphane@gmail.com"
@@ -8037,11 +8014,11 @@ function GizlilikSayfa(){
       <p>
         <span className="text-ink">Ziyaret ölçümü:</span> Vercel Analytics çerez kullanmadan,
         kişiyi tanımlamadan sadece sayfa görüntüleme sayar. Ek olarak Google Analytics
-        yalnızca sen bandodaki "Kabul Ediyorum" düğmesine basarsan yüklenir; reddedersen
-        site aynen çalışmaya devam eder, hiçbir şey kaybetmezsin.
+        yalnızca çerez bildirimini kabul edersen yüklenir; reddedersen site aynen
+        çalışmaya devam eder.
       </p>
       <p>
-        <span className="text-ink">Cihazında kalan veriler:</span> Para birimi/dil tercihin,
+        <span className="text-ink">Cihazında kalan veriler:</span> Para birimi tercihin,
         test geçmişin, forum kullanıcı adın ve PIN'in tarayıcının <code className="text-cy">localStorage</code>'ında
         durur. Bunlar sunucuya gönderilmez, cihazlar arası senkron olmaz.
       </p>
@@ -8093,10 +8070,10 @@ function Footer(){
           </nav>
           <div className="lbl text-dim/70 leading-loose sm:text-right">
             <div>FİYATLAR: EPEY · {fiyatYasi().metin.toLocaleUpperCase('tr')}</div>
-            <div>FPS DEĞERLERİ TAHMİNDİR</div>
+            <div>FPS DEĞERLERİ ÖLÇÜMLERE DAYALI HESAPTIR</div>
             {/* Analitik eklendiği için bu satır şart: site "izleme yok" diyordu,
                 artık ziyaret sayılıyor. Ne sayıldığını saklamak dürüst olmaz. */}
-            <div>ÇEREZ YOK · ZİYARET SAYILIR, KİŞİ TAKİP EDİLMEZ</div>
+            <div>İZNİN OLMADAN ÇEREZ YOK · ZİYARET SAYILIR, KİŞİ TAKİP EDİLMEZ</div>
             <div className="mt-3 text-dim/50">© {new Date().getFullYear()} SETUP HANE</div>
           </div>
         </div>
@@ -9154,7 +9131,7 @@ function PanelSayfa(){
 }
 
 function App(){
-  const [mode,setMode]=useState('topla');           // 'topla' | 'oem' | 'laptop'
+  const mode='topla';   // laptop ve hazır sistem kapalı (28.09.2026); tek yol kendin toplamak
   /* Paylaşılan sistem linki (/sistem:...) tüm başlangıç değerlerini belirler;
      yoksa /fiyat: derin linki, o da yoksa varsayılanlar. Bir kez okunuyor —
      kullanıcı sonradan oynadığında link geri sarmasın diye. */
@@ -9164,8 +9141,7 @@ function App(){
   const [budget,setBudget]=useState(()=>(ps&&ps.butce)||butceUrldenAl()||55000);
   const [prof,setProf]=useState(ps?ps.prof:PROFILES[0]);
   const [pick,setPick]=useState(ps?ps.pick:{cpu:'',gpu:''});   // marka tercihi
-  const [lap,setLap]=useState(null);                // seçili laptop
-  const [oem,setOem]=useState(null);                // seçili hazır masaüstü
+  const lap=null, oem=null;
   const [gid,setGid]=useState(ps?ps.gid:'cs2');
   const [rid,setRid]=useState(ps?ps.rid:'1080');
   /* game/res de bağımlılık: oyun ya da çözünürlük değişince öneri yeniden
@@ -9331,26 +9307,18 @@ function App(){
                   Paranın <span className="em">tamamı</span> işe yarasın.
                 </h2>
                 <p className="mt-6 text-dim max-w-[52ch] leading-relaxed text-[.95rem]">
-                  Önce yolu seç: parçaları kendin mi alacaksın, yoksa kutudan çıkan hazır bir laptop mu?
-                  İkisinde de bütçeyi oynattıkça sonuç anında güncellenir.
+                  Bütçeni ve bilgisayarı ne için kullanacağını seç. Seçimlerini değiştirdikçe
+                  liste hemen güncellenir.
                 </p>
               </Reveal>
+              {/* 28.09.2026: "kendim toplayacağım / hazır alacağım" seçimi kaldırıldı.
+                  Laptop ve hazır sistem bölümleri kapalı olduğu için ziyaretçiye
+                  kapalı bir yolu sunmak anlamsızdı. ModeSwitch/BosBolum kodda duruyor. */}
               <Reveal delay={90}>
-                <div className="mt-10"><ModeSwitch mode={mode} setMode={setMode}/></div>
-              </Reveal>
-              <Reveal delay={140}>
-                {mode==='topla'
-                  ? <>
-                      <Builder budget={budget} setBudget={setBudget} prof={prof} setProf={setProf} res={res}
-                               sys={sys} pick={pick} setPick={setPick} gid={gid} rid={rid} game={game}/>
-                      <AmdIntelCompare budget={budget} prof={prof} game={game} res={res}/>
-                      {prof.needGpu && <AmdIntelCompare budget={budget} prof={prof} game={game} res={res} tur="gpu"/>}
-                    </>
-                  : mode==='oem'
-                  ? <OemPicker budget={budget} setBudget={setBudget} sel={oem} setSel={setOem}
-                               game={game} res={res}/>
-                  : <LaptopPicker budget={budget} setBudget={setBudget} sel={lap} setSel={setLap}
-                                  game={game} res={res}/>}
+                <Builder budget={budget} setBudget={setBudget} prof={prof} setProf={setProf} res={res}
+                         sys={sys} pick={pick} setPick={setPick} gid={gid} rid={rid} game={game}/>
+                <AmdIntelCompare budget={budget} prof={prof} game={game} res={res}/>
+                {prof.needGpu && <AmdIntelCompare budget={budget} prof={prof} game={game} res={res} tur="gpu"/>}
               </Reveal>
             </section>
 
