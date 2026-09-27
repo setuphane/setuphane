@@ -573,3 +573,9 @@ Kullanıcı: "yükselt kısmı çok zayıf; RAM vs seçimlerle performans puanla
 - Uydurma sayı yok: kart puanı TechPowerUp; RAM/güç/görüntü belleği kuralları motorla aynı; fiyatlar katalogdan.
 - **cpuBant düzeltildi:** eski yöntem Ryzen 5 7600'dan zayıf her işlemciye "bekletir" diyordu (katalogdaki en zayıf referans o). Yeni yöntem sitenin FPS modelini kullanıyor: gereken g = idx·resKat·k·mul/ck; eski işlemcinin g'si 7600'a oranla tahmin (±%15), sonuç üç bant.
 - Varsayılan öneri: işlemcinin ağır oyunda RAHAT beslediği en güçlü kart (3600 -> RTX 5060 Ti; 13600K -> RX 9070 XT + 850 W + 32 GB). Daha güçlüsü "İŞLEMCİN SINIRDA" etiketiyle.
+
+### 27.09.2026 — Bot sağlığı
+- Bot 26 ve 27 Eylül'de 10:00'da çalışmadı (bilgisayar kapalı/uykuda; "uyandır" kapalı). 27.09 23:14'te açılınca başladı ama konsol penceresi kapanınca yarıda kaldı (0xC000013A). Elle çalıştırıldı, 16 fiyat güncellendi.
+- Model izleme 25.09'da "curl ENOENT" ile çalışmamıştı: tarama betikleri düz 'curl' çağırıyordu, Görev Zamanlayıcı'da curl yolda yok. Hepsi artık process.env.CURL kullanıyor.
+- RTX 5080 Palit GamingPro'nun 85.100'lük fiyatı geçiciymiş (117.389'a çıktı; bot 3 gün bekletirken sitede %10 düşük fiyat kaldı). Zotac Solid Core OC'ye geçildi (95.549, 4 satıcı, 304 mm).
+- model-izle.mjs'e ACİL kontrol: bizim modelin canlı fiyatı sitedekinden %15+ yüksekse 3 gün beklenmez, bildirim çıkar.

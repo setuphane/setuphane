@@ -136,9 +136,9 @@
    "tarih": "2026-09-21T12:35:53.436Z"
   },
   "sogutucu:air": {
-   "fiyat": 1322,
+   "fiyat": 1328,
    "ad": "Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)",
-   "tarih": "2026-09-27T20:27:26.014Z"
+   "tarih": "2026-09-27T20:30:57.991Z"
   },
   "sogutucu:aio360p": {
    "fiyat": 4523,
@@ -191,9 +191,9 @@
    "tarih": "2026-09-27T20:27:26.014Z"
   },
   "gpu:5080": {
-   "fiyat": 85100,
-   "ad": "GeForce RTX 5080 16 GB (Palit GamingPro)",
-   "tarih": "2026-09-23T14:02:55.978Z"
+   "fiyat": 95549,
+   "ad": "GeForce RTX 5080 16 GB (Zotac Solid Core OC)",
+   "tarih": "2026-09-27T20:30:57.991Z"
   },
   "psu:550": {
    "fiyat": 1899,
@@ -281,5 +281,5 @@
    "tarih": "2026-09-25T07:01:24.383Z"
   }
  },
- "guncelleme": "2026-09-27T20:27:26.014Z"
+ "guncelleme": "2026-09-27T20:30:57.991Z"
 }

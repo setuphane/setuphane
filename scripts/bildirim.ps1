@@ -7,6 +7,7 @@ else {
   $icerik = Get-Content $log -Raw -Encoding UTF8
   $sorunlar = @()
   if ($icerik -match 'BOT HATA VERDI|MODEL IZLEME HATA VERDI|Veritabanı okunamadı|taraması eksik') { $sorunlar += 'bot hata verdi' }
+  if ($icerik -match 'ACİL MODEL') { $sorunlar += 'ACİL: sitede bir kartın fiyatı yanlış, model değişmeli' }
   if ($icerik -match 'MODEL DEĞİŞMELİ') { $sorunlar += 'bir parça 3 satıcının altına düştü' }
   if ($icerik -match 'MODEL DEĞİŞTİRİLEBİLİR') { $sorunlar += 'daha ucuz model 3 gündür doğrulandı' }
   if ($icerik -match 'BEKLETİLEN') { $sorunlar += 'ani fiyat değişimi bekletiliyor' }
