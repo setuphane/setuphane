@@ -3694,6 +3694,15 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                     {paylasildi?'LİNK KOPYALANDI ✓':'PAYLAŞ'}
                   </button>
                 </div>
+                {/* 28.09.2026: destek ricası yalnız üç yerde (burası, Hakkımızda,
+                    alt bilgi). Açılır pencere ya da işin ortasında rica yok. */}
+                <p className="mt-3 text-[.78rem] text-dim leading-relaxed">
+                  Bu araç ücretsiz ve reklamsız. İşine yaradıysa Instagram'da{' '}
+                  <a href="https://instagram.com/setuphane" target="_blank" rel="noopener noreferrer"
+                     onClick={()=>olay('instagram_tik',{yer:'liste'})}
+                     className="text-cy hover:underline underline-offset-4">@setuphane</a>'yi
+                  takip ederek destek olabilirsin.
+                </p>
                 <Kasa3B sys={sys}/>
                 <SistemAciklama sys={sys} budget={budget} prof={prof} pick={pick} game={game} res={res}/>
               </>
@@ -7961,6 +7970,13 @@ function HakkimizdaSayfa(){
         <a href="/isbirlikleri" className="text-cy hover:underline underline-offset-4">İş Birlikleri</a>{' '}
         sayfasına bakabilirsin.
       </p>
+      <p className="border-l-2 border-cy pl-4 text-ink/90">
+        Bu siteden gelir elde etmiyoruz. Bize destek olmanın en kolay yolu Instagram'da{' '}
+        <a href="https://instagram.com/setuphane" target="_blank" rel="noopener noreferrer"
+           onClick={()=>olay('instagram_tik',{yer:'hakkimizda'})}
+           className="text-cy hover:underline underline-offset-4">@setuphane</a>'yi takip etmek ve
+        işine yarayacak birine siteyi önermek.
+      </p>
     </BasitSayfa>
   );
 }
@@ -8057,9 +8073,11 @@ function Footer(){
         <div>
           <div className="w-[168px]"><LogoLockup wordSize={24}/></div>
           <p className="mt-6 text-sm text-dim max-w-[38ch] leading-relaxed">
-            Bütçeye göre bilgisayar toplayan bir topluluk. Instagram'da{' '}
+            Bütçeye göre bilgisayar toplayan bir topluluk. Ücretsiz ve reklamsız.
+            Destek olmak istersen:{' '}
             <a href="https://instagram.com/setuphane" target="_blank" rel="noopener noreferrer"
-               className="text-cy hover:underline underline-offset-4">@setuphane</a>.
+               onClick={()=>olay('instagram_tik',{yer:'altbilgi'})}
+               className="text-cy hover:underline underline-offset-4">@setuphane</a>
           </p>
         </div>
         <div className="flex flex-col sm:items-end gap-8">
