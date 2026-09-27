@@ -30,7 +30,36 @@ KONUYA göre dağınık; bu tablo tek doğru özet.
 
 ## Açık karar
 
-**Motoru seçilen oyuna duyarlı hale getirmek.** Yayın profilinde 6 bütçe noktasında bütçe artınca FPS düşüyor (oyun profilinde 0). Kök neden tek denge sabiti (1.32). Kullanıcıya 24.09'da tekrar önerildi.
+Yok. ("Motoru seçilen oyuna duyarlı hale getirmek" çoktan yapıldı: `effPerf` oyun ve
+çözünürlüğü hesaba katıyor. 28.09 testi: oyun 0, yayın 0, tasarım 34 düşüş; tasarımdaki bilinçli.)
+
+## 28.09.2026 — Metinler, Hakkımızda, analiz, telefon ilk ekranı
+
+- Tüm site metinleri elden geçti: sade, mütevazı, "biz" dili; itici ifadeler kalktı
+  ("ya da hiç almazsın", "yarım yamalak", "çöpe atmışsın"). Yanlış bilgiler düzeldi
+  (fiyatların topluluktan geldiği iddiası, altbilgi "FPS tahmindir"/"çerez yok").
+- Ana sayfadaki "Kendim toplayacağım / Hazır alacağım" seçimi ve "Hazır sisteme göre kârın"
+  (%22 varsayımlı tahmin) kaldırıldı. Kod duruyor (ModeSwitch, BosBolum).
+- Destek ricası üç yerde (liste altı, Hakkımızda, altbilgi) -> olay `instagram_tik` {yer}.
+- Ana sayfada pembe "Biz kimiz, neden ücretsiz?" kartı -> `hakkimizda_tik`; masaüstü üst
+  çubukta HAKKIMIZDA. Hakkımızda metni düz dille yeniden yazıldı.
+- Telefonda büyük hero logosu gizlendi, marka adı üst çubukta; 375x670'te bütçe düğmeleri
+  ilk ekranda.
+- Analiz (Vercel 21-28.09): 183 ziyaretçi (4,4 kat), %66 Instagram, %79 telefon, çıkma %56.
+  GA4 yalnız ~1/5'i görüyor (çerez izni); Vercel Hobby özel olay kaydetmiyor. Ayrıntı: Claude
+  hafızası "setuphane-analitik-baz".
+- Hukuk metinleri (KVKK aydınlatma, /kosullar, forum kuralları) hazır ama YAYINLANMADI:
+  yerel `hukuk-metinleri` dalında. Kullanıcı kararı: şimdilik gerek yok. Ücretli iş birliği
+  başlarsa ya da şikâyet/silme talebi gelirse yayınlanmalı.
+
+**Bekleyenler (28.09):**
+- Birkaç gün sonra Vercel çıkma oranı (%56) ile telefon değişikliğini karşılaştır.
+- Önerilen, kullanıcı henüz seçmedi: bütçe düğmesine basınca doğrudan sonuca kaydırma;
+  "beni sayma" (kendi ziyaretleri); kapalı Aksesuarlar/Öner sayfalarına büyük "Sistem kur"
+  düğmesi; Instagram gönderileri için etiketli sistem bağlantıları; paylaşılan sisteme
+  özel önizleme görseli; test sayfaları için arama motoru çalışması.
+- Forumdaki "Her ay en iyi 3 kurulumu Instagram'da öne çıkarıyoruz" cümlesi gerçekten
+  yapılıyor mu? Kullanıcıya soruldu, cevap yok.
 
 ## Yapılacaklar (24.09.2026 analizi, sırayla)
 
