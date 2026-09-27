@@ -2136,7 +2136,9 @@ function Nav({route}){
         <div className="min-h-[60px] lg:min-h-[68px] py-2 lg:py-2.5 flex items-center justify-between gap-4">
           <a href={route==='ana'?'#top':'/'} className="flex items-center gap-3" aria-label="SETUP HANE ana sayfa">
             <MarkSmall size={38}/>
-            <span className="hidden sm:block"><Wordmark size={15} flicker={false}/></span>
+            {/* 28.09.2026: telefonda da görünür; büyük logo telefonda kalktığı
+                için marka adı üst çubukta duruyor. */}
+            <Wordmark size={15} flicker={false}/>
           </a>
 
           <nav aria-label="Bölümler" className="hidden lg:flex items-center gap-2">
@@ -2220,14 +2222,18 @@ function Hero({budget,setBudget}){
       </div>
 
       <Reveal>
-        {/* marka: sayfanın açılışındaki neon tabela */}
-        <div className="mb-7 sm:mb-14 w-[150px] sm:w-[240px] lg:w-[272px]">
+        {/* marka: sayfanın açılışındaki neon tabela.
+            28.09.2026: telefonda gizli. Ziyaretçilerin %79'u telefondan, çoğu
+            Instagram biyografisinden geliyor ve logoyu zaten biliyor; logo ilk
+            ekranın yarısını kaplayıp bütçe düğmelerini aşağı itiyordu
+            (tek sayfa görüp çıkma oranı %56). */}
+        <div className="hidden sm:block sm:mb-14 sm:w-[240px] lg:w-[272px]">
           <LogoLockup wordSize={34}/>
         </div>
       </Reveal>
 
       <Reveal delay={80}>
-        <Label className="mb-6">TOPLULUK ARACI · SATIŞ YOK · {new Date().getFullYear()}</Label>
+        <Label className="mb-4 sm:mb-6">TOPLULUK ARACI · SATIŞ YOK · {new Date().getFullYear()}</Label>
         <h1 className="h-xl text-[clamp(2.6rem,10.2vw,8rem)] max-w-[16ch]">
           Bütçeni söyle.<br/>Hangi parça <span className="em">neden</span>,<br/>birlikte bakalım.
         </h1>
@@ -2236,7 +2242,7 @@ function Hero({budget,setBudget}){
       <Reveal delay={220}>
         {/* Hızlı başlangıç: bütçeyi tek dokunuşla seçip doğrudan hesaba iner.
             Telefonda sistem kurma bölümü sayfanın çok aşağısında kalıyordu. */}
-        <div className="mt-9 lg:mt-12">
+        <div className="mt-7 sm:mt-9 lg:mt-12">
           <div className="lbl text-dim mb-3">BÜTÇENİ SEÇ, HEMEN BAŞLA</div>
           <div className="flex flex-wrap gap-2">
             {HIZLI_BUTCE.map(b=>(
