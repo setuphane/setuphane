@@ -12,7 +12,7 @@ export async function tara(slug, sayfa = 3) {
     const url = s === 1 ? `https://www.epey.com/${slug}/` : `https://www.epey.com/${slug}/${s}/`;
     /* Node'un fetch'i Epey'de 403 aliyor (TLS parmak izi), curl aliyor. */
     let h;
-    try { h = execFileSync('curl', ['-sS', '--compressed', '-A', UA,
+    try { h = execFileSync(process.env.CURL || 'curl', ['-sS', '--compressed', '-A', UA,
             '-H', 'accept-language: tr-TR,tr;q=0.9', url],
             { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }); }
     catch (e) { console.error(`  ! ${url} -> ${e.message}`); break; }

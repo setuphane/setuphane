@@ -103,7 +103,7 @@ for (const s of secilen) {
      bos kaliyordu. Ucuncuye kadar tekrar deniyoruz; eksik gorselle
      yayina cikmak istemiyoruz. */
   for (let deneme = 1; deneme <= 3 && !h; deneme++) {
-    try { h = execFileSync('curl', ['-sS', '--compressed', '-L', '--max-time', '30', '-A', UA, s.url],
+    try { h = execFileSync(process.env.CURL || 'curl', ['-sS', '--compressed', '-L', '--max-time', '30', '-A', UA, s.url],
       { encoding: 'utf8', maxBuffer: 6e7 }); }
     catch (e) { if (deneme === 3) console.error('  ! ' + s.ad + ' sayfasi alinamadi'); }
   }

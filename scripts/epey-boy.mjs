@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
          + '(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
-const cek = u => execFileSync('curl', ['-sS', '--compressed', '-A', UA,
+const cek = u => execFileSync(process.env.CURL || 'curl', ['-sS', '--compressed', '-A', UA,
   '-H', 'accept-language: tr-TR,tr;q=0.9', '--max-time', '30', u], { encoding: 'utf8', maxBuffer: 3e7 });
 const bekle = ms => new Promise(r => setTimeout(r, ms));
 

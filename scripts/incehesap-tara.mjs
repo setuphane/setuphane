@@ -12,7 +12,7 @@ export function tara(slug = 'hazir-sistemler-fiyatlari', sayfa = 4) {
   for (let s = 1; s <= sayfa; s++) {
     const url = `https://www.incehesap.com/${slug}/` + (s > 1 ? `sayfa-${s}/` : '');
     let h;
-    try { h = execFileSync('curl', ['-sS', '--compressed', '-L', '-A', UA,
+    try { h = execFileSync(process.env.CURL || 'curl', ['-sS', '--compressed', '-L', '-A', UA,
       '-H', 'accept-language: tr-TR,tr;q=0.9', url], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }); }
     catch (e) { console.error('  ! ' + url + ' -> ' + e.message.slice(0, 80)); break; }
 

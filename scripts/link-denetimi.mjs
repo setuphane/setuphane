@@ -50,7 +50,7 @@ console.log(`${urunler.length} benzersiz aksesuar linki denetleniyor `
 const bekle = ms => new Promise(r => setTimeout(r, ms));
 const kontrolEt = link => {
   try {
-    return execFileSync('curl', ['-sS', '-o', devNull, '-w', '%{http_code}', '-L',
+    return execFileSync(process.env.CURL || 'curl', ['-sS', '-o', devNull, '-w', '%{http_code}', '-L',
       '--max-time', '25', '-A', UA, link], { encoding: 'utf8' }).trim();
   } catch (e) { return 'HATA'; }
 };
