@@ -6,9 +6,9 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "gpu:9060xt": {
-   "fiyat": 30689,
+   "fiyat": 34408,
    "ad": "Radeon RX 9060 XT 16 GB (Asus Dual)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "gpu:5060ti": {
    "fiyat": 45569,
@@ -21,9 +21,9 @@
    "tarih": "2026-10-08T07:01:22.195Z"
   },
   "gpu:5070": {
-   "fiyat": 59949,
+   "fiyat": 59999,
    "ad": "GeForce RTX 5070 12 GB (MSI Ventus 3X OC)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "gpu:9070xt": {
    "fiyat": 55729,
@@ -31,19 +31,19 @@
    "tarih": "2026-10-08T07:01:22.195Z"
   },
   "gpu:5090": {
-   "fiyat": 332785,
+   "fiyat": 365279,
    "ad": "GeForce RTX 5090 32 GB (MSI Ventus 3X OC)",
-   "tarih": "2026-10-08T07:01:22.195Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "cpu:8500g": {
-   "fiyat": 7451,
+   "fiyat": 7444,
    "ad": "Ryzen 5 8500G",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "cpu:7500f": {
-   "fiyat": 6599,
+   "fiyat": 6629,
    "ad": "Ryzen 5 7500F",
-   "tarih": "2026-10-08T07:01:22.195Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "cpu:7600": {
    "fiyat": 7349,
@@ -51,9 +51,9 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "cpu:245k": {
-   "fiyat": 11319,
+   "fiyat": 12000,
    "ad": "Core Ultra 5 245K",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "cpu:9600x": {
    "fiyat": 8899,
@@ -61,9 +61,9 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "cpu:265k": {
-   "fiyat": 17000,
+   "fiyat": 16499,
    "ad": "Core Ultra 7 265K",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "cpu:9700x": {
    "fiyat": 13899,
@@ -71,9 +71,9 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "cpu:7800x3d": {
-   "fiyat": 15637,
+   "fiyat": 15629,
    "ad": "Ryzen 7 7800X3D",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "cpu:9950x3d": {
    "fiyat": 33899,
@@ -141,9 +141,9 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "sogutucu:aio360p": {
-   "fiyat": 4799,
+   "fiyat": 5049,
    "ad": "360 mm sıvı soğutma (MSI MAG CoreLiquid A13 360)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "anakart:AM5-0": {
    "fiyat": 4799,
@@ -181,19 +181,19 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "gpu:5060": {
-   "fiyat": 25852,
+   "fiyat": 27729,
    "ad": "GeForce RTX 5060 8 GB (Asus Dual OC)",
-   "tarih": "2026-10-01T07:01:22.073Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "gpu:5070ti": {
-   "fiyat": 81319,
+   "fiyat": 89100,
    "ad": "GeForce RTX 5070 Ti 16 GB (Gigabyte Windforce OC V2)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "gpu:5080": {
-   "fiyat": 102820,
+   "fiyat": 109848,
    "ad": "GeForce RTX 5080 16 GB (Zotac Solid Core OC)",
-   "tarih": "2026-10-01T07:01:22.073Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "psu:550": {
    "fiyat": 2019,
@@ -206,9 +206,9 @@
    "tarih": "2026-10-02T07:01:22.412Z"
   },
   "ram:96": {
-   "fiyat": 80878,
+   "fiyat": 79999,
    "ad": "96 GB DDR5-5600 (2×48) (Crucial Pro)",
-   "tarih": "2026-10-08T07:01:22.195Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "ssd:4t": {
    "fiyat": 36798,
@@ -261,9 +261,9 @@
    "tarih": "2026-10-02T07:01:22.412Z"
   },
   "kasa:5": {
-   "fiyat": 11899,
+   "fiyat": 11007,
    "ad": "Premium camlı vitrin kasa (Lian Li O11 Dynamic EVO RGB)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "cpu:285k": {
    "fiyat": 29599,
@@ -281,9 +281,9 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "kasa:1": {
-   "fiyat": 3679,
+   "fiyat": 3599,
    "ad": "Mesh ön panelli kasa (NZXT H3 Flow)",
-   "tarih": "2026-10-08T07:01:22.195Z"
+   "tarih": "2026-10-09T07:01:32.699Z"
   },
   "sogutucu:aio360": {
    "fiyat": 3517,
@@ -291,5 +291,5 @@
    "tarih": "2026-10-02T07:01:22.412Z"
   }
  },
- "guncelleme": "2026-10-08T07:01:22.195Z"
+ "guncelleme": "2026-10-09T07:01:32.699Z"
 }

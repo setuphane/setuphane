@@ -4,95 +4,95 @@
     "fiyat": 17387,
     "satici": 5,
     "link": "https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html",
-    "seri": 3,
-    "son": "2026-10-08"
+    "seri": 4,
+    "son": "2026-10-09"
   },
   "gpu:b580": {
     "model": "Intel Arc B580",
     "fiyat": 19993,
     "satici": 4,
     "link": "https://www.epey.com/ekran-karti/intel-arc-b580.html",
-    "seri": 6,
-    "son": "2026-10-08"
+    "seri": 7,
+    "son": "2026-10-09"
   },
   "gpu:5050": {
     "model": "Maxsun Terminator GeForce RTX 5050 (MS-RTX5050-TRW-8G)",
-    "fiyat": 18280,
+    "fiyat": 18289,
     "satici": 4,
     "link": "https://www.epey.com/ekran-karti/maxsun-terminator-geforce-rtx-5050.html",
-    "seri": 5,
-    "son": "2026-10-08"
+    "seri": 6,
+    "son": "2026-10-09"
   },
   "gpu:5060": {
     "model": "Zotac Gaming GeForce RTX 5060 Twin Edge (ZT-B50600E-10M)",
     "fiyat": 23631,
-    "satici": 7,
+    "satici": 8,
     "link": "https://www.epey.com/ekran-karti/zotac-gaming-geforce-rtx-5060-twin-edge.html",
-    "seri": 1,
-    "son": "2026-10-08"
+    "seri": 2,
+    "son": "2026-10-09"
   },
   "gpu:9060xt": {
     "model": "Sapphire Pulse Radeon RX 9060 XT 16GB (11350-03-20G)",
     "fiyat": 29999,
     "satici": 4,
     "link": "https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-9060-xt-16gb.html",
-    "seri": 1,
-    "son": "2026-10-08"
+    "seri": 2,
+    "son": "2026-10-09"
   },
   "gpu:5060ti": {
     "model": "Asus Dual GeForce RTX 5060 Ti OC 16GB (DUAL-RTX5060TI-O16G)",
     "fiyat": 45569,
     "satici": 9,
     "link": "https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-ti-oc-16gb.html",
-    "seri": 1,
-    "son": "2026-10-08"
+    "seri": 2,
+    "son": "2026-10-09"
   },
   "gpu:9070": {
-    "model": "ASRock Radeon RX 9070 Steel Legend OC (90-GA5EZZ-00UANF)",
-    "fiyat": 45496,
-    "satici": 3,
-    "link": "https://www.epey.com/ekran-karti/asrock-radeon-rx-9070-steel-legend-oc.html",
+    "model": "Asus Prime Radeon RX 9070 OC Edition (PRIME-RX9070-O16G)",
+    "fiyat": 42999,
+    "satici": 4,
+    "link": "https://www.epey.com/ekran-karti/asus-prime-radeon-rx-9070-oc-edition.html",
     "seri": 1,
-    "son": "2026-10-08"
+    "son": "2026-10-09"
   },
   "gpu:5070": {
     "model": "Zotac Gaming GeForce RTX 5070 Twin Edge (ZT-B50700E-10P)",
     "fiyat": 47261,
-    "satici": 3,
+    "satici": 4,
     "link": "https://www.epey.com/ekran-karti/zotac-gaming-geforce-rtx-5070-twin-edge.html",
-    "seri": 1,
-    "son": "2026-10-08"
+    "seri": 2,
+    "son": "2026-10-09"
   },
   "gpu:9070xt": {
     "model": "PowerColor Reaper Radeon RX 9070 XT (RX9070XT 16G-A)",
-    "fiyat": 49929,
+    "fiyat": 49964,
     "satici": 3,
     "link": "https://www.epey.com/ekran-karti/powercolor-reaper-radeon-rx-9070-xt.html",
-    "seri": 1,
-    "son": "2026-10-08"
+    "seri": 2,
+    "son": "2026-10-09"
   },
   "gpu:5070ti": {
     "model": "MSI GeForce RTX 5070 Ti Shadow 3X OC (G507T-16S3C)",
     "fiyat": 76499,
     "satici": 11,
     "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5070-ti-shadow-3x-oc.html",
-    "seri": 2,
-    "son": "2026-10-08"
+    "seri": 3,
+    "son": "2026-10-09"
   },
   "gpu:5080": {
-    "model": "Zotac Gaming GeForce RTX 5080 Solid Core OC (ZT-B50800J2-10P)",
-    "fiyat": 102820,
-    "satici": 4,
-    "link": "https://www.epey.com/ekran-karti/zotac-gaming-geforce-rtx-5080-solid-core-oc.html",
-    "seri": 5,
-    "son": "2026-10-08"
+    "model": "MSI GeForce RTX 5080 Shadow 3X OC (G5080-16S3C)",
+    "fiyat": 104416,
+    "satici": 9,
+    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5080-16g-shadow-3x-oc.html",
+    "seri": 1,
+    "son": "2026-10-09"
   },
   "gpu:5090": {
-    "model": "MSI GeForce RTX 5090 Ventus 3X OC (G5090-32V3C)",
-    "fiyat": 332785,
-    "satici": 8,
-    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html",
-    "seri": 3,
-    "son": "2026-10-08"
+    "model": "MSI GeForce RTX 5090 Gaming Trio OC (G5090-32GTC)",
+    "fiyat": 355163,
+    "satici": 6,
+    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-32g-gaming-trio-oc.html",
+    "seri": 1,
+    "son": "2026-10-09"
   }
 }
