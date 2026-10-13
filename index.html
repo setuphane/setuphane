@@ -11814,8 +11814,22 @@ let _firsatSozu = null;
 function haftaninSecimleri() {
   if (typeof uzakVar === 'function' && !uzakVar()) return Promise.resolve([]);
   if (!_firsatSozu) {
-    _firsatSozu = sb('urunler?select=kat,ad,kaynak,gorsel,link,firsat_not&aktif=eq.true&firsat=eq.true&order=sira.asc').then(function (r) {
-      return Array.isArray(r) ? r : [];
+    /* Veritabani semasina DOKUNMADAN calisir: isaret, zaten var olan
+       `anahtar` dizisine yaziliyor. O dizi yalnizca /oner sayfasinin
+       eslestirmesi icindi ve o sayfa askida; canli hicbir yer okumuyor.
+       Panel iki ucu da kendisi yonetiyor, kullanici bu ayrintiyi gormuyor.
+       DIKKAT: /oner geri acilirsa 'firsat' ve 'not:' girdileri eslestirme
+       disinda birakilmali. */
+    _firsatSozu = sb('urunler?select=kat,ad,kaynak,gorsel,link,anahtar&aktif=eq.true&anahtar=cs.%7Bfirsat%7D&order=sira.asc').then(function (r) {
+      return Array.isArray(r) ? r.map(function (u) {
+        const a = Array.isArray(u.anahtar) ? u.anahtar : [];
+        const n = a.find(function (x) {
+          return String(x).indexOf('not:') === 0;
+        });
+        return Object.assign({}, u, {
+          firsat_not: n ? String(n).slice(4) : null
+        });
+      }) : [];
     }).catch(function () {
       return [];
     });
@@ -13158,14 +13172,14 @@ function PanelAksesuar({
         kaynak: duzen.kaynak.trim(),
         gorsel: duzen.gorsel.trim(),
         link: duzen.link.trim(),
-        anahtar: String(duzen.anahtar || '').split(',').map(s => s.trim()).filter(Boolean),
+        /* Firsat isareti ve notu anahtar dizisinde tasiniyor (bkz.
+           haftaninSecimleri). Kullaniciya gosterilen kelime kutusunda
+           gorunmezler; burada geri ekleniyorlar. */
+        anahtar: String(duzen.anahtar || '').split(',').map(s => s.trim()).filter(Boolean).concat(duzen.firsat ? ['firsat'] : []).concat(duzen.firsat && String(duzen.firsat_not || '').trim() ? ['not:' + String(duzen.firsat_not).trim()] : []),
         mintl: duzen.mintl === '' || duzen.mintl == null ? null : Number(duzen.mintl),
         maxtl: duzen.maxtl === '' || duzen.maxtl == null ? null : Number(duzen.maxtl),
         sira: Number(duzen.sira) || 0,
-        aktif: !!duzen.aktif,
-        /* Haftanin secimi: /firsatlar sayfasindaki is birligi bolumu bunu okur. */
-        firsat: !!duzen.firsat,
-        firsat_not: String(duzen.firsat_not || '').trim() || null
+        aktif: !!duzen.aktif
       };
       if (duzen.id) await sb('urunler?id=eq.' + duzen.id, {
         method: 'PATCH',
@@ -13257,10 +13271,16 @@ function PanelAksesuar({
   }, katAd(u.kat), " \xB7 ", u.kaynak, " \xB7 s\u0131ra ", u.sira, !u.aktif && ' · gizli')), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2 shrink-0"
   }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => setDuzen({
-      ...u,
-      anahtar: (u.anahtar || []).join(', ')
-    }),
+    onClick: () => {
+      const a = u.anahtar || [];
+      const n = a.find(x => String(x).indexOf('not:') === 0);
+      setDuzen({
+        ...u,
+        anahtar: a.filter(x => x !== 'firsat' && String(x).indexOf('not:') !== 0).join(', '),
+        firsat: a.indexOf('firsat') >= 0,
+        firsat_not: n ? String(n).slice(4) : ''
+      });
+    },
     className: "border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors"
   }, "D\xDCZENLE"), /*#__PURE__*/React.createElement("button", {
     onClick: () => sil(u),
