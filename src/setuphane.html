@@ -7476,15 +7476,33 @@ function SecimKarti({u}){
   return (
     <a href={u.link} target="_blank" rel="sponsored noopener noreferrer"
        onClick={()=>olay('firsat_isbirligi_tik',{urun:u.ad})}
-       className="group block border border-line/70 hover:border-mg/50 transition-colors">
-      <div className="aspect-[4/3] relative overflow-hidden bg-white/[.03]">
+       className="group block border border-line hover:border-cy/50 transition-colors duration-300 overflow-hidden">
+      {/* Görsel alanı büyük ve beyaz zeminli: ürün fotoğrafları mağaza
+          çekimleri, koyu zeminde kenarları kayboluyordu. */}
+      <div className="relative aspect-[16/10] bg-white overflow-hidden">
         <img src={u.gorsel} alt={u.ad} loading="lazy" decoding="async"
-             className="absolute inset-0 w-full h-full object-contain p-3 transition-transform duration-700 group-hover:scale-105"/>
+             className="absolute inset-0 w-full h-full object-contain p-5 transition-transform duration-700 group-hover:scale-[1.04]"/>
+        <span className="absolute top-0 left-0 lbl text-[.55rem] text-bg bg-cy/90 px-2.5 py-1.5">
+          {String(u.kaynak||'').toLocaleUpperCase('tr')}
+        </span>
       </div>
-      <div className="p-3 border-t border-line/70">
-        <div className="text-[.84rem] text-ink/90 leading-snug line-clamp-2">{u.ad}</div>
-        {u.firsat_not ? <div className="text-[.76rem] text-dim mt-1.5 leading-relaxed">{u.firsat_not}</div> : null}
-        <div className="lbl text-[.55rem] text-mg/80 mt-2">İŞ BİRLİĞİ BAĞLANTISI · {String(u.kaynak||'').toLocaleUpperCase('tr')}</div>
+      <div className="p-5 sm:p-6">
+        <h3 className="text-[1.05rem] sm:text-[1.15rem] leading-snug text-ink group-hover:text-cy transition-colors">
+          {u.ad}
+        </h3>
+        {u.firsat_not
+          ? <p className="text-[.92rem] leading-relaxed text-dim mt-3">{u.firsat_not}</p>
+          : null}
+        <div className="flex items-center justify-between gap-4 mt-5 pt-4 border-t border-line">
+          <span className="lbl text-[.55rem] text-dim/70">İŞ BİRLİĞİ BAĞLANTISI</span>
+          <span className="lbl text-[.6rem] text-cy inline-flex items-center gap-2">
+            MAĞAZADA GÖR
+            <svg width="16" height="7" viewBox="0 0 16 7" fill="none" aria-hidden="true"
+                 className="transition-transform duration-500 group-hover:translate-x-1">
+              <path d="M0 3.5h14M11 1l3 2.5-3 2.5" stroke="currentColor" strokeWidth="1.1"/>
+            </svg>
+          </span>
+        </div>
       </div>
     </a>
   );
@@ -7498,48 +7516,59 @@ function FirsatlarSayfa(){
     return function(){ iptal=true; };
   },[]);
 
+  /* Tek ürün varken 4 sütunluk ızgara onu kaybediyordu: kart küçülüyor,
+     sayfanın geri kalanı boş kalıyor. Sütun sayısı ürün sayısına göre. */
+  const n=(secim||[]).length;
+  const izgara = n<=1 ? 'sm:grid-cols-1 max-w-[560px]'
+               : n===2 ? 'sm:grid-cols-2'
+               : 'sm:grid-cols-2 lg:grid-cols-3';
+
   return (
     <div className="py-8 lg:py-12">
       <Reveal>
         <Label className="mb-4">FIRSATLAR</Label>
         <div className="rule mb-8"/>
-        <h1 className="h-xl text-[clamp(2rem,6vw,3.6rem)] max-w-[20ch] mb-8">
+        <h1 className="h-xl text-[clamp(2.1rem,6.5vw,3.8rem)] max-w-[18ch] mb-7">
           Bu hafta <span className="em">önerdiklerimiz</span>.
         </h1>
-        <p className="max-w-[60ch] text-[.95rem] leading-relaxed text-ink/85">
-          Kullandığımız ya da topluluktan iyi geri dönüş aldığımız şeyler. Uzun bir liste değil,
-          gerçekten işine yarayacağını düşündüğümüz birkaç parça.
-        </p>
-        <p className="max-w-[60ch] text-[.88rem] leading-relaxed text-dim mt-3">
-          Buradaki bağlantılardan <span className="text-ink/80">komisyon alıyoruz</span> ve her kartın
-          altında yazıyor. Sistem toplama rehberi bundan tamamen ayrı: oraya para karışmaz, karışırsa
-          listenin hiçbir değeri kalmaz.{' '}
-          <a href="/yontem" className="text-cy hover:underline underline-offset-4">Yöntem</a> sayfasında
-          nerede komisyon var nerede yok, tek tek yazdık.
+        <p className="max-w-[54ch] text-[1.02rem] leading-relaxed text-ink/85">
+          Kullandığımız ya da topluluktan iyi geri dönüş aldığımız birkaç parça.
+          Uzun bir liste değil; gerçekten işine yarayacağını düşündüklerimiz.
         </p>
       </Reveal>
 
-      <Reveal delay={90}>
+      <Reveal delay={80}>
+        {/* Açıklama ürünlerin önünü kesmesin diye tek satırlık şerit. */}
+        <div className="mt-7 border-l-2 border-mg/60 pl-4 py-1 max-w-[62ch]">
+          <p className="text-[.88rem] leading-relaxed text-dim">
+            Buradaki bağlantılardan <span className="text-ink/90">komisyon alıyoruz.</span>{' '}
+            Sistem toplama rehberi bundan tamamen ayrı: oraya para karışmaz.{' '}
+            <a href="/yontem" className="text-cy hover:underline underline-offset-4">Nerede var, nerede yok</a>
+          </p>
+        </div>
+      </Reveal>
+
+      <Reveal delay={140}>
         <div className="mt-10">
-          {secim===null ? <p className="text-dim text-[.9rem]">Yükleniyor…</p> : null}
-          {secim!==null && !secim.length ? (
-            <Card className="p-5 sm:p-8">
-              <div className="text-ink text-[1.05rem] font-light">Bu hafta için seçim yapılmadı.</div>
-              <p className="text-[.9rem] text-dim mt-3 max-w-[58ch] leading-relaxed">
+          {secim===null ? <p className="text-dim text-[.95rem]">Yükleniyor…</p> : null}
+          {secim!==null && !n ? (
+            <div className="border border-line p-8 sm:p-12 text-center max-w-[560px]">
+              <div className="text-ink text-[1.15rem] font-light">Bu hafta için seçim yapılmadı.</div>
+              <p className="text-[.92rem] text-dim mt-3 leading-relaxed">
                 Doldurmak için doldurmuyoruz. Önerecek bir şey olduğunda burada olacak.
               </p>
-            </Card>
+            </div>
           ) : null}
-          {secim!==null && secim.length ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {secim!==null && n ? (
+            <div className={'grid grid-cols-1 gap-5 sm:gap-6 '+izgara}>
               {secim.map(u=><SecimKarti key={u.link} u={u}/>)}
             </div>
           ) : null}
         </div>
       </Reveal>
 
-      <Reveal delay={150}>
-        <p className="text-[.8rem] text-dim/80 mt-8 leading-relaxed max-w-[62ch]">
+      <Reveal delay={200}>
+        <p className="text-[.82rem] text-dim/75 mt-10 leading-relaxed max-w-[62ch]">
           <span className="text-ink/80">İndirimde olduklarını iddia etmiyoruz.</span> Bu ürünlerin
           fiyat geçmişini tutmuyoruz; tutmadığımız bir şey için "indirimde" demek doğru olmaz.
           Fiyatı mağazada kendin gör, beğenmezsen alma.
