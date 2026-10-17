@@ -1,14 +1,14 @@
 {
  "parcalar": {
   "gpu:7600": {
-   "fiyat": 19529,
+   "fiyat": 19319,
    "ad": "Radeon RX 7600 8 GB (Sapphire Pulse)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "gpu:9060xt": {
-   "fiyat": 34089,
+   "fiyat": 34684,
    "ad": "Radeon RX 9060 XT 16 GB (Asus Dual)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "gpu:5060ti": {
    "fiyat": 45569,
@@ -16,14 +16,14 @@
    "tarih": "2026-10-02T07:01:22.412Z"
   },
   "gpu:9070": {
-   "fiyat": 47520,
+   "fiyat": 48000,
    "ad": "Radeon RX 9070 16 GB (Gigabyte Gaming OC)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "gpu:5070": {
-   "fiyat": 63815,
+   "fiyat": 64072,
    "ad": "GeForce RTX 5070 12 GB (MSI Ventus 3X OC)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "gpu:9070xt": {
    "fiyat": 55949,
@@ -31,9 +31,9 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "gpu:5090": {
-   "fiyat": 365279,
+   "fiyat": 379210,
    "ad": "GeForce RTX 5090 32 GB (MSI Ventus 3X OC)",
-   "tarih": "2026-10-09T07:01:32.699Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:8500g": {
    "fiyat": 8199,
@@ -41,14 +41,14 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "cpu:7500f": {
-   "fiyat": 6711,
+   "fiyat": 6803,
    "ad": "Ryzen 5 7500F",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:7600": {
-   "fiyat": 7250,
+   "fiyat": 7399,
    "ad": "Ryzen 5 7600",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:245k": {
    "fiyat": 11996,
@@ -56,24 +56,24 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "cpu:9600x": {
-   "fiyat": 9299,
+   "fiyat": 8999,
    "ad": "Ryzen 5 9600X",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:265k": {
-   "fiyat": 16817,
+   "fiyat": 16020,
    "ad": "Core Ultra 7 265K",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:9700x": {
-   "fiyat": 14012,
+   "fiyat": 14450,
    "ad": "Ryzen 7 9700X",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:7800x3d": {
-   "fiyat": 15431,
+   "fiyat": 15914,
    "ad": "Ryzen 7 7800X3D",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:9950x3d": {
    "fiyat": 34624,
@@ -86,9 +86,9 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "ram:16": {
-   "fiyat": 14249,
+   "fiyat": 13999,
    "ad": "16 GB DDR5-6000 (XPG Lancer Blade)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "ram:32": {
    "fiyat": 30249,
@@ -96,14 +96,14 @@
    "tarih": "2026-09-25T07:01:24.383Z"
   },
   "ram:64": {
-   "fiyat": 53010,
+   "fiyat": 57299,
    "ad": "64 GB DDR5-6000 (2×32) (G.Skill Ripjaws S5)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "ssd:500": {
-   "fiyat": 5443,
+   "fiyat": 5489,
    "ad": "500 GB NVMe Gen4 (WD Blue SN5100)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "ssd:1t": {
    "fiyat": 8899,
@@ -111,14 +111,14 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "psu:650": {
-   "fiyat": 2859,
+   "fiyat": 2849,
    "ad": "650 W 80+ (MSI MAG A650BNL)",
-   "tarih": "2026-10-08T07:01:22.195Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "psu:750": {
-   "fiyat": 4076,
+   "fiyat": 3669,
    "ad": "750 W 80+ (MSI MAG A750BN PCIE5 II)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "psu:850": {
    "fiyat": 5585,
@@ -126,9 +126,9 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "psu:1000": {
-   "fiyat": 8576,
+   "fiyat": 8599,
    "ad": "1000 W 80+ Gold (MSI MAG A1000GL PCIE5 II)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "psu:1200": {
    "fiyat": 8399,
@@ -146,24 +146,24 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "anakart:AM5-0": {
-   "fiyat": 4508,
+   "fiyat": 4799,
    "ad": "MSI Pro A620AM-G Evo WiFi (A620)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "anakart:AM5-1": {
-   "fiyat": 6320,
+   "fiyat": 5977,
    "ad": "Gigabyte B650M Gaming WiFi6E (B650)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "anakart:AM5-2": {
-   "fiyat": 10230,
+   "fiyat": 10174,
    "ad": "Asus B650E Max Gaming WiFi W (B650E)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "anakart:LGA1851-0": {
-   "fiyat": 6515,
+   "fiyat": 6699,
    "ad": "MSI Pro B860M-E (B860)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "anakart:LGA1851-1": {
    "fiyat": 10415,
@@ -171,9 +171,9 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "kasa:0": {
-   "fiyat": 2096,
+   "fiyat": 2306,
    "ad": "Hava akışlı standart kasa (MSI MAG Forge M100A)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "kasa:2": {
    "fiyat": 9793,
@@ -186,24 +186,24 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "gpu:5070ti": {
-   "fiyat": 89100,
+   "fiyat": 90000,
    "ad": "GeForce RTX 5070 Ti 16 GB (Gigabyte Windforce OC V2)",
-   "tarih": "2026-10-09T07:01:32.699Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "gpu:5080": {
-   "fiyat": 106880,
+   "fiyat": 114995,
    "ad": "GeForce RTX 5080 16 GB (Zotac Solid Core OC)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "psu:550": {
-   "fiyat": 2303,
+   "fiyat": 1999,
    "ad": "550 W 80+ (MSI MAG A550BNL)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "sogutucu:cift": {
-   "fiyat": 2714,
+   "fiyat": 2769,
    "ad": "Çift kuleli hava soğutucu (Thermalright Peerless Assassin 120)",
-   "tarih": "2026-10-02T07:01:22.412Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "ram:96": {
    "fiyat": 79999,
@@ -216,9 +216,9 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "gpu:5050": {
-   "fiyat": 21876,
+   "fiyat": 22348,
    "ad": "GeForce RTX 5050 8 GB (Asus Dual OC)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:245kf": {
    "fiyat": 8586,
@@ -226,14 +226,14 @@
    "tarih": "2026-10-07T07:01:21.402Z"
   },
   "cpu:250kf": {
-   "fiyat": 11499,
+   "fiyat": 11855,
    "ad": "Core Ultra 5 250KF Plus",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:250k": {
-   "fiyat": 12104,
+   "fiyat": 11284,
    "ad": "Core Ultra 5 250K Plus",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "cpu:270k": {
    "fiyat": 18499,
@@ -241,9 +241,9 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "anakart:AM5-3": {
-   "fiyat": 22499,
+   "fiyat": 22099,
    "ad": "MSI MPG X870E Edge Ti WiFi (X870E)",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "kasa:3": {
    "fiyat": 5669,
@@ -266,9 +266,9 @@
    "tarih": "2026-10-14T22:22:23.097Z"
   },
   "cpu:285k": {
-   "fiyat": 28489,
+   "fiyat": 27965,
    "ad": "Core Ultra 9 285K",
-   "tarih": "2026-10-14T22:22:23.097Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "gpu:b580": {
    "fiyat": 19993,
@@ -276,9 +276,9 @@
    "tarih": "2026-10-08T07:01:22.195Z"
   },
   "ssd:2t": {
-   "fiyat": 17019,
+   "fiyat": 17203,
    "ad": "2 TB NVMe Gen4 (WD Blue SN5100)",
-   "tarih": "2026-10-07T07:01:21.402Z"
+   "tarih": "2026-10-17T16:15:40.435Z"
   },
   "kasa:1": {
    "fiyat": 3599,
@@ -291,5 +291,5 @@
    "tarih": "2026-10-02T07:01:22.412Z"
   }
  },
- "guncelleme": "2026-10-14T22:22:23.097Z"
+ "guncelleme": "2026-10-17T16:15:40.435Z"
 }
