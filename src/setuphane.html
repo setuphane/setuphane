@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım</title>
-<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz. SETUP HANE topluluğu.">
+<meta name="description" content="Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Sistem önerilerinde komisyon yok, hiçbir markadan para almıyoruz. SETUP HANE topluluğu.">
 <meta name="theme-color" content="#07070B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:title" content="SETUP HANE | Bütçene göre doğru bilgisayar">
-<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Satış yok, komisyon yok. Karar senin.">
+<meta property="og:description" content="Bütçeni söyle, hangi parçanın neden seçildiğini gör. Sistem önerilerinde komisyon yok. Karar senin.">
 <meta name="google-site-verification" content="xjJr_ENpCktifjswCPQF-lTrk-CSHy2Y3fguFi_aBWI">
 <meta property="og:locale" content="tr_TR">
 <meta property="og:site_name" content="SETUP HANE">
@@ -2060,6 +2060,7 @@ const SEKMELER=[
   {id:'ana',        href:'/',           t:'SİSTEM KUR',   kisa:'SİSTEM'},
   {id:'yukselt',    href:'/yukselt',    t:'YÜKSELT',      kisa:'YÜKSELT'},
   {id:'testler',    href:'/testler',    t:'TESTLER',      kisa:'TESTLER'},
+  {id:'firsatlar',  href:'/firsatlar',  t:'FIRSATLAR',    kisa:'FIRSAT'},
   {id:'forum',      href:'/forum',      t:'FORUM',        kisa:'FORUM'},
 ];
 
@@ -2067,7 +2068,7 @@ const SEKMELER=[
    doğru görünmesi için. */
 const ROTA_META={
   ana:     {t:'SETUP HANE | Bütçene göre hangi parça neden, birlikte bakalım',
-            d:'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Hiçbir şey satmıyoruz, komisyon almıyoruz.'},
+            d:'Bütçeni söyle, o paraya kurulabilecek en dengeli sistemi parça parça ve gerekçesiyle gör. Sistem önerilerinde komisyon yok.'},
   /* noindex kalktı: 10 kategorinin hepsinde gerçek iş birliği ürünü var,
      sayfa artık Google'ın "içeriksiz sayfa" saydığı durumda değil.
      Ürünler /panel'den yönetiliyor. */
@@ -2086,6 +2087,8 @@ const ROTA_META={
             d:'Bütçene uygun sistem sor, kurulumunu paylaş, arızanı çöz. Kayıt için e-posta istenmez.'},
   yukselt: {t:'Ekran Kartı Yükseltme: Neyi değiştirmeliyim? | SETUP HANE',
             d:'Elindeki ekran kartını ve işlemcini seç, bütçeni söyle: yalnız kart mı, işlemciyle birlikte mi, yoksa komple yeni sistem mi? Ölçülmüş verilerle.'},
+  firsatlar: {t:'Fırsatlar: bu haftanın seçimleri | SETUP HANE',
+            d:'Kullandığımız ya da topluluktan iyi geri dönüş aldığımız birkaç parça; her hafta yenilenen kısa bir seçki.'},
   yontem: {t:'Yöntem: Nasıl karar veriyoruz | SETUP HANE',
             d:'Performans değerleri ölçümden gelir, fiyat en az üç satıcıdan alınır, uymayan kombinasyon hiç gösterilmez. Para hiçbir öneriyi değiştirmez.'},
   hakkimizda: {t:'Hakkımızda | SETUP HANE',
@@ -2104,6 +2107,7 @@ function rotaCoz(){
   if(p==='/aksesuarlar') return {route:'aksesuarlar', sub:null};
   if(p==='/oner') return {route:'oner', sub:null};
   if(p==='/yukselt') return {route:'yukselt', sub:null};
+  if(p==='/firsatlar') return {route:'firsatlar', sub:null};
   if(p==='/yontem') return {route:'yontem', sub:null};
   if(p==='/hakkimizda') return {route:'hakkimizda', sub:null};
   if(p==='/isbirlikleri') return {route:'isbirlikleri', sub:null};
@@ -2273,7 +2277,8 @@ function Hero({budget,setBudget}){
             <div className="min-w-0">
               <div className="lbl text-mg mb-2">BİZ KİMİZ, NEDEN ÜCRETSİZ?</div>
               <p className="text-[.95rem] sm:text-[1.02rem] leading-relaxed text-ink/90">
-                Bir firma değiliz. Satış yapmıyoruz, reklam ve komisyon almıyoruz.
+                Bir firma değiliz. Sistem önerilerinden tek kuruş komisyon almıyoruz —
+                çünkü herkesin parasının karşılığını tam alması gerektiğini düşünüyoruz.
                 Bu siteyi kimin, neden ücretsiz yaptığını kısaca anlattık.
               </p>
               <span className="inline-flex items-center gap-3 mt-4 lbl text-mg">
@@ -3736,7 +3741,7 @@ function Builder({budget,setBudget,prof,setProf,sys,pick,setPick,res,gid,rid,gam
                 {/* 28.09.2026: destek ricası yalnız üç yerde (burası, Hakkımızda,
                     alt bilgi). Açılır pencere ya da işin ortasında rica yok. */}
                 <p className="mt-3 text-[.78rem] text-dim leading-relaxed">
-                  Bu araç ücretsiz ve reklamsız. İşine yaradıysa Instagram'da{' '}
+                  Bu araç ücretsiz; buradaki hiçbir öneri komisyonlu değil. İşine yaradıysa Instagram'da{' '}
                   <a href="https://instagram.com/setuphane" target="_blank" rel="noopener noreferrer"
                      onClick={()=>olay('instagram_tik',{yer:'liste'})}
                      className="text-cy hover:underline underline-offset-4">@setuphane</a>'yi
@@ -6742,8 +6747,11 @@ const AKSESUAR_KATEGORILERI=[
    d:'Monitör ayağı, laptop standı, telefon ve kulaklık askısı.'},
   {id:'kontrolcu', ad:'Kumanda Aksesuarları',
    d:'Joystick grip’leri, şarj istasyonları ve koruma kılıfları.'},
-  {id:'dekor', ad:'Konfor & Dekor',
+  {id:'dekor', ad:'Konfor & Dekor',
    d:'Bilek destekleri, deskmat’ler, kolluk ve figür/sticker gibi masa dekoru.'},
+ /* Fırsat köşesine mevcut kategorilere girmeyen bir ürün de eklenebilsin.
+    Aksesuarlar sayfası askıda olduğu için burada görünmesi sorun değil. */
+ {id:'diger', ad:'Diğer', d:'Fırsat köşesi için kategori dışı ürünler.'},
 ];
 const AKSESUAR_BOS_SAYISI=3;
 
@@ -7434,6 +7442,129 @@ function Trust(){
    Üçü de gerçek bilgiye dayanıyor — sahte ekip, sahte rakam veya sahte
    hizmet listesi yok. SETUP HANE tek kişilik bir araç+topluluk projesi;
    bunu gizlemek yerine sade ve profesyonel şekilde söylüyoruz. */
+/* ═══════════════════ FIRSATLAR — haftalık köşe ═══════════════════
+   Panelden seçilen iş birliği önerileri. Sistem toplama rehberiyle arasında
+   kalın bir duvar var ve bu duvar /yontem sayfasında yazılı: parça listesine
+   para karışmaz, buraya karışabilir ve her kartta yazar.
+
+   İNDİRİM İDDİA EDİLMEZ. Bu ürünlerin fiyat geçmişini tutmuyoruz; takip
+   etmediğimiz bir şeye "indirimde" demek, sitenin tek varlığı olan
+   güvenilirliği harcamak olurdu.
+
+   Seçim, veritabanı şemasına dokunmadan `anahtar` dizisindeki 'firsat'
+   işaretiyle taşınıyor (not varsa 'not:<metin>'). O dizi yalnızca /oner
+   sayfasının eşleştirmesi içindi ve o sayfa askıda; canlı hiçbir yer okumuyor.
+   Panel iki ucu da kendi yönetiyor, kullanıcı bu ayrıntıyı görmüyor.
+   DİKKAT: /oner geri açılırsa 'firsat' ve 'not:' girdileri eşleştirme
+   dışında bırakılmalı. */
+let _firsatSozu=null;
+function haftaninSecimleri(){
+  if(typeof uzakVar==='function' && !uzakVar()) return Promise.resolve([]);
+  if(!_firsatSozu){
+    _firsatSozu=sb('urunler?select=kat,ad,kaynak,gorsel,link,anahtar&aktif=eq.true&anahtar=cs.%7Bfirsat%7D&order=sira.asc')
+      .then(function(r){ return Array.isArray(r)? r.map(function(u){
+        const a=Array.isArray(u.anahtar)?u.anahtar:[];
+        const n=a.find(function(x){ return String(x).indexOf('not:')===0; });
+        return Object.assign({}, u, {firsat_not: n? String(n).slice(4) : null});
+      }) : []; })
+      .catch(function(){ return []; });
+  }
+  return _firsatSozu;
+}
+
+/* Vitrin karosu — sitenin geri kalanındaki çerçeveli cam kartlardan bilerek
+   farklı: mağaza vitrini düzeni. Beyaz kare görsel alanı (mağaza çekimleri
+   beyaz zeminli, koyu zeminde kenarları kayboluyordu) ve altında çerçevesiz,
+   sade bir başlık. Kart boyutu ürün sayısından bağımsız; 1 ürünle de 20
+   ürünle de aynı ızgara, böylece yeni ürün gelince hiçbir şey sırıtmıyor. */
+function SecimKarti({u}){
+  return (
+    <a href={u.link} target="_blank" rel="sponsored noopener noreferrer"
+       onClick={()=>olay('firsat_isbirligi_tik',{urun:u.ad})}
+       className="group flex flex-col">
+      <div className="relative aspect-square bg-white rounded-[3px] overflow-hidden">
+        <img src={u.gorsel} alt={u.ad} loading="lazy" decoding="async"
+             className="absolute inset-0 w-full h-full object-contain p-[12%] transition-transform duration-700 ease-out group-hover:scale-[1.06]"/>
+      </div>
+      <div className="pt-3.5">
+        <div className="lbl text-[.55rem] text-dim/75">{String(u.kaynak||'').toLocaleUpperCase('tr')}</div>
+        <div className="text-[.93rem] leading-snug text-ink/90 mt-1.5 line-clamp-2 group-hover:text-cy transition-colors duration-300">
+          {u.ad}
+        </div>
+        {u.firsat_not
+          ? <div className="text-[.8rem] leading-relaxed text-dim mt-1.5 line-clamp-2">{u.firsat_not}</div>
+          : null}
+      </div>
+    </a>
+  );
+}
+
+function FirsatlarSayfa(){
+  const [secim,setSecim]=useState(null);
+  useEffect(()=>{
+    let iptal=false;
+    haftaninSecimleri().then(function(r){ if(!iptal) setSecim(r); });
+    return function(){ iptal=true; };
+  },[]);
+  const n=(secim||[]).length;
+
+  return (
+    <div className="py-8 lg:py-12">
+      <Reveal>
+        <div className="flex items-end justify-between gap-6 flex-wrap">
+          <div>
+            <Label className="mb-3">FIRSATLAR</Label>
+            <h1 className="text-[clamp(1.9rem,4.6vw,2.8rem)] font-light leading-[1.05] tracking-[-.025em] text-ink">
+              Bu haftanın <span className="em">seçimleri</span>
+            </h1>
+            <p className="text-[.95rem] text-dim mt-3 max-w-[52ch] leading-relaxed">
+              Kullandığımız ya da topluluktan iyi geri dönüş aldığımız birkaç parça.
+            </p>
+            {/* Tek satır ve bilerek sakin. Ticari bağlantının belirtilmesi hem
+                Ticaret Bakanlığı'nın etkileyici kılavuzunun gereği (belirtilmemiş
+                bağlantı örtülü reklam sayılır) hem de /yontem'deki "sana
+                söylemeden para kazandıran bağlantı koymayız" sözümüz. Kart başına
+                etiket ya da uzun açıklama yerine ürünlerin üstünde tek cümle. */}
+            <p className="text-[.74rem] text-dim/60 mt-2">
+              Bu sayfadaki bağlantılardan yapılan alışverişlerden pay alabiliriz.
+            </p>
+          </div>
+          {n ? <div className="lbl text-[.6rem] text-dim/70 pb-1">{n} ÜRÜN</div> : null}
+        </div>
+        <div className="rule mt-7"/>
+      </Reveal>
+
+      <Reveal delay={90}>
+        <div className="mt-8">
+          {secim===null ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10">
+              {[0,1,2,3].map(i=>(
+                <div key={i}>
+                  <div className="aspect-square bg-ink/[.04] rounded-[3px] animate-pulse"/>
+                  <div className="h-2 w-16 bg-ink/[.05] mt-4"/>
+                  <div className="h-3 w-4/5 bg-ink/[.05] mt-2.5"/>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {secim!==null && !n ? (
+            <div className="py-16 text-center">
+              <div className="text-ink/85 text-[1.05rem] font-light">Bu hafta için seçim yapılmadı.</div>
+              <p className="text-[.88rem] text-dim mt-2">Önerecek bir şey olduğunda burada olacak.</p>
+            </div>
+          ) : null}
+          {secim!==null && n ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10">
+              {secim.map(u=><SecimKarti key={u.link} u={u}/>)}
+            </div>
+          ) : null}
+        </div>
+      </Reveal>
+
+    </div>
+  );
+}
+
 function BasitSayfa({etiket,baslik,children}){
   return (
     <div className="py-8 lg:py-12 max-w-[68ch]">
@@ -7831,7 +7962,7 @@ function YontemSayfa(){
       <p>
         Biz bir firma değiliz, ticari amaç gütmüyoruz. Bu site, kendi parasıyla bilgisayar toplayan
         birinin aynı araştırmayı defalarca yapmaktan sıkılıp oturup yazdığı bir araç. Kimseye bir şey
-        satmıyoruz, hiçbir mağazadan komisyon almıyoruz ve sitede reklam yok. Yaptığımız iş, kuralları
+        satmıyoruz ve sistem önerilerinden hiçbir mağazadan komisyon almıyoruz. Yaptığımız iş, kuralları
         belirleyip onlara uymak.
         Hepsi aşağıda yazıyor: bize güvenmek zorunda değilsin, kontrol edebilirsin.
       </p>
@@ -7904,6 +8035,44 @@ function YontemSayfa(){
         </div>
       </div>
 
+      {/* 14.10.2026 — Komisyon duvari. Site artik oneri disi bolumlerde is
+          birligi kabul ediyor; bunu yazmadan baglanti koymak, /yontem'deki
+          "yapmayacaklarimiz" listesini cignemek olurdu. */}
+      <h2 className="text-[1.25rem] text-ink pt-4">Para nerede var, nerede yok</h2>
+      <p>
+        Sistem toplama rehberi — bütçeni yazıp parça listesini aldığın yer — <strong className="text-ink
+        font-normal">tamamen komisyonsuzdur ve öyle kalacak</strong>. Oradaki hiçbir bağlantıdan para
+        kazanmıyoruz, hiçbir marka o listeye giremez. Sebebi şu: bu sitenin var olma nedeni, parası
+        sınırlı birinin de en iyi sistemi kurabilmesi. Para o listeye bir kez karışsa, listedeki her
+        sayı şüpheli hale gelir ve sitenin elinde satacak bir şey kalmaz.
+      </p>
+      <div className="grid sm:grid-cols-2 gap-4 not-prose py-2">
+        <div className="border border-cy/40 p-5">
+          <div className="lbl text-cy mb-3">KOMİSYON YOK · HİÇ</div>
+          <ul className="text-[.88rem] text-dim leading-relaxed space-y-2">
+            <li>· Bütçeye göre sistem önerisi ve parça listesi</li>
+            <li>· Parça fiyatları ve fiyat geçmişi</li>
+            <li>· Yükseltme aracı, FPS hesabı, darboğaz analizi</li>
+            <li>· Donanım testleri ve forum</li>
+          </ul>
+        </div>
+        <div className="border border-mg/40 p-5">
+          <div className="lbl text-mg mb-3">İŞ BİRLİĞİ OLABİLİR</div>
+          <ul className="text-[.88rem] text-dim leading-relaxed space-y-2">
+            <li>· Haftalık fırsat köşesi ve aksesuar tavsiyeleri</li>
+            <li>· Marka tanıtımları</li>
+          </ul>
+          <p className="text-[.82rem] text-dim/80 mt-3 leading-relaxed">
+            Buralarda ücretli bağlantı olabilir ve <span className="text-ink/80">bunu o sayfada
+            açıkça belirtiriz</span>. Belirtmeden koymayız.
+          </p>
+        </div>
+      </div>
+      <p className="text-[.85rem] text-dim">
+        Bu ayrım pazarlama cümlesi değil, kendimize koyduğumuz sınır. İş birliği bölümünde bile
+        indirim iddiasını ancak fiyatı kendimiz takip ediyorsak yazarız — takip etmediğimiz bir
+        ürüne "indirimde" demeyiz.
+      </p>
       <h2 className="text-[1.25rem] text-ink pt-4">Bitmeyen işleri saklamayız</h2>
       <p>
         Laptop ve hazır sistem listelerini şimdilik kaldırdık. Oradaki fiyatları her gün kontrol
@@ -7996,7 +8165,10 @@ function HakkimizdaSayfa(){
         herkes kullanabilsin diye internete koydu.
       </p>
       <p>
-        Ürün satmıyoruz, komisyon almıyoruz, kimseyi bir mağazaya yönlendirmiyoruz.
+        Sistem önerilerinden komisyon almıyoruz ve orada kimseyi bir mağazaya yönlendirmiyoruz.
+        Sebebi basit: herkesin en iyi fiyata en iyi sistemi kurmasını savunuyoruz, para o listeye
+        karışsa listenin hiçbir değeri kalmaz. Önerilerin dışındaki bölümlerde iş birliği olabilir;
+        orada her bağlantının üstünde bunu açıkça yazarız.
         Her önerinin neden yapıldığı sayfada yazıyor; katılmadığın parçayı değiştirebilirsin.
       </p>
       <p>
@@ -8115,7 +8287,7 @@ function Footer(){
         <div>
           <div className="w-[168px]"><LogoLockup wordSize={24}/></div>
           <p className="mt-6 text-sm text-dim max-w-[38ch] leading-relaxed">
-            Bütçeye göre bilgisayar toplayan bir topluluk. Ücretsiz ve reklamsız.
+            Bütçeye göre bilgisayar toplayan bir topluluk. Sistem önerileri ücretsiz ve komisyonsuz.
             Destek olmak istersen:{' '}
             <a href="https://instagram.com/setuphane" target="_blank" rel="noopener noreferrer"
                onClick={()=>olay('instagram_tik',{yer:'altbilgi'})}
@@ -8150,7 +8322,7 @@ function Footer(){
    oturum jetonu koruma sağlıyor. Sayfayı bilen biri açabilir ama
    giriş yapmadan tek bir satır bile değiştiremez. */
 const PANEL_KEY='sh_panel_v1';
-const PANEL_BOS_URUN={kat:'mousepad', ad:'', kaynak:'Ulugames', gorsel:'', link:'', anahtar:'', mintl:'', maxtl:'', sira:0, aktif:true};
+const PANEL_BOS_URUN={kat:'mousepad', ad:'', kaynak:'Ulugames', gorsel:'', link:'', anahtar:'', mintl:'', maxtl:'', sira:0, aktif:true, firsat:false, firsat_not:''};
 
 function panelOturumOku(){
   try{
@@ -8280,6 +8452,33 @@ function PanelUrunForm({deger,setDeger,onKaydet,onIptal,mesgul}){
           önerilebilir (eski davranış).
         </p>
       </div>
+      <div className="border border-mg/35 bg-mg/[.04] p-4">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" checked={!!deger.firsat}
+                 onChange={e=>alan('firsat',e.target.checked)} className="mt-1 shrink-0"/>
+          <span>
+            <span className="lbl text-mg block mb-1">BU HAFTANIN SEÇİMİ</span>
+            <span className="text-[.8rem] text-dim leading-relaxed block">
+              İşaretlenirse ürün <span className="text-ink/80">/firsatlar</span> sayfasındaki
+              iş birliği bölümünde görünür. O bölümdeki her kartın altında
+              "iş birliği bağlantısı" yazar — indirim iddiası yazmayız.
+            </span>
+          </span>
+        </label>
+        {deger.firsat ? (
+          <div className="mt-4">
+            <label htmlFor="pu-fnot" className="lbl text-dim mb-2 block">NEDEN SEÇTİK · OPSİYONEL</label>
+            <input id="pu-fnot" value={deger.firsat_not||''} maxLength="90"
+                   onChange={e=>alan('firsat_not',e.target.value)}
+                   placeholder="Tek cümle: neden öneriyoruz" className={PANEL_INPUT}/>
+            <p className="text-[.75rem] text-dim/70 mt-2 leading-relaxed">
+              Kartın altında aynen görünür. Boş bırakılabilir.
+              <span className="text-mg/80"> "İndirimde" gibi doğrulayamadığımız bir iddia yazma</span> —
+              aksesuar fiyatlarının geçmişini tutmuyoruz.
+            </p>
+          </div>
+        ) : null}
+      </div>
       <div className="grid sm:grid-cols-2 gap-4 items-end">
         <div>
           <label htmlFor="pu-sira" className="lbl text-dim mb-2 block">SIRA</label>
@@ -8384,7 +8583,12 @@ function PanelAksesuar({oturum, yakala}){
     try{
       const g={ kat:duzen.kat, ad:duzen.ad.trim(), kaynak:duzen.kaynak.trim(),
         gorsel:duzen.gorsel.trim(), link:duzen.link.trim(),
-        anahtar:String(duzen.anahtar||'').split(',').map(s=>s.trim()).filter(Boolean),
+        /* Firsat isareti ve notu anahtar dizisinde tasiniyor (bkz.
+           haftaninSecimleri). Kullaniciya gosterilen kelime kutusunda
+           gorunmezler; burada geri ekleniyorlar. */
+        anahtar:String(duzen.anahtar||'').split(',').map(s=>s.trim()).filter(Boolean)
+          .concat(duzen.firsat?['firsat']:[])
+          .concat((duzen.firsat&&String(duzen.firsat_not||'').trim())?['not:'+String(duzen.firsat_not).trim()]:[]),
         mintl:(duzen.mintl===''||duzen.mintl==null)?null:Number(duzen.mintl),
         maxtl:(duzen.maxtl===''||duzen.maxtl==null)?null:Number(duzen.maxtl),
         sira:Number(duzen.sira)||0, aktif:!!duzen.aktif };
@@ -8440,7 +8644,12 @@ function PanelAksesuar({oturum, yakala}){
               </div>
             </div>
             <div className="flex gap-2 shrink-0">
-              <button onClick={()=>setDuzen({...u, anahtar:(u.anahtar||[]).join(', ')})}
+              <button onClick={()=>{ const a=u.anahtar||[];
+                  const n=a.find(x=>String(x).indexOf('not:')===0);
+                  setDuzen({...u,
+                    anahtar:a.filter(x=>x!=='firsat'&&String(x).indexOf('not:')!==0).join(', '),
+                    firsat:a.indexOf('firsat')>=0,
+                    firsat_not:n?String(n).slice(4):''}); }}
                 className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors">DÜZENLE</button>
               <button onClick={()=>sil(u)}
                 className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-mg hover:text-mg transition-colors">SİL</button>
@@ -9315,6 +9524,13 @@ function App(){
       {route==='yukselt' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
           <YukseltSayfa/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='firsatlar' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <FirsatlarSayfa/>
           <Footer/>
         </main>
       )}
