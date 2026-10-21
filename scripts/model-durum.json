@@ -2,10 +2,10 @@
   "gpu:7600": {
     "model": "XFX Speedster SWFT 210 Radeon RX 7600 Core Gaming 8GB (RX-76PSWFTFY)",
     "fiyat": 18599,
-    "satici": 7,
+    "satici": 6,
     "link": "https://www.epey.com/ekran-karti/xfx-speedster-swft-210-radeon-rx-7600-core-gaming-8gb.html",
-    "seri": 4,
-    "son": "2026-10-20"
+    "seri": 5,
+    "son": "2026-10-21"
   },
   "gpu:b580": {
     "model": "Intel Arc B580",
@@ -16,83 +16,83 @@
     "son": "2026-10-09"
   },
   "gpu:5050": {
-    "model": "Palit GeForce RTX 5050 Dual (NE65050019P1-GB2070D)",
-    "fiyat": 21900,
-    "satici": 3,
-    "link": "https://www.epey.com/ekran-karti/palit-geforce-rtx-5050-dual.html",
+    "model": "Maxsun Terminator GeForce RTX 5050 (MS-RTX5050-TRW-8G)",
+    "fiyat": 21995,
+    "satici": 4,
+    "link": "https://www.epey.com/ekran-karti/maxsun-terminator-geforce-rtx-5050.html",
     "seri": 1,
-    "son": "2026-10-20"
+    "son": "2026-10-21"
   },
   "gpu:5060": {
     "model": "MSI GeForce RTX 5060 Ventus 2X OC (G5060-8V2C)",
-    "fiyat": 27649,
-    "satici": 11,
+    "fiyat": 27659,
+    "satici": 10,
     "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-ventus-2x-oc.html",
-    "seri": 1,
-    "son": "2026-10-20"
+    "seri": 2,
+    "son": "2026-10-21"
   },
   "gpu:9060xt": {
     "model": "ASRock Radeon RX 9060 XT Challenger OC 16GB (RX9060XT CL 16GO)",
     "fiyat": 33999,
     "satici": 3,
     "link": "https://www.epey.com/ekran-karti/asrock-radeon-rx-9060-xt-challenger-oc-16gb.html",
-    "seri": 2,
-    "son": "2026-10-20"
+    "seri": 3,
+    "son": "2026-10-21"
   },
   "gpu:5060ti": {
     "model": "Colorful GeForce RTX 5060 Ti Gaming Duo 16GB-V",
-    "fiyat": 47999,
+    "fiyat": 48494,
     "satici": 7,
     "link": "https://www.epey.com/ekran-karti/colorful-geforce-rtx-5060-ti-gaming-duo-16gb-v.html",
-    "seri": 1,
-    "son": "2026-10-20"
+    "seri": 2,
+    "son": "2026-10-21"
   },
   "gpu:9070": {
     "model": "PowerColor Reaper Radeon RX 9070 (RX9070 16G-A)",
     "fiyat": 46999,
-    "satici": 8,
+    "satici": 9,
     "link": "https://www.epey.com/ekran-karti/powercolor-reaper-radeon-rx-9070.html",
-    "seri": 3,
-    "son": "2026-10-20"
+    "seri": 4,
+    "son": "2026-10-21"
   },
   "gpu:5070": {
-    "model": "MSI GeForce RTX 5070 Shadow 2X OC (G5070-12S2C)",
+    "model": "Zotac Gaming GeForce RTX 5070 Twin Edge (ZT-B50700E-10P)",
     "fiyat": 57999,
-    "satici": 11,
-    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5070-shadow-2x-oc.html",
+    "satici": 6,
+    "link": "https://www.epey.com/ekran-karti/zotac-gaming-geforce-rtx-5070-twin-edge.html",
     "seri": 1,
-    "son": "2026-10-20"
+    "son": "2026-10-21"
   },
   "gpu:9070xt": {
     "model": "XFX Swift Radeon RX 9070 XT Triple Fan Gaming Edition (RX-97TSWF3B9)",
     "fiyat": 55949,
     "satici": 3,
     "link": "https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html",
-    "seri": 1,
-    "son": "2026-10-20"
+    "seri": 2,
+    "son": "2026-10-21"
   },
   "gpu:5070ti": {
     "model": "Gigabyte GeForce RTX 5070 Ti WindForce OC SFF (GV-N507TWF3OC-16GD)",
     "fiyat": 82490,
     "satici": 11,
     "link": "https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5070-ti-windforce-oc-sff.html",
-    "seri": 1,
-    "son": "2026-10-20"
+    "seri": 2,
+    "son": "2026-10-21"
   },
   "gpu:5080": {
     "model": "Palit GeForce RTX 5080 Infinity 3 (NE75080019T2-GB2035S)",
     "fiyat": 106245,
     "satici": 4,
     "link": "https://www.epey.com/ekran-karti/palit-geforce-rtx-5080-infinity-3.html",
-    "seri": 3,
-    "son": "2026-10-20"
+    "seri": 4,
+    "son": "2026-10-21"
   },
   "gpu:5090": {
     "model": "Gigabyte GeForce RTX 5090 Gaming OC (GV-N5090GAMING OC-32GD)",
-    "fiyat": 370016,
-    "satici": 7,
+    "fiyat": 371000,
+    "satici": 4,
     "link": "https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5090-gaming-oc.html",
-    "seri": 3,
-    "son": "2026-10-20"
+    "seri": 4,
+    "son": "2026-10-21"
   }
 }
