@@ -2090,7 +2090,7 @@ const ROTA_META={
   firsatlar: {t:'Fırsatlar: bu haftanın seçimleri | SETUP HANE',
             d:'Kullandığımız ya da topluluktan iyi geri dönüş aldığımız birkaç parça; her hafta yenilenen kısa bir seçki.'},
   baglantilar: {t:'Bağlantılar: videolardaki ürünler | SETUP HANE',
-            d:'SETUP HANE videolarında geçen ürünlerin bağlantıları. En yeni video en üstte.'},
+            d:'SETUP HANE videolarında geçen ürünlerin bağlantıları. Videoda gördüğün ürünü burada bul.'},
   yontem: {t:'Yöntem: Nasıl karar veriyoruz | SETUP HANE',
             d:'Performans değerleri ölçümden gelir, fiyat en az üç satıcıdan alınır, uymayan kombinasyon hiç gösterilmez. Para hiçbir öneriyi değiştirmez.'},
   hakkimizda: {t:'Hakkımızda | SETUP HANE',
@@ -6752,7 +6752,7 @@ const AKSESUAR_KATEGORILERI=[
    d:'Monitör ayağı, laptop standı, telefon ve kulaklık askısı.'},
   {id:'kontrolcu', ad:'Kumanda Aksesuarları',
    d:'Joystick grip’leri, şarj istasyonları ve koruma kılıfları.'},
-  {id:'dekor', ad:'Konfor & Dekor',
+  {id:'dekor', ad:'Konfor & Dekor',
    d:'Bilek destekleri, deskmat’ler, kolluk ve figür/sticker gibi masa dekoru.'},
  /* Fırsat köşesine mevcut kategorilere girmeyen bir ürün de eklenebilsin.
     Aksesuarlar sayfası askıda olduğu için burada görünmesi sorun değil. */
@@ -7580,7 +7580,7 @@ let _videoSozu=null;
 function videolariGetir(){
   if(typeof uzakVar==='function' && !uzakVar()) return Promise.resolve([]);
   if(!_videoSozu){
-    _videoSozu=sb('videolar?select=id,baslik,link,tarih,video_urunleri(id,ad,magaza,link,gorsel,sira)&aktif=eq.true&order=tarih.desc,sira.asc&video_urunleri.order=sira.asc')
+    _videoSozu=sb('videolar?select=id,baslik,link,tarih,video_urunleri(id,ad,magaza,link,gorsel,sira)&aktif=eq.true&order=sira.asc,tarih.desc,olusturma.desc&video_urunleri.order=sira.asc,olusturma.asc')
       .then(function(r){ return Array.isArray(r)?r:[]; })
       .catch(function(){ return []; });
   }
@@ -7632,6 +7632,9 @@ function BaglantilarSayfa(){
     return {...v, urunler:urunler.filter(u=>trKucuk(u.ad).includes(q)||trKucuk(u.magaza).includes(q))};
   }).filter(v=>v.urunler.length);
   const toplam=(videolar||[]).reduce((s,v)=>s+(v.video_urunleri||[]).length,0);
+  /* Sıra panelden elle belirlendiği için ilk video en yeni olmayabilir;
+     etiket en son tarihli videoya gider (aynı tarihte listede önce gelene). */
+  const enYeni=(videolar||[]).reduce((b,v)=>(!b || v.tarih>b.tarih) ? v : b, null);
 
   return (
     <div className="py-8 lg:py-12 max-w-[720px]">
@@ -7641,7 +7644,7 @@ function BaglantilarSayfa(){
           Videolardaki <span className="em">ürünler</span>
         </h1>
         <p className="text-[.95rem] text-dim mt-3 leading-relaxed">
-          Videoda gördüğün ürünü burada bul. En yeni video en üstte.
+          Videoda gördüğün ürünü burada bul.
         </p>
         <p className="text-[.74rem] text-dim/60 mt-2">
           Bu sayfadaki bağlantılardan yapılan alışverişlerden pay alabiliriz.
@@ -7687,12 +7690,12 @@ function BaglantilarSayfa(){
         ) : null}
 
         <div className="space-y-10">
-          {liste.map((v,i)=>(
+          {liste.map(v=>(
             <section key={v.id} aria-label={v.baslik}>
               <div className="flex items-end justify-between gap-4 pb-3 border-b border-line">
                 <div className="min-w-0">
                   <div className="lbl text-[.55rem] text-dim/70 mb-1.5">
-                    {i===0 && !q ? <span className="text-mg">EN YENİ · </span> : null}{kisaTarih(v.tarih).toLocaleUpperCase('tr')}
+                    {enYeni && v.id===enYeni.id && !q ? <span className="text-mg">EN YENİ · </span> : null}{kisaTarih(v.tarih).toLocaleUpperCase('tr')}
                   </div>
                   <h2 className="text-[1.08rem] sm:text-[1.15rem] leading-snug text-ink">{v.baslik}</h2>
                 </div>
@@ -7712,8 +7715,10 @@ function BaglantilarSayfa(){
 }
 
 /* ─────────── Panel: BAĞLANTILAR sekmesi ─────────── */
-const BOS_VIDEO = () => ({id:null, baslik:'', link:'', tarih:new Date().toISOString().slice(0,10), aktif:true, sira:0});
-const BOS_VURUN = vid => ({id:null, video_id:vid, ad:'', magaza:'', link:'', gorsel:'', sira:0});
+/* Sıra panelden yönetilir: yeni video en üste, yeni ürün videonun en altına
+   eklenir; oklar 10, 20, 30… diye yeniden numaralar. */
+const BOS_VIDEO = sira => ({id:null, baslik:'', link:'', tarih:new Date().toISOString().slice(0,10), aktif:true, sira});
+const BOS_VURUN = (vid,sira) => ({id:null, video_id:vid, ad:'', magaza:'', link:'', gorsel:'', sira});
 
 function PanelBaglantilar({oturum, yakala}){
   const [liste,setListe]=useState(null);
@@ -7722,7 +7727,7 @@ function PanelBaglantilar({oturum, yakala}){
   const [mesgul,setMesgul]=useState(false);
 
   const yenile=async()=>{
-    try{ setListe(await sb('videolar?select=*,video_urunleri(*)&order=tarih.desc,sira.asc&video_urunleri.order=sira.asc',{token:oturum.token})); }
+    try{ setListe(await sb('videolar?select=*,video_urunleri(*)&order=sira.asc,tarih.desc,olusturma.desc&video_urunleri.order=sira.asc,olusturma.asc',{token:oturum.token})); }
     catch(e){ yakala(e); }
   };
   useEffect(()=>{ yenile(); },[]);
@@ -7759,6 +7764,27 @@ function PanelBaglantilar({oturum, yakala}){
     try{ await sb('video_urunleri?id=eq.'+u.id,{method:'DELETE',prefer:'return=minimal',token:oturum.token}); await bitir(); }
     catch(e){ yakala(e); }
   };
+  /* Ekran hemen güncellenir, yalnızca sırası değişen satırlar yazılır.
+     Yazma bitene kadar oklar kilitli; hata olursa liste sunucudan okunur. */
+  const tasi=async(dizi,i,yon,tablo,kur)=>{
+    const j=i+yon; if(mesgul || j<0 || j>=dizi.length) return;
+    const yeni=dizi.slice(); [yeni[i],yeni[j]]=[yeni[j],yeni[i]];
+    const numarali=yeni.map((x,k)=>({...x,sira:(k+1)*10}));
+    const degisen=numarali.filter((x,k)=>x.sira!==yeni[k].sira);
+    kur(numarali); setMesgul(true);
+    try{
+      await Promise.all(degisen.map(x=>sb(tablo+'?id=eq.'+x.id,{method:'PATCH',body:{sira:x.sira},prefer:'return=minimal',token:oturum.token})));
+      _videoSozu=null;
+    }catch(e){ yakala(e); await yenile(); } finally{ setMesgul(false); }
+  };
+  const videoTasi=(i,yon)=>tasi(liste,i,yon,'videolar',setListe);
+  const urunTasi=(v,i,yon)=>tasi(v.video_urunleri||[],i,yon,'video_urunleri',
+    y=>setListe(l=>l.map(x=>x.id===v.id?{...x,video_urunleri:y}:x)));
+  const ok=(yon,pasif,fn,etiket)=>(
+    <button type="button" onClick={fn} disabled={pasif||mesgul} aria-label={etiket} title={etiket}
+      className="w-7 h-7 grid place-items-center border border-line text-dim text-[.8rem] leading-none hover:border-cy hover:text-cy transition-colors disabled:opacity-25 disabled:hover:border-line disabled:hover:text-dim">
+      {yon<0?'↑':'↓'}</button>
+  );
 
   const videoFormu = (
     <form onSubmit={videoKaydet} className="border border-cy/40 p-4 sm:p-5 grid gap-4 bg-bg2/40">
@@ -7832,13 +7858,14 @@ function PanelBaglantilar({oturum, yakala}){
   return (
     <div>
       <p className="text-[.86rem] text-dim leading-relaxed max-w-[64ch]">
-        Önce videoyu ekle, sonra altına o videoda geçen ürünleri ekle. Sitede{' '}
+        Önce videoyu ekle, sonra altına o videoda geçen ürünleri ekle.{' '}
         <a href="/baglantilar" target="_blank" rel="noopener" className="text-cy hover:underline">/baglantilar</a>{' '}
-        sayfasında en yeni video en üstte görünür.
+        sayfasında her şey buradaki sırayla görünür: yeni video en üste, yeni ürün videonun en altına gelir.
+        Yerini ↑ ↓ oklarıyla değiştirebilirsin.
       </p>
       <div className="mt-5">
         {!video || video.id ? (
-          <button onClick={()=>{setUrun(null);setVideo(BOS_VIDEO());}}
+          <button onClick={()=>{setUrun(null);setVideo(BOS_VIDEO(liste&&liste.length?Math.min(...liste.map(x=>x.sira||0))-10:10));}}
                   className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors">+ YENİ VİDEO</button>
         ) : null}
         {video && !video.id ? <div className="mt-4">{videoFormu}</div> : null}
@@ -7847,17 +7874,21 @@ function PanelBaglantilar({oturum, yakala}){
       <div className="mt-8 space-y-6">
         {liste===null ? <p className="text-dim text-[.9rem]">Yükleniyor…</p> : null}
         {liste!==null && !liste.length ? <p className="text-dim text-[.9rem]">Henüz video yok.</p> : null}
-        {(liste||[]).map(v=>(
+        {(liste||[]).map((v,vi)=>(
           <div key={v.id} className="border border-line">
             <div className="flex items-start justify-between gap-4 p-4 bg-bg2/30">
-              <div className="min-w-0">
+              <div className="flex flex-col gap-1 shrink-0">
+                {ok(-1,vi===0,()=>videoTasi(vi,-1),'Videoyu yukarı taşı')}
+                {ok(1,vi===liste.length-1,()=>videoTasi(vi,1),'Videoyu aşağı taşı')}
+              </div>
+              <div className="min-w-0 flex-1">
                 <div className={'text-[.95rem] '+(v.aktif?'text-ink':'text-dim line-through')}>{v.baslik}</div>
                 <div className="text-[.74rem] text-dim mt-1">
                   {kisaTarih(v.tarih)} · {(v.video_urunleri||[]).length} ürün{v.aktif?'':' · gizli'}{v.link?' · linkli':''}
                 </div>
               </div>
               <div className="flex gap-2 shrink-0 flex-wrap justify-end">
-                <button onClick={()=>{setVideo(null);setUrun(BOS_VURUN(v.id));}}
+                <button onClick={()=>{setVideo(null);setUrun(BOS_VURUN(v.id,(v.video_urunleri||[]).reduce((m,u)=>Math.max(m,u.sira||0),0)+10));}}
                   className="border border-mg/60 text-mg px-3 py-1.5 lbl text-[.6rem] hover:bg-mg hover:text-bg transition-colors">+ ÜRÜN</button>
                 <button onClick={()=>{setUrun(null);setVideo({...v});}}
                   className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors">DÜZENLE</button>
@@ -7867,9 +7898,13 @@ function PanelBaglantilar({oturum, yakala}){
             </div>
             {video && video.id===v.id ? <div className="p-4 pt-0">{videoFormu}</div> : null}
             <div className="px-4">
-              {(v.video_urunleri||[]).map(u=>(
+              {(v.video_urunleri||[]).map((u,ui,dizi)=>(
                 <div key={u.id}>
                   <div className="flex items-center gap-3 py-2.5 border-t border-line">
+                    <div className="flex gap-1 shrink-0">
+                      {ok(-1,ui===0,()=>urunTasi(v,ui,-1),'Ürünü yukarı taşı')}
+                      {ok(1,ui===dizi.length-1,()=>urunTasi(v,ui,1),'Ürünü aşağı taşı')}
+                    </div>
                     <div className="w-10 h-10 shrink-0 bg-white rounded-[2px] grid place-items-center overflow-hidden">
                       {u.gorsel ? <img src={u.gorsel} alt="" className="w-full h-full object-contain p-0.5"/> : null}
                     </div>
