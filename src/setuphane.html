@@ -2089,6 +2089,8 @@ const ROTA_META={
             d:'Elindeki ekran kartını ve işlemcini seç, bütçeni söyle: yalnız kart mı, işlemciyle birlikte mi, yoksa komple yeni sistem mi? Ölçülmüş verilerle.'},
   firsatlar: {t:'Fırsatlar: bu haftanın seçimleri | SETUP HANE',
             d:'Kullandığımız ya da topluluktan iyi geri dönüş aldığımız birkaç parça; her hafta yenilenen kısa bir seçki.'},
+  baglantilar: {t:'Bağlantılar: videolardaki ürünler | SETUP HANE',
+            d:'SETUP HANE videolarında geçen ürünlerin bağlantıları. En yeni video en üstte.'},
   yontem: {t:'Yöntem: Nasıl karar veriyoruz | SETUP HANE',
             d:'Performans değerleri ölçümden gelir, fiyat en az üç satıcıdan alınır, uymayan kombinasyon hiç gösterilmez. Para hiçbir öneriyi değiştirmez.'},
   hakkimizda: {t:'Hakkımızda | SETUP HANE',
@@ -2103,6 +2105,9 @@ function rotaCoz(){
   const p=(location.pathname||'/').replace(/\/+$/,'')||'/';
   const m=p.match(/^\/testler(?:\/([\w-]+))?$/);
   if(m) return {route:'testler', sub:m[1]||null};
+  /* Instagram bio'suna Turkce yazilmis olabilir: /bağlantılar, /baglantılar. */
+  { let d=p; try{ d=decodeURIComponent(p); }catch(e){}
+    if(new RegExp('^/ba[gğ]lant[iı]lar$','i').test(d)) return {route:'baglantilar', sub:null}; }
   if(p==='/forum') return {route:'forum', sub:null};
   if(p==='/aksesuarlar') return {route:'aksesuarlar', sub:null};
   if(p==='/oner') return {route:'oner', sub:null};
@@ -7565,6 +7570,330 @@ function FirsatlarSayfa(){
   );
 }
 
+/* ═══════════════════ BAĞLANTILAR — videolardaki ürünler ═══════════════════
+   Instagram'daki "bio linki" hedefi: ziyaretçi bir reel izliyor, oradaki
+   ürünü arıyor. Bu yüzden telefona göre kuruldu ve en yeni video en üstte —
+   kişi çoğunlukla az önce izlediği videonun ürününü arıyor.
+   Veri: Supabase `videolar` + `video_urunleri` (bir video, altında ürünler).
+   Panelden yönetiliyor; okuma herkese açık, yazma yalnızca yönetici. */
+let _videoSozu=null;
+function videolariGetir(){
+  if(typeof uzakVar==='function' && !uzakVar()) return Promise.resolve([]);
+  if(!_videoSozu){
+    _videoSozu=sb('videolar?select=id,baslik,link,tarih,video_urunleri(id,ad,magaza,link,gorsel,sira)&aktif=eq.true&order=tarih.desc,sira.asc&video_urunleri.order=sira.asc')
+      .then(function(r){ return Array.isArray(r)?r:[]; })
+      .catch(function(){ return []; });
+  }
+  return _videoSozu;
+}
+const trKucuk = s => String(s||'').toLocaleLowerCase('tr');
+const kisaTarih = t => { try{ return new Date(t+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long'}); }catch(e){ return t; } };
+
+function BaglantiSatiri({u}){
+  const [hata,setHata]=useState(false);
+  return (
+    <a href={u.link} target="_blank" rel="sponsored noopener noreferrer"
+       onClick={()=>olay('baglanti_tik',{urun:u.ad})}
+       className="group flex items-center gap-4 py-3.5 border-t border-line first:border-t-0">
+      <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-white rounded-[3px] overflow-hidden grid place-items-center">
+        {u.gorsel && !hata
+          ? <img src={u.gorsel} alt="" loading="lazy" decoding="async" onError={()=>setHata(true)}
+                 className="w-full h-full object-contain p-1.5"/>
+          : <span className="lbl text-[.5rem] text-bg/50">ÜRÜN</span>}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-[.93rem] leading-snug text-ink/90 line-clamp-2 group-hover:text-cy transition-colors duration-300">{u.ad}</div>
+        {u.magaza ? <div className="lbl text-[.55rem] text-dim/70 mt-1.5">{String(u.magaza).toLocaleUpperCase('tr')}</div> : null}
+      </div>
+      <svg width="18" height="8" viewBox="0 0 18 8" fill="none" aria-hidden="true"
+           className="shrink-0 text-dim/60 group-hover:text-cy transition-all duration-500 group-hover:translate-x-1">
+        <path d="M0 4h16M13 1l3 3-3 3" stroke="currentColor" strokeWidth="1.1"/>
+      </svg>
+    </a>
+  );
+}
+
+function BaglantilarSayfa(){
+  const [videolar,setVideolar]=useState(null);
+  const [ara,setAra]=useState('');
+  useEffect(()=>{
+    let iptal=false;
+    videolariGetir().then(function(r){ if(!iptal) setVideolar(r); });
+    return function(){ iptal=true; };
+  },[]);
+
+  /* Arama: video başlığı eşleşirse videonun tüm ürünleri, eşleşmezse
+     yalnızca adı eşleşen ürünler gösterilir. */
+  const q=trKucuk(ara.trim());
+  const liste=(videolar||[]).map(v=>{
+    const urunler=(v.video_urunleri||[]);
+    if(!q) return {...v, urunler};
+    if(trKucuk(v.baslik).includes(q)) return {...v, urunler};
+    return {...v, urunler:urunler.filter(u=>trKucuk(u.ad).includes(q)||trKucuk(u.magaza).includes(q))};
+  }).filter(v=>v.urunler.length);
+  const toplam=(videolar||[]).reduce((s,v)=>s+(v.video_urunleri||[]).length,0);
+
+  return (
+    <div className="py-8 lg:py-12 max-w-[720px]">
+      <Reveal>
+        <Label className="mb-3">BAĞLANTILAR</Label>
+        <h1 className="text-[clamp(1.9rem,6vw,2.8rem)] font-light leading-[1.05] tracking-[-.025em] text-ink">
+          Videolardaki <span className="em">ürünler</span>
+        </h1>
+        <p className="text-[.95rem] text-dim mt-3 leading-relaxed">
+          Videoda gördüğün ürünü burada bul. En yeni video en üstte.
+        </p>
+        <p className="text-[.74rem] text-dim/60 mt-2">
+          Bu sayfadaki bağlantılardan yapılan alışverişlerden pay alabiliriz.
+        </p>
+      </Reveal>
+
+      {toplam>6 ? (
+        <Reveal delay={60}>
+          <div className="mt-7 relative">
+            <input type="search" value={ara} onChange={e=>setAra(e.target.value)}
+                   placeholder="Ürün ya da video ara" aria-label="Ürün ya da video ara"
+                   className="w-full bg-transparent border border-line px-4 py-3 pl-11 text-ink text-[.95rem] placeholder:text-dim/50 focus:border-cy transition-colors"/>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"
+                 className="absolute left-4 top-1/2 -translate-y-1/2 text-dim/60">
+              <circle cx="7" cy="7" r="5.2" stroke="currentColor" strokeWidth="1.2"/>
+              <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.2"/>
+            </svg>
+          </div>
+        </Reveal>
+      ) : null}
+
+      <div className="mt-8">
+        {videolar===null ? (
+          <div className="space-y-3">
+            {[0,1,2].map(i=>(
+              <div key={i} className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-ink/[.05] rounded-[3px] animate-pulse"/>
+                <div className="flex-1"><div className="h-3 w-3/4 bg-ink/[.05]"/><div className="h-2 w-16 bg-ink/[.04] mt-2.5"/></div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {videolar!==null && !videolar.length ? (
+          <div className="border border-line py-14 px-6 text-center">
+            <div className="text-ink/85 text-[1.05rem] font-light">Henüz bağlantı eklenmedi.</div>
+            <p className="text-[.88rem] text-dim mt-2">Videolarda geçen ürünler burada olacak.</p>
+          </div>
+        ) : null}
+
+        {videolar!==null && videolar.length && !liste.length ? (
+          <p className="text-dim text-[.92rem] py-8">"{ara}" ile eşleşen bir ürün bulamadık.</p>
+        ) : null}
+
+        <div className="space-y-10">
+          {liste.map((v,i)=>(
+            <section key={v.id} aria-label={v.baslik}>
+              <div className="flex items-end justify-between gap-4 pb-3 border-b border-line">
+                <div className="min-w-0">
+                  <div className="lbl text-[.55rem] text-dim/70 mb-1.5">
+                    {i===0 && !q ? <span className="text-mg">EN YENİ · </span> : null}{kisaTarih(v.tarih).toLocaleUpperCase('tr')}
+                  </div>
+                  <h2 className="text-[1.08rem] sm:text-[1.15rem] leading-snug text-ink">{v.baslik}</h2>
+                </div>
+                {v.link ? (
+                  <a href={v.link} target="_blank" rel="noopener noreferrer"
+                     onClick={()=>olay('baglanti_video_tik',{video:v.baslik})}
+                     className="lbl text-[.58rem] text-cy shrink-0 pb-0.5 hover:underline underline-offset-4">VİDEOYU İZLE</a>
+                ) : null}
+              </div>
+              <div>{v.urunler.map(u=><BaglantiSatiri key={u.id} u={u}/>)}</div>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────── Panel: BAĞLANTILAR sekmesi ─────────── */
+const BOS_VIDEO = () => ({id:null, baslik:'', link:'', tarih:new Date().toISOString().slice(0,10), aktif:true, sira:0});
+const BOS_VURUN = vid => ({id:null, video_id:vid, ad:'', magaza:'', link:'', gorsel:'', sira:0});
+
+function PanelBaglantilar({oturum, yakala}){
+  const [liste,setListe]=useState(null);
+  const [video,setVideo]=useState(null);     // düzenlenen/eklenen video
+  const [urun,setUrun]=useState(null);       // düzenlenen/eklenen ürün
+  const [mesgul,setMesgul]=useState(false);
+
+  const yenile=async()=>{
+    try{ setListe(await sb('videolar?select=*,video_urunleri(*)&order=tarih.desc,sira.asc&video_urunleri.order=sira.asc',{token:oturum.token})); }
+    catch(e){ yakala(e); }
+  };
+  useEffect(()=>{ yenile(); },[]);
+  const bitir=async()=>{ _videoSozu=null; await yenile(); };
+
+  const videoKaydet=async e=>{
+    e.preventDefault(); setMesgul(true);
+    try{
+      const g={ baslik:video.baslik.trim(), link:String(video.link||'').trim()||null,
+                tarih:video.tarih, aktif:!!video.aktif, sira:Number(video.sira)||0 };
+      if(video.id) await sb('videolar?id=eq.'+video.id,{method:'PATCH',body:g,token:oturum.token});
+      else         await sb('videolar',{method:'POST',body:g,token:oturum.token});
+      setVideo(null); await bitir();
+    }catch(e){ yakala(e); } finally{ setMesgul(false); }
+  };
+  const videoSil=async v=>{
+    const n=(v.video_urunleri||[]).length;
+    if(!window.confirm('"'+v.baslik+'" silinsin mi?'+(n?' Altındaki '+n+' ürün de silinecek.':''))) return;
+    try{ await sb('videolar?id=eq.'+v.id,{method:'DELETE',prefer:'return=minimal',token:oturum.token}); await bitir(); }
+    catch(e){ yakala(e); }
+  };
+  const urunKaydet=async e=>{
+    e.preventDefault(); setMesgul(true);
+    try{
+      const g={ video_id:urun.video_id, ad:urun.ad.trim(), magaza:String(urun.magaza||'').trim()||null,
+                link:urun.link.trim(), gorsel:String(urun.gorsel||'').trim()||null, sira:Number(urun.sira)||0 };
+      if(urun.id) await sb('video_urunleri?id=eq.'+urun.id,{method:'PATCH',body:g,token:oturum.token});
+      else        await sb('video_urunleri',{method:'POST',body:g,token:oturum.token});
+      setUrun(null); await bitir();
+    }catch(e){ yakala(e); } finally{ setMesgul(false); }
+  };
+  const urunSil=async u=>{
+    if(!window.confirm('"'+u.ad+'" silinsin mi?')) return;
+    try{ await sb('video_urunleri?id=eq.'+u.id,{method:'DELETE',prefer:'return=minimal',token:oturum.token}); await bitir(); }
+    catch(e){ yakala(e); }
+  };
+
+  const videoFormu = (
+    <form onSubmit={videoKaydet} className="border border-cy/40 p-4 sm:p-5 grid gap-4 bg-bg2/40">
+      <div>
+        <label htmlFor="pv-baslik" className="lbl text-dim mb-2 block">VİDEO BAŞLIĞI</label>
+        <input id="pv-baslik" required value={video&&video.baslik||''} onChange={e=>setVideo(v=>({...v,baslik:e.target.value}))}
+               placeholder="Örn. Beyaz setup turu" className={PANEL_INPUT}/>
+        <p className="text-[.75rem] text-dim/70 mt-2">Sitede bu başlıkla görünür; ziyaretçi videoyu bundan tanıyacak.</p>
+      </div>
+      <div className="grid sm:grid-cols-[1fr_180px] gap-4">
+        <div>
+          <label htmlFor="pv-link" className="lbl text-dim mb-2 block">INSTAGRAM LİNKİ · OPSİYONEL</label>
+          <input id="pv-link" type="url" value={video&&video.link||''} onChange={e=>setVideo(v=>({...v,link:e.target.value}))}
+                 placeholder="https://www.instagram.com/reel/…" className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pv-tarih" className="lbl text-dim mb-2 block">TARİH</label>
+          <input id="pv-tarih" type="date" required value={video&&video.tarih||''} onChange={e=>setVideo(v=>({...v,tarih:e.target.value}))}
+                 className={PANEL_INPUT}/>
+        </div>
+      </div>
+      <label className="flex items-center gap-3 text-[.86rem] text-dim cursor-pointer">
+        <input type="checkbox" checked={!!(video&&video.aktif)} onChange={e=>setVideo(v=>({...v,aktif:e.target.checked}))}/>
+        Sitede göster
+      </label>
+      <div className="flex gap-2">
+        <button type="submit" disabled={mesgul} className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors disabled:opacity-40">
+          {mesgul?'KAYDEDİLİYOR…':'KAYDET'}</button>
+        <button type="button" onClick={()=>setVideo(null)} className="border border-line text-dim px-5 py-2.5 lbl hover:text-ink transition-colors">İPTAL</button>
+      </div>
+    </form>
+  );
+
+  const urunFormu = (
+    <form onSubmit={urunKaydet} className="border border-mg/40 p-4 sm:p-5 grid gap-4 bg-bg2/40 mt-3">
+      <div className="grid sm:grid-cols-[1fr_200px] gap-4">
+        <div>
+          <label htmlFor="pvu-ad" className="lbl text-dim mb-2 block">ÜRÜN ADI</label>
+          <input id="pvu-ad" required value={urun&&urun.ad||''} onChange={e=>setUrun(u=>({...u,ad:e.target.value}))} className={PANEL_INPUT}/>
+        </div>
+        <div>
+          <label htmlFor="pvu-magaza" className="lbl text-dim mb-2 block">MAĞAZA</label>
+          <input id="pvu-magaza" value={urun&&urun.magaza||''} onChange={e=>setUrun(u=>({...u,magaza:e.target.value}))}
+                 placeholder="Ulugames" className={PANEL_INPUT}/>
+        </div>
+      </div>
+      <div>
+        <label htmlFor="pvu-link" className="lbl text-dim mb-2 block">ÜRÜN LİNKİ</label>
+        <input id="pvu-link" required type="url" value={urun&&urun.link||''} onChange={e=>setUrun(u=>({...u,link:e.target.value}))}
+               placeholder="https://…" className={PANEL_INPUT}/>
+      </div>
+      <div>
+        <label htmlFor="pvu-gorsel" className="lbl text-dim mb-2 block">GÖRSEL ADRESİ · OPSİYONEL</label>
+        <div className="flex gap-3 items-start">
+          <input id="pvu-gorsel" type="url" value={urun&&urun.gorsel||''} onChange={e=>setUrun(u=>({...u,gorsel:e.target.value}))}
+                 placeholder="https://…" className={PANEL_INPUT}/>
+          <div className="w-14 h-14 shrink-0 bg-white rounded-[3px] grid place-items-center overflow-hidden">
+            {urun&&urun.gorsel ? <img src={urun.gorsel} alt="" className="w-full h-full object-contain p-1"/> : <span className="lbl text-[.5rem] text-bg/40">YOK</span>}
+          </div>
+        </div>
+        <p className="text-[.75rem] text-dim/70 mt-2">Mağaza sayfasındaki görsele sağ tıkla → "Resim adresini kopyala".</p>
+      </div>
+      <div className="flex gap-2">
+        <button type="submit" disabled={mesgul} className="border border-mg text-mg px-5 py-2.5 lbl hover:bg-mg hover:text-bg transition-colors disabled:opacity-40">
+          {mesgul?'KAYDEDİLİYOR…':'ÜRÜNÜ KAYDET'}</button>
+        <button type="button" onClick={()=>setUrun(null)} className="border border-line text-dim px-5 py-2.5 lbl hover:text-ink transition-colors">İPTAL</button>
+      </div>
+    </form>
+  );
+
+  return (
+    <div>
+      <p className="text-[.86rem] text-dim leading-relaxed max-w-[64ch]">
+        Önce videoyu ekle, sonra altına o videoda geçen ürünleri ekle. Sitede{' '}
+        <a href="/baglantilar" target="_blank" rel="noopener" className="text-cy hover:underline">/baglantilar</a>{' '}
+        sayfasında en yeni video en üstte görünür.
+      </p>
+      <div className="mt-5">
+        {!video || video.id ? (
+          <button onClick={()=>{setUrun(null);setVideo(BOS_VIDEO());}}
+                  className="border border-cy text-cy px-5 py-2.5 lbl hover:bg-cy hover:text-bg transition-colors">+ YENİ VİDEO</button>
+        ) : null}
+        {video && !video.id ? <div className="mt-4">{videoFormu}</div> : null}
+      </div>
+
+      <div className="mt-8 space-y-6">
+        {liste===null ? <p className="text-dim text-[.9rem]">Yükleniyor…</p> : null}
+        {liste!==null && !liste.length ? <p className="text-dim text-[.9rem]">Henüz video yok.</p> : null}
+        {(liste||[]).map(v=>(
+          <div key={v.id} className="border border-line">
+            <div className="flex items-start justify-between gap-4 p-4 bg-bg2/30">
+              <div className="min-w-0">
+                <div className={'text-[.95rem] '+(v.aktif?'text-ink':'text-dim line-through')}>{v.baslik}</div>
+                <div className="text-[.74rem] text-dim mt-1">
+                  {kisaTarih(v.tarih)} · {(v.video_urunleri||[]).length} ürün{v.aktif?'':' · gizli'}{v.link?' · linkli':''}
+                </div>
+              </div>
+              <div className="flex gap-2 shrink-0 flex-wrap justify-end">
+                <button onClick={()=>{setVideo(null);setUrun(BOS_VURUN(v.id));}}
+                  className="border border-mg/60 text-mg px-3 py-1.5 lbl text-[.6rem] hover:bg-mg hover:text-bg transition-colors">+ ÜRÜN</button>
+                <button onClick={()=>{setUrun(null);setVideo({...v});}}
+                  className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-cy hover:text-cy transition-colors">DÜZENLE</button>
+                <button onClick={()=>videoSil(v)}
+                  className="border border-line text-dim px-3 py-1.5 lbl text-[.6rem] hover:border-mg hover:text-mg transition-colors">SİL</button>
+              </div>
+            </div>
+            {video && video.id===v.id ? <div className="p-4 pt-0">{videoFormu}</div> : null}
+            <div className="px-4">
+              {(v.video_urunleri||[]).map(u=>(
+                <div key={u.id}>
+                  <div className="flex items-center gap-3 py-2.5 border-t border-line">
+                    <div className="w-10 h-10 shrink-0 bg-white rounded-[2px] grid place-items-center overflow-hidden">
+                      {u.gorsel ? <img src={u.gorsel} alt="" className="w-full h-full object-contain p-0.5"/> : null}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[.86rem] text-ink/90 truncate">{u.ad}</div>
+                      <div className="text-[.72rem] text-dim truncate">{u.magaza||'—'}</div>
+                    </div>
+                    <button onClick={()=>{setVideo(null);setUrun({...u});}}
+                      className="border border-line text-dim px-2.5 py-1 lbl text-[.55rem] hover:border-cy hover:text-cy transition-colors">DÜZENLE</button>
+                    <button onClick={()=>urunSil(u)}
+                      className="border border-line text-dim px-2.5 py-1 lbl text-[.55rem] hover:border-mg hover:text-mg transition-colors">SİL</button>
+                  </div>
+                  {urun && urun.id===u.id ? <div className="pb-4">{urunFormu}</div> : null}
+                </div>
+              ))}
+              {urun && !urun.id && urun.video_id===v.id ? <div className="pb-4">{urunFormu}</div> : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function BasitSayfa({etiket,baslik,children}){
   return (
     <div className="py-8 lg:py-12 max-w-[68ch]">
@@ -8275,6 +8604,7 @@ function GizlilikSayfa(){
 }
 
 const FOOTER_LINKLER=[
+  {href:'/baglantilar',  t:'Videolardaki Ürünler'},
   {href:'/yontem',       t:'Yöntem'},
   {href:'/hakkimizda',   t:'Hakkımızda'},
   {href:'/isbirlikleri', t:'İş Birlikleri'},
@@ -9282,7 +9612,7 @@ function PanelHatalar({oturum, yakala}){
 function PanelSayfa(){
   const [oturum,setOturum]=useState(panelOturumOku);
   const [hata,setHata]=useState('');
-  const [sekme,setSekme]=useState('aksesuar');
+  const [sekme,setSekme]=useState('baglanti');
 
   const cikis=useCallback(()=>{ panelOturumYaz(null); setOturum(null); },[]);
 
@@ -9350,7 +9680,7 @@ function PanelSayfa(){
     finally{ setYedekAliniyor(false); }
   };
 
-  const sekmeler=[['aksesuar','AKSESUARLAR'],['laptop','LAPTOPLAR'],['parca','PARÇALAR'],['hata','HATALAR']];
+  const sekmeler=[['baglanti','BAĞLANTILAR'],['aksesuar','AKSESUARLAR'],['laptop','LAPTOPLAR'],['parca','PARÇALAR'],['hata','HATALAR']];
 
   return (
     <div className="py-8 lg:py-12">
@@ -9390,6 +9720,7 @@ function PanelSayfa(){
       )}
 
       <div className="mt-8">
+        {sekme==='baglanti' && <PanelBaglantilar oturum={oturum} yakala={yakala}/>}
         {sekme==='aksesuar' && <PanelAksesuar oturum={oturum} yakala={yakala}/>}
         {sekme==='laptop'   && <PanelLaptop   oturum={oturum} yakala={yakala}/>}
         {sekme==='parca'    && <PanelParca    oturum={oturum} yakala={yakala}/>}
@@ -9531,6 +9862,13 @@ function App(){
       {route==='firsatlar' && (
         <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
           <FirsatlarSayfa/>
+          <Footer/>
+        </main>
+      )}
+
+      {route==='baglantilar' && (
+        <main id="main" className="max-w-[1100px] mx-auto px-5 sm:px-8 lg:px-12 pt-[128px] lg:pt-[132px]">
+          <BaglantilarSayfa/>
           <Footer/>
         </main>
       )}
