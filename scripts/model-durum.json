@@ -1,11 +1,11 @@
 {
   "gpu:7600": {
     "model": "XFX Speedster SWFT 210 Radeon RX 7600 Core Gaming 8GB (RX-76PSWFTFY)",
-    "fiyat": 19791,
-    "satici": 7,
+    "fiyat": 19884,
+    "satici": 6,
     "link": "https://www.epey.com/ekran-karti/xfx-speedster-swft-210-radeon-rx-7600-core-gaming-8gb.html",
-    "seri": 3,
-    "son": "2026-11-03"
+    "seri": 4,
+    "son": "2026-11-04"
   },
   "gpu:b580": {
     "model": "Intel Arc B580",
@@ -20,79 +20,79 @@
     "fiyat": 22949,
     "satici": 6,
     "link": "https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5050-windforce-oc-8g.html",
-    "seri": 1,
-    "son": "2026-11-03"
+    "seri": 2,
+    "son": "2026-11-04"
   },
   "gpu:5060": {
-    "model": "MSI GeForce RTX 5060 Inspire ITX OC (G5060-8IIC)",
-    "fiyat": 25247,
+    "model": "MSI GeForce RTX 5060 8G Inspire 2X OC (G5060-8I2C)",
+    "fiyat": 29965,
     "satici": 4,
-    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-inspire-itx-oc.html",
+    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-8g-inspire-2x-oc.html",
     "seri": 1,
-    "son": "2026-11-03"
+    "son": "2026-11-04"
   },
   "gpu:9060xt": {
-    "model": "Sapphire Pulse Radeon RX 9060 XT 16GB (11350-03-20G)",
-    "fiyat": 39129,
+    "model": "XFX Swift Radeon RX 9060 XT OC Triple 16GB (RX-96TS316B7)",
+    "fiyat": 35945,
     "satici": 3,
-    "link": "https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-9060-xt-16gb.html",
+    "link": "https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9060-xt-oc-16gb.html",
     "seri": 1,
-    "son": "2026-11-03"
+    "son": "2026-11-04"
   },
   "gpu:5060ti": {
     "model": "PNY GeForce RTX 5060 Ti 16GB OC (VCG5060T16DFXPB1-O)",
     "fiyat": 50999,
-    "satici": 3,
+    "satici": 4,
     "link": "https://www.epey.com/ekran-karti/pny-geforce-rtx-5060-ti-16gb-oc.html",
-    "seri": 3,
-    "son": "2026-11-03"
+    "seri": 4,
+    "son": "2026-11-04"
   },
   "gpu:9070": {
     "model": "Gigabyte Radeon RX 9070 Gaming OC (GV-R9070GAMING OC-16GD)",
-    "fiyat": 59987,
+    "fiyat": 52015,
     "satici": 5,
     "link": "https://www.epey.com/ekran-karti/gigabyte-radeon-rx-9070-gaming-oc.html",
-    "seri": 2,
-    "son": "2026-11-03"
+    "seri": 3,
+    "son": "2026-11-04"
   },
   "gpu:5070": {
-    "model": "MSI GeForce RTX 5070 Ventus 2X OC (G5070-12V2C)",
-    "fiyat": 61999,
-    "satici": 10,
-    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5070-ventus-2x-oc.html",
-    "seri": 2,
-    "son": "2026-11-03"
+    "model": "Asus Dual GeForce RTX 5070 OC (DUAL-RTX5070-O12G)",
+    "fiyat": 60999,
+    "satici": 11,
+    "link": "https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5070-oc.html",
+    "seri": 1,
+    "son": "2026-11-04"
   },
   "gpu:9070xt": {
     "model": "XFX Swift Radeon RX 9070 XT Triple Fan Gaming Edition (RX-97TSWF3B9)",
     "fiyat": 58319,
     "satici": 3,
     "link": "https://www.epey.com/ekran-karti/xfx-swift-radeon-rx-9070xt-triple-fan-gaming-edition.html",
-    "seri": 2,
-    "son": "2026-11-03"
+    "seri": 3,
+    "son": "2026-11-04"
   },
   "gpu:5070ti": {
-    "model": "Palit GeForce RTX 5070 Ti GamingPro (NE7507T019T2-GB2031A)",
-    "fiyat": 91739,
-    "satici": 3,
-    "link": "https://www.epey.com/ekran-karti/palit-geforce-rtx-5070-ti-gamingpro.html",
+    "model": "MSI GeForce RTX 5070 Ti Shadow 3X OC (G507T-16S3C)",
+    "fiyat": 93199,
+    "satici": 10,
+    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5070-ti-shadow-3x-oc.html",
     "seri": 1,
-    "son": "2026-11-03"
+    "son": "2026-11-04"
   },
   "gpu:5080": {
-    "model": "PNY GeForce RTX 5080 ARGB Epic-X OC Triple (VCG508016TFXXPB1-O)",
-    "fiyat": 112013,
+    "model": "Inno3D GeForce RTX 5080 X3 (N50803-16D7-176068N)",
+    "fiyat": 113995,
     "satici": 5,
-    "link": "https://www.epey.com/ekran-karti/pny-geforce-rtx-5080-argb-epic-x-oc-triple.html",
+    "link": "https://www.epey.com/ekran-karti/inno3d-geforce-rtx-5080-x3.html",
     "seri": 1,
-    "son": "2026-11-03"
+    "son": "2026-11-04"
   },
   "gpu:5090": {
-    "model": "Gigabyte GeForce RTX 5090 Gaming OC (GV-N5090GAMING OC-32GD)",
-    "fiyat": 424561,
-    "satici": 6,
-    "link": "https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5090-gaming-oc.html",
-    "seri": 2,
-    "son": "2026-11-03"
+    "model": "MSI GeForce RTX 5090 Ventus 3X OC (G5090-32V3C)",
+    "fiyat": 445279,
+    "satici": 5,
+    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5090-ventus-3x-oc.html",
+    "seri": 1,
+    "son": "2026-11-04"
   }
 }
