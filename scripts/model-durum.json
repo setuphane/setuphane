@@ -24,12 +24,12 @@
     "son": "2026-11-12"
   },
   "gpu:5060": {
-    "model": "Zotac Gaming GeForce RTX 5060 Twin Edge (ZT-B50600E-10M)",
+    "model": "MSI GeForce RTX 5060 Shadow 2X OC (G5060-8S2C)",
     "fiyat": 30785,
-    "satici": 7,
-    "link": "https://www.epey.com/ekran-karti/zotac-gaming-geforce-rtx-5060-twin-edge.html",
+    "satici": 9,
+    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-shadow-2x-oc.html",
     "seri": 1,
-    "son": "2026-11-12"
+    "son": "2026-11-16"
   },
   "gpu:9060xt": {
     "model": "PowerColor Reaper Radeon RX 9060 XT 16GB (RX9060XT 16G-A)",
@@ -80,19 +80,19 @@
     "son": "2026-11-12"
   },
   "gpu:5080": {
-    "model": "PNY GeForce RTX 5080 OC Triple (VCG508016TFXPB1-O)",
-    "fiyat": 120835,
-    "satici": 8,
-    "link": "https://www.epey.com/ekran-karti/pny-geforce-rtx-5080-oc-triple.html",
-    "seri": 2,
-    "son": "2026-11-06"
+    "model": "Inno3D GeForce RTX 5080 X3 (N50803-16D7-176068N)",
+    "fiyat": 119791,
+    "satici": 5,
+    "link": "https://www.epey.com/ekran-karti/inno3d-geforce-rtx-5080-x3.html",
+    "seri": 1,
+    "son": "2026-11-16"
   },
   "gpu:5090": {
     "model": "Gigabyte GeForce RTX 5090 Gaming OC (GV-N5090GAMING OC-32GD)",
     "fiyat": 439999,
     "satici": 4,
     "link": "https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5090-gaming-oc.html",
-    "seri": 2,
-    "son": "2026-11-06"
+    "seri": 3,
+    "son": "2026-11-16"
   }
 }
