@@ -7589,11 +7589,26 @@ function videolariGetir(){
 const trKucuk = s => String(s||'').toLocaleLowerCase('tr');
 const kisaTarih = t => { try{ return new Date(t+'T12:00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long'}); }catch(e){ return t; } };
 
+/* Tıklama sayacı (panelde görünür): yalnızca ürünün o günkü sayısı bir artar;
+   kim tıkladığı, IP ya da cihaz kimliği tutulmaz. Aynı tarayıcı aynı ürünü
+   günde bir kez sayılır, yani sayı "kaç kişi mağazaya gitti"ye yakın. */
+const istanbulGunu = () => new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'});
+function baglantiTik(id){
+  const gun=istanbulGunu();
+  let k=null;
+  try{ k=JSON.parse(localStorage.getItem('sh_tik')||'null'); }catch(e){}
+  if(!k || k.gun!==gun || !Array.isArray(k.id)) k={gun, id:[]};
+  if(k.id.includes(id)) return;
+  k.id.push(id);
+  try{ localStorage.setItem('sh_tik',JSON.stringify(k)); }catch(e){}
+  sb('rpc/baglanti_tik',{method:'POST',body:{p_urun:id},prefer:'return=minimal'}).catch(()=>{});
+}
+
 function BaglantiSatiri({u}){
   const [hata,setHata]=useState(false);
   return (
     <a href={u.link} target="_blank" rel="sponsored noopener noreferrer"
-       onClick={()=>olay('baglanti_tik',{urun:u.ad})}
+       onClick={()=>{ olay('baglanti_tik',{urun:u.ad}); baglantiTik(u.id); }}
        className="group flex items-center gap-4 py-3.5 border-t border-line first:border-t-0">
       <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-white rounded-[3px] overflow-hidden grid place-items-center">
         {u.gorsel && !hata
@@ -7725,11 +7740,25 @@ function PanelBaglantilar({oturum, yakala}){
   const [video,setVideo]=useState(null);     // düzenlenen/eklenen video
   const [urun,setUrun]=useState(null);       // düzenlenen/eklenen ürün
   const [mesgul,setMesgul]=useState(false);
+  const [tik,setTik]=useState({});           // urun_id -> {toplam, hafta}
 
   const yenile=async()=>{
     try{ setListe(await sb('videolar?select=*,video_urunleri(*)&order=sira.asc,tarih.desc,olusturma.desc&video_urunleri.order=sira.asc,olusturma.asc',{token:oturum.token})); }
     catch(e){ yakala(e); }
+    /* Sayaç ayrı: okunamazsa liste yine de çalışsın. */
+    try{
+      const satirlar=await sb('baglanti_tiklari?select=urun_id,gun,sayi',{token:oturum.token})||[];
+      const sinir=new Date(Date.now()-6*864e5).toLocaleDateString('sv-SE',{timeZone:'Europe/Istanbul'});
+      const m={};
+      satirlar.forEach(r=>{
+        const x=m[r.urun_id]||(m[r.urun_id]={toplam:0,hafta:0});
+        x.toplam+=r.sayi; if(r.gun>=sinir) x.hafta+=r.sayi;
+      });
+      setTik(m);
+    }catch(e){}
   };
+  const tikTopla=(urunler,alan)=>(urunler||[]).reduce((s,u)=>s+((tik[u.id]||{})[alan]||0),0);
+  const tumUrunler=(liste||[]).flatMap(v=>v.video_urunleri||[]);
   useEffect(()=>{ yenile(); },[]);
   const bitir=async()=>{ _videoSozu=null; await yenile(); };
 
@@ -7863,6 +7892,20 @@ function PanelBaglantilar({oturum, yakala}){
         sayfasında her şey buradaki sırayla görünür: yeni video en üste, yeni ürün videonun en altına gelir.
         Yerini ↑ ↓ oklarıyla değiştirebilirsin.
       </p>
+      {tumUrunler.length ? (
+        <div className="mt-5 flex flex-wrap gap-x-8 gap-y-2 border border-line px-4 py-3">
+          <div><span className="lbl text-[.55rem] text-dim">SON 7 GÜN</span>
+            <span className="ml-2 text-ink text-[1.05rem] tabular-nums">{tikTopla(tumUrunler,'hafta')}</span>
+            <span className="text-dim text-[.8rem]"> tıklama</span></div>
+          <div><span className="lbl text-[.55rem] text-dim">TOPLAM</span>
+            <span className="ml-2 text-ink text-[1.05rem] tabular-nums">{tikTopla(tumUrunler,'toplam')}</span>
+            <span className="text-dim text-[.8rem]"> tıklama</span></div>
+          <p className="basis-full text-[.72rem] text-dim/70">
+            Ürüne tıklayıp mağazaya giden kişi sayısı. Aynı kişi aynı ürüne gün içinde kaç kez tıklasa da bir sayılır.
+            Sayaç 17 Kasım'da başladı.
+          </p>
+        </div>
+      ) : null}
       <div className="mt-5">
         {!video || video.id ? (
           <button onClick={()=>{setUrun(null);setVideo(BOS_VIDEO(liste&&liste.length?Math.min(...liste.map(x=>x.sira||0))-10:10));}}
@@ -7884,7 +7927,7 @@ function PanelBaglantilar({oturum, yakala}){
               <div className="min-w-0 flex-1">
                 <div className={'text-[.95rem] '+(v.aktif?'text-ink':'text-dim line-through')}>{v.baslik}</div>
                 <div className="text-[.74rem] text-dim mt-1">
-                  {kisaTarih(v.tarih)} · {(v.video_urunleri||[]).length} ürün{v.aktif?'':' · gizli'}{v.link?' · linkli':''}
+                  {kisaTarih(v.tarih)} · {(v.video_urunleri||[]).length} ürün · {tikTopla(v.video_urunleri,'toplam')} tıklama{v.aktif?'':' · gizli'}{v.link?' · linkli':''}
                 </div>
               </div>
               <div className="flex gap-2 shrink-0 flex-wrap justify-end">
@@ -7911,6 +7954,10 @@ function PanelBaglantilar({oturum, yakala}){
                     <div className="flex-1 min-w-0">
                       <div className="text-[.86rem] text-ink/90 truncate">{u.ad}</div>
                       <div className="text-[.72rem] text-dim truncate">{u.magaza||'—'}</div>
+                    </div>
+                    <div className="text-right shrink-0 w-14" title="Toplam tıklama · son 7 gün">
+                      <div className="text-[.9rem] text-ink tabular-nums leading-none">{(tik[u.id]||{}).toplam||0}</div>
+                      <div className="text-[.62rem] text-dim mt-1 tabular-nums">7g: {(tik[u.id]||{}).hafta||0}</div>
                     </div>
                     <button onClick={()=>{setVideo(null);setUrun({...u});}}
                       className="border border-line text-dim px-2.5 py-1 lbl text-[.55rem] hover:border-cy hover:text-cy transition-colors">DÜZENLE</button>
@@ -8621,6 +8668,12 @@ function GizlilikSayfa(){
         metni, seçtiğin kullanıcı adı ve rastgele üretilmiş bir cihaz kimliği veritabanımıza
         kaydedilir ve herkes görebilir. Cihaz kimliği seni tanımlamaz, yalnızca aynı yazıyı iki kez
         beğenmeyi engellemek için var. E-posta, telefon veya gerçek isim istemiyoruz.
+      </p>
+      <p>
+        <span className="text-ink">Bağlantı sayacı:</span> Videolardaki Ürünler sayfasında bir ürüne
+        tıkladığında yalnızca o ürünün o günkü tıklama sayısı bir artar. Kimin tıkladığı, IP adresi ya da
+        cihaz kimliği kaydedilmez. Aynı ürünün iki kez sayılmaması için tarayıcın o gün tıkladığın ürünleri
+        kendi <code className="text-cy">localStorage</code>'ında tutar; bu liste sunucuya gönderilmez.
       </p>
       <p>
         <span className="text-ink">Hata kayıtları:</span> Sitede bir hata oluşursa hatanın metni, hangi

@@ -56,3 +56,25 @@ create policy sil_vu    on public.video_urunleri for delete to authenticated
   using ((auth.jwt() ->> 'email') = 'setuphane@gmail.com');
 
 notify pgrst, 'reload schema';
+
+-- ─── Tıklama sayacı — 17.11.2026, migration: baglanti_tiklari ───
+-- Ürün başına günlük sayı; kim tıkladığı tutulmaz. Ziyaretçi tabloya
+-- doğrudan yazamaz/okuyamaz (anon okuma boş, anon POST 401 — denendi),
+-- yalnızca baglanti_tik() fonksiyonuyla sayıyı bir artırabilir.
+create table if not exists public.baglanti_tiklari (
+  urun_id uuid not null references public.video_urunleri(id) on delete cascade,
+  gun     date not null default current_date,
+  sayi    int  not null default 0,
+  primary key (urun_id, gun)
+);
+alter table public.baglanti_tiklari enable row level security;
+create policy oku_bt on public.baglanti_tiklari for select to authenticated
+  using ((auth.jwt() ->> 'email') = 'setuphane@gmail.com');
+create or replace function public.baglanti_tik(p_urun uuid)
+returns void language sql security definer set search_path = public as $$
+  insert into public.baglanti_tiklari (urun_id, gun, sayi)
+  values (p_urun, (now() at time zone 'Europe/Istanbul')::date, 1)
+  on conflict (urun_id, gun) do update set sayi = public.baglanti_tiklari.sayi + 1;
+$$;
+revoke all on function public.baglanti_tik(uuid) from public;
+grant execute on function public.baglanti_tik(uuid) to anon, authenticated;
