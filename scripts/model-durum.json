@@ -40,12 +40,12 @@
     "son": "2026-11-18"
   },
   "gpu:5060ti": {
-    "model": "Asus Dual GeForce RTX 5060 Ti OC 16GB (DUAL-RTX5060TI-O16G)",
-    "fiyat": 54329,
-    "satici": 12,
-    "link": "https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-ti-oc-16gb.html",
+    "model": "Palit GeForce RTX 5060 Ti Infinity 3 16GB (NE7506T019T1-GB2061S)",
+    "fiyat": 54879,
+    "satici": 3,
+    "link": "https://www.epey.com/ekran-karti/palit-geforce-rtx-5060-ti-infinity-3-16gb.html",
     "seri": 1,
-    "son": "2026-11-12"
+    "son": "2026-11-19"
   },
   "gpu:9070": {
     "model": "Gigabyte Radeon RX 9070 Gaming OC (GV-R9070GAMING OC-16GD)",
@@ -56,43 +56,43 @@
     "son": "2026-11-06"
   },
   "gpu:5070": {
-    "model": "Gainward GeForce RTX 5070 Python III (NE75070019K9-GB2050T)",
-    "fiyat": 59999,
-    "satici": 7,
-    "link": "https://www.epey.com/ekran-karti/gainward-geforce-rtx-5070-python-iii.html",
+    "model": "Inno3D GeForce RTX 5070 Twin X2 (N50702-12D7-195064N)",
+    "fiyat": 59777,
+    "satici": 6,
+    "link": "https://www.epey.com/ekran-karti/inno3d-geforce-rtx-5070-twin-x2.html",
     "seri": 1,
-    "son": "2026-11-18"
+    "son": "2026-11-19"
   },
   "gpu:9070xt": {
-    "model": "Sapphire Pulse Radeon RX 9070 XT (11348-03-20G)",
-    "fiyat": 59999,
-    "satici": 8,
-    "link": "https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-9070-xt.html",
+    "model": "PowerColor Reaper Radeon RX 9070 XT (RX9070XT 16G-A)",
+    "fiyat": 62987,
+    "satici": 5,
+    "link": "https://www.epey.com/ekran-karti/powercolor-reaper-radeon-rx-9070-xt.html",
     "seri": 1,
-    "son": "2026-11-18"
+    "son": "2026-11-19"
   },
   "gpu:5070ti": {
     "model": "Palit GeForce RTX 5070 Ti GamingPro (NE7507T019T2-GB2031A)",
     "fiyat": 90989,
-    "satici": 6,
+    "satici": 5,
     "link": "https://www.epey.com/ekran-karti/palit-geforce-rtx-5070-ti-gamingpro.html",
-    "seri": 1,
-    "son": "2026-11-18"
+    "seri": 2,
+    "son": "2026-11-19"
   },
   "gpu:5080": {
     "model": "Gainward GeForce RTX 5080 Python III (NE75080019T2-GB2035T)",
     "fiyat": 119600,
     "satici": 3,
     "link": "https://www.epey.com/ekran-karti/gainward-geforce-rtx-5080-python-iii.html",
-    "seri": 1,
-    "son": "2026-11-18"
+    "seri": 2,
+    "son": "2026-11-19"
   },
   "gpu:5090": {
     "model": "Gigabyte GeForce RTX 5090 Gaming OC (GV-N5090GAMING OC-32GD)",
     "fiyat": 439999,
     "satici": 4,
     "link": "https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5090-gaming-oc.html",
-    "seri": 4,
-    "son": "2026-11-18"
+    "seri": 5,
+    "son": "2026-11-19"
   }
 }
