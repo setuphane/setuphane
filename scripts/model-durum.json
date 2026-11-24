@@ -1,11 +1,11 @@
 {
   "gpu:7600": {
-    "model": "Sapphire Pulse Radeon RX 7600 8GB (11324-01-20G)",
-    "fiyat": 20999,
-    "satici": 3,
-    "link": "https://www.epey.com/ekran-karti/sapphire-pulse-radeon-rx-7600-8gb.html",
+    "model": "XFX Speedster SWFT 210 Radeon RX 7600 Core Gaming 8GB (RX-76PSWFTFY)",
+    "fiyat": 23919,
+    "satici": 4,
+    "link": "https://www.epey.com/ekran-karti/xfx-speedster-swft-210-radeon-rx-7600-core-gaming-8gb.html",
     "seri": 1,
-    "son": "2026-11-18"
+    "son": "2026-11-24"
   },
   "gpu:b580": {
     "model": "Intel Arc B580",
@@ -24,12 +24,12 @@
     "son": "2026-11-18"
   },
   "gpu:5060": {
-    "model": "Asus Dual GeForce RTX 5060 OC (DUAL-RTX5060-O8G)",
-    "fiyat": 30264,
-    "satici": 13,
-    "link": "https://www.epey.com/ekran-karti/asus-dual-geforce-rtx-5060-oc-dual-rtx5060-o8g.html",
+    "model": "MSI GeForce RTX 5060 Shadow 2X OC (G5060-8S2C)",
+    "fiyat": 30785,
+    "satici": 10,
+    "link": "https://www.epey.com/ekran-karti/msi-geforce-rtx-5060-shadow-2x-oc.html",
     "seri": 1,
-    "son": "2026-11-18"
+    "son": "2026-11-24"
   },
   "gpu:9060xt": {
     "model": "Sapphire Pulse Radeon RX 9060 XT 16GB (11350-03-20G)",
@@ -41,11 +41,11 @@
   },
   "gpu:5060ti": {
     "model": "Palit GeForce RTX 5060 Ti Infinity 3 16GB (NE7506T019T1-GB2061S)",
-    "fiyat": 54879,
-    "satici": 3,
+    "fiyat": 55474,
+    "satici": 8,
     "link": "https://www.epey.com/ekran-karti/palit-geforce-rtx-5060-ti-infinity-3-16gb.html",
-    "seri": 1,
-    "son": "2026-11-19"
+    "seri": 2,
+    "son": "2026-11-24"
   },
   "gpu:9070": {
     "model": "Gigabyte Radeon RX 9070 Gaming OC (GV-R9070GAMING OC-16GD)",
@@ -60,16 +60,16 @@
     "fiyat": 59777,
     "satici": 6,
     "link": "https://www.epey.com/ekran-karti/inno3d-geforce-rtx-5070-twin-x2.html",
-    "seri": 1,
-    "son": "2026-11-19"
+    "seri": 2,
+    "son": "2026-11-24"
   },
   "gpu:9070xt": {
     "model": "PowerColor Reaper Radeon RX 9070 XT (RX9070XT 16G-A)",
-    "fiyat": 62987,
+    "fiyat": 61999,
     "satici": 5,
     "link": "https://www.epey.com/ekran-karti/powercolor-reaper-radeon-rx-9070-xt.html",
-    "seri": 1,
-    "son": "2026-11-19"
+    "seri": 2,
+    "son": "2026-11-24"
   },
   "gpu:5070ti": {
     "model": "Palit GeForce RTX 5070 Ti GamingPro (NE7507T019T2-GB2031A)",
@@ -82,17 +82,17 @@
   "gpu:5080": {
     "model": "Gainward GeForce RTX 5080 Python III (NE75080019T2-GB2035T)",
     "fiyat": 119600,
-    "satici": 3,
+    "satici": 4,
     "link": "https://www.epey.com/ekran-karti/gainward-geforce-rtx-5080-python-iii.html",
-    "seri": 2,
-    "son": "2026-11-19"
+    "seri": 3,
+    "son": "2026-11-24"
   },
   "gpu:5090": {
-    "model": "Gigabyte GeForce RTX 5090 Gaming OC (GV-N5090GAMING OC-32GD)",
-    "fiyat": 439999,
+    "model": "Gigabyte Aorus GeForce RTX 5090 Stealth Ice (GV-N5090AORUSST-ICE-32GD)",
+    "fiyat": 426000,
     "satici": 4,
-    "link": "https://www.epey.com/ekran-karti/gigabyte-geforce-rtx-5090-gaming-oc.html",
-    "seri": 5,
-    "son": "2026-11-19"
+    "link": "https://www.epey.com/ekran-karti/gigabyte-aorus-geforce-rtx-5090-stealth-ice.html",
+    "seri": 1,
+    "son": "2026-11-24"
   }
 }
