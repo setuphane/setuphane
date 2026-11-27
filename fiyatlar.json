@@ -36,9 +36,9 @@
    "tarih": "2026-11-18T07:01:18.022Z"
   },
   "cpu:8500g": {
-   "fiyat": 8648,
+   "fiyat": 8276,
    "ad": "Ryzen 5 8500G",
-   "tarih": "2026-11-24T06:56:12.767Z"
+   "tarih": "2026-11-27T07:01:14.458Z"
   },
   "cpu:7500f": {
    "fiyat": 6759,
@@ -81,9 +81,9 @@
    "tarih": "2026-11-24T06:56:12.767Z"
   },
   "cpu:9800x3d": {
-   "fiyat": 22670,
+   "fiyat": 22299,
    "ad": "Ryzen 7 9800X3D",
-   "tarih": "2026-11-19T07:01:19.822Z"
+   "tarih": "2026-11-27T07:01:14.458Z"
   },
   "ram:16": {
    "fiyat": 14625,
@@ -136,9 +136,9 @@
    "tarih": "2026-11-19T07:01:19.822Z"
   },
   "sogutucu:air": {
-   "fiyat": 1159,
+   "fiyat": 1129,
    "ad": "Kule tipi hava soğutucu (Thermalright Assassin X 120 Refined SE ARGB)",
-   "tarih": "2026-11-20T07:01:13.090Z"
+   "tarih": "2026-11-27T07:01:14.458Z"
   },
   "sogutucu:aio360p": {
    "fiyat": 4774,
@@ -236,9 +236,9 @@
    "tarih": "2026-11-19T07:01:19.822Z"
   },
   "cpu:270k": {
-   "fiyat": 20489,
+   "fiyat": 17900,
    "ad": "Core Ultra 7 270K Plus",
-   "tarih": "2026-11-26T07:01:12.520Z"
+   "tarih": "2026-11-27T07:01:14.458Z"
   },
   "anakart:AM5-3": {
    "fiyat": 23403,
@@ -266,9 +266,9 @@
    "tarih": "2026-11-06T07:01:22.437Z"
   },
   "cpu:285k": {
-   "fiyat": 33205,
+   "fiyat": 29999,
    "ad": "Core Ultra 9 285K",
-   "tarih": "2026-11-19T07:01:19.822Z"
+   "tarih": "2026-11-27T07:01:14.458Z"
   },
   "gpu:b580": {
    "fiyat": 19993,
@@ -281,9 +281,9 @@
    "tarih": "2026-11-24T06:56:12.767Z"
   },
   "kasa:1": {
-   "fiyat": 2819,
+   "fiyat": 2793,
    "ad": "Mesh ön panelli kasa (NZXT H3 Flow)",
-   "tarih": "2026-11-24T06:56:12.767Z"
+   "tarih": "2026-11-27T07:01:14.458Z"
   },
   "sogutucu:aio360": {
    "fiyat": 3898,
@@ -291,5 +291,5 @@
    "tarih": "2026-11-06T07:01:22.437Z"
   }
  },
- "guncelleme": "2026-11-26T07:01:12.520Z"
+ "guncelleme": "2026-11-27T07:01:14.458Z"
 }
